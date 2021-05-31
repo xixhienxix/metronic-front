@@ -1,0 +1,466 @@
+<div class="modal-content">
+<ng-container *ngIf="huesped.id == undefined">
+  <div style="background-color: #FB4848;" class="modal-header">
+    <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center"
+      id="example-modal-sizes-title-lg">
+      NUEVA RESERVACION - FOLIO
+      <label>
+        {{huesped.folio}}</label>
+    </div>
+  </div>
+</ng-container>
+
+
+</div>
+
+   <form (submit)="save()" [formGroup]="formGroup" class="form form-label-right" style="background-color: rgb(224, 224, 224);">
+    <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
+
+      <div class="form-group row" style="border:1px solid rgb(128, 128, 128);">
+
+              <div class="form-group hidden">
+                <div class="input-group">
+                  <input hidden name="datepicker"
+                         class="form-control"
+                         ngbDatepicker
+                         #datepicker="ngbDatepicker"
+                         [autoClose]="'outside'"
+                         (dateSelect)="onDateSelection($event)"
+                         [displayMonths]="2"
+                         [dayTemplate]="t"
+                         outsideDays="hidden"
+                         [startDate]="fromDate!"
+                         tabindex="-1">
+                  <ng-template #t let-date let-focused="focused">
+                    <span class="custom-day"
+                          [class.focused]="focused"
+                          [class.range]="isRange(date)"
+                          [class.faded]="isHovered(date) || isInside(date)"
+                          (mouseenter)="hoveredDate = date"
+                          (mouseleave)="hoveredDate = null">
+                      {{ date.day }}
+                    </span>
+                  </ng-template>
+                </div>
+              </div>
+               <div class="form-group col-lg-6">
+                <label class="form-label">Llegada</label>
+                <div class="input-group">
+                  <input #dpFromDate
+                         class="form-control" placeholder="yyyy-mm-dd"
+                         name="dpFromDate"
+                         [value]="formatter.format(fromDate)"
+                         (input)="fromDate = validateInput(fromDate, dpFromDate.value)">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
+                      <i class="fa fa-calendar icon"></i>
+                    </button>
+                  </div>
+                </div>
+               </div>
+             <div class="form-group col-lg-6">
+                <label class="form-label">Salida</label>
+                <div class="input-group">
+                  <input #dpToDate
+                         class="form-control" placeholder="yyyy-mm-dd"
+                         name="dpToDate"
+                         [value]="formatter.format(toDate)"
+                         (input)="toDate = validateInput(toDate, dpToDate.value)">
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
+                      <i class="fa fa-calendar icon"></i>
+                    </button>
+                  </div>
+                </div>
+             </div>
+
+              <div class="form-group col-lg-6">
+
+                <label class="form-label">Adultos</label>
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary" (click)="minus()" type="button" ng-click="countVal=countVal+1">
+                      <i class="fa fa-minus">
+                      </i>
+                    </button>
+                  </div>
+                  <input
+                    class="input-group form-control form-control-lg form-control-solid text-center"
+                    placeholder=""
+                    name="adultos"
+                    [value]="quantity"
+                    value="{{huesped.adultos}}"
+                    formControlName="adultos"
+                    >
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary" (click)="plus()" type="button">
+                      <i class="fa fa-plus">
+                      </i>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="form-group col-lg-6">
+
+                <label class="form-label">Niños</label>
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary" (click)="minusNin()" type="button">
+                      <i class="fa fa-minus">
+                      </i>
+                    </button>
+                  </div>
+                  <input
+                  class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
+                    name="ninos"
+                    [value]="quantityNin"
+                    value={{huesped.ninos}}
+                    formControlName="ninos"
+                    >
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary" (click)="plusNin()" type="button">
+                      <i class="fa fa-plus">
+                      </i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="col-lg-12">
+                <label class="input-label">Habitación
+                    <select
+                        class="form-control form-control-lg form-control-solid"
+                        name="habitacion"
+                        formControlName="habitacion"
+                        (change)="habValue($event)"
+                      >
+                      <option selected value="0">Selecciona Tipo de Cuarto</option>
+                      <ng-container *ngFor="let tipoCuarto of codigoCuarto">
+                        <option> {{tipoCuarto}} </option>
+                      </ng-container>
+                      <!-- <option value="1">Chardonnay</option>
+                      <option value="2">Cabernet</option>
+                      <option value="3">Shiraz</option>
+                      <option value="4">Malbec</option>
+                      <option value="5">La Vid</option>
+                      <option value="6">Merlot</option>
+                      <option value="7">inot Noir</option> -->
+                    </select>
+                </label>
+              </div>
+
+              <!-- <div class="form-group col-lg-6">
+                <label class="form-label">Tarifa</label>
+                <div class="input-group">
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary" (click)="minusNin()">
+                      <i class="fa fa-money-bill-wave">
+                      </i>
+                    </button>
+                  </div>
+                  <input
+                  class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
+                    name="tarifa"
+                    type="number"
+                    [value]="huesped.tarifa"
+                    value={{huesped.tarifa}}
+                    formControlName="tarifa"
+                    >
+                </div>
+              </div> -->
+
+              <div class="col-lg-12">
+                  <div class="input-group-append">
+                    <button
+                        class="btn btn-success text-center"
+                        (click)="buscaDispo();"
+                        type="button"
+                        > Buscar Disponibilidad
+                    </button>
+                  </div>
+              </div>
+      </div>
+    </div>
+
+
+
+     <ng-container *ngIf="cuartos.length !==0 ">
+      <mat-accordion class="example-headers-align" multi>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header style="background-color:#99d284;">
+            <mat-panel-title>
+              CON DISPONIBILIDAD
+            </mat-panel-title>
+            <mat-panel-description>
+             <!--Type your name and age-->
+             {{cuarto}}
+             <!-- <mat-icon>account_circle</mat-icon> -->
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <!--Contenido del Accordion-->
+<ng-container *ngFor="let habitacionesDisponibles of cuartos ">
+  <div class="table-responsive angular-bootstrap-table">
+    <table class="table table-head-custom table-vertical-center overflow-hidden">
+      <thead>
+
+        <th>
+          # de Cuarto
+        </th>
+        <th>
+          Descripcion
+
+        </th>
+        <th>
+          Capacidad
+        </th>
+        <th>
+          Tarifa
+        </th>
+      </thead>
+      <tbody>
+        <tr>
+
+          <td><mat-checkbox (checked)="preAsignar(habitacionesDisponibles.Numero)"></mat-checkbox> &nbsp; {{ habitacionesDisponibles.Numero }}</td>
+          <td>{{ habitacionesDisponibles.Descripcion}}</td>
+          <td>{{ habitacionesDisponibles.Personas }} Adultos</td>
+          <td>{{ habitacionesDisponibles.Tarifa }}.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>
+
+        </mat-expansion-panel>
+      </mat-accordion>
+     </ng-container>
+     <ng-container *ngIf="cuartos.length ===0 ">
+      <mat-accordion class="example-headers-align" multi>
+        <mat-expansion-panel>
+            <mat-expansion-panel-header style="background-color:#fa6d7c;">
+            <mat-panel-title>
+              SIN DISPONIBILIDAD
+            </mat-panel-title>
+            <mat-panel-description>
+             <!--Type your name and age-->
+             Consulte Otro Tipo de Habitacion
+              <!-- <mat-icon>account_circle</mat-icon> -->
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <!--Contenido del Accordion-->
+
+
+        </mat-expansion-panel>
+      </mat-accordion>
+     </ng-container>
+
+    <!-- <ng-container *ngIf="cuartos.length !==0 ">
+      <div style="background-color:#99d284;" class="modal-header">
+        <div style="text-align: center; color: white;" class=" h4 col-12 text-center"
+          id="example-modal-sizes-title-lg">
+          CON DISPONIBILIDAD
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="cuartos.length ===0 ">
+      <div style="background-color:#fa6d7c;" class="modal-header">
+        <div style="text-align: center; color: white;" class="h4 col-12 text-center"
+          id="example-modal-sizes-title-lg">
+          SIN DISPONIBILIDAD
+        </div>
+      </div>
+    </ng-container> -->
+
+
+    <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
+      <div class="form-group row">
+
+        <div class="form-group col-lg-12">
+          <label class="input-label">Buscar Húsped
+            <div class="input-group">
+              <select
+                class="form-control form-control-lg form-control-solid"
+                name="buscahuesped"
+                (change)="onSelectHuesped($event.target.value)"
+                #buscarHuesped>
+                <option disabled selected value> -- Buscar por Nombre -- </option>
+                <ng-container *ngFor="let huesped of customerService.items$ | async">
+                  <option value="{{huesped.nombre}}">{{huesped.nombre}}
+                  </option>
+                </ng-container>
+              </select>
+            </div>
+          </label>
+          <button class="btn btn-primary" type="button" disabled>
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+
+        <div class="col-lg-12">
+          <label class="form-label">Escribe tu Nombre</label>
+          <input
+            type="text"
+            class="form-control form-control-lg form-control-solid"
+            name="nombre"
+            placeholder="Nombre completo"
+            autocomplete="off"
+            [class.is-invalid]="isControlInvalid('nombre')"
+            [class.is-valid]="isControlValid('nombre')"
+            formControlName="nombre"
+            value="{{huesped.nombre}}"
+          />
+          <div class="valid-feedback" *ngIf="isControlValid('nombre')">
+            Nombre Escrito Correctamente
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('required', 'nombre')"
+          >
+            Campo Requerido*
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('minlength', 'nombre')"
+          >
+            Minimo 3 letras
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('maxlength', 'nombre')"
+          >
+            Maximo 100 letras
+          </div>
+        </div>
+        </div>
+        <div class="form-group row">
+
+        <div class="col-lg-6">
+          <label class="form-label">Escribe tu Email</label>
+          <input
+            type="email"
+            class="form-control form-control-lg form-control-solid"
+            name="email"
+            placeholder="Escribe tu Email"
+            autocomplete="off"
+            [class.is-invalid]="isControlInvalid('email')"
+            [class.is-valid]="isControlValid('email')"
+            formControlName="email"
+            (input)="emailValidator($event.target.value)"
+            value="{{huesped.email}}"
+          />
+          <div class="valid-feedback" *ngIf="isControlValid('email')">
+            Email Escrito Correctamente
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('minlength', 'email')"
+          >
+            Minimo 3 letras
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('maxlength', 'email')"
+          >
+            Maximo 100 letras
+          </div>
+          <div
+          class="invalid-feedback"
+          *ngIf="controlHasError('pattern', 'email')"
+        >
+          Escriba un correo valido
+        </div>
+        </div>
+
+        <div class="col-lg-6">
+          <label class="form-label">Escribe tu Teléfono</label>
+          <input
+            type="tel"
+            class="form-control form-control-lg form-control-solid"
+            name="telefono"
+            placeholder="Teléfono"
+            autocomplete="off"
+            [class.is-invalid]="isControlInvalid('telefono')"
+            [class.is-valid]="isControlValid('telefono')"
+            formControlName="telefono"
+            value="{{huesped.telefono}}"
+          />
+          <small>Formato: 000-0000-0000</small>
+          <!-- <div class="invalid-feedback" *ngIf="isControlValid('telefono')">
+            Teléfono Invalido
+          </div> -->
+          <div class="valid-feedback" *ngIf="isControlValid('telefono')">
+            Teléfono Escrito Correctamente
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('minlength', 'telefono')"
+          >
+            Minimo 12 numeros
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="controlHasError('maxlength', 'telefono')"
+          >
+            Maximo 14 numeros
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <div style="background-color:rgba(17, 37, 146, 0.795);" class="modal-header">
+      <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center "
+        id="example-modal-sizes-title-lg">
+        Tipo de Reserva
+        <div class="form-group row">
+          <div class="form-group col-lg-6 ">
+                <button
+                class="btn btn-success btn-block"
+                type="submit"
+                name="estatus"
+                (click)="setEstatus(1)"
+                >
+                  Realiza Walk-In
+                </button>
+          </div>
+          <div class="form-group col-lg-6 ">
+                <button
+                class="btn btn-warning btn-block"
+                type="submit"
+                name="estatus"
+                (click)="setEstatus(3)"
+                >
+                  Agrega Reserva
+                </button>
+          </div>
+          <div class="form-group col-lg-6 ">
+                <button
+                class="btn btn-secondary btn-block"
+                type="submit"
+                (click)="setEstatus(6)"
+                >
+                  Bloqueo / Sin Llegada
+                </button>
+          </div>
+          <div class="form-group col-lg-6">
+                <button
+                  class="btn btn-primary btn-block"
+                  type="submit"
+                  value="7"
+                  (click)="setEstatus(7)"
+                  >
+                  Reserva Temporal
+                </button>
+          </div>
+        </div>
+      </div>
+    </div>
+</form>
+

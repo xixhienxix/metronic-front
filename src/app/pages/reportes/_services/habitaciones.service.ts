@@ -1,0 +1,48 @@
+import { Injectable } from '@angular/core';
+import { Habitaciones } from '../_models/habitaciones.model'
+import { Observable, of } from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import {environment} from "../../../../environments/environment"
+import { catchError, map, tap } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class HabitacionesService {
+  private listaFolios: Habitaciones[] = [];
+
+
+  getHabitacionesbyTipo(id:string) : Observable<Habitaciones[]> {
+
+  return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id)
+      .pipe(
+        map(responseData=>{
+          return responseData
+        })
+      ))
+  }
+
+  gethabitaciones() :Observable<Habitaciones[]> {
+   return this.http
+    .get<Habitaciones[]>(environment.apiUrl + '/reportes/habitaciones')
+    .pipe(
+      map(responseData=>{
+      return responseData
+    })
+    )
+
+  }
+
+  getCodigohabitaciones() :Observable<Habitaciones[]> {
+    return this.http
+     .get<Habitaciones[]>(environment.apiUrl + '/reportes/tipo')
+     .pipe(
+       map(responseData=>{
+       return responseData
+     })
+     )
+
+   }
+
+  constructor(private http: HttpClient) { }
+}
