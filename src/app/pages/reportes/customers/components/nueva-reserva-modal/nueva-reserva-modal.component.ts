@@ -18,10 +18,16 @@ import {FoliosService} from '../../../_services/folios.service'
 import {HabitacionesService} from '../../../_services/habitaciones.service'
 import { Observable } from 'rxjs';
 import { Habitaciones } from '../../../_models/habitaciones.model';
+import { DisponibilidadService } from '../../../_services/disponibilidad.service';
+import { Disponibilidad } from '../../../_models/disponibilidad.model';
 
 
 let date: Date = new Date();
-
+declare global {
+  interface Date {
+      getDays (start?: number) : [Date, Date]
+  }
+}
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
@@ -120,6 +126,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
+  public disponibilidad:Disponibilidad[]=[];
   public folioactualizado:any;
   cuarto:string;
   private subscriptions: Subscription[] = [];
@@ -133,6 +140,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
     public habitacionService : HabitacionesService,
     public foliosService : FoliosService,
     private customersService: HuespedService,
+    private disponibilidadService:DisponibilidadService,
     private fb: FormBuilder, public modal: NgbActiveModal,
     public customerService: HuespedService,
     public postService : ReportesComponent,
@@ -333,6 +341,35 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
 
   buscaDispo()
   {
+    //DIAS DE DIFERENCIA
+    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
+    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    //
+
+    for (let i=0; i<diaDif; i++) {
+
+    this.disponibilidadService.getdisponibilidad(fromDate.getDate().toString(), fromDate.getMonth().toString(), fromDate.getFullYear().toString(),this.cuarto)
+    .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          if(responseData.hasOwnProperty(key))
+          postArray.push(responseData[key]);
+        }
+        return postArray
+      }))
+      .subscribe((disponibilidad)=>{
+        this.disponibilidad=(disponibilidad)
+        console.log("Revisa Disponibilidad",this.disponibilidad)
+      })
+
+
+      fromDate.setDate(fromDate.getDate() + 1);
+    };
+
+
     this.habitacionService.getHabitacionesbyTipo(this.cuarto)
     .pipe(map(
       (responseData)=>{
