@@ -38,28 +38,8 @@
                               </label>
                             </div>
                             <div style="margin: auto;" class="col-sm-6">
-                              # 1101 -
-                              <ng-container *ngIf="huesped.habitacion===1">
-                                <label value="1" selected disabled> Cardonay</label>
-                              </ng-container>
-                              <ng-container *ngIf="huesped.habitacion===2">
-                                <label value="2" selected disabled> Cabernet</label>
-                              </ng-container>
-                              <ng-container *ngIf="huesped.habitacion===3">
-                                <label value="3" selected disabled> Shiraz</label>
-                              </ng-container>
-                              <ng-container *ngIf="huesped.habitacion===4">
-                                <label value="4" selected disabled> Malbec</label>
-                              </ng-container>
-                              <ng-container *ngIf="huesped.habitacion===5">
-                                <label value="5" selected disabled> La Vid</label>
-                              </ng-container>
-                              <ng-container *ngIf="huesped.habitacion===6">
-                                <label value="6" selected disabled> Merlot</label>
-                              </ng-container>
-                              <ng-container *ngIf="huesped.habitacion===7">
-                                <label value="7" selected disabled> Pinot Noir</label>
-                              </ng-container>
+                              # 1101 - {{huesped.habitacion}}
+
                             </div>
                           </div>
                         </div>
@@ -116,28 +96,7 @@
                 <label class="font-weight-bold">Habitacion / Cama</label>
                 <br>
                 &nbsp;
-                <label>1101 -
-                <ng-container *ngIf="huesped.habitacion===1">
-                  <label value="1" selected disabled> Cardonay</label>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===2">
-                  <label value="2" selected disabled> Cabernet</label>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===3">
-                  <label value="3" selected disabled> Shiraz</label>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===4">
-                  <label value="4" selected disabled> Malbec</label>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===5">
-                  <label value="5" selected disabled> La Vid</label>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===6">
-                  <label value="6" selected disabled> Merlot</label>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===7">
-                  <label value="7" selected disabled> Pinot Noir</label>
-                </ng-container>
+                <label>1101 - {{huesped.habitacion}}
               </label>
               </div>
 

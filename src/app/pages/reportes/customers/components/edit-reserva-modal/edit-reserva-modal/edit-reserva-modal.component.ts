@@ -38,7 +38,7 @@ const EMPTY_CUSTOMER: Huesped = {
   porPagar: 500,
   pendiente:500,
   origen: 'Online',
-  habitacion: 1,
+  habitacion: "",
   telefono:"",
   email:"",
   motivo:"",
@@ -51,7 +51,8 @@ const EMPTY_CUSTOMER: Huesped = {
   pais:'',
   ciudad:'',
   codigoPostal:'',
-  lenguaje:'Español'
+  lenguaje:'Español',
+  numeroCuarto:0
 };
 
 
@@ -290,7 +291,8 @@ export class EditReservaModalComponent implements OnInit {
         this.huesped.pais,
         this.huesped.ciudad,
         this.huesped.codigoPostal,
-        this.huesped.lenguaje
+        this.huesped.lenguaje,
+        this.huesped.numeroCuarto
       );
         console.log("AddPost Succesfull")
 

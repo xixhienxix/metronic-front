@@ -53,7 +53,7 @@ export class ReportesComponent implements OnInit {
           porPagar:number,
           pendiente:number,
           origen:string,
-          habitacion:number,
+          habitacion:string,
           telefono:string,
           email:string,
           motivo:string,
@@ -65,7 +65,8 @@ export class ReportesComponent implements OnInit {
           pais:string,
           ciudad:string,
           codigoPostal:string,
-          lenguaje:string) {
+          lenguaje:string,
+          numeroCuarto:number) {
     const post: Huesped = {id:id,folio:folio,adultos:adultos,
       ninos:ninos,nombre:nombre, estatus:estatus,
       llegada:llegada,salida:salida,
@@ -73,14 +74,15 @@ export class ReportesComponent implements OnInit {
       pendiente:pendiente,origen:origen,habitacion:habitacion,
       telefono:telefono,email:email,motivo:motivo,
       fechaNacimiento:fechaNacimiento,trabajaEn:trabajaEn,
-      tipoDeID:tipoDeID,numeroDeID:numeroDeID,direccion:direccion,pais:pais,ciudad:ciudad,codigoPostal:codigoPostal,lenguaje:lenguaje
+      tipoDeID:tipoDeID,numeroDeID:numeroDeID,direccion:direccion,pais:pais,ciudad:ciudad,codigoPostal:codigoPostal,lenguaje:lenguaje,
+      numeroCuarto:numeroCuarto
     };
     this.http
       .post<{ message: string }>(environment.apiUrl+"/reportes/huesped", post)
       .subscribe(responseData => {
         console.log(responseData.message);
         this.huesped.push(post);
-        this.postsUpdated.next([...this.huesped]);
+        // this.postsUpdated.next([...this.huesped]);
       });
   }
 

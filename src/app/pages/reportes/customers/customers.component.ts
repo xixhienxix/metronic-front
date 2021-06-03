@@ -39,7 +39,7 @@ import { isJSDocThisTag } from 'typescript';
 import { NuevaReservaModalComponent } from './components/nueva-reserva-modal/nueva-reserva-modal.component';
 import { HabitacionesService } from '../_services/habitaciones.service';
 import { Habitaciones } from '../_models/habitaciones.model';
-
+import { DisponibilidadService } from '../_services/disponibilidad.service'
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
@@ -72,6 +72,7 @@ export class CustomersComponent
   public foliosprueba1: [];
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
+  public codigoCuarto:Habitaciones[]=[];
 
   constructor(
     private fb: FormBuilder,
@@ -80,7 +81,9 @@ export class CustomersComponent
     public postService : ReportesComponent,
     public foliosService : FoliosService,
     public habitacionesService : HabitacionesService,
-    private http: HttpClient
+    private http: HttpClient,
+    public habitacionService : HabitacionesService,
+    public disponibilidadSercice : DisponibilidadService,
 
   ) {
 
@@ -126,6 +129,13 @@ export class CustomersComponent
                         })
   }
 
+
+  habValue($event)
+  {
+    // this.huesped.habitacion = $event.target.options[$event.target.options.selectedIndex].text;
+    // console.log("this.cuarto",this.cuarto)
+  }
+
   getFolios(): void {
 
     this.foliosService.getFolios()
@@ -143,7 +153,6 @@ export class CustomersComponent
                           this.folios=(folios)
                         })
   }
-
 
 
 

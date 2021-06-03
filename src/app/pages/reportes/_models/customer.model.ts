@@ -16,7 +16,7 @@ export interface Huesped extends BaseModel {
   porPagar: number;
   pendiente: number;
   origen: string;
-  habitacion: number;  // Chardonay = 1 | Cabernet = 2 | Shiraz = 3 | Malbec = 4 | La Vid = 5 | Merlot = 6 | Pinot Noir = 7
+  habitacion: string;
   telefono:string;
   email:string;
   motivo:string;
@@ -30,6 +30,7 @@ export interface Huesped extends BaseModel {
   ciudad:string;
   codigoPostal:string;
   lenguaje:string;
+  numeroCuarto:number;
 }
 export interface Estatus extends BaseModel
 {

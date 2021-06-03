@@ -142,36 +142,9 @@
                       <ng-container *ngFor="let tipoCuarto of codigoCuarto">
                         <option> {{tipoCuarto}} </option>
                       </ng-container>
-                      <!-- <option value="1">Chardonnay</option>
-                      <option value="2">Cabernet</option>
-                      <option value="3">Shiraz</option>
-                      <option value="4">Malbec</option>
-                      <option value="5">La Vid</option>
-                      <option value="6">Merlot</option>
-                      <option value="7">inot Noir</option> -->
                     </select>
                 </label>
               </div>
-
-              <!-- <div class="form-group col-lg-6">
-                <label class="form-label">Tarifa</label>
-                <div class="input-group">
-                  <div class="input-group-append">
-                    <button class="btn btn-secondary" (click)="minusNin()">
-                      <i class="fa fa-money-bill-wave">
-                      </i>
-                    </button>
-                  </div>
-                  <input
-                  class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
-                    name="tarifa"
-                    type="number"
-                    [value]="huesped.tarifa"
-                    value={{huesped.tarifa}}
-                    formControlName="tarifa"
-                    >
-                </div>
-              </div> -->
 
               <div class="col-lg-12">
                   <div class="input-group-append">
@@ -188,7 +161,7 @@
 
 
 
-     <ng-container *ngIf="cuartos.length !==0 ">
+     <ng-container *ngIf="disponibilidad.length !==0 ">
       <mat-accordion class="example-headers-align" multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header style="background-color:#99d284;">
@@ -196,49 +169,47 @@
               CON DISPONIBILIDAD
             </mat-panel-title>
             <mat-panel-description>
-             <!--Type your name and age-->
              {{cuarto}}
              <!-- <mat-icon>account_circle</mat-icon> -->
             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <!--Contenido del Accordion-->
-<ng-container *ngFor="let habitacionesDisponibles of cuartos ">
-  <div class="table-responsive angular-bootstrap-table">
-    <table class="table table-head-custom table-vertical-center overflow-hidden">
-      <thead>
+            <div  class="table-responsive angular-bootstrap-table">
+              <table class="table table-head-custom table-vertical-center overflow-hidden">
+                <thead>
+                  <th>
+                    # de Cuarto
+                  </th>
+                  <th>
+                    Descripcion
 
-        <th>
-          # de Cuarto
-        </th>
-        <th>
-          Descripcion
-
-        </th>
-        <th>
-          Capacidad
-        </th>
-        <th>
-          Tarifa
-        </th>
-      </thead>
-      <tbody>
-        <tr>
-
-          <td><mat-checkbox (checked)="preAsignar(habitacionesDisponibles.Numero)"></mat-checkbox> &nbsp; {{ habitacionesDisponibles.Numero }}</td>
-          <td>{{ habitacionesDisponibles.Descripcion}}</td>
-          <td>{{ habitacionesDisponibles.Personas }} Adultos</td>
-          <td>{{ habitacionesDisponibles.Tarifa }}.00</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</ng-container>
-
+                  </th>
+                  <th>
+                    Capacidad
+                  </th>
+                  <th>
+                    Tarifa
+                  </th>
+                </thead>
+                <ng-container *ngFor="let habitacionesDisponibles of mySet">
+                <ng-container *ngFor="let tipocuarto of cuartos">
+                <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
+                  <tr>
+                    <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                    <td >{{ tipocuarto.Descripcion}}</td>
+                    <td >{{ tipocuarto.Personas }} Adultos</td>
+                    <td >{{ tipocuarto.Tarifa }}.00</td>
+                  </tr>
+                </tbody>
+              </ng-container>
+            </ng-container>
+              </table>
+            </div>
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
-     <ng-container *ngIf="cuartos.length ===0 ">
+     <ng-container *ngIf="disponibilidad.length ===0 ">
       <mat-accordion class="example-headers-align" multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header style="background-color:#fa6d7c;">
@@ -258,24 +229,6 @@
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
-
-    <!-- <ng-container *ngIf="cuartos.length !==0 ">
-      <div style="background-color:#99d284;" class="modal-header">
-        <div style="text-align: center; color: white;" class=" h4 col-12 text-center"
-          id="example-modal-sizes-title-lg">
-          CON DISPONIBILIDAD
-        </div>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="cuartos.length ===0 ">
-      <div style="background-color:#fa6d7c;" class="modal-header">
-        <div style="text-align: center; color: white;" class="h4 col-12 text-center"
-          id="example-modal-sizes-title-lg">
-          SIN DISPONIBILIDAD
-        </div>
-      </div>
-    </ng-container> -->
-
 
     <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
       <div class="form-group row">
@@ -421,7 +374,7 @@
         Tipo de Reserva
         <div class="form-group row">
           <div class="form-group col-lg-6 ">
-                <button
+                <button disabled
                 class="btn btn-success btn-block"
                 type="submit"
                 name="estatus"
@@ -435,7 +388,7 @@
                 class="btn btn-warning btn-block"
                 type="submit"
                 name="estatus"
-                (click)="setEstatus(3)"
+                (click)="setEstatus(2)"
                 >
                   Agrega Reserva
                 </button>

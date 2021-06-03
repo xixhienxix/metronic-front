@@ -20,6 +20,8 @@ import { Observable } from 'rxjs';
 import { Habitaciones } from '../../../_models/habitaciones.model';
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 import { Disponibilidad } from '../../../_models/disponibilidad.model';
+import { getDefaultCompilerOptions, reduceEachTrailingCommentRange } from 'typescript';
+import { DeleteHuespedModalComponent } from '../delete-customer-modal/delete-customer-modal.component';
 
 
 let date: Date = new Date();
@@ -44,7 +46,7 @@ const EMPTY_CUSTOMER: Huesped = {
   porPagar: 500,
   pendiente:500,
   origen: 'Online',
-  habitacion: 0,
+  habitacion: '',
   telefono:"",
   email:"",
   motivo:"",
@@ -57,8 +59,8 @@ const EMPTY_CUSTOMER: Huesped = {
   pais:'',
   ciudad:'',
   codigoPostal:'',
-  lenguaje:'Español'
-
+  lenguaje:'Español',
+  numeroCuarto: 0
 };
 
 
@@ -110,9 +112,11 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
 
   fromDate: NgbDate | null;
   fromDate1: string;
+  ToDoListForm:any;
 
   toDate: NgbDate | null;
 //
+  mySet = new Set();
   id:number;
   folio:number;
   isLoading$;
@@ -127,6 +131,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
   public disponibilidad:Disponibilidad[]=[];
+  public sinDisponibilidad:any[]=[]
   public folioactualizado:any;
   cuarto:string;
   private subscriptions: Subscription[] = [];
@@ -156,6 +161,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
     this.isLoading$ = this.customersService.isLoading$;
     this.loadCustomer();
     this.getDispo();
+
   }
 
 
@@ -206,9 +212,11 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
   }
 
 
+
   save() {
-    this.prepareHuesped();
+  this.prepareHuesped();
   this.create();
+  this.resetFoliador();
   }
 
   edit() {
@@ -248,7 +256,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
 
         this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-        this.huesped.noches=(this.fromDate.day)-(this.toDate.day)
+        this.huesped.noches=(this.toDate.day)-(this.fromDate.day)
         this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
         this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
         this.huesped.habitacion=formData.habitacion
@@ -256,6 +264,8 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
         this.huesped.email=formData.email
         this.huesped.motivo=formData.motivo
         this.huesped.id=this.huesped.folio
+        this.huesped.numeroCuarto=this.preAsig
+
     this.postService.addPost
     (
       this.huesped.id,
@@ -283,12 +293,33 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
       this.huesped.pais,
       this.huesped.ciudad,
       this.huesped.codigoPostal,
-      this.huesped.lenguaje
+      this.huesped.lenguaje,
+      this.huesped.numeroCuarto
     );
       console.log("AddPost Succesfull")
-
-
   }
+
+resetFoliador()
+{
+
+  this.foliosService.getFolios().pipe(map(
+    (responseData)=>{
+      const postArray = []
+      for(const key in responseData)
+      {
+        if(responseData.hasOwnProperty(key))
+        postArray.push(responseData[key]);
+      }
+      return postArray
+    }))
+    .subscribe((folios)=>{
+      this.folios=(folios)
+      console.log("Nuevo folio de Reserva",this.folios)
+      this.huesped.folio=this.folios[0].Folio
+    })
+}
+
+
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sb => sb.unsubscribe());
@@ -347,29 +378,6 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
     let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
     //
 
-    for (let i=0; i<diaDif; i++) {
-
-    this.disponibilidadService.getdisponibilidad(fromDate.getDate().toString(), fromDate.getMonth().toString(), fromDate.getFullYear().toString(),this.cuarto)
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-          postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
-      .subscribe((disponibilidad)=>{
-        this.disponibilidad=(disponibilidad)
-        console.log("Revisa Disponibilidad",this.disponibilidad)
-      })
-
-
-      fromDate.setDate(fromDate.getDate() + 1);
-    };
-
-
     this.habitacionService.getHabitacionesbyTipo(this.cuarto)
     .pipe(map(
       (responseData)=>{
@@ -385,11 +393,54 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
         this.cuartos=(cuartos)
         console.log("buscaDispo this.cuartos",this.cuartos)
       })
+
+
+    for (let i=0; i<diaDif; i++) {
+
+    this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
+    .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          if(responseData.hasOwnProperty(key))
+           postArray.push(responseData[key]);
+        }
+        return postArray
+      }))
+      .subscribe((disponibles)=>{
+        for(i=0;i<disponibles.length;i++)
+        {
+          this.disponibilidad=(disponibles)
+          if(disponibles[i].Estatus==0)
+          {
+            this.sinDisponibilidad.push(disponibles[i].Habitacion)
+          }
+          this.mySet.add(this.disponibilidad[i].Habitacion)
+        }
+        for(i=0;i<this.sinDisponibilidad.length;i++)
+        {
+          this.mySet.delete(this.sinDisponibilidad[i])
+        }
+        console.log("MySET: ",this.mySet)
+        // this.mySet.delete(this.sinDisponibilidad[0])
+        console.log("sinDiusponibilidad",this.sinDisponibilidad)
+        console.log("MySET (Delete): ",this.mySet)
+
+      })
+      fromDate.setDate(fromDate.getDate() + 1);
+    };
+
   }
 
-  preAsignar(cuarto:number)
+
+
+  preAsignar(numeroCuarto:number,codigo:string)
   {
-    this.preAsig=cuarto;
+    console.log("check.value",numeroCuarto);
+    this.preAsig=numeroCuarto;
+    this.cuarto=codigo;
+
   }
 
   habValue($event)
@@ -483,6 +534,16 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
     const parsed = this.formatter.parse(input);
     return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
   }
+
+
+
+  getmyData(){
+    return this.mySet;
+    }
+
+  // setMyData(data){
+  //   this.mySet=[…data];
+  //   }
 
 
 }
