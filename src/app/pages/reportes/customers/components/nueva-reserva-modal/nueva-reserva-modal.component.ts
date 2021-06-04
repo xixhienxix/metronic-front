@@ -1,8 +1,8 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar, } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import { of, Subscription } from 'rxjs';
-import { catchError, finalize, first, tap } from 'rxjs/operators';
+import { catchError, finalize, first, ignoreElements, tap } from 'rxjs/operators';
 import { Huesped } from '../../../_models/customer.model';
 import { Foliador } from '../../../_models/Foliador.model';
 import { HuespedService } from '../../../_services';
@@ -22,7 +22,7 @@ import { DisponibilidadService } from '../../../_services/disponibilidad.service
 import { Disponibilidad } from '../../../_models/disponibilidad.model';
 import { getDefaultCompilerOptions, reduceEachTrailingCommentRange } from 'typescript';
 import { DeleteHuespedModalComponent } from '../delete-customer-modal/delete-customer-modal.component';
-
+import { ViewChild } from '@angular/core'
 
 let date: Date = new Date();
 declare global {
@@ -64,8 +64,6 @@ const EMPTY_CUSTOMER: Huesped = {
 };
 
 
-
-
 @Component({
   selector: 'app-edit-customer-modal',
   templateUrl: './nueva-reserva-modal.component.html',
@@ -104,7 +102,7 @@ const EMPTY_CUSTOMER: Huesped = {
 })
 
 
-export class NuevaReservaModalComponent implements OnInit, OnDestroy {
+export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
   @Input()
 
 //DATETIMEPICKER RANGE
@@ -117,6 +115,9 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
   toDate: NgbDate | null;
 //
   mySet = new Set();
+  maxAdultos:number=6;
+  maxNinos:number=6;
+  bandera:boolean=false
   id:number;
   folio:number;
   isLoading$;
@@ -130,6 +131,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
+  public infoCuarto:Habitaciones[]=[];
   public disponibilidad:Disponibilidad[]=[];
   public sinDisponibilidad:any[]=[]
   public folioactualizado:any;
@@ -149,7 +151,8 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
     private fb: FormBuilder, public modal: NgbActiveModal,
     public customerService: HuespedService,
     public postService : ReportesComponent,
-    private http: HttpClient
+    private http: HttpClient,
+    public i18n: NgbDatepickerI18n
     ) {
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
@@ -161,7 +164,7 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
     this.isLoading$ = this.customersService.isLoading$;
     this.loadCustomer();
     this.getDispo();
-
+    this.getHabitaciones();
   }
 
 
@@ -195,15 +198,14 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
   }
 
   loadForm() {
-
     this.formGroup = this.fb.group({
       nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
       telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.minLength(10),Validators.maxLength(14)])],
       salida:[this.huesped.salida, Validators.compose([Validators.required])],
       llegada:[this.huesped.llegada, Validators.compose([Validators.required])],
-      adultos:[this.huesped.adultos, Validators.compose([Validators.required])],
-      ninos:[this.huesped.ninos, Validators.compose([Validators.required])],
+      adultos:[this.huesped.adultos, Validators.compose([Validators.required,Validators.max(this.maxAdultos)])],
+      ninos:[this.huesped.ninos, Validators.compose([Validators.required,Validators.max(this.maxNinos)])],
       habitacion:[this.huesped.habitacion, Validators.compose([Validators.required])],
       // tarifa:[this.huesped.tarifa, Validators.compose([Validators.required])]
 
@@ -299,9 +301,9 @@ export class NuevaReservaModalComponent implements OnInit, OnDestroy {
       console.log("AddPost Succesfull")
   }
 
+
 resetFoliador()
 {
-
   this.foliosService.getFolios().pipe(map(
     (responseData)=>{
       const postArray = []
@@ -346,8 +348,23 @@ resetFoliador()
     return control.dirty || control.touched;
   }
 
-  emailValidator(event:Event){
-
+  getHabitaciones()
+  {
+    this.habitacionService.gethabitaciones()
+    .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          postArray.push(responseData)
+        }
+        return postArray
+      }
+    ))
+    .subscribe((infoCuartos)=>{
+      this.infoCuarto=infoCuartos
+      console.log("InfoCuartos Completa :",this.infoCuarto)
+    })
   }
 
   getDispo()
@@ -372,7 +389,53 @@ resetFoliador()
 
   buscaDispo()
   {
-    //DIAS DE DIFERENCIA
+    if(this.bandera)
+    {
+      //DIAS DE DIFERENCIA
+    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
+    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    //
+
+
+    for (let i=0; i<diaDif; i++) {
+
+    this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
+    .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          if(responseData.hasOwnProperty(key))
+           postArray.push(responseData[key]);
+        }
+        return postArray
+      }))
+      .subscribe((disponibles)=>{
+        for(i=0;i<disponibles.length;i++)
+        {
+          this.disponibilidad=(disponibles)
+          if(disponibles[i].Estatus==0)
+          {
+            this.sinDisponibilidad.push(disponibles[i].Habitacion)
+          }
+          this.mySet.add(this.disponibilidad[i].Habitacion)
+        }
+        for(i=0;i<this.sinDisponibilidad.length;i++)
+        {
+          this.mySet.delete(this.sinDisponibilidad[i])
+        }
+        console.log("MySET de TODOS LOS CUARTOS: ",this.mySet)
+        console.log("sinDiusponibilidad TODOS LOS CUARTOS",this.sinDisponibilidad)
+        console.log("MySET TODOS LOS CUARTOS (Delete): ",this.mySet)
+
+      })
+      fromDate.setDate(fromDate.getDate() + 1);
+    };
+
+    }else
+    {
+      //DIAS DE DIFERENCIA
     let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
     let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
@@ -422,14 +485,13 @@ resetFoliador()
         {
           this.mySet.delete(this.sinDisponibilidad[i])
         }
-        console.log("MySET: ",this.mySet)
-        // this.mySet.delete(this.sinDisponibilidad[0])
-        console.log("sinDiusponibilidad",this.sinDisponibilidad)
-        console.log("MySET (Delete): ",this.mySet)
+
 
       })
       fromDate.setDate(fromDate.getDate() + 1);
     };
+
+    }
 
   }
 
@@ -438,6 +500,28 @@ resetFoliador()
   preAsignar(numeroCuarto:number,codigo:string)
   {
     console.log("check.value",numeroCuarto);
+    this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
+    .pipe(map((responseData)=>
+    {
+      const responseArray=[]
+      for (const key in responseData){
+        if(responseData.hasOwnProperty(key))
+        responseArray.push(responseData[key]);
+      }
+      return responseArray
+
+    }))
+    .subscribe((infoCuartos)=>{
+      this.infoCuarto=infoCuartos
+      console.log("InforCuartos:",this.infoCuarto)
+    });
+
+    if(this.quantity>this.infoCuarto[0].Personas)
+    {
+      this.formGroup.controls['adultos'].updateValueAndValidity();
+      this.maxNinos=this.infoCuarto[0].Personas
+      this.maxNinos=this.infoCuarto[0].Personas_Extra
+    }
     this.preAsig=numeroCuarto;
     this.cuarto=codigo;
 
@@ -445,22 +529,51 @@ resetFoliador()
 
   habValue($event)
   {
-    this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
-    // this.cuarto = this.cuarto.split(" ")[0]
-    console.log("this.cuarto",this.cuarto)
+    this.disponibilidad=[]
+    this.mySet.clear
+    this.cuartos=[]
+    this.sinDisponibilidad=[]
+
+    if($event.target.options.selectedIndex==1)
+    {
+        this.cuarto=""
+        this.habitacionService.gethabitaciones()
+        .pipe(map(
+          (responseData)=>{
+            const postArray = []
+            for(const key in responseData)
+            {
+              if(responseData.hasOwnProperty(key))
+              postArray.push(responseData[key]);
+            }
+            return postArray
+          }))
+          .subscribe((cuartos)=>{
+            this.cuartos=(cuartos)
+            console.log("buscaDispo this.cuartos",this.cuartos)
+          })
+        this.bandera=true
+    }else
+    {
+      this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+      console.log("this.cuarto",this.cuarto)
+      this.bandera=false
+    }
   }
 
   isNumber(val): boolean { return typeof val === 'number'; }
   isNotNumber(val): boolean { return typeof val !== 'number'; }
 
-
+//Maximos Y Minimos Adultos Niños
   quantity:number=1;
   quantityNin:number=1;
 
   plus()
   {
-    this.quantity++;
-    this.huesped.adultos=this.quantity
+    if(this.quantity<6){
+      this.quantity++;
+      this.huesped.adultos=this.quantity
+    }
   }
   minus()
   {
@@ -475,8 +588,11 @@ resetFoliador()
   }
   plusNin()
   {
-    this.quantityNin++;
-    this.huesped.ninos=this.quantityNin;
+    if(this.quantityNin<6)
+    {
+      this.quantityNin++;
+      this.huesped.ninos=this.quantityNin;
+    }
   }
   minusNin()
   {
@@ -491,10 +607,18 @@ resetFoliador()
 
   }
 
-
+  //
+  emailValidator(evetn:any)
+  {
+  //algo
+  }
 
   setEstatus(value): void {
     this.huesped.estatus = value;
+    if(value==1)
+    {this.huesped.folio=this.folios[1].Folio}
+    else
+    this.huesped.folio=this.folios[0].Folio
 }
 
 
@@ -533,17 +657,28 @@ resetFoliador()
   validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
     const parsed = this.formatter.parse(input);
     return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
+
   }
 
+  rangoFechas(llegada:string,salida:string)
+  {
+    let rangodeFechas
+    let toDate =   new Date(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
+    let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
+    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+
+    this.huesped.noches=diaDif
+
+    rangodeFechas = llegada.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(llegada.split("/")[0]))+"/"+llegada.split("/")[2]+" - " +salida.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(salida.split("/")[0]))+"/"+salida.split("/")[2]
+
+    return rangodeFechas
+  }
 
 
   getmyData(){
     return this.mySet;
     }
 
-  // setMyData(data){
-  //   this.mySet=[…data];
-  //   }
 
 
 }

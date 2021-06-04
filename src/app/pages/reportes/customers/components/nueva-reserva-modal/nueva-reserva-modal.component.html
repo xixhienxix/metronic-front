@@ -1,11 +1,11 @@
 <div class="modal-content">
 <ng-container *ngIf="huesped.id == undefined">
-  <div style="background-color: #FB4848;" class="modal-header">
+  <div style="background-color: #00506a;" class="modal-header">
     <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center"
       id="example-modal-sizes-title-lg">
-      NUEVA RESERVACION - FOLIO
-      <label>
-        {{huesped.folio}}</label>
+      NUEVA RESERVA / BLOQUEO
+      <!-- <label>
+        {{huesped.folio}}</label> -->
     </div>
   </div>
 </ng-container>
@@ -43,36 +43,43 @@
                   </ng-template>
                 </div>
               </div>
-               <div class="form-group col-lg-6">
-                <label class="form-label">Llegada</label>
-                <div class="input-group">
-                  <input #dpFromDate
-                         class="form-control" placeholder="yyyy-mm-dd"
-                         name="dpFromDate"
-                         [value]="formatter.format(fromDate)"
-                         (input)="fromDate = validateInput(fromDate, dpFromDate.value)">
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
-                      <i class="fa fa-calendar icon"></i>
-                    </button>
+                <div class="form-group col-lg-8">
+                  <label class="form-label">Seleccionar Rango de Fecha</label>
+                  <div class="input-group">
+                    <input hidden #dpFromDate
+                           class="form-control" placeholder="yyyy-mm-dd"
+                           name="dpFromDate"
+                           [value]="formatter.format(fromDate)"
+                           (input)="fromDate = validateInput(fromDate, dpFromDate.value)">
+                    <input class="form-control col-lg-8" [value]="rangoFechas(dpFromDate.value,dpToDate.value)">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
+                        <i class="fa fa-calendar icon"></i>
+                      </button>
+                    </div>
                   </div>
-                </div>
-               </div>
-             <div class="form-group col-lg-6">
-                <label class="form-label">Salida</label>
-                <div class="input-group">
-                  <input #dpToDate
+                 </div>
+                 <div  class="form-group col-lg-4">
+                   <div class="row"><label>Noches:</label></div>
+
+                      <label class="font-weight-bold h1 text-right">{{huesped.noches}}</label>
+                 </div>
+
+             <!-- <div class="form-group col-lg-6"> -->
+                <!-- <label class="form-label">Salida</label> -->
+                <!-- <div class="input-group"> -->
+                  <input hidden #dpToDate
                          class="form-control" placeholder="yyyy-mm-dd"
                          name="dpToDate"
                          [value]="formatter.format(toDate)"
                          (input)="toDate = validateInput(toDate, dpToDate.value)">
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
+                  <!-- <div class="input-group-append"> -->
+                    <!-- <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
                       <i class="fa fa-calendar icon"></i>
-                    </button>
-                  </div>
-                </div>
-             </div>
+                    </button> -->
+                  <!-- </div> -->
+                <!-- </div> -->
+             <!-- </div> -->
 
               <div class="form-group col-lg-6">
 
@@ -86,18 +93,29 @@
                   </div>
                   <input
                     class="input-group form-control form-control-lg form-control-solid text-center"
+                    #controladultos
                     placeholder=""
+                    type="number"
+                    max="6"
                     name="adultos"
                     [value]="quantity"
-                    value="{{huesped.adultos}}"
                     formControlName="adultos"
+                    [class.is-invalid]="isControlInvalid('adultos')"
+                    [class.is-valid]="isControlValid('adultos')"
                     >
+                    <div
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('max', 'adultos')"
+                    >
+                    Maximo {{maxAdultos}} Adultos
+                    </div>
                   <div class="input-group-append">
                     <button class="btn btn-secondary" (click)="plus()" type="button">
                       <i class="fa fa-plus">
                       </i>
                     </button>
                   </div>
+
 
                 </div>
               </div>
@@ -113,12 +131,22 @@
                     </button>
                   </div>
                   <input
+                  type="number"
+                  max="6"
                   class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
                     name="ninos"
                     [value]="quantityNin"
                     value={{huesped.ninos}}
                     formControlName="ninos"
+                    [class.is-invalid]="isControlInvalid('ninos')"
+                    [class.is-valid]="isControlValid('ninos')"
                     >
+                  <div class="input-group-append"
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('maxlength', 'ninos')"
+                  >
+                    Maximo {{maxNinos}} Niños
+                  </div>
                   <div class="input-group-append">
                     <button class="btn btn-secondary" (click)="plusNin()" type="button">
                       <i class="fa fa-plus">
@@ -127,7 +155,6 @@
                   </div>
                 </div>
               </div>
-
 
 
               <div class="col-lg-12">
@@ -139,6 +166,7 @@
                         (change)="habValue($event)"
                       >
                       <option selected value="0">Selecciona Tipo de Cuarto</option>
+                      <option value="1">Todos los Cuartos</option>
                       <ng-container *ngFor="let tipoCuarto of codigoCuarto">
                         <option> {{tipoCuarto}} </option>
                       </ng-container>
@@ -168,22 +196,26 @@
             <mat-panel-title>
               CON DISPONIBILIDAD
             </mat-panel-title>
-            <mat-panel-description>
+            <mat-panel-description *ngIf="bandera==false">
              {{cuarto}}
              <!-- <mat-icon>account_circle</mat-icon> -->
             </mat-panel-description>
+            <mat-panel-description *ngIf="bandera==true">
+
+              <!-- <mat-icon>account_circle</mat-icon> -->
+             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <!--Contenido del Accordion-->
             <div  class="table-responsive angular-bootstrap-table">
-              <table class="table table-head-custom table-vertical-center overflow-hidden">
+              <table *ngIf="bandera==false" class="table table-head-custom table-vertical-center overflow-hidden">
+                <div class="modal-header"> {{cuarto}} </div>
                 <thead>
                   <th>
                     # de Cuarto
                   </th>
                   <th>
                     Descripcion
-
                   </th>
                   <th>
                     Capacidad
@@ -205,6 +237,42 @@
               </ng-container>
             </ng-container>
               </table>
+
+<ng-container *ngIf="bandera==true">
+  <ng-container *ngFor="let codigosCuarto of codigoCuarto;  let i = index">
+    <div class="modal-header">{{codigosCuarto}}</div>
+        <table  class="table table-head-custom table-vertical-center overflow-hidden">
+          <thead>
+            <th>
+              # de Cuarto
+            </th>
+            <th>
+              Descripcion
+            </th>
+            <th>
+              Capacidad
+            </th>
+            <th>
+              Tarifa
+            </th>
+          </thead>
+          <ng-container *ngFor="let habitacionesDisponibles of mySet">
+          <ng-container *ngFor="let tipocuarto of cuartos">
+          <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
+            <tr>
+              <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+              <td >{{ tipocuarto.Descripcion}}</td>
+              <td >{{ tipocuarto.Personas }} Adultos</td>
+              <td >{{ tipocuarto.Tarifa }}.00</td>
+            </tr>
+          </tbody>
+        </ng-container>
+      </ng-container>
+        </table>
+  </ng-container>
+</ng-container>
+
+
             </div>
         </mat-expansion-panel>
       </mat-accordion>

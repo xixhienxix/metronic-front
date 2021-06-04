@@ -242,10 +242,9 @@ export class CustomersComponent
     if(id==undefined)
     {
       const modalRef = this.modalService.open(NuevaReservaModalComponent, { size: 'md' });
-
-      modalRef.componentInstance.folio = this.folios[0].Folio;
+      modalRef.componentInstance.folios = this.folios
       modalRef.componentInstance.id = id;
-      console.log("this.folios[0].Folio",this.folios[0].Folio);
+      console.log("this.folios",this.folios);
       modalRef.result.then(() =>
       this.customerService.fetch(),
       () => { }
