@@ -40,12 +40,17 @@ import { EditReservaModalComponent } from './customers/components/edit-reserva-m
 import { MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatTabsModule} from '@angular/material/tabs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatIconModule} from '@angular/material/icon';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatButtonModule} from '@angular/material/button';
-
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import {MatSelectModule} from '@angular/material/select'
+import {MatListModule} from '@angular/material/list';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   declarations: [
@@ -75,7 +80,6 @@ import {MatButtonModule} from '@angular/material/button';
     MessagesComponent,
     NuevaReservaModalComponent,
 
-
   ],
   imports: [
     MatSlideToggleModule,
@@ -102,6 +106,15 @@ import {MatButtonModule} from '@angular/material/button';
     MatDatepickerModule,
     MatFormFieldModule,
     MatButtonModule,
+    MatAutocompleteModule,
+    MatSelectModule,
+    MatListModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatToolbarModule,
+    MatFormFieldModule,
+    MatSelectModule
+
        // RouterModule.forChild([
     //   {
     //     path: '',

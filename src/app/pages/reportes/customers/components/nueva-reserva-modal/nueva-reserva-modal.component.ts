@@ -1,28 +1,23 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {  Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
-import { of, Subscription } from 'rxjs';
-import { catchError, finalize, first, ignoreElements, tap } from 'rxjs/operators';
+import { from, of, Subscription } from 'rxjs';
+import { catchError,  first,  tap } from 'rxjs/operators';
 import { Huesped } from '../../../_models/customer.model';
 import { Foliador } from '../../../_models/Foliador.model';
 import { HuespedService } from '../../../_services';
-import { CustomAdapter, CustomDateParserFormatter, getDateFromString } from '../../../../../_metronic/core';
-import { NgModule } from "@angular/core";
+import { CustomAdapter, CustomDateParserFormatter } from '../../../../../_metronic/core';
 import { ReportesComponent } from '../../../reportes.component'
-import {Injectable}from '@angular/core'
-import { FormsModule } from '@angular/forms';
 import { HttpClient } from "@angular/common/http";
-import {environment} from "../../../../../../environments/environment"
-import {map} from 'rxjs/operators'
-import {FoliosService} from '../../../_services/folios.service'
-import {HabitacionesService} from '../../../_services/habitaciones.service'
-import { Observable } from 'rxjs';
+import { map} from 'rxjs/operators'
+import { FoliosService} from '../../../_services/folios.service'
+import { HabitacionesService} from '../../../_services/habitaciones.service'
 import { Habitaciones } from '../../../_models/habitaciones.model';
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 import { Disponibilidad } from '../../../_models/disponibilidad.model';
-import { getDefaultCompilerOptions, reduceEachTrailingCommentRange } from 'typescript';
-import { DeleteHuespedModalComponent } from '../delete-customer-modal/delete-customer-modal.component';
-import { ViewChild } from '@angular/core'
+import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
+import { Observable} from  'rxjs';
 
 let date: Date = new Date();
 declare global {
@@ -30,6 +25,9 @@ declare global {
       getDays (start?: number) : [Date, Date]
   }
 }
+
+
+
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
@@ -69,6 +67,8 @@ const EMPTY_CUSTOMER: Huesped = {
   templateUrl: './nueva-reserva-modal.component.html',
   styleUrls: ['./nueva-reserva-modal.component.scss'],
   styles:[`
+
+
   .form-group.hidden {
     width: 0;
     margin: 0;
@@ -91,7 +91,8 @@ const EMPTY_CUSTOMER: Huesped = {
   }
   .custom-day.faded {
     background-color: rgba(2, 117, 216, 0.5);
-  }
+  },
+
 `],
   // NOTE: For this example we are only providing current component, but probably
   // NOTE: you will w  ant to provide your main App Module
@@ -114,6 +115,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
 
   toDate: NgbDate | null;
 //
+options: string[] = ['One', 'Two', 'Three'];
+filteredOptions: Observable<string[]>;
+
+  private modalService: NgbModal
+  searchGroup: FormGroup;
   mySet = new Set();
   maxAdultos:number=6;
   maxNinos:number=6;
@@ -127,6 +133,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
   habitaciones:Habitaciones;
   folioLetra:string;
   formGroup: FormGroup;
+  myControl: FormGroup;
   preAsig:number;
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
@@ -138,6 +145,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
   cuarto:string;
   private subscriptions: Subscription[] = [];
   public listaFolios:Foliador[];
+  displayNone:string = "display:none"
+  showDropDown=false;
+  accordionDisplay="";
+
 
 
   constructor(
@@ -164,8 +175,38 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
     this.isLoading$ = this.customersService.isLoading$;
     this.loadCustomer();
     this.getDispo();
+    // this.gethuespedes();
     this.getHabitaciones();
+
+
+
   }
+
+
+
+  // gethuespedes()
+  // {
+  //   this.customerService.getAll().pipe(
+  //     map((responseData)=>{
+  //       const getarray=[]
+  //       for(const key in responseData)
+  //       {
+  //         if(responseData.hasOwnProperty(key))
+  //         getarray.push(responseData[key]);
+  //       }
+  //       return getarray
+
+  //     })
+  //   ).subscribe((result)=>{
+  //     for(let i=0;i<result.length;i++)
+  //     {
+  //       this.options.push(result[i].nombre)}
+  //     console.log("result:",this.options)
+  //   })
+
+  // }
+
+
 
 
   loadCustomer() {
@@ -198,20 +239,36 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
   }
 
   loadForm() {
+
     this.formGroup = this.fb.group({
       nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
-      telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.minLength(10),Validators.maxLength(14)])],
+      telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.pattern('(([+][(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\s*[)]?[-\s\.]?[(]?[0-9]{1,3}[)]?([-\s\.]?[0-9]{3})([-\s\.]?[0-9]{3,4})'),Validators.minLength(12),Validators.maxLength(14)])],
       salida:[this.huesped.salida, Validators.compose([Validators.required])],
       llegada:[this.huesped.llegada, Validators.compose([Validators.required])],
       adultos:[this.huesped.adultos, Validators.compose([Validators.required,Validators.max(this.maxAdultos)])],
       ninos:[this.huesped.ninos, Validators.compose([Validators.required,Validators.max(this.maxNinos)])],
       habitacion:[this.huesped.habitacion, Validators.compose([Validators.required])],
-      // tarifa:[this.huesped.tarifa, Validators.compose([Validators.required])]
-
+      searchTerm:['']
     });
 
+    const searchEvent = this.formGroup.controls.searchTerm.valueChanges
+      .pipe(
+        debounceTime(150),
+        distinctUntilChanged()
+      )
+      .subscribe((val) => this.search(val));
+        this.subscriptions.push(searchEvent);
+
+    // const searchEvent = this.formGroup.controls.searchTerm.valueChanges
+    // .pipe(
+    //   startWith(''),
+    //   map(value => this._filter(value))
+    // );
+
   }
+
+
 
 
 
@@ -298,7 +355,34 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
       this.huesped.lenguaje,
       this.huesped.numeroCuarto
     );
-      console.log("AddPost Succesfull")
+      alert("HUESPED GUARDADO")
+      this.modal.close();
+
+      // const modalRef = this.modalService.open(NgbdModal1Content, { size: 'md' });
+  }
+
+
+  // search
+  // searchForm() {
+  //   this.searchGroup = this.fb.group({
+  //     searchTerm: [''],
+  //   });
+
+  //   const searchEvent = this.searchGroup.controls.searchTerm.valueChanges
+  //     .pipe(
+  //       /*
+  //     The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
+  //     we are limiting the amount of server requests emitted to a maximum of one every 150ms
+  //     */
+  //       debounceTime(150),
+  //       distinctUntilChanged()
+  //     )
+  //     .subscribe((val) => this.search(val));
+  //   this.subscriptions.push(searchEvent);
+  // }
+
+  search(searchTerm: string) {
+    this.customerService.patchState({ searchTerm });
   }
 
 
@@ -389,6 +473,8 @@ resetFoliador()
 
   buscaDispo()
   {
+    this.accordionDisplay="";
+
     if(this.bandera)
     {
       //DIAS DE DIFERENCIA
@@ -529,6 +615,7 @@ resetFoliador()
 
   habValue($event)
   {
+    this.accordionDisplay="display:none"
     this.disponibilidad=[]
     this.mySet.clear
     this.cuartos=[]
@@ -555,7 +642,7 @@ resetFoliador()
         this.bandera=true
     }else
     {
-      this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+      this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
       console.log("this.cuarto",this.cuarto)
       this.bandera=false
     }
@@ -564,15 +651,37 @@ resetFoliador()
   isNumber(val): boolean { return typeof val === 'number'; }
   isNotNumber(val): boolean { return typeof val !== 'number'; }
 
+
+  //Mat-expansioln-Pane [Acordion]
+  step = 0;
+
+  setStep(index: number) {
+    this.step = index;
+  }
+
+  nextStep() {
+    this.step++;
+  }
+
+  prevStep() {
+    this.step--;
+  }
+
+
+
+
+
 //Maximos Y Minimos Adultos Niños
   quantity:number=1;
   quantityNin:number=1;
 
   plus()
   {
-    if(this.quantity<6){
+    if(this.quantity<8){
       this.quantity++;
       this.huesped.adultos=this.quantity
+      //this.formGroup.controls['ninos'].patchValue(this.quantityNin)
+      //this.formGroup.controls['ninos'].updateValueAndValidity();
     }
   }
   minus()
@@ -679,6 +788,61 @@ resetFoliador()
     return this.mySet;
     }
 
+    toggleDropdown()
+    {
+    this.showDropDown=!this.showDropDown
+    }
+
+    closeDropDown()
+    {
+    this.showDropDown=false
+    }
+
+    selectValue(value){
+      this.formGroup.patchValue({"search":value})
+      this.showDropDown=false
+    }
+
+    getSearchValue() {
+      return this.formGroup.value.search;
+    }
+
+    open() {
+      this.modalService.open(NgbdModal1Content);
+    }
+
+    showList(event:any)
+    {
+      if(event.target.value="")
+      {
+        this.displayNone="display:none"
+      }
+      else
+      this.displayNone=""
+    }
+    closeList()
+    {
+      this.displayNone="display:none"
+    }
+
+  }
 
 
+
+
+
+export class NgbdModal1Content {
+  constructor(private modalService: NgbModal, public activeModal: NgbActiveModal) {}
+
+  open() {
+    this.modalService.open(NgbdModal2Content, {
+      size: 'lg'
+    });
+  }
 }
+
+
+export class NgbdModal2Content {
+    constructor(public activeModal: NgbActiveModal) {}
+  }
+

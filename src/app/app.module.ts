@@ -17,13 +17,16 @@ import { SplashScreenModule } from './_metronic/partials/layout/splash-screen/sp
 // #fake-start#
 import { FakeAPIService } from './_fake/fake-api.service';
 // #fake-end#
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatIconModule} from '@angular/material/icon';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatButtonModule} from '@angular/material/button';
+// import { MatTabsModule } from '@angular/material/tabs';
+// import { MatCheckboxModule } from '@angular/material/checkbox';
+// // import {MatExpansionModule} from '@angular/material/expansion';
+// import {MatIconModule} from '@angular/material/icon';
+// import {MatDatepickerModule} from '@angular/material/datepicker';
+// import {MatFormFieldModule} from '@angular/material/form-field';
+// import {MatButtonModule} from '@angular/material/button';
+// import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { ClickOutsideDirective } from './pages/directives/click-outside.directive';
+
 
 function appInitializer(authService: AuthService) {
   return () => {
@@ -35,7 +38,7 @@ function appInitializer(authService: AuthService) {
 
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent,ClickOutsideDirective],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -44,14 +47,16 @@ function appInitializer(authService: AuthService) {
     HttpClientModule,
     HighlightModule,
     ClipboardModule,
-    MatTabsModule,
-    MatCheckboxModule,
-    MatExpansionModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatFormFieldModule,
-    MatButtonModule,
-    // #fake-start#
+    // MatTabsModule,
+    // MatCheckboxModule,
+    // MatExpansionModule,
+    // MatIconModule,
+    // MatDatepickerModule,
+    // MatFormFieldModule,
+    // MatButtonModule,
+
+
+        // #fake-start#
     environment.isMockEnabled
       ? HttpClientInMemoryWebApiModule.forRoot(FakeAPIService, {
         passThruUnknownUrl: true,

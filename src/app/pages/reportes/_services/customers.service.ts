@@ -27,6 +27,18 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
     super(http);
   }
 
+  //
+  getAll() :Observable<Huesped[]> {
+    return this.http
+     .get<Huesped[]>(environment.apiUrl + '/reportes/huesped')
+     .pipe(
+       map(responseData=>{
+       return responseData
+     })
+     )
+
+   }
+
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Huesped>> {
     return this.http.get<Huesped[]>(this.API_URL).pipe(
