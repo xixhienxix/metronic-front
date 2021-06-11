@@ -1,4 +1,4 @@
-import {  Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import { from, of, Subscription } from 'rxjs';
@@ -18,6 +18,10 @@ import { Disponibilidad } from '../../../_models/disponibilidad.model';
 import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
 import { Observable} from  'rxjs';
+import {MatDialog} from '@angular/material/dialog';
+import {MatMenuTrigger} from '@angular/material/menu';
+import { DialogComponent } from './components/dialog/dialog.component';
+import {HistoricoService} from '../../../_services/historico.service'
 
 let date: Date = new Date();
 declare global {
@@ -93,6 +97,7 @@ const EMPTY_CUSTOMER: Huesped = {
     background-color: rgba(2, 117, 216, 0.5);
   },
 
+
 `],
   // NOTE: For this example we are only providing current component, but probably
   // NOTE: you will w  ant to provide your main App Module
@@ -103,7 +108,10 @@ const EMPTY_CUSTOMER: Huesped = {
 })
 
 
-export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
+export class NuevaReservaModalComponent implements  OnInit, OnDestroy
+{
+  @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
+
   @Input()
 
 //DATETIMEPICKER RANGE
@@ -117,13 +125,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy {
 //
 options: string[] = ['One', 'Two', 'Three'];
 filteredOptions: Observable<string[]>;
-
+public dialog: MatDialog
   private modalService: NgbModal
   searchGroup: FormGroup;
   mySet = new Set();
   maxAdultos:number=6;
   maxNinos:number=6;
-  bandera:boolean=false
+  bandera:boolean=false;
+  inicio : boolean = true;
   id:number;
   folio:number;
   isLoading$;
@@ -148,6 +157,8 @@ filteredOptions: Observable<string[]>;
   displayNone:string = "display:none"
   showDropDown=false;
   accordionDisplay="";
+  _isDisabled:boolean=true;
+
 
 
 
@@ -158,6 +169,7 @@ filteredOptions: Observable<string[]>;
     public habitacionService : HabitacionesService,
     public foliosService : FoliosService,
     private customersService: HuespedService,
+    public historicoService: HistoricoService,
     private disponibilidadService:DisponibilidadService,
     private fb: FormBuilder, public modal: NgbActiveModal,
     public customerService: HuespedService,
@@ -173,46 +185,16 @@ filteredOptions: Observable<string[]>;
 
   ngOnInit(): void {
     this.isLoading$ = this.customersService.isLoading$;
+    this.historicoService.fetch();
     this.loadCustomer();
     this.getDispo();
-    // this.gethuespedes();
     this.getHabitaciones();
-
-
-
   }
-
-
-
-  // gethuespedes()
-  // {
-  //   this.customerService.getAll().pipe(
-  //     map((responseData)=>{
-  //       const getarray=[]
-  //       for(const key in responseData)
-  //       {
-  //         if(responseData.hasOwnProperty(key))
-  //         getarray.push(responseData[key]);
-  //       }
-  //       return getarray
-
-  //     })
-  //   ).subscribe((result)=>{
-  //     for(let i=0;i<result.length;i++)
-  //     {
-  //       this.options.push(result[i].nombre)}
-  //     console.log("result:",this.options)
-  //   })
-
-  // }
-
-
 
 
   loadCustomer() {
 
     if (!this.id) {
-      console.log("Load Costumer !this.folio", this.folio)
 
       this.huesped = EMPTY_CUSTOMER;
       this.huesped.folio=this.folio;
@@ -220,8 +202,6 @@ filteredOptions: Observable<string[]>;
       this.loadForm();
 
     } else {
-      console.log("Load Costumer else this.folio", this.folio)
-      console.log("Load Costumer else this.id", this.id)
 
       const sb = this.customersService.getItemById(this.folio).pipe(
         first(),
@@ -308,7 +288,6 @@ filteredOptions: Observable<string[]>;
 
     const formData = this.formGroup.value;
 
-
     this.huesped.llegada = this.fromDate.toString();
     this.huesped.salida = this.toDate.toString();
     this.huesped.nombre = formData.nombre;
@@ -324,8 +303,8 @@ filteredOptions: Observable<string[]>;
         this.huesped.motivo=formData.motivo
         this.huesped.id=this.huesped.folio
         this.huesped.numeroCuarto=this.preAsig
-
-    this.postService.addPost
+        this.huesped.habitacion=this.cuarto
+  let post = this.postService.addPost
     (
       this.huesped.id,
       this.huesped.folio,
@@ -355,34 +334,57 @@ filteredOptions: Observable<string[]>;
       this.huesped.lenguaje,
       this.huesped.numeroCuarto
     );
-      alert("HUESPED GUARDADO")
+      if(this.huesped.estatus==1){
+        alert("Walk-In #"+this.huesped.folio +" Generado con exito!");
+      }else
+      if(this.huesped.estatus==2){
+        alert("Reserva #"+this.huesped.folio +" Generada con exito!");
+      }else
+      if(this.huesped.estatus==6){
+        alert("Bloqueo #"+this.huesped.folio +" Generada con exito!");
+      }else
+      if(this.huesped.estatus==7){
+        alert("Reserva Temporal #"+this.huesped.folio +" Generada con exito!");
+      }
+      this.inicio==true;
+      this.huesped= {
+        id:undefined,
+        folio:undefined,
+        adultos:1,
+        ninos:1,
+        nombre: '',
+        estatus: 1,
+        llegada:'',
+        salida:'',
+        noches: 1,
+        tarifa:500,
+        porPagar: 500,
+        pendiente:500,
+        origen: 'Online',
+        habitacion: '',
+        telefono:"",
+        email:"",
+        motivo:"",
+        //  OtrosDatos
+        fechaNacimiento:'',
+        trabajaEn:'',
+        tipoDeID:'',
+        numeroDeID:'',
+        direccion:'',
+        pais:'',
+        ciudad:'',
+        codigoPostal:'',
+        lenguaje:'Español',
+        numeroCuarto: 0
+      };
       this.modal.close();
 
-      // const modalRef = this.modalService.open(NgbdModal1Content, { size: 'md' });
   }
 
 
-  // search
-  // searchForm() {
-  //   this.searchGroup = this.fb.group({
-  //     searchTerm: [''],
-  //   });
-
-  //   const searchEvent = this.searchGroup.controls.searchTerm.valueChanges
-  //     .pipe(
-  //       /*
-  //     The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
-  //     we are limiting the amount of server requests emitted to a maximum of one every 150ms
-  //     */
-  //       debounceTime(150),
-  //       distinctUntilChanged()
-  //     )
-  //     .subscribe((val) => this.search(val));
-  //   this.subscriptions.push(searchEvent);
-  // }
 
   search(searchTerm: string) {
-    this.customerService.patchState({ searchTerm });
+    this.historicoService.patchState({ searchTerm });
   }
 
 
@@ -473,6 +475,7 @@ resetFoliador()
 
   buscaDispo()
   {
+    this.inicio==false;
     this.accordionDisplay="";
 
     if(this.bandera)
@@ -657,6 +660,10 @@ resetFoliador()
 
   setStep(index: number) {
     this.step = index;
+    this.disponibilidad=[]
+    this.mySet.clear
+    this.cuartos=[]
+    this.sinDisponibilidad=[]
   }
 
   nextStep() {
@@ -776,7 +783,11 @@ resetFoliador()
     let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
     let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
 
+    if(!isNaN(diaDif)){
     this.huesped.noches=diaDif
+    }else
+    this.huesped.noches=1
+
 
     rangodeFechas = llegada.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(llegada.split("/")[0]))+"/"+llegada.split("/")[2]+" - " +salida.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(salida.split("/")[0]))+"/"+salida.split("/")[2]
 
@@ -807,9 +818,7 @@ resetFoliador()
       return this.formGroup.value.search;
     }
 
-    open() {
-      this.modalService.open(NgbdModal1Content);
-    }
+
 
     showList(event:any)
     {
@@ -825,24 +834,11 @@ resetFoliador()
       this.displayNone="display:none"
     }
 
+    toggleSearch() {
+      let control = this.formGroup.get('searchTerm')
+      control.disabled ? control.enable() : control.disable();
+    }
+
   }
 
-
-
-
-
-export class NgbdModal1Content {
-  constructor(private modalService: NgbModal, public activeModal: NgbActiveModal) {}
-
-  open() {
-    this.modalService.open(NgbdModal2Content, {
-      size: 'lg'
-    });
-  }
-}
-
-
-export class NgbdModal2Content {
-    constructor(public activeModal: NgbActiveModal) {}
-  }
 

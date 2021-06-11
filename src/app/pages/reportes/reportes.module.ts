@@ -51,6 +51,9 @@ import {MatListModule} from '@angular/material/list';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatMenuTrigger} from '@angular/material/menu';
+import { DialogComponent } from './customers/components/nueva-reserva-modal/components/dialog/dialog.component';
 
 @NgModule({
   declarations: [
@@ -113,7 +116,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     ReactiveFormsModule,
     MatToolbarModule,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDialogModule,
 
        // RouterModule.forChild([
     //   {
@@ -139,7 +143,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     DeleteSpecsModalComponent,
     FetchSpecsModalComponent,
     EditRemarkModalComponent,
-    EditSpecModalComponent
+    EditSpecModalComponent,
+    DialogComponent
+
+
   ]
 })
 @Injectable({

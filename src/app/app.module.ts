@@ -26,6 +26,7 @@ import { FakeAPIService } from './_fake/fake-api.service';
 // import {MatButtonModule} from '@angular/material/button';
 // import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { ClickOutsideDirective } from './pages/directives/click-outside.directive';
+import { DialogComponent } from './pages/reportes/customers/components/nueva-reserva-modal/components/dialog/dialog.component';
 
 
 function appInitializer(authService: AuthService) {
@@ -38,7 +39,7 @@ function appInitializer(authService: AuthService) {
 
 
 @NgModule({
-  declarations: [AppComponent,ClickOutsideDirective],
+  declarations: [AppComponent,ClickOutsideDirective, DialogComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

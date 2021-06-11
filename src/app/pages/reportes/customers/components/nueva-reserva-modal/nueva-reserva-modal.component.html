@@ -17,7 +17,6 @@
     <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
 
       <div class="form-group row" style="border:1px solid rgb(128, 128, 128);">
-
               <div class="form-group hidden">
                 <div class="input-group">
                   <input hidden name="datepicker"
@@ -46,7 +45,7 @@
               </div>
 
               <div class="form-group col-lg-8">
-                  <label class="form-label">Seleccionar Rango de Fecha</label>
+                  <label class="form-label">Selecciona Rango de Fecha</label>
                   <div class="input-group">
                     <input hidden
                            #dpFromDate
@@ -64,24 +63,9 @@
                       </button>
                     </div>
                   </div>
-                 </div>
+              </div>
 
-                 <ng-template #footerTemplate>
-                  <hr class="my-0">
-                  <!-- <button class="btn btn-primary btn-sm m-2 float-left" (click)="model=today d.close()">Today</button> -->
-                  <button class="btn btn-secondary btn-sm m-2 float-right" (click)="datepicker.close()">Close</button>
-                </ng-template>
-
-
-
-                 <div  class="form-group col-lg-4">
-                    <div class="input-group">
-                     <label>Noches:</label>
-                     </div>
-                      <label style="padding-left: 30%;" class="font-weight-bold h1 text-right">{{huesped.noches}}</label>
-                 </div>
-
-             <!-- <div class="form-group col-lg-6"> -->
+              <!-- <div class="form-group col-lg-6"> -->
                 <!-- <label class="form-label">Salida</label> -->
                 <!-- <div class="input-group"> -->
                   <input hidden #dpToDate
@@ -96,6 +80,23 @@
                   <!-- </div> -->
                 <!-- </div> -->
              <!-- </div> -->
+
+
+                <ng-template #footerTemplate>
+                  <hr class="my-0">
+                  <!-- <button class="btn btn-primary btn-sm m-2 float-left" (click)="model=today d.close()">Today</button> -->
+                  <button class="btn btn-secondary btn-sm m-2 float-right" (click)="datepicker.close()">Confirmar</button>
+                </ng-template>
+
+
+                 <div  class="form-group col-lg-4">
+                    <div class="input-group">
+                     <label>Noches:</label>
+                     </div>
+                     <label style="padding-left: 30%;" class="font-weight-bold h1 text-right">{{huesped.noches}}</label>
+                 </div>
+
+
 
               <div class="form-group col-lg-6">
 
@@ -293,7 +294,7 @@
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
-     <ng-container *ngIf="disponibilidad.length === 0 ">
+     <ng-container *ngIf="disponibilidad.length === 0 && inicio===false"  >
       <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header style="background-color:#fa6d7c;">
@@ -315,87 +316,73 @@
      </ng-container>
 
     <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
-      <div class="form-group row">
-
-            <div class="form-group col-lg-12">
-              <label class="input-label">Buscar Cliente</label>
-
-              <input type="text"
-                    placeholder="Busca por Nombre"
-                    aria-label="Number"
-                    matInput
-                    formControlName="searchTerm"
-                    class="form-control col-lg-12"
-                    (click)="showList($event)"
-                    value="{{huesped.nombre}}"
-                    >
-
-
-              <div class="col-lg-12" [style]="displayNone" class="name-container-dropdown">
-                <mat-selection-list (click)="closeList();onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
-                  <mat-list-option  *ngFor="let huesped of customerService.items$ | async"  [value]="huesped.nombre">
-                    {{huesped.nombre}}
-                  </mat-list-option>
-                </mat-selection-list>
-              </div>
-
-
-            <!-- <div class="input-group">
-              <select
-                class="form-control form-control-lg form-control-solid"
-                name="buscahuesped"
-                (change)="onSelectHuesped($event.target.value)"
-                #buscarHuesped>
-                <option disabled selected value> -- Buscar por Nombre -- </option>
-                <ng-container *ngFor="let huesped of customerService.items$ | async">
-                  <option value="{{huesped.nombre}}">{{huesped.nombre}}
-                  </option>
-                </ng-container>
-              </select>
-            </div> -->
-
-          <!-- <button class="btn btn-primary" type="button" disabled>
-            <i class="fa fa-search"></i>
-          </button> -->
-
+      <div class="form-group">
+        <div class="row">
+          <label class="form-label" for="form1">Buscar en Historico</label>
+          <div  class="input-group col-lg-12 text-center">
+              <input  type="search"
+                      disabled
+                      placeholder="Busca por Nombre    ---->"
+                      aria-label="Number"
+                      matInput
+                      formControlName="searchTerm"
+                      class="form-control col-lg-12 text-center"
+                      (click)="showList($event)"
+                      value="{{huesped.nombre}}"
+                      />
+            <button type="button" (click)="toggleSearch()" class="btn btn-primary">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="" [style]="displayNone" class="name-container-dropdown">
+          <mat-selection-list (click)="closeList();onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
+            <mat-list-option  *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
+              {{huesped.nombre}}
+            </mat-list-option>
+          </mat-selection-list>
         </div>
       </div>
 
-        <div class="col-lg-12">
-          <label class="form-label">Escribe tu Nombre</label>
-          <input
-            type="text"
-            class="form-control form-control-lg form-control-solid"
-            name="nombre"
-            placeholder="Nombre completo"
-            autocomplete="off"
-            [class.is-invalid]="isControlInvalid('nombre')"
-            [class.is-valid]="isControlValid('nombre')"
-            formControlName="nombre"
-            value="{{huesped.nombre}}"
-          />
-          <div class="valid-feedback" *ngIf="isControlValid('nombre')">
-            Nombre Escrito Correctamente
-          </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="controlHasError('required', 'nombre')"
-          >
-            Campo Requerido*
-          </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="controlHasError('minlength', 'nombre')"
-          >
-            Minimo 3 letras
-          </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="controlHasError('maxlength', 'nombre')"
-          >
-            Maximo 100 letras
+
+        <div class="row">
+          <div class="col-lg-12">
+            <label class="form-label">Escribe tu Nombre</label>
+            <input
+              type="text"
+              class="form-control form-control-lg form-control-solid"
+              name="nombre"
+              placeholder="Nombre completo"
+              autocomplete="off"
+              [class.is-invalid]="isControlInvalid('nombre')"
+              [class.is-valid]="isControlValid('nombre')"
+              formControlName="nombre"
+              value="{{huesped.nombre}}"
+            />
+            <div class="valid-feedback" *ngIf="isControlValid('nombre')">
+              Nombre Escrito Correctamente
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="controlHasError('required', 'nombre')"
+            >
+              Campo Requerido*
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="controlHasError('minlength', 'nombre')"
+            >
+              Minimo 3 letras
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="controlHasError('maxlength', 'nombre')"
+            >
+              Maximo 100 letras
+            </div>
           </div>
         </div>
+
 
         <div class="form-group row">
 
@@ -524,6 +511,5 @@
     </div>
 
 </form>
-
 
 
