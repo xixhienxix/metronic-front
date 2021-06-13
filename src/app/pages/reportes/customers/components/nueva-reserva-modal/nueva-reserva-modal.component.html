@@ -1,11 +1,11 @@
 <div class="modal-content">
 <ng-container *ngIf="huesped.id == undefined">
-  <div style="background-color: #FB4848;" class="modal-header">
+  <div style="background-color: #00506a;" class="modal-header">
     <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center"
       id="example-modal-sizes-title-lg">
-      NUEVA RESERVACION - FOLIO
-      <label>
-        {{huesped.folio}}</label>
+      NUEVA RESERVA / BLOQUEO
+      <!-- <label>
+        {{huesped.folio}}</label> -->
     </div>
   </div>
 </ng-container>
@@ -17,16 +17,16 @@
     <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
 
       <div class="form-group row" style="border:1px solid rgb(128, 128, 128);">
-
               <div class="form-group hidden">
                 <div class="input-group">
                   <input hidden name="datepicker"
                          class="form-control"
                          ngbDatepicker
+                         [footerTemplate]="footerTemplate"
                          #datepicker="ngbDatepicker"
                          [autoClose]="'outside'"
                          (dateSelect)="onDateSelection($event)"
-                         [displayMonths]="2"
+                         [displayMonths]="1"
                          [dayTemplate]="t"
                          outsideDays="hidden"
                          [startDate]="fromDate!"
@@ -43,36 +43,60 @@
                   </ng-template>
                 </div>
               </div>
-               <div class="form-group col-lg-6">
-                <label class="form-label">Llegada</label>
-                <div class="input-group">
-                  <input #dpFromDate
-                         class="form-control" placeholder="yyyy-mm-dd"
-                         name="dpFromDate"
-                         [value]="formatter.format(fromDate)"
-                         (input)="fromDate = validateInput(fromDate, dpFromDate.value)">
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
-                      <i class="fa fa-calendar icon"></i>
-                    </button>
+
+              <div class="form-group col-lg-8">
+                  <label class="form-label">Selecciona Rango de Fecha</label>
+                  <div class="input-group">
+                    <input hidden
+                           #dpFromDate
+                           class="form-control" placeholder="yyyy-mm-dd"
+                           name="dpFromDate"
+                           [value]="formatter.format(fromDate)"
+                           (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
+                           >
+                    <input #rango
+                            class="form-control col-lg-8"
+                            [value]="rangoFechas(dpFromDate.value,dpToDate.value)">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
+                        <i class="fa fa-calendar icon"></i>
+                      </button>
+                    </div>
                   </div>
-                </div>
-               </div>
-             <div class="form-group col-lg-6">
-                <label class="form-label">Salida</label>
-                <div class="input-group">
-                  <input #dpToDate
+              </div>
+
+              <!-- <div class="form-group col-lg-6"> -->
+                <!-- <label class="form-label">Salida</label> -->
+                <!-- <div class="input-group"> -->
+                  <input hidden #dpToDate
                          class="form-control" placeholder="yyyy-mm-dd"
                          name="dpToDate"
                          [value]="formatter.format(toDate)"
                          (input)="toDate = validateInput(toDate, dpToDate.value)">
-                  <div class="input-group-append">
-                    <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
+                  <!-- <div class="input-group-append"> -->
+                    <!-- <button class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
                       <i class="fa fa-calendar icon"></i>
-                    </button>
-                  </div>
-                </div>
-             </div>
+                    </button> -->
+                  <!-- </div> -->
+                <!-- </div> -->
+             <!-- </div> -->
+
+
+                <ng-template #footerTemplate>
+                  <hr class="my-0">
+                  <!-- <button class="btn btn-primary btn-sm m-2 float-left" (click)="model=today d.close()">Today</button> -->
+                  <button class="btn btn-secondary btn-sm m-2 float-right" (click)="datepicker.close()">Confirmar</button>
+                </ng-template>
+
+
+                 <div  class="form-group col-lg-4">
+                    <div class="input-group">
+                     <label>Noches:</label>
+                     </div>
+                     <label style="padding-left: 30%;" class="font-weight-bold h1 text-right">{{huesped.noches}}</label>
+                 </div>
+
+
 
               <div class="form-group col-lg-6">
 
@@ -86,18 +110,29 @@
                   </div>
                   <input
                     class="input-group form-control form-control-lg form-control-solid text-center"
+                    #controladultos
                     placeholder=""
+                    type="number"
+                    max="6"
                     name="adultos"
                     [value]="quantity"
-                    value="{{huesped.adultos}}"
                     formControlName="adultos"
+                    [class.is-invalid]="isControlInvalid('adultos')"
+                    [class.is-valid]="isControlValid('adultos')"
                     >
+                    <div
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('max', 'adultos')"
+                    >
+                    Maximo {{maxAdultos}} Adultos
+                    </div>
                   <div class="input-group-append">
                     <button class="btn btn-secondary" (click)="plus()" type="button">
                       <i class="fa fa-plus">
                       </i>
                     </button>
                   </div>
+
 
                 </div>
               </div>
@@ -113,12 +148,22 @@
                     </button>
                   </div>
                   <input
+                  type="number"
+                  max="6"
                   class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
                     name="ninos"
                     [value]="quantityNin"
                     value={{huesped.ninos}}
                     formControlName="ninos"
+                    [class.is-invalid]="isControlInvalid('ninos')"
+                    [class.is-valid]="isControlValid('ninos')"
                     >
+                  <div class="input-group-append"
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('maxlength', 'ninos')"
+                  >
+                    Maximo {{maxNinos}} Niños
+                  </div>
                   <div class="input-group-append">
                     <button class="btn btn-secondary" (click)="plusNin()" type="button">
                       <i class="fa fa-plus">
@@ -127,7 +172,6 @@
                   </div>
                 </div>
               </div>
-
 
 
               <div class="col-lg-12">
@@ -139,45 +183,19 @@
                         (change)="habValue($event)"
                       >
                       <option selected value="0">Selecciona Tipo de Cuarto</option>
+                      <option value="1">Todos los Cuartos</option>
                       <ng-container *ngFor="let tipoCuarto of codigoCuarto">
-                        <option> {{tipoCuarto}} </option>
+                        <option> {{tipoCuarto.replace("_"," ")}} </option>
                       </ng-container>
-                      <!-- <option value="1">Chardonnay</option>
-                      <option value="2">Cabernet</option>
-                      <option value="3">Shiraz</option>
-                      <option value="4">Malbec</option>
-                      <option value="5">La Vid</option>
-                      <option value="6">Merlot</option>
-                      <option value="7">inot Noir</option> -->
                     </select>
                 </label>
               </div>
-
-              <!-- <div class="form-group col-lg-6">
-                <label class="form-label">Tarifa</label>
-                <div class="input-group">
-                  <div class="input-group-append">
-                    <button class="btn btn-secondary" (click)="minusNin()">
-                      <i class="fa fa-money-bill-wave">
-                      </i>
-                    </button>
-                  </div>
-                  <input
-                  class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
-                    name="tarifa"
-                    type="number"
-                    [value]="huesped.tarifa"
-                    value={{huesped.tarifa}}
-                    formControlName="tarifa"
-                    >
-                </div>
-              </div> -->
 
               <div class="col-lg-12">
                   <div class="input-group-append">
                     <button
                         class="btn btn-success text-center"
-                        (click)="buscaDispo();"
+                        (click)="buscaDispo();setStep(1) "
                         type="button"
                         > Buscar Disponibilidad
                     </button>
@@ -188,58 +206,96 @@
 
 
 
-     <ng-container *ngIf="cuartos.length !==0 ">
-      <mat-accordion class="example-headers-align" multi>
-        <mat-expansion-panel>
+  <ng-container *ngIf="disponibilidad.length !==0 ">
+      <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
+        <mat-expansion-panel  [expanded]="step === 1"  hideToggle>
             <mat-expansion-panel-header style="background-color:#99d284;">
             <mat-panel-title>
               CON DISPONIBILIDAD
             </mat-panel-title>
-            <mat-panel-description>
-             <!--Type your name and age-->
-             {{cuarto}}
+            <mat-panel-description *ngIf="bandera==false">
              <!-- <mat-icon>account_circle</mat-icon> -->
             </mat-panel-description>
+            <mat-panel-description *ngIf="bandera==true">
+
+              <!-- <mat-icon>account_circle</mat-icon> -->
+             </mat-panel-description>
           </mat-expansion-panel-header>
 
           <!--Contenido del Accordion-->
-<ng-container *ngFor="let habitacionesDisponibles of cuartos ">
-  <div class="table-responsive angular-bootstrap-table">
-    <table class="table table-head-custom table-vertical-center overflow-hidden">
-      <thead>
+            <div  class="table-responsive angular-bootstrap-table">
+              <table *ngIf="bandera==false" class="table table-head-custom table-vertical-center overflow-hidden">
+                <div class="font-weight-bold text-uppercase modal-header"> {{cuarto.replace("_"," ")}} </div>
+                <thead>
+                  <th>
+                    # de Cuarto
+                  </th>
+                  <th>
+                    Descripcion
+                  </th>
+                  <th>
+                    Capacidad
+                  </th>
+                  <th>
+                    Tarifa
+                  </th>
+                </thead>
+                <ng-container *ngFor="let habitacionesDisponibles of mySet">
+                <ng-container *ngFor="let tipocuarto of cuartos">
+                <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
+                  <tr>
+                    <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                    <td >{{ tipocuarto.Descripcion}}</td>
+                    <td >{{ tipocuarto.Personas }} Adultos</td>
+                    <td >{{ tipocuarto.Tarifa }}.00</td>
+                  </tr>
+                </tbody>
+              </ng-container>
+            </ng-container>
+              </table>
 
-        <th>
-          # de Cuarto
-        </th>
-        <th>
-          Descripcion
 
-        </th>
-        <th>
-          Capacidad
-        </th>
-        <th>
-          Tarifa
-        </th>
-      </thead>
-      <tbody>
-        <tr>
-
-          <td><mat-checkbox (checked)="preAsignar(habitacionesDisponibles.Numero)"></mat-checkbox> &nbsp; {{ habitacionesDisponibles.Numero }}</td>
-          <td>{{ habitacionesDisponibles.Descripcion}}</td>
-          <td>{{ habitacionesDisponibles.Personas }} Adultos</td>
-          <td>{{ habitacionesDisponibles.Tarifa }}.00</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<ng-container *ngIf="bandera==true">
+  <ng-container *ngFor="let codigosCuarto of codigoCuarto;  let i = index">
+    <div class="font-weight-bold text-uppercase modal-header">{{codigosCuarto.replace("_"," ")}}</div>
+        <table  class="table table-head-custom table-vertical-center overflow-hidden">
+          <thead>
+            <th>
+              # de Cuarto
+            </th>
+            <th>
+              Descripcion
+            </th>
+            <th>
+              Capacidad
+            </th>
+            <th>
+              Tarifa
+            </th>
+          </thead>
+          <ng-container *ngFor="let habitacionesDisponibles of mySet">
+          <ng-container *ngFor="let tipocuarto of cuartos">
+          <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
+            <tr>
+              <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+              <td >{{ tipocuarto.Descripcion}}</td>
+              <td >{{ tipocuarto.Personas }} Adultos</td>
+              <td >{{ tipocuarto.Tarifa }}.00</td>
+            </tr>
+          </tbody>
+        </ng-container>
+      </ng-container>
+        </table>
+  </ng-container>
 </ng-container>
 
+
+            </div>
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
-     <ng-container *ngIf="cuartos.length ===0 ">
-      <mat-accordion class="example-headers-align" multi>
+     <ng-container *ngIf="disponibilidad.length === 0 && inicio===false"  >
+      <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header style="background-color:#fa6d7c;">
             <mat-panel-title>
@@ -259,84 +315,75 @@
       </mat-accordion>
      </ng-container>
 
-    <!-- <ng-container *ngIf="cuartos.length !==0 ">
-      <div style="background-color:#99d284;" class="modal-header">
-        <div style="text-align: center; color: white;" class=" h4 col-12 text-center"
-          id="example-modal-sizes-title-lg">
-          CON DISPONIBILIDAD
-        </div>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="cuartos.length ===0 ">
-      <div style="background-color:#fa6d7c;" class="modal-header">
-        <div style="text-align: center; color: white;" class="h4 col-12 text-center"
-          id="example-modal-sizes-title-lg">
-          SIN DISPONIBILIDAD
-        </div>
-      </div>
-    </ng-container> -->
-
-
     <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
-      <div class="form-group row">
+      <div class="form-group">
+        <div class="row">
+          <label class="form-label" for="form1">Buscar en Historico</label>
+          <div  class="input-group col-lg-12 text-center">
+              <input  type="search"
+                      disabled
+                      placeholder="Busca por Nombre    ---->"
+                      aria-label="Number"
+                      matInput
+                      formControlName="searchTerm"
+                      class="form-control col-lg-12 text-center"
+                      (click)="showList($event)"
+                      value="{{huesped.nombre}}"
+                      />
+            <button type="button" (click)="toggleSearch()" class="btn btn-primary">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="" [style]="displayNone" class="name-container-dropdown">
+          <mat-selection-list (click)="closeList();onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
+            <mat-list-option  *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
+              {{huesped.nombre}}
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+      </div>
 
-        <div class="form-group col-lg-12">
-          <label class="input-label">Buscar Húsped
-            <div class="input-group">
-              <select
-                class="form-control form-control-lg form-control-solid"
-                name="buscahuesped"
-                (change)="onSelectHuesped($event.target.value)"
-                #buscarHuesped>
-                <option disabled selected value> -- Buscar por Nombre -- </option>
-                <ng-container *ngFor="let huesped of customerService.items$ | async">
-                  <option value="{{huesped.nombre}}">{{huesped.nombre}}
-                  </option>
-                </ng-container>
-              </select>
+
+        <div class="row">
+          <div class="col-lg-12">
+            <label class="form-label">Escribe tu Nombre</label>
+            <input
+              type="text"
+              class="form-control form-control-lg form-control-solid"
+              name="nombre"
+              placeholder="Nombre completo"
+              autocomplete="off"
+              [class.is-invalid]="isControlInvalid('nombre')"
+              [class.is-valid]="isControlValid('nombre')"
+              formControlName="nombre"
+              value="{{huesped.nombre}}"
+            />
+            <div class="valid-feedback" *ngIf="isControlValid('nombre')">
+              Nombre Escrito Correctamente
             </div>
-          </label>
-          <button class="btn btn-primary" type="button" disabled>
-            <i class="fa fa-search"></i>
-          </button>
+            <div
+              class="invalid-feedback"
+              *ngIf="controlHasError('required', 'nombre')"
+            >
+              Campo Requerido*
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="controlHasError('minlength', 'nombre')"
+            >
+              Minimo 3 letras
+            </div>
+            <div
+              class="invalid-feedback"
+              *ngIf="controlHasError('maxlength', 'nombre')"
+            >
+              Maximo 100 letras
+            </div>
+          </div>
         </div>
 
-        <div class="col-lg-12">
-          <label class="form-label">Escribe tu Nombre</label>
-          <input
-            type="text"
-            class="form-control form-control-lg form-control-solid"
-            name="nombre"
-            placeholder="Nombre completo"
-            autocomplete="off"
-            [class.is-invalid]="isControlInvalid('nombre')"
-            [class.is-valid]="isControlValid('nombre')"
-            formControlName="nombre"
-            value="{{huesped.nombre}}"
-          />
-          <div class="valid-feedback" *ngIf="isControlValid('nombre')">
-            Nombre Escrito Correctamente
-          </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="controlHasError('required', 'nombre')"
-          >
-            Campo Requerido*
-          </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="controlHasError('minlength', 'nombre')"
-          >
-            Minimo 3 letras
-          </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="controlHasError('maxlength', 'nombre')"
-          >
-            Maximo 100 letras
-          </div>
-        </div>
-        </div>
+
         <div class="form-group row">
 
         <div class="col-lg-6">
@@ -421,7 +468,7 @@
         Tipo de Reserva
         <div class="form-group row">
           <div class="form-group col-lg-6 ">
-                <button
+                <button disabled
                 class="btn btn-success btn-block"
                 type="submit"
                 name="estatus"
@@ -435,7 +482,7 @@
                 class="btn btn-warning btn-block"
                 type="submit"
                 name="estatus"
-                (click)="setEstatus(3)"
+                (click)="setEstatus(2)"
                 >
                   Agrega Reserva
                 </button>
@@ -462,5 +509,7 @@
         </div>
       </div>
     </div>
+
 </form>
+
 

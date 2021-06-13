@@ -222,56 +222,35 @@
             </td>
             <td>{{ huesped.llegada }}</td>
             <td>{{ huesped.salida }}</td>
-            <td>{{ huesped.noches }}</td>
+            <td style="text-align: center;">{{ huesped.noches }}</td>
             <td>{{ huesped.tarifa }}</td>
             <td>{{ huesped.porPagar }}</td>
             <td>{{ huesped.pendiente }}</td>
             <td>{{ huesped.origen }}</td>
             <!-- <td>{{ huesped.habitacion }}</td> -->
             <td>
-              <select id="hab" class="btn btn-dark" #hab>
-                <ng-container *ngIf="huesped.habitacion===1">
-                  <option value="1" selected disabled> Cardonay</option>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===2">
-                  <option value="2" selected disabled> Cabernet</option>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===3">
-                  <option value="3" selected disabled> Shiraz</option>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===4">
-                  <option value="4" selected disabled> Malbec</option>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===5">
-                  <option value="5" selected disabled> La Vid</option>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===6">
-                  <option value="6" selected disabled> Merlot</option>
-                </ng-container>
-                <ng-container *ngIf="huesped.habitacion===7">
-                  <option value="7" selected disabled> Pinot Noir</option>
-                </ng-container>
-                <option value="1"> Cardonay</option>
-                <option value="2"> Cabernet</option>
-                <option value="3"> Shiraz</option>
-                <option value="4"> Malbec</option>
-                <option value="5"> La Vid</option>
-                <option value="6"> Merlot</option>
-                <option value="7"> Pinot Noir</option>
-              </select>
-
+              <!-- <select style="width: 100%;"
+                        class="form-control form-control-lg form-control-solid"
+                        name="habitacion"
+                        formControlName="habitacion"
+                        (change)="habValue($event)"
+                      >
+                      <option style="width: 100%;" selected *ngIf="huesped.numeroCuarto == 0">S/N - {{huesped.habitacion}}</option>
+                      <option style="width: 100%;" selected *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}</option>
+                      <ng-container *ngFor="let tipoCuarto of cuartos">
+                        <option> {{tipoCuarto}} </option>
+                      </ng-container>
+                    </select> -->
+                      <label class="btn" style="background-color: #fb7f8c;" *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
+                      </label>
+                      <label class="btn" style="background-color: #3da7e0;" *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
+                      </label>
             </td>
-            <!-- <td>
-              <span class="label label-dot label-primary mr-2" [class.label-success]="customer.type === 1"
-                [class.label-primary]="customer.type === 2"></span>&nbsp;<span class="font-bold font-primary">
-                <ng-container *ngIf="customer.type === 1">Business</ng-container>
-                <ng-container *ngIf="customer.type === 2">Individual</ng-container>
-              </span>
-            </td> -->
+
             <td>
 
               <a
-                title="Edit huesped"
+                title="Editar Folio"
                 class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3"
                 (click)="edit(huesped.folio)">
                 <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
@@ -279,13 +258,13 @@
                 </span>
               </a>
 
-              <a title="Delete huesped" class="btn btn-icon btn-light btn-hover-danger btn-sm"
+              <!-- <a title="Delete huesped" class="btn btn-icon btn-light btn-hover-danger btn-sm"
                 >
-                <!--(click)="delete(huesped.folio)"-->
+                (click)="delete(huesped.folio)"
                 <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
                   class="svg-icon svg-icon-md svg-icon-danger">
                 </span>
-              </a>
+              </a> -->
             </td>
           </tr>
         </tbody>

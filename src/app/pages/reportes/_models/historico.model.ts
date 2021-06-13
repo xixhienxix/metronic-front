@@ -1,6 +1,6 @@
 import { BaseModel } from '../../../_metronic/shared/crud-table';
 
-export interface Huesped extends BaseModel {
+export interface Historico extends BaseModel {
 
   // id: number;
   folio:number
@@ -32,8 +32,4 @@ export interface Huesped extends BaseModel {
   lenguaje:string;
   numeroCuarto:number;
 }
-export interface Estatus extends BaseModel
-{
-  id:number,
-  nombre:string;
-}
+

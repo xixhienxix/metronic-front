@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
 import { exhaustMap, map } from 'rxjs/operators';
 import { TableService, TableResponseModel, ITableState, BaseModel, PaginatorState, SortState, GroupingState } from '../../../_metronic/shared/crud-table';
-import { Huesped } from '../_models/customer.model';
+import { Historico } from '../_models/historico.model';
 import { baseFilter } from '../../../_fake/fake-helpers/http-extenstions';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
@@ -21,15 +21,15 @@ const DEFAULT_STATE: ITableState = {
   providedIn: 'root'
 })
 
-export class HuespedService extends TableService<Huesped> implements OnDestroy {
-   API_URL = `${environment.apiUrl}/reportes/huesped`;
+export class HistoricoService extends TableService<Historico> implements OnDestroy {
+   API_URL = `${environment.apiUrl}/reportes/historico`;
   constructor(@Inject(HttpClient) http) {
     super(http);
   }
   //
-  getAll() :Observable<Huesped[]> {
+  getAll() :Observable<Historico[]> {
     return this.http
-     .get<Huesped[]>(environment.apiUrl + '/reportes/huesped')
+     .get<Historico[]>(environment.apiUrl + '/reportes/historico')
      .pipe(
        map(responseData=>{
        return responseData
@@ -39,11 +39,11 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
    }
 
   // READ
-  find(tableState: ITableState): Observable<TableResponseModel<Huesped>> {
-    return this.http.get<Huesped[]>(this.API_URL).pipe(
-      map((response: Huesped[]) => {
+  find(tableState: ITableState): Observable<TableResponseModel<Historico>> {
+    return this.http.get<Historico[]>(this.API_URL).pipe(
+      map((response: Historico[]) => {
         const filteredResult = baseFilter(response, tableState);
-        const result: TableResponseModel<Huesped> = {
+        const result: TableResponseModel<Historico> = {
           items: filteredResult.items,
           total: filteredResult.total
         };
@@ -61,14 +61,14 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   }
 
   updateStatusForItems(ids: number[], status: number): Observable<any> {
-    return this.http.get<Huesped[]>(this.API_URL).pipe(
-      map((huespedes: Huesped[]) => {
+    return this.http.get<Historico[]>(this.API_URL).pipe(
+      map((huespedes: Historico[]) => {
         return huespedes.filter(c => ids.indexOf(c.id ) > -1).map(c => {
           c.noches = status;
           return c;
         });
       }),
-      exhaustMap((huespedes: Huesped[]) => {
+      exhaustMap((huespedes: Historico[]) => {
         const tasks$ = [];
         huespedes.forEach(huespedes => {
           tasks$.push(this.update(huespedes));

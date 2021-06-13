@@ -39,6 +39,8 @@ import { isJSDocThisTag } from 'typescript';
 import { NuevaReservaModalComponent } from './components/nueva-reserva-modal/nueva-reserva-modal.component';
 import { HabitacionesService } from '../_services/habitaciones.service';
 import { Habitaciones } from '../_models/habitaciones.model';
+import { DisponibilidadService } from '../_services/disponibilidad.service'
+import { HistoricoService } from '../_services/historico.service'
 
 @Component({
   selector: 'app-customers',
@@ -72,16 +74,19 @@ export class CustomersComponent
   public foliosprueba1: [];
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
+  public codigoCuarto:Habitaciones[]=[];
 
   constructor(
     private fb: FormBuilder,
     private modalService: NgbModal,
     public customerService: HuespedService,
+    public historicoService: HistoricoService,
     public postService : ReportesComponent,
     public foliosService : FoliosService,
     public habitacionesService : HabitacionesService,
-    private http: HttpClient
-
+    private http: HttpClient,
+    public habitacionService : HabitacionesService,
+    public disponibilidadSercice : DisponibilidadService,
   ) {
 
   }
@@ -100,6 +105,7 @@ export class CustomersComponent
     this.sorting = this.customerService.sorting;
     const sb = this.customerService.isLoading$.subscribe(res => this.isLoading = res);
     this.subscriptions.push(sb);
+    this.sorting.direction = 'desc';
 
   }
 
@@ -126,9 +132,34 @@ export class CustomersComponent
                         })
   }
 
+
+  habValue($event)
+  {
+    // this.huesped.habitacion = $event.target.options[$event.target.options.selectedIndex].text;
+    // console.log("this.cuarto",this.cuarto)
+  }
+
   getFolios(): void {
 
     this.foliosService.getFolios()
+                      .pipe(map(
+                        (responseData)=>{
+                          const postArray = []
+                          for(const key in responseData)
+                          {
+                            if(responseData.hasOwnProperty(key))
+                            postArray.push(responseData[key]);
+                          }
+                          return postArray
+                        }))
+                        .subscribe((codigoCuarto)=>{
+                          this.codigoCuarto=(codigoCuarto)
+                        })
+  }
+
+  getTipoCuarto(): void {
+
+    this.habitacionService.getCodigohabitaciones()
                       .pipe(map(
                         (responseData)=>{
                           const postArray = []
@@ -143,9 +174,6 @@ export class CustomersComponent
                           this.folios=(folios)
                         })
   }
-
-
-
 
   // filtration
   filterForm() {
@@ -208,9 +236,9 @@ export class CustomersComponent
     const isActiveColumn = sorting.column === column;
     if (!isActiveColumn) {
       sorting.column = column;
-      sorting.direction = 'asc';
+      sorting.direction = 'desc';
     } else {
-      sorting.direction = sorting.direction === 'asc' ? 'desc' : 'asc';
+      sorting.direction = sorting.direction === 'desc' ? 'asc' : 'desc';
     }
     this.customerService.patchState({ sorting });
   }
@@ -233,13 +261,13 @@ export class CustomersComponent
     if(id==undefined)
     {
       const modalRef = this.modalService.open(NuevaReservaModalComponent, { size: 'md' });
-
-      modalRef.componentInstance.folio = this.folios[0].Folio;
+      modalRef.componentInstance.folios = this.folios
       modalRef.componentInstance.id = id;
-      console.log("this.folios[0].Folio",this.folios[0].Folio);
-      modalRef.result.then(() =>
+
+      modalRef.result.then( () =>
       this.customerService.fetch(),
       () => { }
+
     );
     }
     else
