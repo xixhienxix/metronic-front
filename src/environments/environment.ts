@@ -7,8 +7,8 @@ export const environment = {
   appVersion: 'v726demo1',
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: false,
-  //apiUrl:'https://movnext-api.eu-4.evennode.com/api'
-  apiUrl:'http://localhost:3000/api'
+  apiUrl:'https://movnext-api.eu-4.evennode.com/api'
+  //apiUrl:'http://localhost:3000/api'
 
 };
 
