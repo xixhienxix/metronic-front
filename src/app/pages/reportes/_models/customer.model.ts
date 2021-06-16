@@ -8,7 +8,7 @@ export interface Huesped extends BaseModel {
   ninos:number;
   nombre: string;
   // apellido: string;
-  estatus: number; // Huesped en Casa = 1 | Reserva Sin Pagar = 2 | Reserva Confirmada = 3 | Hizo Checkout = 4 | Uso Interno = 5 | Bloqueo = 6 | Reserva Temporal = 7
+  estatus: string; // Huesped en Casa = 1 | Reserva Sin Pagar = 2 | Reserva Confirmada = 3 | Hizo Checkout = 4 | Uso Interno = 5 | Bloqueo = 6 | Reserva Temporal = 7
   llegada: string;
   salida: string;
   noches: number;
@@ -32,8 +32,4 @@ export interface Huesped extends BaseModel {
   lenguaje:string;
   numeroCuarto:number;
 }
-export interface Estatus extends BaseModel
-{
-  id:number,
-  nombre:string;
-}
+

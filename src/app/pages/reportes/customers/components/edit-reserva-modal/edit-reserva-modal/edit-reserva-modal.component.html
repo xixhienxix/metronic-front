@@ -19,13 +19,7 @@
                               </div>
                               <div style="margin: auto;" class="col-sm-6">
                                 <span [style]="setLabel" class="label label-lg label-inline">
-                                  <ng-container *ngIf="huesped.estatus==1">Huesped En Casa</ng-container>
-                                  <ng-container *ngIf="huesped.estatus==2">Reserva Sin Pago</ng-container>
-                                  <ng-container *ngIf="huesped.estatus==3">Reserva Confirmada</ng-container>
-                                  <ng-container *ngIf="huesped.estatus==4">Hizo Check-Out</ng-container>
-                                  <ng-container *ngIf="huesped.estatus==5">Uso Interno</ng-container>
-                                  <ng-container *ngIf="huesped.estatus==6">Bloqueo / Sin Llegadas</ng-container>
-                                  <ng-container *ngIf="huesped.estatus==7">Reserva Temporal</ng-container>
+                                    {{huesped.estatus}}
                                 </span>
                               </div>
                           </div>

@@ -22,6 +22,7 @@ export class ReportesComponent implements OnInit {
 
   constructor(private http:HttpClient) { }
 
+  menssage : any;
   private huesped:Huesped[]=[];
   private postsUpdated = new Subject<Huesped[]>();
   private folios:Foliador[]=[];
@@ -45,7 +46,7 @@ export class ReportesComponent implements OnInit {
           adultos:number,
           ninos:number,
           nombre:string,
-          estatus:number,
+          estatus:string,
           llegada:string,
           salida:string,
           noches:number,
@@ -77,22 +78,22 @@ export class ReportesComponent implements OnInit {
       tipoDeID:tipoDeID,numeroDeID:numeroDeID,direccion:direccion,pais:pais,ciudad:ciudad,codigoPostal:codigoPostal,lenguaje:lenguaje,
       numeroCuarto:numeroCuarto
     };
-    // var post1 = this.http
-    //   .post<{ message: string }>(environment.apiUrl+"/reportes/huesped", post)
-    //   .toPromise()
+
+    //   const promise = new Promise((resolve, reject) => {
+    //     const apiURL = environment.apiUrl;
+    //     this.http
+    //     .post<{ message: string }>(environment.apiUrl+"/reportes/huesped", post)
+    //     .toPromise()
+    //     .then(()=>{
+    //       console.log("Post Enviado Con Exito")
+    //     }).catch(error => console.log(error));
+    //   return promise;
+    // })
+
+    this.http.post<any>(environment.apiUrl+"/reportes/huesped", post)
 
 
-      const promise = new Promise((resolve, reject) => {
-        const apiURL = environment.apiUrl;
-        this.http
-        .post<{ message: string }>(environment.apiUrl+"/reportes/huesped", post)
-        .toPromise()
-        .then(()=>{
-          console.log("Post Enviado Con Exito")
-        }).catch(error => console.log(error));
-      return promise;
-    })
-  }
+    }
 
 
   actualizaEstatusHabitacion(id:number)

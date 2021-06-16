@@ -5,7 +5,9 @@ import { from, of, Subscription } from 'rxjs';
 import { catchError,  first,  tap } from 'rxjs/operators';
 import { Huesped } from '../../../_models/customer.model';
 import { Foliador } from '../../../_models/Foliador.model';
+import { Estatus } from '../../../_models/estatus.model';
 import { HuespedService } from '../../../_services';
+import { EstatusService } from '../../../_services/estatus.service';
 import { CustomAdapter, CustomDateParserFormatter } from '../../../../../_metronic/core';
 import { ReportesComponent } from '../../../reportes.component'
 import { HttpClient } from "@angular/common/http";
@@ -22,6 +24,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatMenuTrigger} from '@angular/material/menu';
 import { DialogComponent } from './components/dialog/dialog.component';
 import {HistoricoService} from '../../../_services/historico.service'
+import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+
 
 let date: Date = new Date();
 declare global {
@@ -38,7 +42,7 @@ const EMPTY_CUSTOMER: Huesped = {
   adultos:1,
   ninos:1,
   nombre: '',
-  estatus: 1,
+  estatus: '',
   // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
   // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
   llegada:'',
@@ -110,7 +114,7 @@ const EMPTY_CUSTOMER: Huesped = {
 
 export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 {
-  @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
+  // @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
 
   @Input()
 
@@ -122,11 +126,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   ToDoListForm:any;
 
   toDate: NgbDate | null;
-//
-options: string[] = ['One', 'Two', 'Three'];
-filteredOptions: Observable<string[]>;
-public dialog: MatDialog
-  private modalService: NgbModal
+  closeResult: string;
+
+  filteredOptions: Observable<string[]>;
+  public dialog: MatDialog
   searchGroup: FormGroup;
   mySet = new Set();
   maxAdultos:number=6;
@@ -144,12 +147,14 @@ public dialog: MatDialog
   formGroup: FormGroup;
   myControl: FormGroup;
   preAsig:number;
+  searchValue:string='';
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
   public infoCuarto:Habitaciones[]=[];
   public disponibilidad:Disponibilidad[]=[];
   public sinDisponibilidad:any[]=[]
+  public estatusArray:Estatus[]=[];
   public folioactualizado:any;
   cuarto:string;
   private subscriptions: Subscription[] = [];
@@ -164,6 +169,7 @@ public dialog: MatDialog
 
   constructor(
     //Date Imports
+    private modalService: NgbModal,
     private calendar: NgbCalendar,
     public formatter: NgbDateParserFormatter,
     public habitacionService : HabitacionesService,
@@ -173,6 +179,7 @@ public dialog: MatDialog
     private disponibilidadService:DisponibilidadService,
     private fb: FormBuilder, public modal: NgbActiveModal,
     public customerService: HuespedService,
+    public estatusService: EstatusService,
     public postService : ReportesComponent,
     private http: HttpClient,
     public i18n: NgbDatepickerI18n
@@ -189,6 +196,8 @@ public dialog: MatDialog
     this.loadCustomer();
     this.getDispo();
     this.getHabitaciones();
+    this.getFolios();
+    this.getEstatus();
   }
 
 
@@ -223,7 +232,7 @@ public dialog: MatDialog
     this.formGroup = this.fb.group({
       nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
-      telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.pattern('(([+][(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\s*[)]?[-\s\.]?[(]?[0-9]{1,3}[)]?([-\s\.]?[0-9]{3})([-\s\.]?[0-9]{3,4})'),Validators.minLength(12),Validators.maxLength(14)])],
+      telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.pattern('[0-9]+'),Validators.minLength(10),Validators.maxLength(14)])],
       salida:[this.huesped.salida, Validators.compose([Validators.required])],
       llegada:[this.huesped.llegada, Validators.compose([Validators.required])],
       adultos:[this.huesped.adultos, Validators.compose([Validators.required,Validators.max(this.maxAdultos)])],
@@ -240,17 +249,49 @@ public dialog: MatDialog
       .subscribe((val) => this.search(val));
         this.subscriptions.push(searchEvent);
 
-    // const searchEvent = this.formGroup.controls.searchTerm.valueChanges
-    // .pipe(
-    //   startWith(''),
-    //   map(value => this._filter(value))
-    // );
 
   }
 
 
+  getFolios(): void
+  {
 
+    this.foliosService.getFolios()
+                      .pipe(map(
+                        (responseData)=>{
+                          const postArray = []
+                          for(const key in responseData)
+                          {
+                            if(responseData.hasOwnProperty(key))
+                            postArray.push(responseData[key]);
+                          }
+                          return postArray
+                        }))
+                        .subscribe((folios)=>{
+                          this.folios=(folios)
+                        })
+  }
 
+  getEstatus(): void {
+    this.estatusService.getEstatus()
+                      .pipe(map(
+                        (responseData)=>{
+                          const postArray = []
+                          for(const key in responseData)
+                          {
+                            if(responseData.hasOwnProperty(key))
+                            postArray.push(responseData[key]);
+                          }
+                          return postArray
+                        }))
+                        .subscribe((estatus)=>{
+                          for(let i=0;i<estatus.length;i++)
+                          {
+                            this.estatusArray=estatus
+                          }
+                        })
+
+  }
 
   save() {
   this.prepareHuesped();
@@ -334,54 +375,10 @@ public dialog: MatDialog
       this.huesped.lenguaje,
       this.huesped.numeroCuarto
     );
-      if(this.huesped.estatus==1){
-        alert("Walk-In #"+this.huesped.folio +" Generado con exito!");
-      }else
-      if(this.huesped.estatus==2){
-        alert("Reserva #"+this.huesped.folio +" Generada con exito!");
-      }else
-      if(this.huesped.estatus==6){
-        alert("Bloqueo #"+this.huesped.folio +" Generada con exito!");
-      }else
-      if(this.huesped.estatus==7){
-        alert("Reserva Temporal #"+this.huesped.folio +" Generada con exito!");
-      }
-      this.inicio==true;
-      this.huesped= {
-        id:undefined,
-        folio:undefined,
-        adultos:1,
-        ninos:1,
-        nombre: '',
-        estatus: 1,
-        llegada:'',
-        salida:'',
-        noches: 1,
-        tarifa:500,
-        porPagar: 500,
-        pendiente:500,
-        origen: 'Online',
-        habitacion: '',
-        telefono:"",
-        email:"",
-        motivo:"",
-        //  OtrosDatos
-        fechaNacimiento:'',
-        trabajaEn:'',
-        tipoDeID:'',
-        numeroDeID:'',
-        direccion:'',
-        pais:'',
-        ciudad:'',
-        codigoPostal:'',
-        lenguaje:'Español',
-        numeroCuarto: 0
-      };
+
       this.modal.close();
 
   }
-
-
 
   search(searchTerm: string) {
     this.historicoService.patchState({ searchTerm });
@@ -477,6 +474,10 @@ resetFoliador()
   {
     this.inicio==false;
     this.accordionDisplay="";
+    // this.disponibilidad=[]
+    // this.mySet.clear
+    // this.cuartos=[]
+    // this.sinDisponibilidad=[]
 
     if(this.bandera)
     {
@@ -660,10 +661,10 @@ resetFoliador()
 
   setStep(index: number) {
     this.step = index;
-    this.disponibilidad=[]
-    this.mySet.clear
-    this.cuartos=[]
-    this.sinDisponibilidad=[]
+    // this.disponibilidad=[]
+    // this.mySet.clear
+    // this.cuartos=[]
+    // this.sinDisponibilidad=[]
   }
 
   nextStep() {
@@ -730,9 +731,17 @@ resetFoliador()
   }
 
   setEstatus(value): void {
-    this.huesped.estatus = value;
+    for(let i=0; i<this.estatusArray.length; i++)
+    {
+      if(value==this.estatusArray[i].id)
+      {
+        this.huesped.estatus = this.estatusArray[i].estatus;
+
+      }
+    }
+
     if(value==1)
-    {this.huesped.folio=this.folios[1].Folio}
+    {this.huesped.folio=this.folios[2].Folio}
     else
     this.huesped.folio=this.folios[0].Folio
 }
@@ -820,15 +829,22 @@ resetFoliador()
 
 
 
-    showList(event:any)
+    showList(x)
     {
-      if(event.target.value="")
-      {
-        this.displayNone="display:none"
-      }
-      else
       this.displayNone=""
+
+      if(x.key!="Backspace" && x.key!="Shift" && x.key!="Control" && x.key!="Enter") {this.searchValue += x.key;}
+      else
+      if (x.key=="Backspace")
+      {
+        this.searchValue =this.searchValue.substring(0, this.searchValue.length - 1);
+
+        if(this.searchValue==""){this.displayNone="display:none"}
+      }
+
+
     }
+
     closeList()
     {
       this.displayNone="display:none"
@@ -838,6 +854,57 @@ resetFoliador()
       let control = this.formGroup.get('searchTerm')
       control.disabled ? control.enable() : control.disable();
     }
+
+
+    //MODAL
+    open(content) {
+
+      this.modalService.open(content).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      });
+
+      this.inicio==true;
+      this.huesped.id=undefined
+      this.huesped.folio=undefined
+      this.huesped.adultos=1
+      this.huesped.ninos=1
+      this.huesped.nombre=''
+      this.huesped.estatus=''
+      this.huesped.llegada=''
+      this.huesped.salida=''
+      this.huesped.noches=1
+      this.huesped.tarifa=500
+      this.huesped.porPagar=500
+      this.huesped.pendiente=500
+      this.huesped.origen='Online'
+      this.huesped.habitacion=''
+      this.huesped.telefono=''
+      this.huesped.email=''
+      this.huesped.motivo=''
+      this.huesped.fechaNacimiento=''
+      this.huesped.trabajaEn=''
+      this.huesped.tipoDeID=''
+      this.huesped.numeroDeID=''
+      this.huesped.direccion=''
+      this.huesped.pais=''
+      this.huesped.ciudad=''
+      this.huesped.codigoPostal=''
+      this.huesped.lenguaje='Español'
+      this.huesped.numeroCuarto=0
+
+  }
+
+  private getDismissReason(reason: any): string {
+      if (reason === ModalDismissReasons.ESC) {
+          return 'by pressing ESC';
+      } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+          return 'by clicking on a backdrop';
+      } else {
+          return  `with: ${reason}`;
+      }
+  }
 
   }
 

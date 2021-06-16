@@ -13,7 +13,7 @@
 
 </div>
 
-   <form (submit)="save()" [formGroup]="formGroup" class="form form-label-right" style="background-color: rgb(224, 224, 224);">
+   <form (submit)="save(); open(content)" [formGroup]="formGroup" class="form form-label-right" style="background-color: rgb(224, 224, 224);">
     <div class="overlay overlay-block cursor-default modal-body" style="background-color: rgb(224, 224, 224);">
 
       <div class="form-group row" style="border:1px solid rgb(128, 128, 128);">
@@ -321,26 +321,27 @@
           <label class="form-label" for="form1">Buscar en Historico</label>
           <div  class="input-group col-lg-12 text-center">
               <input  type="search"
-                      disabled
-                      placeholder="Busca por Nombre    ---->"
+                      placeholder="Busca por Nombre"
                       aria-label="Number"
                       matInput
                       formControlName="searchTerm"
                       class="form-control col-lg-12 text-center"
-                      (click)="showList($event)"
-                      value="{{huesped.nombre}}"
+                      (keyup)="showList($event)"
+                      value="{{searchValue}}"
+                      oninput="this.value = this.value.toLowerCase()"
                       />
-            <button type="button" (click)="toggleSearch()" class="btn btn-primary">
+            <!-- <button type="button" (click)="toggleSearch()" class="btn btn-primary">
               <i class="fas fa-search"></i>
-            </button>
+            </button> -->
           </div>
         </div>
-        <div class="" [style]="displayNone" class="name-container-dropdown">
-          <mat-selection-list (click)="closeList();onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
-            <mat-list-option  *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
+        <div  [style]="displayNone" class="name-container-dropdown">
+          <mat-selection-list  (click)="closeList(); onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
+            <mat-list-option *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
               {{huesped.nombre}}
             </mat-list-option>
           </mat-selection-list>
+          <!-- <span id='close' onclick='this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false;'>x</span> -->
         </div>
       </div>
 
@@ -436,7 +437,6 @@
             formControlName="telefono"
             value="{{huesped.telefono}}"
           />
-          <small>Formato: 000-0000-0000</small>
           <!-- <div class="invalid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Invalido
           </div> -->
@@ -447,7 +447,7 @@
             class="invalid-feedback"
             *ngIf="controlHasError('minlength', 'telefono')"
           >
-            Minimo 12 numeros
+            Minimo 10 numeros
           </div>
           <div
             class="invalid-feedback"
@@ -455,6 +455,12 @@
           >
             Maximo 14 numeros
           </div>
+          <div
+          class="invalid-feedback"
+          *ngIf="controlHasError('pattern', 'telefono')"
+          >
+           Solo se permiten números
+        </div>
         </div>
 
       </div>
@@ -468,7 +474,7 @@
         Tipo de Reserva
         <div class="form-group row">
           <div class="form-group col-lg-6 ">
-                <button disabled
+                <button
                 class="btn btn-success btn-block"
                 type="submit"
                 name="estatus"
@@ -482,7 +488,7 @@
                 class="btn btn-warning btn-block"
                 type="submit"
                 name="estatus"
-                (click)="setEstatus(2)"
+                (click)="setEstatus(2); "
                 >
                   Agrega Reserva
                 </button>
@@ -512,4 +518,32 @@
 
 </form>
 
+
+<div class="example-preview">
+  <span *ngIf="closeResult">
+    <pre>{{closeResult}}</pre>
+  </span>
+  <div>
+    <ng-template #content let-c="close" let-d="dismiss">
+      <div  class="modal-header">
+        <h4 *ngIf="huesped.folio!=undefined" class="modal-title">Folio # {{this.huesped.folio}}</h4>
+        <h4 *ngIf="huesped.folio==undefined" class="modal-title">Reserva Generada</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <p *ngIf="huesped.folio!=undefined">Folio # {{huesped.folio}} Generado con Exito </p>
+        <p *ngIf="huesped.folio==undefined">Cliente Guardado con Exito </p>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Continuar</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </ng-template>
+    <!-- <button class="btn btn-primary" (click)="open(content)">Launch demo modal</button> -->
+  </div>
+</div>
 

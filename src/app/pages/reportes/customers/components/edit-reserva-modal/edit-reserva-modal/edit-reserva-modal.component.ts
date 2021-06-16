@@ -5,6 +5,7 @@ import { of, Subscription } from 'rxjs';
 import { catchError, finalize, first, tap } from 'rxjs/operators';
 import { Huesped } from '../../../../_models/customer.model';
 import { Foliador } from '../../../../_models/foliador.model';
+import { Estatus } from '../../../../_models/estatus.model';
 import { HuespedService } from '../../../../_services';
 import { CustomAdapter, CustomDateParserFormatter, getDateFromString } from '../../../../../../_metronic/core';
 import { NgModule } from "@angular/core";
@@ -15,6 +16,7 @@ import { HttpClient } from "@angular/common/http";
 import {environment} from "../../../../../../../environments/environment"
 import {map} from 'rxjs/operators'
 import {FoliosService} from '../../../../_services/folios.service'
+import {EstatusService} from '../../../../_services/estatus.service'
 import { Observable } from 'rxjs';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -28,7 +30,7 @@ const EMPTY_CUSTOMER: Huesped = {
   adultos:1,
   ninos:1,
   nombre: '',
-  estatus: 1,
+  estatus:'',
   // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
   // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
   llegada:'',
@@ -116,6 +118,7 @@ export class EditReservaModalComponent implements OnInit {
     formGroup: FormGroup;
     public folios:Foliador[]=[];
     public folioactualizado:any;
+    estatusArray:Estatus[]=[];
     checked: boolean = true;
     modifica:boolean = true;
     changeStyleHidden:string = 'display:none'
@@ -137,6 +140,7 @@ export class EditReservaModalComponent implements OnInit {
       private fb: FormBuilder, public modal: NgbActiveModal,
       public customerService: HuespedService,
       public postService : ReportesComponent,
+      public estatusService : EstatusService,
       private http: HttpClient
       ) {
         this.fromDate = calendar.getToday();
@@ -147,7 +151,7 @@ export class EditReservaModalComponent implements OnInit {
     ngOnInit(): void {
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
-
+      this.getEstatus();
     }
 
 
@@ -155,7 +159,26 @@ export class EditReservaModalComponent implements OnInit {
     //   const response = await this.http.get(this.currentPriceUrl).toPromise();
     //   return response.json().bpi[currency].rate;
     // }
+    getEstatus(): void {
+      this.estatusService.getEstatus()
+                        .pipe(map(
+                          (responseData)=>{
+                            const postArray = []
+                            for(const key in responseData)
+                            {
+                              if(responseData.hasOwnProperty(key))
+                              postArray.push(responseData[key]);
+                            }
+                            return postArray
+                          }))
+                          .subscribe((estatus)=>{
+                            for(let i=0;i<estatus.length;i++)
+                            {
+                              this.estatusArray=estatus
+                            }
+                          })
 
+    }
 
     loadCustomer() {
 
@@ -182,7 +205,7 @@ export class EditReservaModalComponent implements OnInit {
         ).subscribe((huesped1: Huesped) => {
           this.huesped = huesped1;
           this.loadForm();
-          this.setLabelStyle(this.huesped.estatus);
+          // this.setLabelStyle(this.huesped.estatus);
         });
         this.subscriptions.push(sb);
       }
@@ -374,28 +397,41 @@ export class EditReservaModalComponent implements OnInit {
     }
 
     setEstatus(value): void {
-      if(value==1){this.huesped.estatus=value; this.setLabelStyle(value)}//Huesped en Casa
-      if(this.huesped.estatus==2){}//Reserva sin Pago
-      if(this.huesped.estatus==3){}//Reserva Confirmada
-      if(this.huesped.estatus==4){}//Check-Out
-      if(this.huesped.estatus==5){}//Uso Interno
-      if(this.huesped.estatus==6){}//Bloqueo / Sin llegada
-      if(this.huesped.estatus==7){}//Reserva Temporal
 
-      this.huesped.estatus = value;
-      this.setLabelStyle(value)
+      for (let i=0;i<this.estatusArray.length;i++)
+      {
+        if(value==this.estatusArray[i].id)
+        {
+          this.huesped.estatus = this.estatusArray[i].estatus
+          this.setLabel= this.estatusArray[i].color
+        }
+      }
   }
 
-  setLabelStyle(id:number)
+  backgroundColor(estatus:number)
   {
-    if(id==1){this.setLabel="color:#a6e390"}
-    if(id==2){this.setLabel="color:#ffce54"}
-    if(id==3){this.setLabel="color:#a8d5e5"}
-    if(id==4){this.setLabel="color:fb7f8c"}
-    if(id==5){this.setLabel="color:#d8b8f0"}
-    if(id==6){this.setLabel="color:#e6e9ed"}
-    if(id==7){this.setLabel="color:#fac3e2"}
+    let color;
+
+    for (let i=0;i<this.estatusArray.length;i++)
+    {
+      if(estatus==this.estatusArray[i].id)
+      {
+        color = this.estatusArray[i].color
+      }
+    }
+    return color;
   }
+
+  // setLabelStyle(id:number)
+  // {
+  //   if(id==1){this.setLabel="color:#a6e390"}
+  //   if(id==2){this.setLabel="color:#ffce54"}
+  //   if(id==3){this.setLabel="color:#a8d5e5"}
+  //   if(id==4){this.setLabel="color:fb7f8c"}
+  //   if(id==5){this.setLabel="color:#d8b8f0"}
+  //   if(id==6){this.setLabel="color:#e6e9ed"}
+  //   if(id==7){this.setLabel="color:#fac3e2"}
+  // }
 
     onSelectHuesped(event : string)
     {

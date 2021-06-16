@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { EstatusService } from '../_services';
 import { HuespedService } from '../_services';
 import {FoliosService} from '../_services/folios.service'
 import { ReportesComponent } from '../reportes.component';
@@ -40,7 +39,9 @@ import { NuevaReservaModalComponent } from './components/nueva-reserva-modal/nue
 import { HabitacionesService } from '../_services/habitaciones.service';
 import { Habitaciones } from '../_models/habitaciones.model';
 import { DisponibilidadService } from '../_services/disponibilidad.service'
+import { EstatusService } from '../_services/estatus.service'
 import { HistoricoService } from '../_services/historico.service'
+import { Estatus } from '../_models/estatus.model';
 
 @Component({
   selector: 'app-customers',
@@ -71,6 +72,8 @@ export class CustomersComponent
   // foliador:Foliador;
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
+  public estatusDesc:Estatus[]=[];
+  public estatusArray:Estatus[]=[];
   public foliosprueba1: [];
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
@@ -87,6 +90,8 @@ export class CustomersComponent
     private http: HttpClient,
     public habitacionService : HabitacionesService,
     public disponibilidadSercice : DisponibilidadService,
+    public estatusService : EstatusService,
+
   ) {
 
   }
@@ -97,6 +102,8 @@ export class CustomersComponent
     this.postService.getPost();
     this.getFolios();
     this.getCuartos();
+    this.getEstatus();
+    this.getTipoCuarto();
     this.filterForm();
     this.searchForm();
     this.customerService.fetch();
@@ -106,7 +113,6 @@ export class CustomersComponent
     const sb = this.customerService.isLoading$.subscribe(res => this.isLoading = res);
     this.subscriptions.push(sb);
     this.sorting.direction = 'desc';
-
   }
 
 
@@ -115,6 +121,29 @@ export class CustomersComponent
   ngOnDestroy() {
     this.subscriptions.forEach((sb) => sb.unsubscribe());
   }
+
+  getEstatus(): void {
+    this.estatusService.getEstatus()
+                      .pipe(map(
+                        (responseData)=>{
+                          const postArray = []
+                          for(const key in responseData)
+                          {
+                            if(responseData.hasOwnProperty(key))
+                            postArray.push(responseData[key]);
+                          }
+                          return postArray
+                        }))
+                        .subscribe((estatus)=>{
+                          for(let i=0;i<estatus.length;i++)
+                          {
+                            // this.estatusDesc.push(estatus[i].estatus)
+                            this.estatusArray=estatus
+                          }
+                        })
+
+  }
+
   getCuartos(): void {
     this.habitacionesService.gethabitaciones()
                       .pipe(map(
@@ -152,8 +181,8 @@ export class CustomersComponent
                           }
                           return postArray
                         }))
-                        .subscribe((codigoCuarto)=>{
-                          this.codigoCuarto=(codigoCuarto)
+                        .subscribe((folios)=>{
+                          this.folios=(folios)
                         })
   }
 
@@ -170,38 +199,40 @@ export class CustomersComponent
                           }
                           return postArray
                         }))
-                        .subscribe((folios)=>{
-                          this.folios=(folios)
+                        .subscribe((codigoCuarto)=>{
+                          this.codigoCuarto=(codigoCuarto)
                         })
   }
+
+
 
   // filtration
   filterForm() {
     this.filterGroup = this.fb.group({
-      status: [''],
-      type: [''],
+      estatus: [''],
+      habitacion: [''],
       searchTerm: [''],
     });
     this.subscriptions.push(
-      this.filterGroup.controls.status.valueChanges.subscribe(() =>
+      this.filterGroup.controls.estatus.valueChanges.subscribe(() =>
         this.filter()
       )
     );
     this.subscriptions.push(
-      this.filterGroup.controls.type.valueChanges.subscribe(() => this.filter())
+      this.filterGroup.controls.habitacion.valueChanges.subscribe(() => this.filter())
     );
   }
 
   filter() {
     const filter = {};
-    const status = this.filterGroup.get('status').value;
-    if (status) {
-      filter['status'] = status;
+    const estatus = this.filterGroup.get('estatus').value;
+    if (estatus) {
+      filter['estatus'] = estatus;
     }
 
-    const type = this.filterGroup.get('type').value;
-    if (type) {
-      filter['type'] = type;
+    const habitacion = this.filterGroup.get('habitacion').value;
+    if (habitacion) {
+      filter['habitacion'] = habitacion;
     }
     this.customerService.patchState({ filter });
   }
@@ -324,6 +355,7 @@ export class CustomersComponent
       elem.style.fontWeight="bold"
       elem.style.color="black"
       //HUESED EN CASA
+
     }else if(estatus==2)
     {
       console.log(estatus, 'antes')
@@ -332,6 +364,7 @@ export class CustomersComponent
       elem.style.fontWeight="bold"
       elem.style.color="black"
       //RESERVA SIN PAGO
+
     }else if(estatus==3)
     {
       console.log(estatus, 'antes')
@@ -340,7 +373,18 @@ export class CustomersComponent
       elem.style.fontWeight="bold"
       elem.style.color="white"
       //RESERVA CONFIRMADA
+
     }else if(estatus==4)
+      {
+      console.log(estatus, 'antes')
+      elem.className='btn'
+      elem.style.backgroundColor="#fb7f8c"
+      elem.style.fontWeight="bold"
+      elem.style.color="white"
+      }
+    //CHECK-OUT
+
+    else if(estatus==5)
     {
       console.log(estatus, 'antes')
       elem.className='btn'
@@ -348,7 +392,8 @@ export class CustomersComponent
       elem.style.fontWeight="bold"
       elem.style.color="white"
   //USO INTERNO
-    }else if(estatus==5)
+
+    }else if(estatus==6)
     {
       console.log(estatus, 'antes')
       elem.className='btn'
@@ -356,7 +401,8 @@ export class CustomersComponent
       elem.style.fontWeight="bold"
       elem.style.color="black"
       //BLOQUEO
-    }else if(estatus==6)
+
+    }else if(estatus==7)
     {
       console.log(estatus, 'antes')
       elem.className='btn'
@@ -365,7 +411,22 @@ export class CustomersComponent
       elem.style.color="black"
    //RESERVA TEMPORAL
     }
+
+
   }
 
+  backgroundColor(estatus:number)
+  {
+    let color;
+
+    for (let i=0;i<this.estatusArray.length;i++)
+    {
+      if(estatus==this.estatusArray[i].id)
+      {
+        color = this.estatusArray[i].color
+      }
+    }
+    return color;
+  }
 
 }

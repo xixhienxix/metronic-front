@@ -15,34 +15,29 @@
         <div class="col-lg-4">
           <div class="row" [formGroup]="filterGroup">
             <div class="col-lg-6">
-              <select class="form-control" name="status" placeholder="Filtro de Estatus" formControlName="status">
+              <select class="form-control" name="estatus" placeholder="Filtro de Estatus" formControlName="estatus">
                 <option value="">Todos</option>
-                <option value="1">Húesped en Casa</option>
-                <option value="2">Reserva Sin Pago</option>
-                <option value="3">Reserva Confirmada</option>
-                <option value="4">Hizo Check-Out</option>
-                <option value="5">Uso Interno</option>
-                <option value="6">Bloqueo / Sin Llegadas</option>
-                <option value="7">Reserva Temporal</option>
+                <ng-container *ngFor="let estatus of estatusArray ">
+                  <option>{{estatus.estatus}}</option>
+                </ng-container>
+
               </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
             </div>
             <div class="col-lg-6">
-              <select class="form-control" placeholder="Filtra por habitacion" name="type" formControlName="type">
-                <option value="">All</option>
-                <option value="1">Chardonay</option>
-                <option value="2">Cabernet</option>
-                <option value="1">Shiraz</option>
-                <option value="2">Malbec</option>
-                <option value="1">La Vid</option>
-                <option value="2">Merlot</option>
-                <option value="1">Pinot Noir</option>
+              <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" formControlName="habitacion">
+                <option selected value="">All</option>
+                <ng-container *ngFor="let tipo of codigoCuarto">
+                  <option>
+                    {{tipo.replace("_"," ")}}
+                  </option>
+                </ng-container>
               </select><small class="form-text text-muted"><b>Filtro</b> Por Tipo</small>
             </div>
           </div>
         </div>
         <div class="col-lg-2" [formGroup]="searchGroup">
-          <input type="text" class="form-control" name="searchText" placeholder="Search" value=""
-            formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b>Por Nombre</small>
+          <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Search" value=""
+            formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
         </div>
       </div>
     </div>
@@ -99,7 +94,7 @@
           </th>
           <th>
             Estatus de Reserva
-            <app-sort-icon column="status" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+            <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
           <th>
@@ -150,76 +145,14 @@
             <td>{{ huesped.folio }}</td>
             <td>{{ huesped.nombre }}</td>
             <td>
-
-              <ng-container *ngIf="huesped.estatus===1">
-                <select id="demo" name="filter_for" class="btn" style="background-color: #82E428;" #demo
-                  (change)="estatus(demo,$event.target.value)">
-                  <option selected disable value="1"> Húesped en Casa</option>
-                  <option value="2"> Reserva Sin pago</option>
-                  <option value="3"> Reserva Confirmada</option>
-                  <option value="4"> Uso Interno</option>
-                  <option value="5"> Bloqueo</option>
-                  <option value="6"> Reserva Temporal</option>
-                </select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus===2">
-                <select id="demo" name="filter_for" class="btn" style="background-color:#EBEB6C;" #demo
-                  (change)="estatus(demo,$event.target.value)">
-                  <option value="1"> Húesped en Casa</option>
-                  <option selected disable value="2"> Reserva Sin pago</option>
-                  <option value="3"> Reserva Confirmada</option>
-                  <option value="4"> Uso Interno</option>
-                  <option value="5"> Bloqueo</option>
-                  <option value="6"> Reserva Temporal</option>
-                </select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus===3">
-                <select id="demo" name="filter_for" class="btn" style="background-color:#27A9FF;" #demo
-                  (change)="estatus(demo,$event.target.value)">
-                  <option value="1"> Húesped en Casa</option>
-                  <option value="2"> Reserva Sin pago</option>
-                  <option selected disable value="3"> Reserva Confirmada</option>
-                  <option value="4"> Uso Interno</option>
-                  <option value="5"> Bloqueo</option>
-                  <option value="6"> Reserva Temporal</option>
-                </select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus===4">
-                <select id="demo" name="filter_for" class="btn" style="background-color:#F97FF9;" #demo
-                  (change)="estatus(demo,$event.target.value)">
-                  <option value="1"> Húesped en Casa</option>
-                  <option value="2"> Reserva Sin pago</option>
-                  <option value="3"> Reserva Confirmada</option>
-                  <option selected disable value="4"> Uso Interno</option>
-                  <option value="5"> Bloqueo</option>
-                  <option value="6"> Reserva Temporal</option>
-                </select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus===5">
-                <select id="demo" name="filter_for" class="btn" style="background-color:#D1D1C9;" #demo
-                  (change)="estatus(demo,$event.target.value)">
-                  <option selected disable value="1"> Húesped en Casa</option>
-                  <option value="2"> Reserva Sin pago</option>
-                  <option value="3"> Reserva Confirmada</option>
-                  <option value="4"> Uso Interno</option>
-                  <option selected disable value="5"> Bloqueo</option>
-                  <option value="6"> Reserva Temporal</option>
-                </select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus===6">
-                <select id="demo" name="filter_for" class="btn" style="background-color:rgb(55, 222, 224);" #demo
-                  (change)="estatus(demo,$event.target.value)">
-                  <option selected disable value="1"> Húesped en Casa</option>
-                  <option value="2"> Reserva Sin pago</option>
-                  <option value="3"> Reserva Confirmada</option>
-                  <option value="4"> Uso Interno</option>
-                  <option value="5"> Bloqueo</option>
-                  <option selected disable value="6"> Reserva Temporal</option>
-                </select>
-              </ng-container>
-
-
+              <select [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+                <option>{{huesped.estatus}}</option>
+                <ng-container *ngFor="let estatus of estatusArray;">
+                  <option [style.background-color]="estatus.color" value="{{estatus.id}}">{{estatus.estatus}}</option>
+                </ng-container>
+              </select>
             </td>
+
             <td>{{ huesped.llegada }}</td>
             <td>{{ huesped.salida }}</td>
             <td style="text-align: center;">{{ huesped.noches }}</td>
@@ -229,18 +162,7 @@
             <td>{{ huesped.origen }}</td>
             <!-- <td>{{ huesped.habitacion }}</td> -->
             <td>
-              <!-- <select style="width: 100%;"
-                        class="form-control form-control-lg form-control-solid"
-                        name="habitacion"
-                        formControlName="habitacion"
-                        (change)="habValue($event)"
-                      >
-                      <option style="width: 100%;" selected *ngIf="huesped.numeroCuarto == 0">S/N - {{huesped.habitacion}}</option>
-                      <option style="width: 100%;" selected *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}</option>
-                      <ng-container *ngFor="let tipoCuarto of cuartos">
-                        <option> {{tipoCuarto}} </option>
-                      </ng-container>
-                    </select> -->
+
                       <label class="btn" style="background-color: #fb7f8c;" *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
                       </label>
                       <label class="btn" style="background-color: #3da7e0;" *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
