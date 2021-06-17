@@ -475,7 +475,8 @@
         <div class="form-group row">
           <div class="form-group col-lg-6 ">
                 <button
-                class="btn btn-success btn-block"
+                style="background-color: #fac34e"
+                class="btn"
                 type="submit"
                 name="estatus"
                 (click)="setEstatus(1)"
@@ -485,26 +486,29 @@
           </div>
           <div class="form-group col-lg-6 ">
                 <button
-                class="btn btn-warning btn-block"
+                class="btn"
+                style="background-color: #99d284"
                 type="submit"
                 name="estatus"
                 (click)="setEstatus(2); "
                 >
-                  Agrega Reserva
+                  Realiza Reserva
                 </button>
           </div>
           <div class="form-group col-lg-6 ">
                 <button
-                class="btn btn-secondary btn-block"
+                class="btn"
+                style="background-color: #d0aaec"
                 type="submit"
-                (click)="setEstatus(6)"
+                (click)="setEstatus(5)"
                 >
-                  Bloqueo / Sin Llegada
+                  Reserva Uso Interno
                 </button>
           </div>
           <div class="form-group col-lg-6">
                 <button
-                  class="btn btn-primary btn-block"
+                  class="btn"
+                  style="background-color: #fab3db"
                   type="submit"
                   value="7"
                   (click)="setEstatus(7)"
