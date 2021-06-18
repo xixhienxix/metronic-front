@@ -42,6 +42,7 @@ import { DisponibilidadService } from '../_services/disponibilidad.service'
 import { EstatusService } from '../_services/estatus.service'
 import { HistoricoService } from '../_services/historico.service'
 import { Estatus } from '../_models/estatus.model';
+import { BloqueoReservaModalComponent } from './components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
 
 @Component({
   selector: 'app-customers',
@@ -284,8 +285,23 @@ export class CustomersComponent
     this.edit(undefined);
   }
 
-  // this.person = this.http.get("https://jsonplaceholder.typicode.com/posts/1")
-  // .map(res => res.json()).toPromise()
+  crearBloqueo() {
+    this.bloqueo();
+  }
+
+
+  bloqueo() {
+
+      const modalRef = this.modalService.open(BloqueoReservaModalComponent, { size: 'md' });
+
+      modalRef.result.then( () =>
+      this.customerService.fetch(),
+      () => { }
+
+    );
+    }
+
+
 
    edit(id: number) {
 

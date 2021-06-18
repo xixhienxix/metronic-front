@@ -54,6 +54,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatMenuTrigger} from '@angular/material/menu';
 import { DialogComponent } from './customers/components/nueva-reserva-modal/components/dialog/dialog.component';
+import { BloqueoReservaModalComponent } from './customers/components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
 
 @NgModule({
   declarations: [
@@ -82,6 +83,7 @@ import { DialogComponent } from './customers/components/nueva-reserva-modal/comp
     EditSpecModalComponent,
     MessagesComponent,
     NuevaReservaModalComponent,
+    BloqueoReservaModalComponent,
 
   ],
   imports: [
@@ -144,7 +146,8 @@ import { DialogComponent } from './customers/components/nueva-reserva-modal/comp
     FetchSpecsModalComponent,
     EditRemarkModalComponent,
     EditSpecModalComponent,
-    DialogComponent
+    DialogComponent,
+    BloqueoReservaModalComponent,
 
 
   ]
