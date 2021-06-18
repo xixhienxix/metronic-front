@@ -11,7 +11,7 @@
 
 </div>
 
-<form (submit)="save(); "  class="form form-label-right"
+<form (submit)="save(text.value); open(content) "  class="form form-label-right"
   style="background-color: #e6e9ed">
   <div class="overlay overlay-block cursor-default modal-body" style="background-color: #e6e9ed">
 
@@ -81,7 +81,7 @@
       <label style="color:#00506a; font-weight: bold;" class="form-label">Numero de Habitacion </label>
       <div class="col-lg-12">
         <select class="form-control form-control-lg form-control-solid" name="cuarto"
-          (change)="habValue($event)">
+          (change)="cuartoValue($event)">
           <option selected value="0">-- Cualquiera ---</option>
           <option value="1">Todos los Cuartos</option>
           <ng-container *ngFor="let numCuarto of infoCuarto">
@@ -92,55 +92,127 @@
     </div>
 
     <br>
+    <div class="row">
+      <label style="color:#00506a; font-weight: bold;" class="form-label">Restricciones:</label>
+    <div style="background-color: transparent;" class="form-control">
+          <section class="example-section">
+            <mat-checkbox
+                          (change)="toggleLlegadas($event)"
+                          style="margin: 5pxpx; color:#00506a; font-weight: bold;"
+                          class="example-margin">
+                          No hay Llegadas &nbsp;
+            </mat-checkbox>
+            <mat-checkbox
+                          (change)="toggleSalidas($event)"
+                          style="color:#00506a; font-weight: bold;"
+                          class="example-margin">
+                          No Hay Salidas
+            </mat-checkbox>
+          </section>
+        <small>No Hay Llegadas + Salidas = <label  style="color: #fa6d7c; font-weight:bold">Fuera de Servicio</label></small>
+      </div>
+        </div>
+        <br>
+        <br>
+        <label style="color:#00506a; font-weight: bold;" class="form-label"> Comentarios: </label>
+      <div class="row">
+        <textarea  #text class="form-control">
+          -
+        </textarea>
+
+      </div>
+</div>
 
 
+
+
+
+<div style="background-color:#00506a;" class="modal-header">
+  <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="modal-title h5 col-12 text-center">
+    <button type="submit" style="background-color: #319dd7; color: white; font-weight: bold;" class="btn btn-block">GUARDAR BLOQUEO</button>
   </div>
-
+</div>
 </form>
 
 
 
 
-<div style="background-color:#00506a;" class="modal-tittle">
-  <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="modal-title h5 col-12 text-center">
-    GUARDAR BLOQUEO
-  </div>
-</div>
-
-<div class="overlay overlay-block cursor-default modal-body" style="background-color: #dadcdf">
+<div  class="table-responsive angular-bootstrap-table">
+  <div class="font-weight-bold text-uppercase modal-header">Lista de Bloqueos </div>
   <table  class="table table-head-custom table-vertical-center overflow-hidden">
-    <div class="font-weight-bold text-uppercase modal-header"> Lista de Bloqueos </div>
-  <thead>
-    <th>
-      Habitacion
-    </th>
-    <th>
-      Mov Rooms
-    </th>
-    <th>
-      Desde
-    </th>
-    <th>
-      Hasta
-    </th>
-    <th>
-      Hasta
-    </th>
-  </thead>
-  <tbody>
-  <ng-container *ngFor="let bloqueos of listaBloqueos">
-    <tr>
-      <td >{{ bloqueos.Habitacion}}</td>
-      <td >{{ bloqueos.Cuarto}}</td>
-      <td >{{ bloqueos.Desde}}</td>
-      <td >{{ bloqueos.Hasta}}</td>
-      <td >{{ bloqueos.Restricciones}}</td>
-    </tr>
-</ng-container>
-</tbody>
-</table>
+    <thead>
+      <th>
+        Habitacion
+      </th>
+      <th>
+        Mov Rooms
+      </th>
+      <th>
+        Fechas
+      </th>
+      <th>
+        Restricciones
+      </th>
+      <th>
+        Comentarios
+      </th>
+      <th>Acciones</th>
 
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let bloqueos of listaBloqueos">
+        <tr>
+          <td >{{ bloqueos.Habitacion}}</td>
+          <td >{{ bloqueos.Cuarto}}</td>
+          <td >{{ bloqueos.Desde}} - {{ bloqueos.Hasta}}</td>
+          <td >
+            <section class="example-section">
+                <mat-checkbox
+                      [checked]="bloqueos.sinLlegadas"
+                      style="margin: 5pxpx; color:#00506a; font-weight: bold;"
+                      class="example-margin">
+                      No hay Llegadas &nbsp;
+                </mat-checkbox>
+                <mat-checkbox
+                      [checked]="bloqueos.sinSalidas"
+                      style="color:#00506a; font-weight: bold;"
+                      class="example-margin">
+                      No Hay Salidas
+                </mat-checkbox>
+                <mat-checkbox
+                      [checked]="bloqueos.fueraDeServicio"
+                      style="color:#00506a; font-weight: bold;"
+                      class="example-margin">
+                      Fuera de Servicio
+                </mat-checkbox>
+            </section>
+          </td>
+          <td>
+            {{bloqueos.comentarios}}
+          </td>
+          <a
+          title="Editar Folio"
+          class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3"
+          (click)="edit(bloqueos._id)"
+          >
+          <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
+            class="svg-icon svg-icon-md svg-icon-primary">
+          </span>
+        </a>
 
+        <a  title="Delete huesped"
+            class="btn btn-icon btn-light btn-hover-danger btn-sm"
+            (click)="edit(bloqueos._id)"
+            >
+          <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
+            class="svg-icon svg-icon-md svg-icon-danger">
+          </span>
+        </a>
+        </tr>
+    </ng-container>
+    </tbody>
+
+  </table>
 </div>
 
 
@@ -149,16 +221,15 @@
   <div>
     <ng-template #content let-c="close" let-d="dismiss">
       <div class="modal-header">
-        <h4 *ngIf="huesped.folio!=undefined" class="modal-title">Folio # {{this.huesped.folio}}</h4>
-        <h4 *ngIf="huesped.folio==undefined" class="modal-title">Reserva Generada</h4>
+
+        <h1>Bloqueos</h1>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
 
-        <p *ngIf="huesped.folio!=undefined">Folio # {{huesped.folio}} Generado con Exito </p>
-        <p *ngIf="huesped.folio==undefined">Cliente Guardado con Exito </p>
+        <p>Bloqueo Generado con Exito</p>
 
       </div>
       <div class="modal-footer">

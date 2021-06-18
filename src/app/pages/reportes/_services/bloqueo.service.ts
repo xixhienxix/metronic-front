@@ -25,7 +25,17 @@ export class BloqueoService  {
       ))
   }
 
+  getBloqueosbyId(id:string) : Observable<Bloqueo[]> {
 
+    return  (this.http.get<Bloqueo[]>(environment.apiUrl+"/get/bloqueos/"+id)
+        .pipe(
+          map(responseData=>{
+
+            console.log("MAP",responseData)
+            return responseData
+          })
+        ))
+    }
 
   getBloqueos() :Observable<Bloqueo[]> {
    return this.http

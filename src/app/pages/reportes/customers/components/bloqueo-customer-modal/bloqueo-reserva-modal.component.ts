@@ -1,27 +1,18 @@
 import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
-import { from, of, Subscription } from 'rxjs';
-import { catchError,  first,  tap } from 'rxjs/operators';
-import { Huesped } from '../../../_models/customer.model';
-import { Foliador } from '../../../_models/Foliador.model';
+import {  of, Subscription } from 'rxjs';
+import { catchError,   tap } from 'rxjs/operators';
 import { Estatus } from '../../../_models/estatus.model';
-import { HuespedService } from '../../../_services';
 import { EstatusService } from '../../../_services/estatus.service';
 import { CustomAdapter, CustomDateParserFormatter } from '../../../../../_metronic/core';
 import { ReportesComponent } from '../../../reportes.component'
 import { HttpClient } from "@angular/common/http";
 import { map} from 'rxjs/operators'
-import { FoliosService} from '../../../_services/folios.service'
 import { HabitacionesService} from '../../../_services/habitaciones.service'
 import { Habitaciones } from '../../../_models/habitaciones.model';
-import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 import { Disponibilidad } from '../../../_models/disponibilidad.model';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
-import { Observable} from  'rxjs';
-import {MatDialog} from '@angular/material/dialog';
-import {HistoricoService} from '../../../_services/historico.service'
+import {  NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { BloqueoService } from '../../../_services/bloqueo.service'
 import { Bloqueo } from '../../../_models/bloqueo.model';
@@ -35,38 +26,7 @@ declare global {
 
 
 
-const EMPTY_CUSTOMER: Huesped = {
-  id:undefined,
-  folio:undefined,
-  adultos:1,
-  ninos:1,
-  nombre: '',
-  estatus: '',
-  // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
-  // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
-  llegada:'',
-  salida:'',
-  noches: 1,
-  tarifa:500,
-  porPagar: 500,
-  pendiente:500,
-  origen: 'Online',
-  habitacion: '',
-  telefono:"",
-  email:"",
-  motivo:"",
-  //  OtrosDatos
-  fechaNacimiento:'',
-  trabajaEn:'',
-  tipoDeID:'',
-  numeroDeID:'',
-  direccion:'',
-  pais:'',
-  ciudad:'',
-  codigoPostal:'',
-  lenguaje:'Español',
-  numeroCuarto: 0
-};
+
 
 
 @Component({
@@ -126,11 +86,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   toDate: NgbDate | null;
 
 
-  id:number;
-  folio:number;
   isLoading$;
-  model:NgbDateStruct;
-  huesped: Huesped;
   habitaciones:Habitaciones;
   formGroup: FormGroup;
   myControl: FormGroup;
@@ -142,13 +98,16 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   public estatusArray:Estatus[]=[];
   public folioactualizado:any;
   cuarto:string;
+  numCuarto: string;
+  sinSalidasChecked:boolean=false;
+  sinLlegadasChecked:boolean=false;
+  fueraDeServicio:boolean;
   private subscriptions: Subscription[] = [];
-  public listaFolios:Foliador[];
   public listaBloqueos:Bloqueo[];
-  displayNone:string = "display:none"
-  showDropDown=false;
-  accordionDisplay="";
   _isDisabled:boolean=true;
+  tipoDeCuarto:string;
+  closeResult: string;
+
 
 
 
@@ -259,70 +218,81 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   // }
 
 
-
-  save() {
-  this.postBloqueo();
+  save(text:string) {
+  this.postBloqueo(text);
   }
 
 
 
-  private postBloqueo() {
+  private postBloqueo(text:string) {
 
-    const formData = this.formGroup.value;
+    let desde;
+    let hasta;
 
-    this.huesped.llegada = this.fromDate.toString();
-    this.huesped.salida = this.toDate.toString();
-    this.huesped.nombre = formData.nombre;
+    this.fromDate.toString();
+    this.toDate.toString();
+    this.cuarto;
+    this.numCuarto;
+    this.sinLlegadasChecked;
 
-        this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
-        this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-        this.huesped.noches=(this.toDate.day)-(this.fromDate.day)
-        this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
-        this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
-        this.huesped.habitacion=formData.habitacion
-        this.huesped.telefono=formData.telefono
-        this.huesped.email=formData.email
-        this.huesped.motivo=formData.motivo
-        this.huesped.id=this.huesped.folio
-        this.huesped.numeroCuarto=0
-        this.huesped.habitacion=this.cuarto
-  let post = this.postService.addPost
+    if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
+    { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+
+        desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
+        hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
+
+  let post = this.postService.postBloqueo
     (
-      this.huesped.id,
-      this.huesped.folio,
-      this.huesped.adultos,
-      this.huesped.ninos,
-      this.huesped.nombre,
-      this.huesped.estatus,
-      this.huesped.llegada,
-      this.huesped.salida,
-      this.huesped.noches,
-      this.huesped.tarifa,
-      this.huesped.pendiente,
-      this.huesped.porPagar,
-      this.huesped.origen,
-      this.huesped.habitacion,
-      this.huesped.telefono,
-      this.huesped.email,
-      this.huesped.motivo,
-      this.huesped.fechaNacimiento,
-      this.huesped.trabajaEn,
-      this.huesped.tipoDeID,
-      this.huesped.numeroDeID,
-      this.huesped.direccion,
-      this.huesped.pais,
-      this.huesped.ciudad,
-      this.huesped.codigoPostal,
-      this.huesped.lenguaje,
-      this.huesped.numeroCuarto
+      desde,
+      hasta,
+      this.tipoDeCuarto,
+      parseInt(this.numCuarto),
+      this.sinLlegadasChecked,
+      this.sinSalidasChecked,
+      this.fueraDeServicio,
+      text
     );
-
+      this.listaBloqueos=[]
+      this.getBloqueos();
       this.modal.close();
 
   }
 
 
+  edit(id:number) {
 
+  //   this.bloqueoService.getBloqueosbyId();
+
+  //   let desde;
+  //   let hasta;
+
+  //   this.fromDate.toString();
+  //   this.toDate.toString();
+  //   this.cuarto;
+  //   this.numCuarto;
+  //   this.sinLlegadasChecked;
+
+  //   if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
+  //   { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+
+  //       desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
+  //       hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
+
+  // let post = this.postService.postBloqueo
+  //   (
+  //     desde,
+  //     hasta,
+  //     this.cuarto,
+  //     parseInt(this.numCuarto),
+  //     this.sinLlegadasChecked,
+  //     this.sinSalidasChecked,
+  //     this.fueraDeServicio,
+  //     text
+  //   );
+
+  //   const sbUpdate = this.postService.actualizaBloqueos(id);
+
+  }
 
 
   ngOnDestroy(): void {
@@ -353,14 +323,32 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
 
 
+  toggleLlegadas($event)
+  {
+    if($event.checked==true)
+    {
+      this.sinLlegadasChecked = true;
+    }else
+    this.sinLlegadasChecked=false
+  }
 
+  toggleSalidas($event)
+  {
+    if($event.checked==true)
+    {
+      this.sinSalidasChecked = true;
+    }else
+    this.sinSalidasChecked=false;
+  }
 
   habValue($event)
   {
 
+
     if($event.target.options.selectedIndex==1)
     {
         this.cuarto=""
+        this.tipoDeCuarto="Todos"
         this.habitacionService.gethabitaciones()
           .subscribe((cuartos)=>{
             this.infoCuarto=(cuartos)
@@ -368,6 +356,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     }else
     {
       this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
+      this.tipoDeCuarto=$event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
       console.log("this.cuarto",this.cuarto)
       this.infoCuarto = []
 
@@ -377,15 +366,19 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       })
 
     }
+    // this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
+
+  }
+
+  cuartoValue($event)
+  {
+    this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
 
   numCuartos($event)
   {
-    this.accordionDisplay="display:none"
-    this.disponibilidad=[]
     this.cuartos=[]
-    this.sinDisponibilidad=[]
 
     if($event.target.options.selectedIndex==1)
     {
@@ -462,16 +455,32 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
 
 
-  private getDismissReason(reason: any): string {
-      if (reason === ModalDismissReasons.ESC) {
-          return 'by pressing ESC';
-      } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-          return 'by clicking on a backdrop';
-      } else {
-          return  `with: ${reason}`;
-      }
+
+
+
+//MODAL
+open(content) {
+
+  this.modalService.open(content).result.then((result) => {
+  this.closeResult = `Closed with: ${result}`;
+  }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  });
+
+}
+
+private getDismissReason(reason: any): string {
+  if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+  } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+  } else {
+      return  `with: ${reason}`;
   }
+}
+
+
+
+
 
   }
-
-

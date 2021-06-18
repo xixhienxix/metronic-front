@@ -1,11 +1,14 @@
 
 import { BaseModel } from '../../../_metronic/shared/crud-table';
 
-export interface Bloqueo extends BaseModel
+export interface Bloqueo
 {
   Habitacion:string,
-  Cuarto:string;
+  Cuarto:number;
   Desde:string;
   Hasta:string;
-  Restricciones:string;
+  sinLlegadas:boolean;
+  sinSalidas:boolean;
+  fueraDeServicio:boolean;
+  Comentarios:string;
 }

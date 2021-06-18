@@ -8,6 +8,7 @@ import {Injectable} from '@angular/core'
 import { Foliador } from './_models/foliador.model';
 import { map } from 'rxjs/operators';
 import {environment} from '../../../environments/environment'
+import { Bloqueo } from './_models/bloqueo.model';
 
 
 @Component({
@@ -78,6 +79,7 @@ export class ReportesComponent implements OnInit {
       tipoDeID:tipoDeID,numeroDeID:numeroDeID,direccion:direccion,pais:pais,ciudad:ciudad,codigoPostal:codigoPostal,lenguaje:lenguaje,
       numeroCuarto:numeroCuarto
     };
+    this.http.post<any>(environment.apiUrl+"/reportes/huesped", post)
 
     //   const promise = new Promise((resolve, reject) => {
     //     const apiURL = environment.apiUrl;
@@ -89,12 +91,46 @@ export class ReportesComponent implements OnInit {
     //     }).catch(error => console.log(error));
     //   return promise;
     // })
+    }
 
-    this.http.post<any>(environment.apiUrl+"/reportes/huesped", post)
+    postBloqueo(
+      desde:string,
+      hasta:string,
+      cuarto:string,
+      numCuarto:number,
+      sinLlegadasChecked:boolean,
+      sinSalidasChecked:boolean,
+      fueraDeServicio:boolean,
+      text:string
+      ) {
+const bloqueos: Bloqueo = {
+  Habitacion:cuarto,
+  Cuarto:numCuarto,
+  Desde:desde,
+  Hasta:hasta,
+  sinLlegadas:sinLlegadasChecked,
+  sinSalidas:sinSalidasChecked,
+  fueraDeServicio:fueraDeServicio,
+  Comentarios:text
 
+};
+    this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", bloqueos)
+    .subscribe((response)=>
+    {
+      console.log("exito",response.msg)
+    })
 
     }
 
+
+    actualizaBloqueos(id:number)
+    {
+      this.http
+      .post<{ message: string }>(environment.apiUrl+"/post/bloqueos/:id", id)
+      .subscribe(responseData => {
+        console.log(responseData.message);
+      });
+    }
 
   actualizaEstatusHabitacion(id:number)
   {
