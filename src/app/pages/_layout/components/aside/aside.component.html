@@ -155,6 +155,69 @@
 
 
 
+<!-- Applications -->
+      <!-- begin::section -->
+      <li class="menu-section">
+        <h4 class="menu-text">Consultas</h4>
+        <i class="menu-icon flaticon-more-v2"></i>
+      </li>
+      <!-- end:: section -->
+
+      <!-- ECommerce -->
+      <!-- begin::1 Level -->
+      <li
+        class="menu-item menu-item-submenu"
+        aria-haspopup="true"
+        data-menu-toggle="hover"
+        routerLinkActive="menu-item-open"
+      >
+        <a
+          class="menu-link menu-toggle"
+          routerLinkActive="active"
+          href="/reportes"
+        >
+          <span
+            [inlineSVG]="'./assets/media/svg/icons/Shopping/Cart3.svg'"
+            cacheSVG="true"
+            class="svg-icon menu-icon"
+          ></span>
+          <span class="menu-text">Reportes</span>
+          <i class="menu-arrow"></i>
+        </a>
+        <div class="menu-submenu">
+          <i class="menu-arrow"></i>
+          <ul class="menu-subnav">
+            <!-- <li class="menu-item" aria-haspopup="true">
+              <span class="menu-link">
+                <span class="menu-text">eCommerce</span>
+              </span>
+            </li> -->
+
+            <!-- begin::2 Level -->
+            <li
+              class="menu-item"
+              aria-haspopup="true"
+              data-menu-toggle="hover"
+              routerLinkActive="menu-item-active"
+            >
+              <a
+                class="menu-link"
+                routerLink="/reportes/customers"
+                routerLinkActive="active"
+              >
+                <i class="menu-bullet menu-bullet-dot">
+                  <span></span>
+                </i>
+                <span class="menu-text">Lista de húespedes</span>
+              </a>
+            </li>
+            <!-- end::2 Level -->
+
+
+          </ul>
+        </div>
+      </li>
+      <!-- end::1 Level -->
 
 
 

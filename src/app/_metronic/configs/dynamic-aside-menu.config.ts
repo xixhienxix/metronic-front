@@ -21,84 +21,50 @@ export const DynamicAsideMenuConfig = {
     { section: 'Components' },
 
     //SECCION DE REPORTES
-    {
-      title: 'Reportes',
-      root: true,
-      bullet: 'dot',
-      page: '/reportes',
-      icon: 'flaticon2-browser-2',
-      svg: './assets/media/svg/icons/Design/Cap-2.svg',
-      permission: 'accessToECommerceModule',
-      submenu: [
-        {
-          title: 'Lista de Húespedes',
-          page: '/reportes/customers'
-        },
-        {
-          title: 'Historico de Clientes',
-          page: '/ecommerce/products'
-        },
-      ]
-    },
+    // {
+    //   title: 'Reportes',
+    //   root: true,
+    //   bullet: 'dot',
+    //   page: '/reportes',
+    //   icon: 'flaticon2-browser-2',
+    //   svg: './assets/media/svg/icons/Design/Cap-2.svg',
+    //   permission: 'accessToECommerceModule',
+    //   submenu: [
+    //     {
+    //       title: 'Lista de Húespedes',
+    //       page: '/reportes/customers'
+    //     },
+    //     {
+    //       title: 'Historico de Clientes',
+    //       page: '/ecommerce/products'
+    //     },
+    //   ]
+    // },
 
+    { section: 'Consultas' },
 
 
     /////////////////
 
-    // {
+     {
 
 
-    //   title: 'Google Material',
-    //   root: true,
-    //   bullet: 'dot',
-    //   page: '/material',
-    //   icon: 'flaticon2-browser-2',
-    //   svg: './assets/media/svg/icons/Design/Cap-2.svg',
-    //   submenu: [
-    //     {
-    //       title: 'Form Controls',
-    //       bullet: 'dot',
-    //       page: '/material/form-controls',
-    //       submenu: [
-    //         {
-    //           title: 'Auto Complete',
-    //           page: '/material/form-controls/autocomplete',
-    //           permission: 'accessToECommerceModule'
-    //         },
-    //         {
-    //           title: 'Checkbox',
-    //           page: '/material/form-controls/checkbox'
-    //         },
-    //         {
-    //           title: 'Radio Button',
-    //           page: '/material/form-controls/radiobutton'
-    //         },
-    //         {
-    //           title: 'Datepicker',
-    //           page: '/material/form-controls/datepicker'
-    //         },
-    //         {
-    //           title: 'Form Field',
-    //           page: '/material/form-controls/formfield'
-    //         },
-    //         {
-    //           title: 'Input',
-    //           page: '/material/form-controls/input'
-    //         },
-    //         {
-    //           title: 'Select',
-    //           page: '/material/form-controls/select'
-    //         },
-    //         {
-    //           title: 'Slider',
-    //           page: '/material/form-controls/slider'
-    //         },
-    //         {
-    //           title: 'Slider Toggle',
-    //           page: '/material/form-controls/slidertoggle'
-    //         }
-    //       ]
-    //     },
+      title: 'Reportes',
+      bullet: 'dot',
+      icon: 'flaticon2-list-2',
+      svg: './assets/media/svg/icons/Shopping/Cart3.svg',
+      root: true,
+      permission: 'accessToReportesModule',
+      page: '/reportes',
+      submenu: [
+          {
+            title: 'Lista de Huespedes',
+            page: '/reportes/customers',
+            permission: 'accessToReportesModule'
+          },
+
+        ]
+      },
     //     {
     //       title: 'Navigation',
     //       bullet: 'dot',
