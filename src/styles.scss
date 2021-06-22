@@ -103,3 +103,6 @@
   height: 3px;
   width: 100%;
 }
+.cdk-overlay-connected-position-bounding-box {
+  z-index: 99999 !important;
+}

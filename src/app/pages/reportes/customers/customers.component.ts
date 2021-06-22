@@ -44,6 +44,7 @@ import { HistoricoService } from '../_services/historico.service'
 import { Estatus } from '../_models/estatus.model';
 import { BloqueoReservaModalComponent } from './components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
 
+
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
@@ -289,11 +290,8 @@ export class CustomersComponent
     this.bloqueo();
   }
 
-
   bloqueo() {
-
       const modalRef = this.modalService.open(BloqueoReservaModalComponent, { size: 'md' });
-
       modalRef.result.then( () =>
       this.customerService.fetch(),
       () => { }
