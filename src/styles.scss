@@ -70,6 +70,7 @@
 
 .angular-bootstrap-table {
   overflow-x: auto;
+  overflow-y: 200px;
 }
 .angular-bootstrap-table {
   th {
@@ -102,4 +103,7 @@
 .progress-modal {
   height: 3px;
   width: 100%;
+}
+.cdk-overlay-connected-position-bounding-box {
+  z-index: 99999 !important;
 }

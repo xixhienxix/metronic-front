@@ -1,4 +1,4 @@
-import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {  Component, Input, OnDestroy, OnInit, ViewChild,ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import {  of, Subscription } from 'rxjs';
@@ -16,6 +16,8 @@ import {  NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { BloqueoService } from '../../../_services/bloqueo.service'
 import { Bloqueo } from '../../../_models/bloqueo.model';
+import {FormControl} from '@angular/forms';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 let date: Date = new Date();
 declare global {
@@ -26,13 +28,11 @@ declare global {
 
 
 
-
-
-
 @Component({
   selector: 'app-edit-customer-modal',
   templateUrl: './bloqueo-reserva-modal.component.html',
   styleUrls: ['./bloqueo-reserva-modal.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   styles:[`
 
 
@@ -62,6 +62,7 @@ declare global {
 
 
 `],
+
   // NOTE: For this example we are only providing current component, but probably
   // NOTE: you will w  ant to provide your main App Module
   providers: [
@@ -74,9 +75,11 @@ declare global {
 export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 {
   // @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
+  @ViewChild('matSelect') matSelect = null;
 
   @Input()
 
+  last_selection = null;
 //DATETIMEPICKER RANGE
   hoveredDate: NgbDate | null = null;
 
@@ -84,31 +87,31 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   fromDate1: string;
 
   toDate: NgbDate | null;
+  habitacionfb = new FormControl();
 
-
+  checkAll = false;
   isLoading$;
   habitaciones:Habitaciones;
   formGroup: FormGroup;
   myControl: FormGroup;
   public cuartos:Habitaciones[]=[];
-  public codigoCuarto:Habitaciones[]=[];
+  public codigoCuarto:any[]=[];
   public infoCuarto:Habitaciones[]=[];
   public disponibilidad:Disponibilidad[]=[];
   public sinDisponibilidad:any[]=[]
   public estatusArray:Estatus[]=[];
   public folioactualizado:any;
   cuarto:string;
-  numCuarto: string;
+  numCuarto: Array<number>=[];
   sinSalidasChecked:boolean=false;
   sinLlegadasChecked:boolean=false;
   fueraDeServicio:boolean;
   private subscriptions: Subscription[] = [];
   public listaBloqueos:Bloqueo[];
   _isDisabled:boolean=true;
-  tipoDeCuarto:string;
+  tipoDeCuarto:Array<string>=[];
   closeResult: string;
-
-
+  habitacionNumero:number;
 
 
 
@@ -209,13 +212,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   }
 
 
-  // loadForm() {
-
-  //   this.formGroup = this.fb.group({
-  //     cuarto:[this.huesped.llegada, Validators.compose([Validators.required])],
-  //     habitacion:[this.huesped.llegada, Validators.compose([Validators.required])]
-  //   });
-  // }
 
 
   save(text:string) {
@@ -246,7 +242,10 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       desde,
       hasta,
       this.tipoDeCuarto,
-      parseInt(this.numCuarto),
+
+      this.numCuarto,
+      //parseInt(this.numCuarto),
+
       this.sinLlegadasChecked,
       this.sinSalidasChecked,
       this.fueraDeServicio,
@@ -344,19 +343,26 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   habValue($event)
   {
 
+    // if($event.target.options.selectedIndex==1)
+    if($event.value==1)
 
-    if($event.target.options.selectedIndex==1)
     {
         this.cuarto=""
-        this.tipoDeCuarto="Todos"
+        this.tipoDeCuarto=[]
+        for(let i=0;i<this.codigoCuarto.length;i++)
+        {
+          this.tipoDeCuarto.push(this.codigoCuarto[i])
+        }
+        // this.tipoDeCuarto="Todos"
         this.habitacionService.gethabitaciones()
           .subscribe((cuartos)=>{
             this.infoCuarto=(cuartos)
           })
+
     }else
     {
-      this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
-      this.tipoDeCuarto=$event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
+      this.cuarto = $event.value.replace(" ","_");
+      this.tipoDeCuarto=$event.value.replace("_"," ");
       console.log("this.cuarto",this.cuarto)
       this.infoCuarto = []
 
@@ -370,12 +376,28 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   }
 
-  cuartoValue($event)
+  cuartoValue(selected:boolean,value:any)
   {
-    this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+    let index;
+    if(selected==true)
+    {
+      this.numCuarto.push(value.Numero);
+    }else if(selected==false)
+    {
+      index=this.numCuarto.indexOf(value.Numero,0)
+      this.numCuarto.splice(index,1)
+    }
+    //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
-
+  Allchecked(event:any)
+  {
+    if(this.checkAll==false)
+    {
+      this.checkAll=true;
+    }else
+    this.checkAll=false;
+  }
   numCuartos($event)
   {
     this.cuartos=[]
@@ -480,7 +502,14 @@ private getDismissReason(reason: any): string {
 }
 
 
+//CheckBox
+okayChecked() {
+  // this.last_selection = this.formGroup.controls.project.value
+  this.matSelect.close()
+}
 
-
+closeModal(){
+  this.modal.close();
+}
 
   }

@@ -1,12 +1,14 @@
 <div class="modal-content">
 <ng-container *ngIf="huesped.id == undefined">
   <div style="background-color: #00506a;" class="modal-header">
-    <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center"
+    <div style="text-align: center; color: white;" class="modal-title h4 col-10 text-center"
       id="example-modal-sizes-title-lg">
       NUEVA RESERVA / BLOQUEO
       <!-- <label>
         {{huesped.folio}}</label> -->
     </div>
+    <button style="background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+
   </div>
 </ng-container>
 

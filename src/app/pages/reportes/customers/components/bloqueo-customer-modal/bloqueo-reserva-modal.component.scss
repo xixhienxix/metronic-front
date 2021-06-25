@@ -30,6 +30,31 @@ select {
   -moz-appearance: none;
 }
 
+.mat-select-panel
+{
+  background-image:
+    linear-gradient(45deg, transparent 50%, #00506a 60%),
+    linear-gradient(135deg, #00506a 40%, transparent 50%) !important;
+  background-position:
+    calc(100% - 30px) 14px,
+    calc(100% - 20px) 14px,
+    100% 0;
+  background-size:
+    10px 10px,
+    10px 10px;
+  background-repeat: no-repeat;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.example-additional-selection {
+  opacity: 0.75;
+  font-size: 0.75em;
+}
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 9999 !important;
+}
+
 //   .ngb-dp-day {
 //   width: 4rem !important;
 //   height: 4rem !important;

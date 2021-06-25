@@ -905,7 +905,10 @@ resetFoliador()
           return  `with: ${reason}`;
       }
   }
-
+  closeModal()
+  {
+    this.modal.close();
+  }
   }
 
 

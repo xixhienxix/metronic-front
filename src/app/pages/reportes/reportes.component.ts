@@ -96,8 +96,8 @@ export class ReportesComponent implements OnInit {
     postBloqueo(
       desde:string,
       hasta:string,
-      cuarto:string,
-      numCuarto:number,
+      cuarto:Array<string>,
+      numCuarto:Array<number>,
       sinLlegadasChecked:boolean,
       sinSalidasChecked:boolean,
       fueraDeServicio:boolean,

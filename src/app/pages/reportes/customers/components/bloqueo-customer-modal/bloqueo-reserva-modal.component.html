@@ -1,14 +1,14 @@
 <div class="modal-content">
-    <div style="background-color: #00506a;" class="modal-header">
-      <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center"
+  <div style="background-color: #00506a;" class="modal-header">
+      <div style="text-align: center; color: white;" class="modal-title h4 col-10 text-center"
         id="example-modal-sizes-title-lg">
         BLOQUEO DE HABITACIONES
         <!-- <label>
           {{huesped.folio}}</label> -->
       </div>
+      <button style="background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+
     </div>
-
-
 </div>
 
 <form (submit)="save(text.value); open(content) "  class="form form-label-right"
@@ -66,28 +66,40 @@
     <div class="row">
       <label style="color:#00506a; font-weight: bold;" class="form-label">Tipo de Habitación </label>
       <div class="col-lg-12">
-        <select #tipoCuarto class="form-control form-control-lg form-control-solid" name="habitacion"
-           (change)="habValue($event)">
-          <option selected value="0">-- Cualquiera ---</option>
-          <option value="1">Todos los Tipos de Cuartos</option>
-          <ng-container *ngFor="let tipoCuarto of codigoCuarto">
-            <option> {{tipoCuarto.replace("_"," ")}} </option>
-          </ng-container>
-        </select>
+        <mat-select #tipoCuarto
+                    class="form-control form-control-lg form-control-solid"
+                    name="habitacion"
+                    (selectionChange)="habValue($event)"
+                    placeholder="-- Cualquiera -- ">
+            <mat-option value="1">Todos los Tipos de Cuartos</mat-option>
+            <mat-option *ngFor="let tipoCuarto of codigoCuarto" [value]="tipoCuarto">{{tipoCuarto.replace("_"," ")}} </mat-option>
+        </mat-select>
       </div>
     </div>
 <br>
     <div class="row">
       <label style="color:#00506a; font-weight: bold;" class="form-label">Numero de Habitacion </label>
       <div class="col-lg-12">
-        <select class="form-control form-control-lg form-control-solid" name="cuarto"
-          (change)="cuartoValue($event)">
-          <option selected value="0">-- Cualquiera ---</option>
-          <option value="1">Todos los Cuartos</option>
-          <ng-container *ngFor="let numCuarto of infoCuarto">
-            <option> {{numCuarto.Numero}} </option>
-          </ng-container>
-        </select>
+          <mat-select #matSelect
+                      class="form-control form-control-lg form-control-solid"
+                      [formControl]="habitacionfb"
+                      multiple
+                      placeholder="-- Cualquiera -- ">
+
+            <!-- <mat-select-trigger>
+              {{habitacionfb.value ? habitacionfb.value[0] : ''}}
+              <span *ngIf="habitacionfb.value?.length > 1" class="example-additional-selection">
+                ({{habitacionfb.value.length - 1}} {{habitacionfb.value?.length === 2 ? 'Otra' : 'Otras'}})
+              </span>
+            </mat-select-trigger> -->
+            <footer>
+              <button style="background-color: #319dd7;" (click)="okayChecked()" mat-raised-button class="btn btn-blocked">Confirmar</button>
+            </footer>
+            <!-- <mat-option (click)="Allchecked($event)">Todos</mat-option> -->
+              <div>
+                <mat-option #matOption (click)="cuartoValue(matOption.selected,matOption.value);" *ngFor="let numero of infoCuarto" [value]="numero">{{numero.Numero}}</mat-option>
+              </div>
+          </mat-select>
       </div>
     </div>
 
@@ -117,7 +129,7 @@
         <label style="color:#00506a; font-weight: bold;" class="form-label"> Comentarios: </label>
       <div class="row">
         <textarea  #text class="form-control">
-          -
+
         </textarea>
 
       </div>
@@ -137,9 +149,9 @@
 
 
 
-<div  class="table-responsive angular-bootstrap-table">
+<div class="table-responsive angular-bootstrap-table">
   <div class="font-weight-bold text-uppercase modal-header">Lista de Bloqueos </div>
-  <table  class="table table-head-custom table-vertical-center overflow-hidden">
+  <table style="overflow-y: 100px;" class="table table-head-custom table-vertical-center ">
     <thead>
       <th>
         Habitacion
@@ -162,8 +174,16 @@
     <tbody>
       <ng-container *ngFor="let bloqueos of listaBloqueos">
         <tr>
-          <td >{{ bloqueos.Habitacion}}</td>
-          <td >{{ bloqueos.Cuarto}}</td>
+          <td>
+            <ng-container *ngFor="let habitacion of bloqueos.Habitacion">
+              {{habitacion}}
+            </ng-container>
+          </td>
+          <td>
+            <ng-container *ngFor="let cuartos of bloqueos.Cuarto">
+              {{cuartos}}
+            </ng-container>
+          </td>
           <td >{{ bloqueos.Desde}} - {{ bloqueos.Hasta}}</td>
           <td >
             <section class="example-section">
