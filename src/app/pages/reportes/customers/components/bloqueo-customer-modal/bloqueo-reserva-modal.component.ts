@@ -89,27 +89,27 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   toDate: NgbDate | null;
   habitacionfb = new FormControl();
 
-
+  checkAll = false;
   isLoading$;
   habitaciones:Habitaciones;
   formGroup: FormGroup;
   myControl: FormGroup;
   public cuartos:Habitaciones[]=[];
-  public codigoCuarto:Habitaciones[]=[];
+  public codigoCuarto:any[]=[];
   public infoCuarto:Habitaciones[]=[];
   public disponibilidad:Disponibilidad[]=[];
   public sinDisponibilidad:any[]=[]
   public estatusArray:Estatus[]=[];
   public folioactualizado:any;
   cuarto:string;
-  numCuarto: string;
+  numCuarto: Array<number>=[];
   sinSalidasChecked:boolean=false;
   sinLlegadasChecked:boolean=false;
   fueraDeServicio:boolean;
   private subscriptions: Subscription[] = [];
   public listaBloqueos:Bloqueo[];
   _isDisabled:boolean=true;
-  tipoDeCuarto:string="";
+  tipoDeCuarto:Array<string>=[];
   closeResult: string;
   habitacionNumero:number;
 
@@ -242,7 +242,10 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       desde,
       hasta,
       this.tipoDeCuarto,
-      parseInt(this.numCuarto),
+
+      this.numCuarto,
+      //parseInt(this.numCuarto),
+
       this.sinLlegadasChecked,
       this.sinSalidasChecked,
       this.fueraDeServicio,
@@ -345,11 +348,17 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
     {
         this.cuarto=""
-        this.tipoDeCuarto="Todos"
+        this.tipoDeCuarto=[]
+        for(let i=0;i<this.codigoCuarto.length;i++)
+        {
+          this.tipoDeCuarto.push(this.codigoCuarto[i])
+        }
+        // this.tipoDeCuarto="Todos"
         this.habitacionService.gethabitaciones()
           .subscribe((cuartos)=>{
             this.infoCuarto=(cuartos)
           })
+
     }else
     {
       this.cuarto = $event.value.replace(" ","_");
@@ -367,12 +376,28 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   }
 
-  cuartoValue($event)
+  cuartoValue(selected:boolean,value:any)
   {
-    this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+    let index;
+    if(selected==true)
+    {
+      this.numCuarto.push(value.Numero);
+    }else if(selected==false)
+    {
+      index=this.numCuarto.indexOf(value.Numero,0)
+      this.numCuarto.splice(index,1)
+    }
+    //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
-
+  Allchecked(event:any)
+  {
+    if(this.checkAll==false)
+    {
+      this.checkAll=true;
+    }else
+    this.checkAll=false;
+  }
   numCuartos($event)
   {
     this.cuartos=[]
