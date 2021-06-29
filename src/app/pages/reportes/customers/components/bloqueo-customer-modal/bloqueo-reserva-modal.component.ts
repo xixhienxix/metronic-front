@@ -264,40 +264,23 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   }
 
 
-  edit(id:number) {
+  edit(_id:number) {
 
-  //   this.bloqueoService.getBloqueosbyId();
+    // let post = this.postService.postBloqueo
+    // (
+    //   desde,
+    //   hasta,
+    //   unique,
 
-  //   let desde;
-  //   let hasta;
-
-  //   this.fromDate.toString();
-  //   this.toDate.toString();
-  //   this.cuarto;
-  //   this.numCuarto;
-  //   this.sinLlegadasChecked;
-
-  //   if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
-  //   { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
-
-  //       desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
-  //       hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-
-  // let post = this.postService.postBloqueo
-  //   (
-  //     desde,
-  //     hasta,
-  //     this.cuarto,
-  //     parseInt(this.numCuarto),
-  //     this.sinLlegadasChecked,
-  //     this.sinSalidasChecked,
-  //     this.fueraDeServicio,
-  //     text
-  //   );
-
-  //   const sbUpdate = this.postService.actualizaBloqueos(id);
+    //   this.numCuarto,
+    //   this.sinLlegadasChecked,
+    //   this.sinSalidasChecked,
+    //   this.fueraDeServicio,
+    //   text
+    // );
 
   }
+
 
 
   ngOnDestroy(): void {

@@ -37,6 +37,18 @@ export class BloqueoService  {
         ))
     }
 
+  actualizaBloqueosById(id:string) : Observable<Bloqueo[]> {
+
+      return  (this.http.get<Bloqueo[]>(environment.apiUrl+"/actualiza/bloqueos/"+id)
+          .pipe(
+            map(responseData=>{
+
+              console.log("MAP",responseData)
+              return responseData
+            })
+          ))
+      }
+
   getBloqueos() :Observable<Bloqueo[]> {
    return this.http
     .get<Bloqueo[]>(environment.apiUrl + '/reportes/bloqueos')
