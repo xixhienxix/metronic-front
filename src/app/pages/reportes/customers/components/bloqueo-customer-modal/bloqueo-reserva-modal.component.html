@@ -70,7 +70,7 @@
                     class="form-control form-control-lg form-control-solid"
                     name="habitacion"
                     (selectionChange)="habValue($event)"
-                    placeholder="-- Cualquiera -- ">
+                    placeholder="-- Seleccione Tipo de Habitación -- ">
             <mat-option value="1">Todos los Tipos de Cuartos</mat-option>
             <mat-option *ngFor="let tipoCuarto of codigoCuarto" [value]="tipoCuarto">{{tipoCuarto.replace("_"," ")}} </mat-option>
         </mat-select>
@@ -84,20 +84,13 @@
                       class="form-control form-control-lg form-control-solid"
                       [formControl]="habitacionfb"
                       multiple
-                      placeholder="-- Cualquiera -- ">
-
-            <!-- <mat-select-trigger>
-              {{habitacionfb.value ? habitacionfb.value[0] : ''}}
-              <span *ngIf="habitacionfb.value?.length > 1" class="example-additional-selection">
-                ({{habitacionfb.value.length - 1}} {{habitacionfb.value?.length === 2 ? 'Otra' : 'Otras'}})
-              </span>
-            </mat-select-trigger> -->
+                      placeholder="-- {{placeHolder}} -- ">
             <footer>
               <button style="background-color: #319dd7;" (click)="okayChecked()" mat-raised-button class="btn btn-blocked">Confirmar</button>
             </footer>
             <!-- <mat-option (click)="Allchecked($event)">Todos</mat-option> -->
               <div>
-                <mat-option #matOption (click)="cuartoValue(matOption.selected,matOption.value);" *ngFor="let numero of infoCuarto" [value]="numero">{{numero.Numero}}</mat-option>
+                <mat-option #matOption (click)="cuartoValue(matOption.selected,matOption.value);" *ngFor="let numero of mySet" [value]="numero">{{numero}}</mat-option>
               </div>
           </mat-select>
       </div>
