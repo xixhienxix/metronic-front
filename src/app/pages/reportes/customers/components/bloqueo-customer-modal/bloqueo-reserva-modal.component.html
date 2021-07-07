@@ -1,6 +1,6 @@
 <div class="modal-content">
   <div style="background-color: #00506a;" class="modal-header">
-      <div style="text-align: center; color: white;" class="modal-title h4 col-10 text-center"
+      <div style="text-align: center; color: white;" class="text-center modal-title h4 col-10"
         id="example-modal-sizes-title-lg">
         BLOQUEO DE HABITACIONES
         <!-- <label>
@@ -11,13 +11,13 @@
     </div>
 </div>
 
-<form (submit)="save(text.value); open(content) "  class="form form-label-right"
+<form (submit)="save(text.value); "  class="form form-label-right"
   style="background-color: #e6e9ed">
-  <div class="overlay overlay-block cursor-default modal-body" style="background-color: #e6e9ed">
+  <div class="cursor-default overlay overlay-block modal-body" style="background-color: #e6e9ed">
 
     <div class="row">
       <!--Hidden-->
-      <div class="form-group hidden">
+      <div class="hidden form-group">
         <div class="input-group">
           <input hidden name="datepicker" class="form-control" ngbDatepicker [footerTemplate]="footerTemplate"
             #datepicker="ngbDatepicker" [autoClose]="'outside'" (dateSelect)="onDateSelection($event)"
@@ -35,7 +35,7 @@
 
 
       <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Rango de Fecha</label>
-      <div class="input-group mb-3 col-lg-9">
+      <div class="mb-3 input-group col-lg-9">
         <div class="input-group-prepend">
           <button
             style="border-top: 2px solid #dadcdf;border-bottom: 2px solid #dadcdf;border-left: 2px solid #dadcdf; background-color: transparent;"
@@ -57,7 +57,7 @@
       <!--Calendar Footer-->
       <ng-template #footerTemplate>
         <hr class="my-0">
-        <button class="btn btn-secondary btn-sm m-2 float-right" (click)="datepicker.close()">Confirmar</button>
+        <button class="float-right m-2 btn btn-secondary btn-sm" (click)="datepicker.close()">Confirmar</button>
       </ng-template>
       <!--Calendar Footer-->
     </div>
@@ -102,15 +102,19 @@
     <div style="background-color: transparent;" class="form-control">
           <section class="example-section">
             <mat-checkbox
+                          #sinLlegadas
                           (change)="toggleLlegadas($event)"
                           style="margin: 5pxpx; color:#00506a; font-weight: bold;"
-                          class="example-margin">
+                          class="example-margin"
+                          [checked]="sinLlegadasChecked">
                           No hay Llegadas &nbsp;
             </mat-checkbox>
             <mat-checkbox
+                          #sinSalidas
                           (change)="toggleSalidas($event)"
                           style="color:#00506a; font-weight: bold;"
-                          class="example-margin">
+                          class="example-margin"
+                          [checked]="sinSalidasChecked">
                           No Hay Salidas
             </mat-checkbox>
           </section>
@@ -133,17 +137,17 @@
 
 
 <div style="background-color:#00506a;" class="modal-header">
-  <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="modal-title h5 col-12 text-center">
+  <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="text-center modal-title h5 col-12">
     <button type="submit" style="background-color: #319dd7; color: white; font-weight: bold;" class="btn btn-block">GUARDAR BLOQUEO</button>
   </div>
 </div>
 </form>
 
 
-
-
 <div class="table-responsive angular-bootstrap-table">
-  <div class="font-weight-bold text-uppercase modal-header">Lista de Bloqueos </div>
+  <div class="font-weight-bold text-uppercase modal-header">Lista de Bloqueos
+    <button style="background-color: #319dd7; color: white; font-weight: bold;" class="btn" (click)="getBloqueos()"> Actualizar</button>
+  </div>
   <table style="overflow-y: 100px;" class="table table-head-custom table-vertical-center ">
     <thead>
       <th>
@@ -164,7 +168,7 @@
       <th>Acciones</th>
 
     </thead>
-    <tbody>
+    <tbody *ngIf="!isLoading">
       <ng-container *ngFor="let bloqueos of listaBloqueos">
         <tr>
           <td>
@@ -177,36 +181,44 @@
               {{cuartos}}
             </ng-container>
           </td>
-          <td >{{ bloqueos.Desde}} - {{ bloqueos.Hasta}}</td>
+          <td >{{ bloqueos.Desde}}  {{ bloqueos.Hasta}}</td>
           <td >
+
             <section class="example-section">
                 <mat-checkbox
                       [checked]="bloqueos.sinLlegadas"
                       style="margin: 5pxpx; color:#00506a; font-weight: bold;"
-                      class="example-margin">
+                      class="example-margin"
+                      #sinLlegadas
+                      >
                       No hay Llegadas &nbsp;
                 </mat-checkbox>
                 <mat-checkbox
                       [checked]="bloqueos.sinSalidas"
                       style="color:#00506a; font-weight: bold;"
-                      class="example-margin">
+                      class="example-margin"
+                      #sinSalidas>
                       No Hay Salidas
                 </mat-checkbox>
                 <mat-checkbox
                       [checked]="bloqueos.fueraDeServicio"
                       style="color:#00506a; font-weight: bold;"
-                      class="example-margin">
+                      class="example-margin"
+                      #fueraDeServicio>
                       Fuera de Servicio
                 </mat-checkbox>
             </section>
           </td>
           <td>
-            {{bloqueos.comentarios}}
+           <textarea
+           #textArea>
+            {{bloqueos.Comentarios}}
+           </textarea>
           </td>
           <a
           title="Guardar Cambios"
-          class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3"
-          (click)="edit(bloqueos._id)"
+          class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
+          (click)="edit(bloqueos._id,bloqueos.Desde,bloqueos.Hasta,bloqueos.Habitacion,bloqueos.Cuarto,sinLlegadas.checked,sinSalidas.checked,fueraDeServicio.checked,textArea.value);"
           >
           <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
             class="svg-icon svg-icon-md svg-icon-primary">
@@ -215,7 +227,7 @@
 
         <a  title="Eliminar Bloqueo"
             class="btn btn-icon btn-light btn-hover-danger btn-sm"
-            (click)="edit(bloqueos._id)"
+            (click)="openDelete(deleteID,bloqueos._id,bloqueos.Desde,bloqueos.Hasta,bloqueos.Habitacion,bloqueos.Cuarto)"
             >
           <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
             class="svg-icon svg-icon-md svg-icon-danger">
@@ -224,32 +236,43 @@
         </tr>
     </ng-container>
     </tbody>
-
+    <tbody *ngIf="isLoading">
+      <h3>Cargando Datos...
+        </h3>
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Cargando</span>
+      </div>
+    </tbody>
   </table>
 </div>
 
-
-<!--External Modal-->
-<div class="example-preview">
-  <div>
-    <ng-template #content let-c="close" let-d="dismiss">
-      <div class="modal-header">
-
-        <h1>Bloqueos</h1>
-        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-
-        <p>Bloqueo Generado con Exito</p>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Continuar</button>
-        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-      </div>
-    </ng-template>
-    <!-- <button class="btn btn-primary" (click)="open(content)">Launch demo modal</button> -->
-  </div>
+<div *ngIf="error!=null" class="font-weight-bold text-uppercase modal-header">
+  <h3>{{error}}</h3>
 </div>
+
+
+
+<ng-template #exito let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{statusBloqueo}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <p>One fine body&hellip;</p>
+  </div> -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click');getBloqueos()">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #deleteID let-modal>
+  <div class="modal-body">
+    <p>¿Estas seguro Que quieres Borrar el Bloqueo?&hellip;</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="borrar(idDelete,desdeDelete,hastaDelete,habitacionDelete,numeroDelete);modal.close('Close click')">Borrar</button>
+    <button type="button" class="btn btn-danger" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>
