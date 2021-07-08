@@ -37,6 +37,7 @@ export class ReportesComponent implements OnInit {
     });
 
   }
+
   getPostUpdateListener() {
     return this.postsUpdated.asObservable();
   }
@@ -93,44 +94,7 @@ export class ReportesComponent implements OnInit {
     // })
     }
 
-    postBloqueo(
-      desde:string,
-      hasta:string,
-      cuarto:Array<string>,
-      numCuarto:Array<number>,
-      sinLlegadasChecked:boolean,
-      sinSalidasChecked:boolean,
-      fueraDeServicio:boolean,
-      text:string
-      ) {
-const bloqueos: Bloqueo = {
-  Habitacion:cuarto,
-  Cuarto:numCuarto,
-  Desde:desde,
-  Hasta:hasta,
-  sinLlegadas:sinLlegadasChecked,
-  sinSalidas:sinSalidasChecked,
-  fueraDeServicio:fueraDeServicio,
-  Comentarios:text
 
-};
-    this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", bloqueos)
-    .subscribe((response)=>
-    {
-      console.log("exito",response.msg)
-    })
-
-    }
-
-
-    actualizaBloqueos(id:number)
-    {
-      this.http
-      .post<{ message: string }>(environment.apiUrl+"/post/bloqueos/:id", id)
-      .subscribe(responseData => {
-        console.log(responseData.message);
-      });
-    }
 
   actualizaEstatusHabitacion(id:number)
   {

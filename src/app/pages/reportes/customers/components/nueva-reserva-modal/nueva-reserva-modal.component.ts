@@ -474,10 +474,7 @@ resetFoliador()
   {
     this.inicio==false;
     this.accordionDisplay="";
-    // this.disponibilidad=[]
-    // this.mySet.clear
-    // this.cuartos=[]
-    // this.sinDisponibilidad=[]
+
 
     if(this.bandera)
     {
@@ -486,7 +483,6 @@ resetFoliador()
     let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
     let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
     //
-
 
     for (let i=0; i<diaDif; i++) {
 

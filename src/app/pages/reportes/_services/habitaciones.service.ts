@@ -22,6 +22,16 @@ export class HabitacionesService {
       ))
   }
 
+  getHabitacionbyNumero(numero:string) : Observable<Habitaciones[]> {
+
+    return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitacion/"+numero)
+        .pipe(
+          map(responseData=>{
+            return responseData
+          })
+        ))
+    }
+
   gethabitaciones() :Observable<Habitaciones[]> {
    return this.http
     .get<Habitaciones[]>(environment.apiUrl + '/reportes/habitaciones')
