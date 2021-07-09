@@ -40,7 +40,7 @@ const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
   adultos:1,
-  ninos:1,
+  ninos:0,
   nombre: '',
   estatus: '',
   // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
@@ -163,8 +163,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   showDropDown=false;
   accordionDisplay="";
   _isDisabled:boolean=true;
-
-
+  banderaDisabled:boolean=true;
+  tempCheckBox:boolean=true
 
 
   constructor(
@@ -238,6 +238,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       adultos:[this.huesped.adultos, Validators.compose([Validators.required,Validators.max(this.maxAdultos)])],
       ninos:[this.huesped.ninos, Validators.compose([Validators.required,Validators.max(this.maxNinos)])],
       habitacion:[this.huesped.habitacion, Validators.compose([Validators.required])],
+      checkBox:[],
       searchTerm:['']
     });
 
@@ -252,6 +253,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   }
 
+  customerServiceFetch()
+  {
+    this.customerService.fetch()
+  }
 
   getFolios(): void
   {
@@ -501,7 +506,7 @@ resetFoliador()
         for(i=0;i<disponibles.length;i++)
         {
           this.disponibilidad=(disponibles)
-          if(disponibles[i].Estatus==0)
+          if(disponibles[i].Estatus!=1)
           {
             this.sinDisponibilidad.push(disponibles[i].Habitacion)
           }
@@ -561,7 +566,7 @@ resetFoliador()
         for(i=0;i<disponibles.length;i++)
         {
           this.disponibilidad=(disponibles)
-          if(disponibles[i].Estatus==0)
+          if(disponibles[i].Estatus!=1)
           {
             this.sinDisponibilidad.push(disponibles[i].Habitacion)
           }
@@ -571,8 +576,7 @@ resetFoliador()
         {
           this.mySet.delete(this.sinDisponibilidad[i])
         }
-
-
+        console.log("aqui",this.mySet.size)
       })
       fromDate.setDate(fromDate.getDate() + 1);
     };
@@ -583,9 +587,17 @@ resetFoliador()
 
 
 
-  preAsignar(numeroCuarto:number,codigo:string)
+  preAsignar(numeroCuarto:number,codigo:string,event)
   {
     console.log("check.value",numeroCuarto);
+
+    if(event)
+    {
+      this.tempCheckBox=false
+    }else{
+      this.tempCheckBox=true
+    }
+
     this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
     .pipe(map((responseData)=>
     {
@@ -677,7 +689,7 @@ resetFoliador()
 
 //Maximos Y Minimos Adultos Niños
   quantity:number=1;
-  quantityNin:number=1;
+  quantityNin:number=0;
 
   plus()
   {
@@ -701,7 +713,7 @@ resetFoliador()
   }
   plusNin()
   {
-    if(this.quantityNin<6)
+    if(this.quantityNin<7)
     {
       this.quantityNin++;
       this.huesped.ninos=this.quantityNin;
@@ -709,7 +721,7 @@ resetFoliador()
   }
   minusNin()
   {
-    if(this.quantityNin>1)
+    if(this.quantityNin>0)
     {
     this.quantityNin--;
     this.huesped.ninos=this.quantityNin;
@@ -839,6 +851,10 @@ resetFoliador()
       }
 
 
+    }
+
+    limpiaInput(){
+      this.searchValue=""
     }
 
     closeList()
