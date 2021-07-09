@@ -1,5 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+#BackEnd
+/backend
+
 # compiled output
 /dist
 /tmp
@@ -52,3 +55,8 @@ src/assets
 # System Files
 .DS_Store
 Thumbs.db
+.gitignore
+
+#firebase
+.firebase
+
