@@ -150,7 +150,8 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     public i18n: NgbDatepickerI18n
     ) {
       this.fromDate = calendar.getToday();
-      this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      //this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      this.toDate = calendar.getToday();
     }
 
 
@@ -392,12 +393,18 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     this.cuarto=$event.value;
     this.sinDisponibilidad=[];
 
+    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
+    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+
+    if(diaDif==0)
+    {
+      diaDif=1;
+    }
+
+
     if($event.value==1)
     {
-        let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-        let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-        let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
-        //
 
         for (let i=0; i<diaDif; i++) {
 
@@ -429,18 +436,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
             {
               this.mySet.delete(this.sinDisponibilidad[i])
             }
-            // if(this.mySet.size!=0)
-            // {
-            //   this.setEmpty=false;
-            //   this.placeHolder="-- Seleccione Habitación -- "
-            // }
-            // else
-            // {
-            //   this.setEmpty=true;
-            //   this.placeHolder="Sin Disponibilidad consulte otra Fecha o Tipo de Cuarto"
-            // }
-
-
           })
           fromDate.setDate(fromDate.getDate() + 1);
         };
@@ -449,10 +444,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
     else
     {
-      let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-      let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-      let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
-      //
 
       this.habitacionService.getHabitacionesbyTipo(this.cuarto)
       .pipe(map(

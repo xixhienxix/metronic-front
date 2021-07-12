@@ -474,7 +474,7 @@ resetFoliador()
   {
     this.inicio==false;
     this.accordionDisplay="";
-
+    this.mySet.clear();
 
     if(this.bandera)
     {
@@ -501,7 +501,7 @@ resetFoliador()
         for(i=0;i<disponibles.length;i++)
         {
           this.disponibilidad=(disponibles)
-          if(disponibles[i].Estatus==0)
+          if(disponibles[i].Estatus==0||disponibles[i].Estatus==2||disponibles[i].Estatus==4)
           {
             this.sinDisponibilidad.push(disponibles[i].Habitacion)
           }
@@ -561,7 +561,7 @@ resetFoliador()
         for(i=0;i<disponibles.length;i++)
         {
           this.disponibilidad=(disponibles)
-          if(disponibles[i].Estatus==0)
+          if(disponibles[i].Estatus==0||disponibles[i].Estatus==2||disponibles[i].Estatus==4)
           {
             this.sinDisponibilidad.push(disponibles[i].Habitacion)
           }
@@ -571,7 +571,8 @@ resetFoliador()
         {
           this.mySet.delete(this.sinDisponibilidad[i])
         }
-
+        if (this.mySet.size==0)
+        {this.disponibilidad=[]}
 
       })
       fromDate.setDate(fromDate.getDate() + 1);
