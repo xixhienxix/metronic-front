@@ -54,3 +54,5 @@ src/assets
 Thumbs.db
 
 backend
+
+*.cache
