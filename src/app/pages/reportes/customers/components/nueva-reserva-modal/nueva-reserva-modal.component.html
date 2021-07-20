@@ -15,7 +15,7 @@
 
 </div>
 
-   <form (submit)="save(); open(content); customerServiceFetch()" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
+   <form (ngSubmit)="onSubmit(); customerServiceFetch()" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
     <div class="cursor-default overlay overlay-block modal-body" style="background-color: #e6e9ed">
 
 <div class="row">
@@ -185,6 +185,9 @@
                           <option> {{tipoCuarto.replace("_"," ")}} </option>
                         </ng-container>
                       </select>
+                      <mat-error *ngIf="habitacion.errors?.required">
+                        * Campo Obligatorio
+                      </mat-error>
                 </div>
               </div>
 
@@ -389,6 +392,9 @@
             >
               Maximo 100 letras
             </div>
+            <mat-error *ngIf="nombre.errors?.required">
+              * Escribe tu Nombre
+            </mat-error>
           </div>
         </div>
 
@@ -514,6 +520,7 @@
                 [disabled]="tempCheckBox||!isControlValid('nombre')"
                 (click)="setEstatus(5)"
                 >
+
                   Reserva Uso Interno
                 </button>
           </div>
@@ -564,3 +571,32 @@
   </div>
 </div>
 
+  <ng-template #error let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Error</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>
+
+  <ng-template #exito let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Húesped Guardado con exito</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- <div class="modal-body">
+      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+    </div> -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>
