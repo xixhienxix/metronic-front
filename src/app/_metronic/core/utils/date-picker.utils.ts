@@ -12,14 +12,18 @@ export class CustomAdapter extends NgbDateAdapter<string> {
   readonly DELIMITER = '/';
 
   fromModel(value: string | null): NgbDateStruct | null {
-    if (value) {
-      const date = value.split(this.DELIMITER);
-      return {
-        month: parseInt(date[0], 10),
-        day: parseInt(date[1], 10),
-        year: parseInt(date[2], 10)
-      };
+    // if(typeof value === 'string')
+    // {
+      if (value) {
+        const date = value.split(this.DELIMITER);
+        return {
+          month: parseInt(date[0], 10),
+          day: parseInt(date[1], 10),
+          year: parseInt(date[2], 10)
+        };
+      // }
     }
+
     return null;
   }
 

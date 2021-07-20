@@ -1,4 +1,4 @@
-import {  Component, Input, OnDestroy, OnInit, ViewChild,ViewEncapsulation } from '@angular/core';
+import {  Component, Input, OnDestroy, OnInit, ViewChild,ViewEncapsulation,ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import {  of, Subscription } from 'rxjs';
@@ -20,13 +20,13 @@ import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 
+
 let date: Date = new Date();
 declare global {
   interface Date {
       getDays (start?: number) : [Date, Date]
   }
 }
-
 
 
 @Component({
@@ -78,24 +78,31 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   // @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
   @ViewChild('matSelect') matSelect = null;
   @ViewChild('exito') miniModal = null;
-
+  @ViewChild('fechaIncorrecta') fechaIncorrecta = null;
 
   @Input()
 
   last_selection = null;
 //DATETIMEPICKER RANGE
+
+  habitacionfb = new FormControl();
   hoveredDate: NgbDate | null = null;
 
-  fromDate: NgbDate | null;
-  fromDate1: string;
+  //Date Variables
 
+  fromDate: NgbDate | null;
   toDate: NgbDate | null;
-  habitacionfb = new FormControl();
+
+  model: NgbDateStruct;
+  modelFin: NgbDateStruct;
+
+
+  fechaInvalida:boolean=false
 
   checkAll = false;
   isLoading$;
   habitaciones:Habitaciones;
-  formGroup: FormGroup;
+  bloqueoFormGroup: FormGroup;
   myControl: FormGroup;
   mySet = new Set();
   placeHolder:string="-- Seleccione Habitación --"
@@ -113,10 +120,11 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   sinSalidasChecked:boolean=false;
   sinLlegadasChecked:boolean=false;
+  fueraDeServicioChecked:boolean=false;
 
   sinSalidasCheck:boolean=false;
   sinLlegadasCheck:boolean=false;
-  fueraDeServicio:boolean;
+  // fueraDeServicio:boolean;
   private subscriptions: Subscription[] = [];
   public listaBloqueos:Bloqueo[];
   _isDisabled:boolean=true;
@@ -133,35 +141,76 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   error:string=null;
   isLoading:boolean=true
   statusBloqueo:string
+  fechaInicialBloqueo:string
+  fechaFinalBloqueo:string
+  comparadorInicial:Date
+  comparadorFinal:Date
+  display:boolean=true
+  isSubmitted:boolean
 
 
-  constructor(
+  public tipoCuartoForm: FormBuilder
+
+    constructor(
     //Date Imports
+    public fb: FormBuilder,
     private modalService: NgbModal,
     private calendar: NgbCalendar,
     public formatter: NgbDateParserFormatter,
     public habitacionService : HabitacionesService,
-    private fb: FormBuilder, public modal: NgbActiveModal,
+    public modal: NgbActiveModal,
     public estatusService: EstatusService,
     public bloqueoService: BloqueoService,
     public disponibilidadService:DisponibilidadService,
     public postService : ReportesComponent,
     private http: HttpClient,
     public i18n: NgbDatepickerI18n
-    ) {
+    )
+    {
+      this.model= calendar.getToday();
       this.fromDate = calendar.getToday();
-      //this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
-      this.toDate = calendar.getToday();
+      this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
+      this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+      this.comparadorInicial=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
+      this.comparadorFinal=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
     }
 
 
 
   ngOnInit(): void {
+
+    this.loadForm();
     this.getCodigosCuarto();
     this.getHabitaciones();
     this.getEstatus();
     this.getBloqueos();
+
   }
+//VALIDATORS & FORM
+myselectedFoods = ['',Validators.required];
+
+foodForm: FormControl = new FormControl(this.myselectedFoods);
+
+loadForm() {
+
+  this.bloqueoFormGroup = this.fb.group({
+    'tipoCuarto': [ undefined, Validators.required ],
+    'numeroHab' : [undefined,Validators.required]
+  });
+
+}
+get tipoCuarto() { return this.bloqueoFormGroup.get('tipoCuarto') }
+get numeroHab() { return this.bloqueoFormGroup.get('numeroHab') }
+
+onFormSubmit(value: string) {
+  if (this.bloqueoFormGroup.valid) {
+    this.save(value.trim())  }
+  else {
+    console.log('invalid');
+  }
+}
+
 
 
   getHabitaciones()
@@ -239,6 +288,14 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   private postBloqueo(text:string) {
 
+    let fechaini =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
+    let fechafin = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+
+    if(fechaini<fechafin)
+    {
+      this.openFechaIncorrecta(this.fechaIncorrecta)
+    }else{
+
     let desde;
     let hasta;
 
@@ -248,8 +305,8 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     this.numCuarto;
     this.sinLlegadasChecked;
 
-    if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
-    { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+    // if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
+    // { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
 
         desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
@@ -266,7 +323,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       this.numCuarto,
       this.sinLlegadasChecked,
       this.sinSalidasChecked,
-      this.fueraDeServicio,
+      this.fueraDeServicioChecked,
       text
     ).subscribe((response)=>{
       console.log("estatus POST",response)
@@ -291,7 +348,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       this.sinLlegadasChecked=false
       //this.getBloqueos();
       //this.modal.close();
-
+    }
   }
 
 
@@ -386,6 +443,15 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       this.sinSalidasChecked = true;
     }else
     this.sinSalidasChecked=false;
+  }
+
+  toggleFuera($event)
+  {
+    if($event.checked==true)
+    {
+      this.fueraDeServicioChecked = true;
+    }else
+    this.fueraDeServicioChecked=false;
   }
 
   habValue($event)
@@ -591,67 +657,43 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
 
 //Date Helpers
-  onDateSelection(date: NgbDate) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
-      this.toDate = date;
-    } else {
-      this.toDate = null;
-      this.fromDate = date;
-    }
-  }
+fechaSeleccionadaInicial(event:NgbDate){
+  this.comparadorInicial = new Date(event.year,event.month-1,event.day)
 
-  isHovered(date: NgbDate) {
-    return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  }
+  this.fechaInicialBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
 
-  isInside(date: NgbDate) {
-    return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  }
-
-  isRange(date: NgbDate) {
-    return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-  }
-
-  validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
-    const parsed = this.formatter.parse(input);
-    return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
-
-  }
-
-  rangoFechas(llegada:string,salida:string)
+  if(this.comparadorInicial>this.comparadorFinal)
   {
-    let rangodeFechas
-    let toDate =   new Date(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
-    let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
-    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    this.display=false
+  }else if(this.comparadorInicial<this.comparadorFinal)
+  {this.display=true}
+}
+fechaSeleccionadaFinal(event:NgbDate){
+  this.comparadorFinal = new Date(event.year,event.month-1,event.day)
 
-    rangodeFechas = llegada.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(llegada.split("/")[0]))+"/"+llegada.split("/")[2]+" - " +salida.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(salida.split("/")[0]))+"/"+salida.split("/")[2]
+  this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
 
-    return rangodeFechas
-  }
+  if(this.comparadorInicial>this.comparadorFinal)
+  {
+    this.display=false
+  }else if(this.comparadorInicial<this.comparadorFinal)
+  {this.display=true}
+}
 
-
-
-
-
-
-//MODAL
-// open(content) {
-
-//   this.modalService.open(content,{size:'sm'}).result.then((result) => {
-//   this.closeResult = `Closed with: ${result}`;
-//   }, (reason) => {
-//       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-//   });
-
-// }
 
 //MODAL
 openMini(exito) {
 
   this.modalService.open(exito,{ size: 'sm' }).result.then((result) => {
+  this.closeResult = `Closed with: ${result}`;
+  }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  });
+
+}
+openFechaIncorrecta(fechaIncorrecta) {
+
+  this.modalService.open(fechaIncorrecta,{ size: 'sm' }).result.then((result) => {
   this.closeResult = `Closed with: ${result}`;
   }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
