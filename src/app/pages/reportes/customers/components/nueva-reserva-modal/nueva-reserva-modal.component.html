@@ -3,7 +3,7 @@
   <div style="background-color: #00506a;" class="modal-header">
     <div style="text-align: center; color: white;" class="text-center modal-title h4 col-10"
       id="example-modal-sizes-title-lg">
-      NUEVA RESERVA / BLOQUEO
+      NUEVA RESERVA
       <!-- <label>
         {{huesped.folio}}</label> -->
     </div>
@@ -15,8 +15,8 @@
 
 </div>
 
-   <form (submit)="save(); open(content)" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
     <div class="cursor-default overlay overlay-block modal-body" style="background-color: #e6e9ed">
+   <form (ngSubmit)="onSubmit(); customerServiceFetch()" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
 
 <div class="row">
 <!--Hidden-->
@@ -108,8 +108,7 @@
                       class="text-center input-group form-control form-control-lg form-control-solid"
                       #controladultos
                       placeholder=""
-                      type="number"
-                      max="6"
+                      disabled
                       name="adultos"
                       [value]="quantity"
                       formControlName="adultos"
@@ -145,8 +144,7 @@
                     </div>
                     <input
                       style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; border-left: 2px solid #e6e9ed;"
-                      type="number"
-                      max="6"
+                      disabled
                       class="text-center input-group form-control form-control-lg form-control-solid" placeholder=""
                       name="ninos"
                       [value]="quantityNin"
@@ -187,6 +185,9 @@
                           <option> {{tipoCuarto.replace("_"," ")}} </option>
                         </ng-container>
                       </select>
+                      <mat-error *ngIf="habitacion.errors?.required">
+                        * Campo Obligatorio
+                      </mat-error>
                 </div>
               </div>
 
@@ -246,7 +247,7 @@
                 <ng-container *ngFor="let tipocuarto of cuartos">
                 <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
                   <tr>
-                    <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                    <td ><mat-checkbox [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
                     <td >{{ tipocuarto.Descripcion}}</td>
                     <td >{{ tipocuarto.Personas }} Adultos</td>
                     <td >{{ tipocuarto.Tarifa }}.00</td>
@@ -279,7 +280,7 @@
           <ng-container *ngFor="let tipocuarto of cuartos">
           <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
             <tr>
-              <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+              <td ><mat-checkbox #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
               <td >{{ tipocuarto.Descripcion}}</td>
               <td >{{ tipocuarto.Personas }} Adultos</td>
               <td >{{ tipocuarto.Tarifa }}.00</td>
@@ -326,7 +327,8 @@
         <div class="row">
           <label class="form-label" for="form1">Buscar en Historico</label>
           <div  class="text-center input-group col-lg-12">
-              <input  type="search"
+              <input  #filterName
+                      type="search"
                       placeholder="Busca por Nombre"
                       aria-label="Number"
                       matInput
@@ -342,6 +344,7 @@
           </div>
         </div>
         <div  [style]="displayNone" class="name-container-dropdown">
+          <button type="button" (click)="closeList();filterName.value = '';limpiaInput() " class="btn btn-block" style="background-color: #025976; font-weight: bold; color: white;">Cancelar</button>
           <mat-selection-list  (click)="closeList(); onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
             <mat-list-option *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
               {{huesped.nombre}}
@@ -362,10 +365,9 @@
               placeholder="Nombre completo"
               autocomplete="off"
               [class.is-invalid]="isControlInvalid('nombre')"
-              [class.is-valid]="isControlValid('nombre')"
               formControlName="nombre"
               value="{{huesped.nombre}}"
-            />
+            /><!--[class.is-valid]="isControlValid('nombre')"-->
             <div class="valid-feedback" *ngIf="isControlValid('nombre')">
               Nombre Escrito Correctamente
             </div>
@@ -387,6 +389,9 @@
             >
               Maximo 100 letras
             </div>
+            <mat-error *ngIf="nombre.errors?.required">
+              * Escribe tu Nombre
+            </mat-error>
           </div>
         </div>
 
@@ -401,12 +406,13 @@
             name="email"
             placeholder="Escribe tu Email"
             autocomplete="off"
-            [class.is-invalid]="isControlInvalid('email')"
-            [class.is-valid]="isControlValid('email')"
             formControlName="email"
-            (input)="emailValidator($event.target.value)"
             value="{{huesped.email}}"
-          />
+            [class.is-invalid]="isControlInvalid('email')"
+            (input)="emailValidator($event.target.value)"
+          /><!--
+          [class.is-invalid]="isControlInvalid('email')"
+            [class.is-valid]="isControlValid('email')"-->
           <div class="valid-feedback" *ngIf="isControlValid('email')">
             Email Escrito Correctamente
           </div>
@@ -438,11 +444,11 @@
             name="telefono"
             placeholder="Teléfono"
             autocomplete="off"
-            [class.is-invalid]="isControlInvalid('telefono')"
-            [class.is-valid]="isControlValid('telefono')"
             formControlName="telefono"
             value="{{huesped.telefono}}"
-          />
+            [class.is-invalid]="isControlInvalid('telefono')"
+          /><!--[class.is-invalid]="isControlInvalid('telefono')"
+            [class.is-valid]="isControlValid('telefono')"-->
           <!-- <div class="invalid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Invalido
           </div> -->
@@ -485,6 +491,7 @@
                 style="background-color:#99d284 ;"
                 type="submit"
                 name="estatus"
+                [disabled]="tempCheckBox||!isControlValid('nombre')"
                 (click)="setEstatus(1)"
                 >
                   Realiza Walk-In
@@ -496,6 +503,7 @@
                 style="background-color:#fac34e ;"
                 type="submit"
                 name="estatus"
+                [disabled]="tempCheckBox||!isControlValid('nombre')"
                 (click)="setEstatus(2); "
                 >
                   Agrega Reserva
@@ -506,8 +514,10 @@
                 class="btn btn-block"
                 style="background-color:#d0aaec ;"
                 type="submit"
+                [disabled]="tempCheckBox||!isControlValid('nombre')"
                 (click)="setEstatus(5)"
                 >
+
                   Reserva Uso Interno
                 </button>
           </div>
@@ -517,6 +527,7 @@
                   style="background-color:#fab3db ;"
                   type="submit"
                   value="7"
+                  [disabled]="tempCheckBox||!isControlValid('nombre')"
                   (click)="setEstatus(7)"
                   >
                   Reserva Temporal
@@ -557,3 +568,32 @@
   </div>
 </div>
 
+  <ng-template #error let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Error</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>
+
+  <ng-template #exito let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Húesped Guardado con exito</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- <div class="modal-body">
+      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+    </div> -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>

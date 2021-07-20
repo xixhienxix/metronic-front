@@ -80,18 +80,7 @@ export class ReportesComponent implements OnInit {
       tipoDeID:tipoDeID,numeroDeID:numeroDeID,direccion:direccion,pais:pais,ciudad:ciudad,codigoPostal:codigoPostal,lenguaje:lenguaje,
       numeroCuarto:numeroCuarto
     };
-    this.http.post<any>(environment.apiUrl+"/reportes/huesped", post)
-
-    //   const promise = new Promise((resolve, reject) => {
-    //     const apiURL = environment.apiUrl;
-    //     this.http
-    //     .post<{ message: string }>(environment.apiUrl+"/reportes/huesped", post)
-    //     .toPromise()
-    //     .then(()=>{
-    //       console.log("Post Enviado Con Exito")
-    //     }).catch(error => console.log(error));
-    //   return promise;
-    // })
+    return this.http.post<any>(environment.apiUrl+"/reportes/huesped", post)
     }
 
 

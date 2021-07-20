@@ -40,7 +40,7 @@ const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
   adultos:1,
-  ninos:1,
+  ninos:0,
   nombre: '',
   estatus: '',
   // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
@@ -68,7 +68,6 @@ const EMPTY_CUSTOMER: Huesped = {
   lenguaje:'Español',
   numeroCuarto: 0
 };
-
 
 @Component({
   selector: 'app-edit-customer-modal',
@@ -114,7 +113,8 @@ const EMPTY_CUSTOMER: Huesped = {
 
 export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 {
-  // @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
+  @ViewChild('error') errorModal: null;
+  @ViewChild('exito') exitoModal: null;
 
   @Input()
 
@@ -163,8 +163,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   showDropDown=false;
   accordionDisplay="";
   _isDisabled:boolean=true;
-
-
+  banderaDisabled:boolean=true;
+  tempCheckBox:boolean=true
 
 
   constructor(
@@ -233,13 +233,15 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
       telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.pattern('[0-9]+'),Validators.minLength(10),Validators.maxLength(14)])],
-      salida:[this.huesped.salida, Validators.compose([Validators.required])],
-      llegada:[this.huesped.llegada, Validators.compose([Validators.required])],
-      adultos:[this.huesped.adultos, Validators.compose([Validators.required,Validators.max(this.maxAdultos)])],
-      ninos:[this.huesped.ninos, Validators.compose([Validators.required,Validators.max(this.maxNinos)])],
+      salida:[this.huesped.salida, Validators.compose([])],
+      llegada:[this.huesped.llegada, Validators.compose([])],
+      adultos:[this.huesped.adultos, Validators.compose([Validators.max(this.maxAdultos)])],
+      ninos:[this.huesped.ninos, Validators.compose([Validators.max(this.maxNinos)])],
       habitacion:[this.huesped.habitacion, Validators.compose([Validators.required])],
-      searchTerm:['']
+      searchTerm:['',Validators.maxLength(100)]
     });
+
+
 
     const searchEvent = this.formGroup.controls.searchTerm.valueChanges
       .pipe(
@@ -252,6 +254,40 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   }
 
+  //Getters
+  get habitacion() { return this.formGroup.get('habitacion') }
+  get nombre(){return this.formGroup.get('nombre')}
+
+  onSubmit(){
+    if(this.formGroup.valid)
+    {
+      this.save();
+    }else if(this.formGroup.invalid)
+    {
+      this.findInvalidControlsRecursive(this.formGroup);
+    }
+  }
+
+  //CheckEstatus Controls
+  public findInvalidControlsRecursive(formToInvestigate:FormGroup):string[] {
+    var invalidControls:string[] = [];
+    let recursiveFunc = (form:FormGroup) => {
+      Object.keys(form.controls).forEach(field => {
+        const control = form.get(field);
+        if (control.invalid) invalidControls.push(field);
+        if (control instanceof FormGroup) {
+          recursiveFunc(control);
+        }
+      });
+    }
+    recursiveFunc(formToInvestigate);
+    return invalidControls;
+  }
+
+  customerServiceFetch()
+  {
+    this.customerService.fetch()
+  }
 
   getFolios(): void
   {
@@ -374,7 +410,25 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       this.huesped.codigoPostal,
       this.huesped.lenguaje,
       this.huesped.numeroCuarto
-    );
+    ).subscribe(
+      ()=>{},
+      (err)=>{
+        if(err){
+          this.modalService.open(this.errorModal,{size:'sm'}).result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
+              }
+      },
+      ()=>{
+        this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+
+      });
 
       this.modal.close();
 
@@ -584,9 +638,17 @@ resetFoliador()
 
 
 
-  preAsignar(numeroCuarto:number,codigo:string)
+  preAsignar(numeroCuarto:number,codigo:string,event)
   {
     console.log("check.value",numeroCuarto);
+
+    if(event)
+    {
+      this.tempCheckBox=false
+    }else{
+      this.tempCheckBox=true
+    }
+
     this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
     .pipe(map((responseData)=>
     {
@@ -678,7 +740,7 @@ resetFoliador()
 
 //Maximos Y Minimos Adultos Niños
   quantity:number=1;
-  quantityNin:number=1;
+  quantityNin:number=0;
 
   plus()
   {
@@ -702,7 +764,7 @@ resetFoliador()
   }
   plusNin()
   {
-    if(this.quantityNin<6)
+    if(this.quantityNin<7)
     {
       this.quantityNin++;
       this.huesped.ninos=this.quantityNin;
@@ -710,7 +772,7 @@ resetFoliador()
   }
   minusNin()
   {
-    if(this.quantityNin>1)
+    if(this.quantityNin>0)
     {
     this.quantityNin--;
     this.huesped.ninos=this.quantityNin;
@@ -840,6 +902,10 @@ resetFoliador()
       }
 
 
+    }
+
+    limpiaInput(){
+      this.searchValue=""
     }
 
     closeList()
