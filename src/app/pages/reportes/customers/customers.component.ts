@@ -429,13 +429,13 @@ export class CustomersComponent
 
   }
 
-  backgroundColor(estatus:number)
+  backgroundColor(estatus:string)
   {
     let color;
 
     for (let i=0;i<this.estatusArray.length;i++)
     {
-      if(estatus==this.estatusArray[i].id)
+      if(estatus==this.estatusArray[i].estatus)
       {
         color = this.estatusArray[i].color
       }

@@ -200,6 +200,7 @@ loadForm() {
   });
 
 }
+
 get tipoCuarto() { return this.bloqueoFormGroup.get('tipoCuarto') }
 get numeroHab() { return this.bloqueoFormGroup.get('numeroHab') }
 
@@ -288,13 +289,6 @@ onFormSubmit(value: string) {
 
   private postBloqueo(text:string) {
 
-    let fechaini =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-    let fechafin = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-
-    if(fechaini<fechafin)
-    {
-      this.openFechaIncorrecta(this.fechaIncorrecta)
-    }else{
 
     let desde;
     let hasta;
@@ -307,6 +301,7 @@ onFormSubmit(value: string) {
 
     // if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
     // { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+
 
         desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
@@ -325,21 +320,23 @@ onFormSubmit(value: string) {
       this.sinSalidasChecked,
       this.fueraDeServicioChecked,
       text
-    ).subscribe((response)=>{
-      console.log("estatus POST",response)
-      if(response.status==200){
+    ).subscribe(
+      ()=>{
         this.statusBloqueo="Bloqueo Generado con Exito"
         this.openMini(this.miniModal)
-        this.mySet.clear();
-        this.getBloqueos();
-        this.getCodigosCuarto();
+        this.initializeBloqueo()
 
-      }else
+      },
+      (err)=>{
+        if (err)
+        this.statusBloqueo="Hubo un problema al guardar el bloqueo actualize la pagina eh intente nuevamente"
+        this.openMini(this.miniModal)
+      },
+      ()=>
       {
-       this.statusBloqueo="Hubo un problema al guardar el bloqueo actualize la pagina eh intente nuevamente"
-       this.openMini(this.miniModal)
-      }
-    });
+       //Complete Regardless
+      },
+    );
       this.listaBloqueos=[]
       unique=[]
       this.numCuarto=[]
@@ -348,9 +345,20 @@ onFormSubmit(value: string) {
       this.sinLlegadasChecked=false
       //this.getBloqueos();
       //this.modal.close();
-    }
+
   }
 
+initializeBloqueo(){
+  this.mySet.clear();
+        this.getBloqueos();
+        this.getCodigosCuarto();
+        this.fromDate = this.calendar.getToday();
+        this.toDate = this.calendar.getNext(this.calendar.getToday(), 'd', 1);
+        this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
+        this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+        this.comparadorInicial=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
+        this.loadForm();
+}
 
   edit(_id:string,
     desde:string,
@@ -658,6 +666,8 @@ onFormSubmit(value: string) {
 
 //Date Helpers
 fechaSeleccionadaInicial(event:NgbDate){
+  this.fromDate = event
+
   this.comparadorInicial = new Date(event.year,event.month-1,event.day)
 
   this.fechaInicialBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
@@ -668,7 +678,11 @@ fechaSeleccionadaInicial(event:NgbDate){
   }else if(this.comparadorInicial<this.comparadorFinal)
   {this.display=true}
 }
+
 fechaSeleccionadaFinal(event:NgbDate){
+
+  this.toDate = event
+
   this.comparadorFinal = new Date(event.year,event.month-1,event.day)
 
   this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year

@@ -206,7 +206,6 @@
                   </div>
               </div>
           </div>
-      </div>
 
 
 
@@ -247,7 +246,7 @@
                 <ng-container *ngFor="let tipocuarto of cuartos">
                 <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
                   <tr>
-                    <td ><mat-checkbox [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                    <td ><mat-checkbox [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
                     <td >{{ tipocuarto.Descripcion}}</td>
                     <td >{{ tipocuarto.Personas }} Adultos</td>
                     <td >{{ tipocuarto.Tarifa }}.00</td>
@@ -280,7 +279,7 @@
           <ng-container *ngFor="let tipocuarto of cuartos">
           <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
             <tr>
-              <td ><mat-checkbox #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+              <td ><mat-checkbox #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
               <td >{{ tipocuarto.Descripcion}}</td>
               <td >{{ tipocuarto.Personas }} Adultos</td>
               <td >{{ tipocuarto.Tarifa }}.00</td>
@@ -299,7 +298,7 @@
      </ng-container>
      <!--SIN DISPONIBILIDAD-->
      <ng-container *ngIf="disponibilidad.length === 0 && inicio===false"  >
-      <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
+      <mat-accordion  [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header style="background-color:#fa6d7c;">
             <mat-panel-title>

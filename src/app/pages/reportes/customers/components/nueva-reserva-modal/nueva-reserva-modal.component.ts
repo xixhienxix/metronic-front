@@ -333,6 +333,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   this.prepareHuesped();
   this.create();
   this.resetFoliador();
+  this.initializeHuesped();
   }
 
   edit() {
@@ -438,6 +439,36 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.historicoService.patchState({ searchTerm });
   }
 
+  initializeHuesped()
+  {
+    this.inicio==true;
+    this.huesped.id=undefined
+    this.huesped.folio=undefined
+    this.huesped.adultos=1
+    this.huesped.ninos=1
+    this.huesped.nombre=''
+    this.huesped.estatus=''
+    this.huesped.llegada=''
+    this.huesped.salida=''
+    this.huesped.noches=1
+    this.huesped.tarifa=500
+    this.huesped.porPagar=500
+    this.huesped.pendiente=500
+    this.huesped.origen='Online'
+    this.huesped.habitacion=''
+    this.huesped.telefono=''
+    this.huesped.email=''
+    this.huesped.motivo=''
+    this.huesped.fechaNacimiento=''
+    this.huesped.trabajaEn=''
+    this.huesped.tipoDeID=''
+    this.huesped.numeroDeID=''
+    this.huesped.direccion=''
+    this.huesped.pais=''
+    this.huesped.ciudad=''
+    this.huesped.codigoPostal=''
+    this.huesped.lenguaje='Español'
+    this.huesped.numeroCuarto=0  }
 
 resetFoliador()
 {
@@ -526,7 +557,7 @@ resetFoliador()
 
   buscaDispo()
   {
-    this.inicio==false;
+    this.inicio=false;
     this.accordionDisplay="";
     this.mySet.clear();
 
@@ -633,14 +664,15 @@ resetFoliador()
     };
 
     }
-
   }
 
 
 
-  preAsignar(numeroCuarto:number,codigo:string,event)
+  preAsignar(numeroCuarto:number,codigo:string,event,tarifa:number)
   {
     console.log("check.value",numeroCuarto);
+
+    this.huesped.tarifa=tarifa;
 
     if(event)
     {
