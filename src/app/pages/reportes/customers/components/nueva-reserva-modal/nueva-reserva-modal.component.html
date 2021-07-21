@@ -33,7 +33,8 @@
              [dayTemplate]="t"
              outsideDays="hidden"
              [startDate]="fromDate!"
-             tabindex="-1">
+             tabindex="-1"
+             [minDate]=fromDate>
       <ng-template #t let-date let-focused="focused">
         <span class="custom-day"
               [class.focused]="focused"

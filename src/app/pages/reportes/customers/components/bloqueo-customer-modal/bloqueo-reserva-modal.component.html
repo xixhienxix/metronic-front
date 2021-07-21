@@ -24,7 +24,7 @@
           <div class="input-group">
 
             <input hidden class="form-control" placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
-            (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker">
+            (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker" [minDate]=fromDate>
 
             <input class="form-control" placeholder="yyyy-mm-dd" name="dpnotHidden" #dd [value]="fechaInicialBloqueo" >
 
@@ -50,7 +50,7 @@
               <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
               (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
 
-              <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff [value]="fechaFinalBloqueo" >
+              <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fechaFinalBloqueo" >
 
               <div class="input-group-append">
                 <button class="btn btn-primary" (click)="f.toggle()" type="button">
