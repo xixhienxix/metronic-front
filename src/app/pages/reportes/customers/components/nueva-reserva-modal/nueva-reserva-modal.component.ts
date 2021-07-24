@@ -122,6 +122,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   hoveredDate: NgbDate | null = null;
 
   fromDate: NgbDate | null;
+  today: NgbDate | null;
   fromDate1: string;
   ToDoListForm:any;
 
@@ -146,13 +147,15 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   folioLetra:string;
   formGroup: FormGroup;
   myControl: FormGroup;
-  preAsig:number;
+  preAsig = new Set<number>();
   searchValue:string='';
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
+  //Disponibilidad
   public infoCuarto:Habitaciones[]=[];
   public disponibilidad:Disponibilidad[]=[];
+
   public sinDisponibilidad:any[]=[]
   public estatusArray:Estatus[]=[];
   public folioactualizado:any;
@@ -165,7 +168,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
   tempCheckBox:boolean=true
-
 
   constructor(
     //Date Imports
@@ -184,6 +186,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     private http: HttpClient,
     public i18n: NgbDatepickerI18n
     ) {
+      this.today = calendar.getToday();
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
     }
@@ -364,7 +367,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   private prepareHuesped() {
 
-    const formData = this.formGroup.value;
+    for(let habitaciones of this.preAsig)
+    {
+
+      const formData = this.formGroup.value;
 
     this.huesped.llegada = this.fromDate.toString();
     this.huesped.salida = this.toDate.toString();
@@ -380,7 +386,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         this.huesped.email=formData.email
         this.huesped.motivo=formData.motivo
         this.huesped.id=this.huesped.folio
-        this.huesped.numeroCuarto=this.preAsig
+        this.huesped.numeroCuarto=habitaciones
         this.huesped.habitacion=this.cuarto
   let post = this.postService.addPost
     (
@@ -431,7 +437,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
       });
 
-      this.modal.close();
+    }
+
+    this.modal.close();
 
   }
 
@@ -569,7 +577,7 @@ resetFoliador()
     let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
     //
 
-    for (let i=0; i<diaDif; i++) {
+    for (let i=0; i<(diaDif+1); i++) {
 
     this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
     .pipe(map(
@@ -583,22 +591,31 @@ resetFoliador()
         return postArray
       }))
       .subscribe((disponibles)=>{
-        for(i=0;i<disponibles.length;i++)
+        for(let x=0;x<disponibles.length;x++)
         {
           this.disponibilidad=(disponibles)
-          if(disponibles[i].Estatus==0||disponibles[i].Estatus==2||disponibles[i].Estatus==4)
+
+          if(i==0)
           {
-            this.sinDisponibilidad.push(disponibles[i].Habitacion)
+            if(disponibles[x].Estatus==2||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           }
-          this.mySet.add(this.disponibilidad[i].Habitacion)
+          else if (i==(diaDif))
+          {
+            if(disponibles[x].Estatus==3||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+          } else
+
+              if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
+              {
+                this.sinDisponibilidad.push(disponibles[x].Habitacion)
+              }
+
+          this.mySet.add(this.disponibilidad[x].Habitacion)
         }
+
         for(i=0;i<this.sinDisponibilidad.length;i++)
         {
           this.mySet.delete(this.sinDisponibilidad[i])
         }
-        console.log("MySET de TODOS LOS CUARTOS: ",this.mySet)
-        console.log("sinDiusponibilidad TODOS LOS CUARTOS",this.sinDisponibilidad)
-        console.log("MySET TODOS LOS CUARTOS (Delete): ",this.mySet)
 
       })
       fromDate.setDate(fromDate.getDate() + 1);
@@ -629,7 +646,7 @@ resetFoliador()
       })
 
 
-    for (let i=0; i<diaDif; i++) {
+    for (let i=0; i<(diaDif+1); i++) {
 
     this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
     .pipe(map(
@@ -643,27 +660,38 @@ resetFoliador()
         return postArray
       }))
       .subscribe((disponibles)=>{
-        for(i=0;i<disponibles.length;i++)
+        for(let x=0;x<disponibles.length;x++)
         {
           this.disponibilidad=(disponibles)
-          if(disponibles[i].Estatus==0||disponibles[i].Estatus==2||disponibles[i].Estatus==4)
+
+          if(i==0)
           {
-            this.sinDisponibilidad.push(disponibles[i].Habitacion)
+            if(disponibles[x].Estatus==2||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           }
-          this.mySet.add(this.disponibilidad[i].Habitacion)
+          else if (i==(diaDif))
+          {
+            if(disponibles[x].Estatus==3||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+          } else
+
+              if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
+              {
+                this.sinDisponibilidad.push(disponibles[x].Habitacion)
+              }
+
+          this.mySet.add(this.disponibilidad[x].Habitacion)
         }
+
         for(i=0;i<this.sinDisponibilidad.length;i++)
         {
           this.mySet.delete(this.sinDisponibilidad[i])
         }
-        if (this.mySet.size==0)
-        {this.disponibilidad=[]}
 
       })
       fromDate.setDate(fromDate.getDate() + 1);
     };
 
     }
+    this.inicio=false;
   }
 
 
@@ -676,8 +704,12 @@ resetFoliador()
 
     if(event)
     {
+      this.preAsig.add(numeroCuarto);
+
       this.tempCheckBox=false
     }else{
+      this.preAsig.delete(numeroCuarto);
+
       this.tempCheckBox=true
     }
 
@@ -703,7 +735,7 @@ resetFoliador()
       this.maxNinos=this.infoCuarto[0].Personas
       this.maxNinos=this.infoCuarto[0].Personas_Extra
     }
-    this.preAsig=numeroCuarto;
+
     this.cuarto=codigo;
 
   }
@@ -752,6 +784,7 @@ resetFoliador()
 
   setStep(index: number) {
     this.step = index;
+    // this.inicio=false;
     // this.disponibilidad=[]
     // this.mySet.clear
     // this.cuartos=[]
@@ -856,6 +889,15 @@ resetFoliador()
       this.toDate = null;
       this.fromDate = date;
     }
+    if(this.disponibilidad.length!=0)
+    {
+      this.disponibilidad=[]
+      this.inicio=true
+      this.codigoCuarto=[]
+      this.getDispo();
+      this.mySet.clear()
+    }
+    // }else{this.buscaDispo()}
   }
 
   isHovered(date: NgbDate) {

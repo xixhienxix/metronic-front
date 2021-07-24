@@ -24,7 +24,7 @@
           <div class="input-group">
 
             <input hidden class="form-control" placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
-            (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker" [minDate]=fromDate>
+            (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker" [minDate]=today>
 
             <input class="form-control" placeholder="yyyy-mm-dd" name="dpnotHidden" #dd [value]="fechaInicialBloqueo" >
 
@@ -128,6 +128,7 @@
                           [checked]="sinSalidasChecked">
                           No Hay Salidas
             </mat-checkbox>
+            &nbsp;
             <mat-checkbox
                           #sinSalidas
                           (change)="toggleFuera($event)"

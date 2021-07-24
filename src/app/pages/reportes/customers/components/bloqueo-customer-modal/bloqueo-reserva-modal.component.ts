@@ -91,10 +91,10 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   //Date Variables
 
   fromDate: NgbDate | null;
+  today: NgbDate | null;
   toDate: NgbDate | null;
 
-  model: NgbDateStruct;
-  modelFin: NgbDateStruct;
+
 
 
   fechaInvalida:boolean=false
@@ -103,6 +103,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   isLoading$;
   habitaciones:Habitaciones;
   bloqueoFormGroup: FormGroup;
+  checkboxFormGroup: FormGroup;
   myControl: FormGroup;
   mySet = new Set();
   placeHolder:string="-- Seleccione Habitación --"
@@ -110,8 +111,11 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:any[]=[];
   public infoCuarto:any[]=[];
+  //Busca Dispo
   public disponibilidad:Disponibilidad[]=[];
-  public sinDisponibilidad:any[]=[]
+  public sinDisponibilidad:any[]=[];
+
+
   public estatusArray:Estatus[]=[];
   public folioactualizado:any;
   public tipodeCuartoFiltrados:Array<string>=[];
@@ -167,7 +171,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     public i18n: NgbDatepickerI18n
     )
     {
-      this.model= calendar.getToday();
+      this.today= calendar.getToday();
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
       this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
@@ -196,7 +200,7 @@ loadForm() {
 
   this.bloqueoFormGroup = this.fb.group({
     'tipoCuarto': [ undefined, Validators.required ],
-    'numeroHab' : [undefined,Validators.required]
+    'numeroHab' : [undefined,Validators.required],
   });
 
 }
@@ -479,7 +483,6 @@ initializeBloqueo(){
 
     if($event.value==1)
     {
-
         for (let i=0; i<diaDif; i++) {
 
         this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
@@ -499,16 +502,15 @@ initializeBloqueo(){
             for(i=0;i<disponibles.length;i++)
             {
               this.disponibilidad=(disponibles)
-              if(disponibles[i].Estatus!=1)
+              if(disponibles[i].Estatus==0)
               {
                 this.sinDisponibilidad.push(disponibles[i].Habitacion)
               }
-               this.mySet.add(this.disponibilidad[i].Habitacion)
             }
-
             for(i=0;i<this.sinDisponibilidad.length;i++)
             {
               this.mySet.delete(this.sinDisponibilidad[i])
+
             }
           })
           fromDate.setDate(fromDate.getDate() + 1);
@@ -553,7 +555,7 @@ initializeBloqueo(){
           for(i=0;i<disponibles.length;i++)
           {
             this.disponibilidad=(disponibles)
-            if(disponibles[i].Estatus!=1)
+            if(disponibles[i].Estatus==0)
             {
               this.sinDisponibilidad.push(disponibles[i].Habitacion)
             }
@@ -564,16 +566,6 @@ initializeBloqueo(){
             this.mySet.delete(this.sinDisponibilidad[i])
           }
 
-          // if(this.mySet.size!=0)
-          // {
-          //   this.setEmpty=false;
-          //   this.placeHolder="-- Seleccione Habitación -- "
-          // }
-          // else
-          // {
-          //   this.setEmpty=true;
-          //   this.placeHolder="Sin Disponibilidad consulte otra Fecha o Tipo de Cuarto"
-          // }
           console.log("mySet x tipo",this.mySet)
         })
         fromDate.setDate(fromDate.getDate() + 1);
