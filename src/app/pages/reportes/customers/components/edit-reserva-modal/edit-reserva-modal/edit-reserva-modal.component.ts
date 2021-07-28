@@ -287,36 +287,8 @@ export class EditReservaModalComponent implements OnInit {
           this.huesped.email=formData.email
           this.huesped.motivo=formData.motivo
           this.huesped.id=this.huesped.folio
-      this.postService.addPost
-      (
-        this.huesped.id,
-        this.huesped.folio,
-        this.huesped.adultos,
-        this.huesped.ninos,
-        this.huesped.nombre,
-        this.huesped.estatus,
-        this.huesped.llegada,
-        this.huesped.salida,
-        this.huesped.noches,
-        this.huesped.tarifa,
-        this.huesped.pendiente,
-        this.huesped.porPagar,
-        this.huesped.origen,
-        this.huesped.habitacion,
-        this.huesped.telefono,
-        this.huesped.email,
-        this.huesped.motivo,
-        this.huesped.fechaNacimiento,
-        this.huesped.trabajaEn,
-        this.huesped.tipoDeID,
-        this.huesped.numeroDeID,
-        this.huesped.direccion,
-        this.huesped.pais,
-        this.huesped.ciudad,
-        this.huesped.codigoPostal,
-        this.huesped.lenguaje,
-        this.huesped.numeroCuarto
-      );
+
+      this.customerService.addPost(this.huesped);
         console.log("AddPost Succesfull")
 
 

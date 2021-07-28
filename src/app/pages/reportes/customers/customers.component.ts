@@ -1,5 +1,5 @@
 // tslint:disable:no-string-literal
-import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgModule, OnDestroy, OnInit, ɵɵtrustConstantResourceUrl,ViewChild} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
@@ -12,6 +12,8 @@ import { Foliador } from '../_models/foliador.model';
 import { HttpClient } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { map, filter, switchMap } from 'rxjs/operators';
+import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {Huesped} from '../_models/customer.model'
 
 import {
   GroupingState,
@@ -51,6 +53,7 @@ import { BloqueoReservaModalComponent } from './components/bloqueo-customer-moda
   styleUrls: ['./customers.component.scss'],
 })
 export class CustomersComponent
+
   implements
   OnInit,
   OnDestroy,
@@ -65,12 +68,18 @@ export class CustomersComponent
   IGroupingView,
   ISearchView,
   IFilterView {
+
+    @ViewChild('exito') exito: null;
+    @ViewChild('error') error: null;
+
   paginator: PaginatorState;
   sorting: SortState;
   grouping: GroupingState;
   isLoading: boolean;
   filterGroup: FormGroup;
   searchGroup: FormGroup;
+  closeResult: string;
+
   // foliador:Foliador;
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
@@ -80,6 +89,8 @@ export class CustomersComponent
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
   public codigoCuarto:Habitaciones[]=[];
+
+  oldDropValue:string
 
   constructor(
     private fb: FormBuilder,
@@ -443,4 +454,41 @@ export class CustomersComponent
     return color;
   }
 
+  cambiaEstatus(huesped:Huesped)
+  {
+    this.customerService.updateHuesped(huesped)
+    .subscribe(
+     ()=>
+     {
+      this.modalService.open(this.exito,{size:'sm'}).result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });
+        this.customerService.fetch();
+    },
+     (err)=>
+     {
+       console.log(err.message)
+      this.modalService.open(this.error,{size:'sm'}).result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });     },
+     ()=>{
+
+     }
+
+   )
+  }
+
+  getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+        return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+        return 'by clicking on a backdrop';
+    } else {
+        return  `with: ${reason}`;
+    }
+}
 }

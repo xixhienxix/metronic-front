@@ -57,15 +57,15 @@
                     <b>{{ grouping.getSelectedRowsCount() }}</b></span></label>
               </div>
               <div>
-                <button type="button" class="btn btn-danger font-weight-bolder font-size-sm mr-1"
+                <button type="button" class="mr-1 btn btn-danger font-weight-bolder font-size-sm"
                   (click)="deleteSelected()">
                   <i class="fa fa-trash"></i> Delete All
                 </button>&nbsp;
-                <button type="button" class="btn btn-light-primary font-weight-bolder font-size-sm mr-1"
+                <button type="button" class="mr-1 btn btn-light-primary font-weight-bolder font-size-sm"
                   (click)="fetchSelected()">
                   <i class="fa fa-stream"></i> Fetch Selected
                 </button>&nbsp;
-                <button type="button" class="btn btn-light-primary font-weight-bolder font-size-sm mr-1"
+                <button type="button" class="mr-1 btn btn-light-primary font-weight-bolder font-size-sm"
                   (click)="updateStatusForSelected()">
                   <i class="fa fa-sync-alt"></i> Update Status
                 </button>
@@ -79,7 +79,7 @@
 
     <!-- begin:Table -->
     <div class="table-responsive angular-bootstrap-table">
-      <table class="table table-head-custom table-vertical-center overflow-hidden">
+      <table class="table overflow-hidden table-head-custom table-vertical-center">
         <thead>
           <!-- <th class="selection-cell-header" data-row-selection="true">
             <label class="checkbox checkbox-single"><input type="checkbox" (click)="grouping.selectAllRows()"
@@ -115,7 +115,7 @@
             <app-sort-icon column="noches" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
+          <!-- <th>
             Tarifa X Noche
             <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
@@ -124,7 +124,7 @@
             Por Pagar
             <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
-          </th>
+          </th> -->
           <th>
             Pago Pendiente
             <app-sort-icon column="pago pendiente" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
@@ -148,27 +148,42 @@
             <td>{{ huesped.folio }}</td>
             <td>{{ huesped.nombre }}</td>
             <td>
-              <select [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                <option>{{huesped.estatus}}</option>
-                <ng-container *ngFor="let estatus of estatusArray;">
-                  <option [style.background-color]="estatus.color" value="{{estatus.id}}">{{estatus.estatus}}</option>
+              <mat-select style="width: 150px;" [(value)]="huesped.estatus" (focus)="oldDropValue" (selectionChange)="cambiaEstatus(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+                <ng-container *ngFor="let estatus of estatusArray">
+                  <ng-container  *ngIf="estatus.estatus=='Reserva Sin Pago'">
+                    <mat-option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+                  </ng-container>
+                  <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
+                    <mat-option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+                  </ng-container>
                 </ng-container>
-              </select>
+              </mat-select>
+
+              <!-- <select (focus)="oldDropValue" (change)="cambiaEstatus(huesped.estatus)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+                <ng-container *ngFor="let estatus of estatusArray">
+                  <ng-container  *ngIf="estatus.estatus=='Reserva Sin Pago'">
+                    <option [style.background-color]="estatus.color" [value]="estatus.id">{{estatus.estatus}}</option>>
+                  </ng-container>
+                  <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
+                    <option [style.background-color]="estatus.color" [value]="estatus.id">{{estatus.estatus}}</option>>
+                  </ng-container>
+                </ng-container>
+              </select> -->
             </td>
 
             <td>{{ huesped.llegada }}</td>
             <td>{{ huesped.salida }}</td>
             <td style="text-align: center;">{{ huesped.noches }}</td>
-            <td>{{ huesped.tarifa }}</td>
-            <td>{{ huesped.porPagar }}</td>
+            <!-- <td>{{ huesped.tarifa }}</td>
+            <td>{{ huesped.porPagar }}</td> -->
             <td>{{ huesped.pendiente }}</td>
             <td>{{ huesped.origen }}</td>
             <!-- <td>{{ huesped.habitacion }}</td> -->
             <td>
 
-                      <label class="btn" style="background-color: #fb7f8c;" *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
+                      <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
                       </label>
-                      <label class="btn" style="background-color: #3da7e0;" *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
+                      <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
                       </label>
             </td>
 
@@ -176,7 +191,7 @@
 
               <a
                 title="Editar Folio"
-                class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3"
+                class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
                 (click)="edit(huesped.folio)">
                 <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
                   class="svg-icon svg-icon-md svg-icon-primary">
@@ -196,7 +211,36 @@
       </table>
     </div>
     <!-- end: Table -->
-    <app-paginator class="d-flex justify-content-between align-items-center flex-wrap" [paginator]="paginator"
+    <app-paginator class="flex-wrap d-flex justify-content-between align-items-center" [paginator]="paginator"
       [isLoading]="isLoading" (paginate)="paginate($event)"></app-paginator>
   </div>
 </div>
+<ng-template #exito let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Estatus Actualizado Correctamente</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+  </div> -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #error let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Hubo un problema al actualizar el Estatus intente de nuevo mas tarde</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+  </div> -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>

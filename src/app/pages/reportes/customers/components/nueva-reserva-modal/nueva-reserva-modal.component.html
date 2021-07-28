@@ -211,7 +211,6 @@
           </div>
 
 
-
   <ng-container *ngIf="mySet.size !==0 ">
       <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel  [expanded]="step === 1"  hideToggle>
@@ -249,7 +248,7 @@
                 <ng-container *ngFor="let tipocuarto of cuartos">
                 <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
                   <tr>
-                    <td ><mat-checkbox [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                    <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
                     <td >{{ tipocuarto.Descripcion}}</td>
                     <td >{{ tipocuarto.Personas }} Adultos</td>
                     <td >{{ tipocuarto.Tarifa }}.00</td>
@@ -282,7 +281,7 @@
           <ng-container *ngFor="let tipocuarto of cuartos">
           <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
             <tr>
-              <td ><mat-checkbox #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+              <td ><mat-checkbox formControlName="checkbox" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
               <td >{{ tipocuarto.Descripcion}}</td>
               <td >{{ tipocuarto.Personas }} Adultos</td>
               <td >{{ tipocuarto.Tarifa }}.00</td>
@@ -493,7 +492,7 @@
                 style="background-color:#99d284 ;"
                 type="submit"
                 name="estatus"
-                [disabled]="tempCheckBox||!isControlValid('nombre')"
+                [disabled]="preAsig.size===0||!isControlValid('nombre')"
                 (click)="setEstatus(1)"
                 >
                   Realiza Walk-In
@@ -505,7 +504,7 @@
                 style="background-color:#fac34e ;"
                 type="submit"
                 name="estatus"
-                [disabled]="tempCheckBox||!isControlValid('nombre')"
+                [disabled]="preAsig.size===0||!isControlValid('nombre')"
                 (click)="setEstatus(2); "
                 >
                   Agrega Reserva
@@ -516,7 +515,7 @@
                 class="btn btn-block"
                 style="background-color:#d0aaec ;"
                 type="submit"
-                [disabled]="tempCheckBox||!isControlValid('nombre')"
+                [disabled]="preAsig.size===0||!isControlValid('nombre')"
                 (click)="setEstatus(5)"
                 >
 
@@ -529,7 +528,7 @@
                   style="background-color:#fab3db ;"
                   type="submit"
                   value="7"
-                  [disabled]="tempCheckBox||!isControlValid('nombre')"
+                  [disabled]="preAsig.size===0||!isControlValid('nombre')"
                   (click)="setEstatus(7)"
                   >
                   Reserva Temporal

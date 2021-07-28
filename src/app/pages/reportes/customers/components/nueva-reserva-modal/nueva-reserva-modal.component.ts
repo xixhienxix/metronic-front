@@ -25,7 +25,7 @@ import {MatMenuTrigger} from '@angular/material/menu';
 import { DialogComponent } from './components/dialog/dialog.component';
 import {HistoricoService} from '../../../_services/historico.service'
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-
+import {preAsigModel} from '../../../_models/_models_helpers/preAsig'
 
 let date: Date = new Date();
 declare global {
@@ -143,11 +143,12 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   model:NgbDateStruct;
   huesped: Huesped;
   foliador:Foliador;
+
   habitaciones:Habitaciones;
   folioLetra:string;
   formGroup: FormGroup;
   myControl: FormGroup;
-  preAsig = new Set<number>();
+  preAsig = new Set<preAsigModel>();
   searchValue:string='';
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
@@ -167,7 +168,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   accordionDisplay="";
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
-  tempCheckBox:boolean=true
+  estatusID:number;
+
 
   constructor(
     //Date Imports
@@ -241,6 +243,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       adultos:[this.huesped.adultos, Validators.compose([Validators.max(this.maxAdultos)])],
       ninos:[this.huesped.ninos, Validators.compose([Validators.max(this.maxNinos)])],
       habitacion:[this.huesped.habitacion, Validators.compose([Validators.required])],
+      checkbox:[false,Validators.required],
       searchTerm:['',Validators.maxLength(100)]
     });
 
@@ -286,6 +289,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     recursiveFunc(formToInvestigate);
     return invalidControls;
   }
+
 
   customerServiceFetch()
   {
@@ -335,7 +339,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   save() {
   this.prepareHuesped();
   this.create();
-  this.resetFoliador();
+  this.getFolios();
   this.initializeHuesped();
   }
 
@@ -381,43 +385,16 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         this.huesped.noches=(this.toDate.day)-(this.fromDate.day)
         this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
         this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
-        this.huesped.habitacion=formData.habitacion
+        this.huesped.habitacion=habitaciones.codigo
         this.huesped.telefono=formData.telefono
         this.huesped.email=formData.email
         this.huesped.motivo=formData.motivo
         this.huesped.id=this.huesped.folio
-        this.huesped.numeroCuarto=habitaciones
-        this.huesped.habitacion=this.cuarto
-  let post = this.postService.addPost
-    (
-      this.huesped.id,
-      this.huesped.folio,
-      this.huesped.adultos,
-      this.huesped.ninos,
-      this.huesped.nombre,
-      this.huesped.estatus,
-      this.huesped.llegada,
-      this.huesped.salida,
-      this.huesped.noches,
-      this.huesped.tarifa,
-      this.huesped.pendiente,
-      this.huesped.porPagar,
-      this.huesped.origen,
-      this.huesped.habitacion,
-      this.huesped.telefono,
-      this.huesped.email,
-      this.huesped.motivo,
-      this.huesped.fechaNacimiento,
-      this.huesped.trabajaEn,
-      this.huesped.tipoDeID,
-      this.huesped.numeroDeID,
-      this.huesped.direccion,
-      this.huesped.pais,
-      this.huesped.ciudad,
-      this.huesped.codigoPostal,
-      this.huesped.lenguaje,
-      this.huesped.numeroCuarto
-    ).subscribe(
+        this.huesped.numeroCuarto=habitaciones.habitacion
+
+
+  let post = this.customerService.addPost(this.huesped)
+  .subscribe(
       ()=>{},
       (err)=>{
         if(err){
@@ -429,14 +406,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
               }
       },
       ()=>{
+
         this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
           });
-
       });
-
+      this.huesped.folio=this.huesped.folio+1
     }
 
     this.modal.close();
@@ -478,24 +455,24 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.huesped.lenguaje='Español'
     this.huesped.numeroCuarto=0  }
 
-resetFoliador()
-{
-  this.foliosService.getFolios().pipe(map(
-    (responseData)=>{
-      const postArray = []
-      for(const key in responseData)
-      {
-        if(responseData.hasOwnProperty(key))
-        postArray.push(responseData[key]);
-      }
-      return postArray
-    }))
-    .subscribe((folios)=>{
-      this.folios=(folios)
-      console.log("Nuevo folio de Reserva",this.folios)
-      this.huesped.folio=this.folios[0].Folio
-    })
-}
+// resetFoliador()
+// {
+//   this.foliosService.getFolios().pipe(map(
+//     (responseData)=>{
+//       const postArray = []
+//       for(const key in responseData)
+//       {
+//         if(responseData.hasOwnProperty(key))
+//         postArray.push(responseData[key]);
+//       }
+//       return postArray
+//     }))
+//     .subscribe((folios)=>{
+//       this.folios=(folios)
+//       console.log("Nuevo folio de Reserva",this.folios)
+//       this.huesped.folio=this.folios[0].Folio
+//     })
+// }
 
 
 
@@ -698,32 +675,26 @@ resetFoliador()
 
   preAsignar(numeroCuarto:number,codigo:string,event,tarifa:number)
   {
-    console.log("check.value",numeroCuarto);
 
     this.huesped.tarifa=tarifa;
 
     if(event)
     {
-      this.preAsig.add(numeroCuarto);
-
-      this.tempCheckBox=false
-    }else{
-      this.preAsig.delete(numeroCuarto);
-
-      this.tempCheckBox=true
+      this.preAsig.add({habitacion:numeroCuarto,codigo:codigo});
+      // this.tempCheckBox=true
+    }
+    else
+    {
+      this.preAsig.forEach(item =>
+        {
+          if (item.codigo === codigo && item.habitacion === numeroCuarto)
+              this.preAsig.delete(item);
+            });
     }
 
-    this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
-    .pipe(map((responseData)=>
-    {
-      const responseArray=[]
-      for (const key in responseData){
-        if(responseData.hasOwnProperty(key))
-        responseArray.push(responseData[key]);
-      }
-      return responseArray
+      this.findInvalidControlsRecursive(this.formGroup);
 
-    }))
+    this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
     .subscribe((infoCuartos)=>{
       this.infoCuarto=infoCuartos
       console.log("InforCuartos:",this.infoCuarto)
@@ -736,7 +707,7 @@ resetFoliador()
       this.maxNinos=this.infoCuarto[0].Personas_Extra
     }
 
-    this.cuarto=codigo;
+    // this.cuarto=codigo;
 
   }
 
@@ -773,7 +744,10 @@ resetFoliador()
       console.log("this.cuarto",this.cuarto)
       this.bandera=false
     }
+
   }
+
+
 
   isNumber(val): boolean { return typeof val === 'number'; }
   isNotNumber(val): boolean { return typeof val !== 'number'; }
@@ -860,14 +834,18 @@ resetFoliador()
       if(value==this.estatusArray[i].id)
       {
         this.huesped.estatus = this.estatusArray[i].estatus;
-
       }
     }
 
     if(value==1)
-    {this.huesped.folio=this.folios[2].Folio}
+    {
+      this.huesped.folio=this.folios[2].Folio
+      this.estatusID=value
+    }
     else
     this.huesped.folio=this.folios[0].Folio
+    this.estatusID=value
+
 }
 
 
@@ -893,10 +871,11 @@ resetFoliador()
     {
       this.disponibilidad=[]
       this.inicio=true
-      this.codigoCuarto=[]
-      this.getDispo();
       this.mySet.clear()
     }
+    this.codigoCuarto=[]
+    this.getDispo();
+
     // }else{this.buscaDispo()}
   }
 

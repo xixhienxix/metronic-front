@@ -312,6 +312,7 @@ onFormSubmit(value: string) {
 
         let unique = this.tipodeCuartoFiltrados.filter(this.onlyUnique)
 
+
   let post = this.bloqueoService.postBloqueo
     (
       "_id",
@@ -658,6 +659,7 @@ initializeBloqueo(){
 
 //Date Helpers
 fechaSeleccionadaInicial(event:NgbDate){
+
   this.fromDate = event
 
   this.comparadorInicial = new Date(event.year,event.month-1,event.day)
