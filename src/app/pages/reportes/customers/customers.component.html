@@ -36,6 +36,15 @@
                 </ng-container>
               </select><small class="form-text text-muted"><b>Filtro</b> Por Tipo</small>
             </div>
+            <div class="col-lg-6">
+              <select class="form-control" name="origen" placeholder="Filtro de Origenes" formControlName="origen">
+                <option value="">Todos</option>
+                <ng-container *ngFor="let origen of origenArray ">
+                  <option>{{origen.Descripcion}}</option>
+                </ng-container>
+
+              </select><small class="form-text text-muted"><b>Fitro </b> Por Origen</small>
+            </div>
           </div>
         </div>
         <div class="col-lg-2" [formGroup]="searchGroup">
@@ -101,6 +110,11 @@
               (sort)="sort($event)"></app-sort-icon>
           </th>
           <th>
+            Habitación
+            <app-sort-icon column="type" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th>
             Día de Llegada
             <app-sort-icon column="llegada" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
@@ -130,16 +144,12 @@
             <app-sort-icon column="pago pendiente" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
+          <th style="display:none;">
             Origen
             <app-sort-icon column="origen" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
-            Habitación
-            <app-sort-icon column="type" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
+
           <th>Acciones</th>
         </thead>
         <tbody>
@@ -150,7 +160,7 @@
             <td ><!--cambiaEstatus(huesped)-->
               <mat-select style="width: 200px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
                 <ng-container *ngFor="let estatus of estatusArray">
-                  <ng-container  *ngIf="estatus.estatus=='Reserva Sin Pago'||estatus.estatus=='Reserva Confirmada'||estatus.estatus=='Esperando por Prepago'||estatus.estatus=='Prepago Realizado'||estatus.estatus=='Pagada Completamente'">
+                  <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
                     <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
                   </ng-container>
                   <!-- <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
@@ -170,22 +180,22 @@
                 </ng-container>
               </select> -->
             </td>
+            <td>
 
+              <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
+              </label>
+              <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
+              </label>
+    </td>
             <td>{{ huesped.llegada }}</td>
             <td>{{ huesped.salida }}</td>
             <td style="text-align: center;">{{ huesped.noches }}</td>
             <!-- <td>{{ huesped.tarifa }}</td>
             <td>{{ huesped.porPagar }}</td> -->
-            <td>{{ huesped.pendiente }}</td>
-            <td>{{ huesped.origen }}</td>
+            <td>$ {{ huesped.pendiente }}</td>
+            <td style="display:none;">{{ huesped.origen }}</td>
             <!-- <td>{{ huesped.habitacion }}</td> -->
-            <td>
 
-                      <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
-                      </label>
-                      <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
-                      </label>
-            </td>
 
             <td>
 

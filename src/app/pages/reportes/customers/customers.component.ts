@@ -44,8 +44,10 @@ import { DisponibilidadService } from '../_services/disponibilidad.service'
 import { EstatusService } from '../_services/estatus.service'
 import { HistoricoService } from '../_services/historico.service'
 import { Estatus } from '../_models/estatus.model';
+import { Origen } from '../_models/origen.model';
 import { BloqueoReservaModalComponent } from './components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
 import { ConfirmationModalComponent } from './components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
+import { OrigenService } from '../_services/origen.service';
 
 @Component({
   selector: 'app-customers',
@@ -87,6 +89,7 @@ export class CustomersComponent
   public cuartos:Habitaciones[]=[];
   public estatusDesc:Estatus[]=[];
   public estatusArray:Estatus[]=[];
+  public origenArray:Origen[]=[];
   public foliosprueba1: [];
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
@@ -104,6 +107,7 @@ export class CustomersComponent
     public habitacionesService : HabitacionesService,
     private http: HttpClient,
     public habitacionService : HabitacionesService,
+    public origenService : OrigenService,
     public disponibilidadSercice : DisponibilidadService,
     public estatusService : EstatusService,
 
@@ -118,6 +122,7 @@ export class CustomersComponent
     this.getFolios();
     this.getCuartos();
     this.getEstatus();
+    this.getOrigen();
     this.getTipoCuarto();
     this.filterForm();
     this.searchForm();
@@ -157,6 +162,37 @@ export class CustomersComponent
                           }
                         })
 
+  }
+
+  getOrigen():void{
+this.origenService.getOrigenes()
+.pipe(map(
+  (responseData) => {
+    const origenArrays = []
+    for (const key in responseData)
+    {
+      if(responseData.hasOwnProperty(key))
+      origenArrays.push(responseData[key])
+    }
+    return origenArrays
+  }
+))
+.subscribe(
+  (origen)=>
+  {
+    for(let i=0;i<origen.length;i++)
+    {
+      this.origenArray=origen
+    }
+  },
+  (err)=>{
+    if(err)
+    {
+      console.log(err.message)
+    }
+  },
+  ()=>{}
+  )
   }
 
   getCuartos(): void {
@@ -224,6 +260,7 @@ export class CustomersComponent
   // filtration
   filterForm() {
     this.filterGroup = this.fb.group({
+      origen: [''],
       estatus: [''],
       habitacion: [''],
       searchTerm: [''],
@@ -236,11 +273,15 @@ export class CustomersComponent
     this.subscriptions.push(
       this.filterGroup.controls.habitacion.valueChanges.subscribe(() => this.filter())
     );
+    this.subscriptions.push(
+      this.filterGroup.controls.origen.valueChanges.subscribe(() => this.filter())
+    );
   }
 
   filter() {
     const filter = {};
     const estatus = this.filterGroup.get('estatus').value;
+
     if (estatus) {
       filter['estatus'] = estatus;
     }
@@ -249,6 +290,13 @@ export class CustomersComponent
     if (habitacion) {
       filter['habitacion'] = habitacion;
     }
+
+    const origen = this.filterGroup.get('origen').value;
+    if(origen){
+      filter['origen']=origen;
+    }
+
+
     this.customerService.patchState({ filter });
   }
 
