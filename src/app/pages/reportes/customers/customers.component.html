@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="col-lg-2" [formGroup]="searchGroup">
-          <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Search" value=""
+          <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Buscar" value=""
             formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
         </div>
       </div>
@@ -95,7 +95,7 @@
             <app-sort-icon column="firstName" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
+          <th style="text-align: center;">
             Estatus de Reserva
             <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
@@ -147,15 +147,15 @@
 
             <td>{{ huesped.folio }}</td>
             <td>{{ huesped.nombre }}</td>
-            <td>
-              <mat-select style="width: 150px;" [(value)]="huesped.estatus" (focus)="oldDropValue" (selectionChange)="cambiaEstatus(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+            <td ><!--cambiaEstatus(huesped)-->
+              <mat-select style="width: 200px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
                 <ng-container *ngFor="let estatus of estatusArray">
-                  <ng-container  *ngIf="estatus.estatus=='Reserva Sin Pago'">
-                    <mat-option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+                  <ng-container  *ngIf="estatus.estatus=='Reserva Sin Pago'||estatus.estatus=='Reserva Confirmada'||estatus.estatus=='Esperando por Prepago'||estatus.estatus=='Prepago Realizado'||estatus.estatus=='Pagada Completamente'">
+                    <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
                   </ng-container>
-                  <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
-                    <mat-option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
-                  </ng-container>
+                  <!-- <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
+                    <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+                  </ng-container> -->
                 </ng-container>
               </mat-select>
 
@@ -244,3 +244,4 @@
     <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
   </div>
 </ng-template>
+

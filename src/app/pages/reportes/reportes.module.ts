@@ -58,6 +58,7 @@ import { BloqueoReservaModalComponent } from './customers/components/bloqueo-cus
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
+import { ConfirmationModalComponent } from './customers/components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -90,6 +91,7 @@ registerLocaleData(localeEs);
     MessagesComponent,
     NuevaReservaModalComponent,
     BloqueoReservaModalComponent,
+    ConfirmationModalComponent,
 
   ],
   imports: [

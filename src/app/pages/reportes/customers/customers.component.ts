@@ -45,7 +45,7 @@ import { EstatusService } from '../_services/estatus.service'
 import { HistoricoService } from '../_services/historico.service'
 import { Estatus } from '../_models/estatus.model';
 import { BloqueoReservaModalComponent } from './components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
-
+import { ConfirmationModalComponent } from './components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-customers',
@@ -71,6 +71,8 @@ export class CustomersComponent
 
     @ViewChild('exito') exito: null;
     @ViewChild('error') error: null;
+    @ViewChild('dialog') dialog: null;
+    @ViewChild('option') option: null;
 
   paginator: PaginatorState;
   sorting: SortState;
@@ -454,33 +456,33 @@ export class CustomersComponent
     return color;
   }
 
-  cambiaEstatus(huesped:Huesped)
-  {
-    this.customerService.updateHuesped(huesped)
-    .subscribe(
-     ()=>
-     {
-      this.modalService.open(this.exito,{size:'sm'}).result.then((result) => {
-        this.closeResult = `Closed with: ${result}`;
-        }, (reason) => {
-            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-        });
-        this.customerService.fetch();
-    },
-     (err)=>
-     {
-       console.log(err.message)
-      this.modalService.open(this.error,{size:'sm'}).result.then((result) => {
-        this.closeResult = `Closed with: ${result}`;
-        }, (reason) => {
-            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-        });     },
-     ()=>{
+  // cambiaEstatus(huesped:Huesped)
+  // {
+  //   this.customerService.updateHuesped(huesped)
+  //   .subscribe(
+  //    ()=>
+  //    {
+  //     this.modalService.open(this.exito,{size:'sm'}).result.then((result) => {
+  //       this.closeResult = `Closed with: ${result}`;
+  //       }, (reason) => {
+  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  //       });
+  //       this.customerService.fetch();
+  //   },
+  //    (err)=>
+  //    {
+  //      console.log(err.message)
+  //     this.modalService.open(this.error,{size:'sm'}).result.then((result) => {
+  //       this.closeResult = `Closed with: ${result}`;
+  //       }, (reason) => {
+  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  //       });     },
+  //    ()=>{
 
-     }
+  //    }
 
-   )
-  }
+  //  )
+  // }
 
   getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -491,4 +493,36 @@ export class CustomersComponent
         return  `with: ${reason}`;
     }
 }
+
+oldDropdownValue(event)
+{
+  this.oldDropValue = event.value
+}
+
+openDialog(huesped:Huesped) {
+  const modalRef = this.modalService.open(ConfirmationModalComponent,
+    {
+      scrollable: true,
+      windowClass: 'myCustomModalClass',
+      // keyboard: false,
+      // backdrop: 'static'
+      // backdrop: If `true`, the backdrop element will be created for a given modal. Alternatively, specify `’static’` for a backdrop that doesn’t close the modal on click. The default value is `true`.
+      // beforeDismiss: Callback right before the modal will be dismissed.
+      // centered: If `true`, the modal will be centered vertically. The default value is `false`.
+      // container: A selector specifying the element all-new modal windows should be appended to. If not specified, it will be `body`.
+      // keyboard: If `true`, the modal will be closed when the `Escape` key is pressed. The default value is `true`.
+      // scrollable: Scrollable modal content (false by default).
+      // size: Size of a new modal window. ‘sm’ | ‘lg’ | ‘xl’ | string;
+      // windowClass: A custom class to append to the modal window.
+      // backdropClass: A custom class to append to the modal backdrop.
+      // Using componetInstance we can pass data object to modal contents.
+    });
+
+
+  modalRef.componentInstance.huesped = huesped;
+  modalRef.result.then((result) => {
+    console.log(result);
+  }, (reason) => {
+  });
+  }
 }

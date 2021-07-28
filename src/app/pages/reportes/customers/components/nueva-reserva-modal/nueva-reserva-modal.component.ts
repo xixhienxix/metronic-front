@@ -143,7 +143,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   model:NgbDateStruct;
   huesped: Huesped;
   foliador:Foliador;
-
+  banderaExito:boolean;
   habitaciones:Habitaciones;
   folioLetra:string;
   formGroup: FormGroup;
@@ -407,11 +407,16 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       },
       ()=>{
 
-        this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
-          this.closeResult = `Closed with: ${result}`;
-          }, (reason) => {
-              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          });
+        if(this.banderaExito)
+        {
+          this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
+            this.banderaExito=false;
+        }
+
       });
       this.huesped.folio=this.huesped.folio+1
     }
@@ -426,6 +431,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   initializeHuesped()
   {
+    this.banderaExito=true;
+
     this.inicio==true;
     this.huesped.id=undefined
     this.huesped.folio=undefined
