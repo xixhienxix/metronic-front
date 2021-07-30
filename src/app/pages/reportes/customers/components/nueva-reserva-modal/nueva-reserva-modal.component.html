@@ -183,7 +183,7 @@
                           [value]=tipodeCuartoDropDown
                         >
                         <option selected value="0">-- Selecciona Habitación ---</option>
-                        <option value="1">Todos las Habitaciones</option>
+                        <option value="1">Todas las Habitaciones</option>
                         <ng-container *ngFor="let tipoCuarto of codigoCuarto">
                           <option> {{tipoCuarto.replace("_"," ")}} </option>
                         </ng-container>
@@ -234,14 +234,17 @@
                   <th>
                     # de Cuarto
                   </th>
-                  <th>
+                  <!-- <th>
                     Descripcion
-                  </th>
+                  </th> -->
                   <th>
                     Capacidad
                   </th>
                   <th>
                     Tarifa
+                  </th>
+                  <th>
+                    Total
                   </th>
                 </thead>
                 <ng-container *ngFor="let habitacionesDisponibles of mySet">
@@ -249,15 +252,15 @@
                 <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
                   <tr>
                     <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
-                    <td >{{ tipocuarto.Descripcion}}</td>
+                    <!-- <td >{{ tipocuarto.Descripcion}}</td> -->
                     <td >{{ tipocuarto.Personas }} Adultos</td>
-                    <td >{{ tipocuarto.Tarifa }}.00</td>
+                    <td >$ {{ tipocuarto.Tarifa }}.00</td>
+                    <td >$ {{ tipocuarto.Tarifa * diaDif}}.00</td>
                   </tr>
                 </tbody>
               </ng-container>
             </ng-container>
               </table>
-
 
 <ng-container *ngIf="bandera==true">
   <ng-container *ngFor="let codigosCuarto of codigoCuarto;  let i = index">
@@ -267,14 +270,17 @@
             <th>
               # de Cuarto
             </th>
-            <th>
+            <!-- <th>
               Descripcion
-            </th>
+            </th> -->
             <th>
               Capacidad
             </th>
             <th>
               Tarifa
+            </th>
+            <th>
+              Total
             </th>
           </thead>
           <ng-container *ngFor="let habitacionesDisponibles of mySet">
@@ -282,9 +288,10 @@
           <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
             <tr>
               <td ><mat-checkbox formControlName="checkbox" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
-              <td >{{ tipocuarto.Descripcion}}</td>
+              <!-- <td >{{ tipocuarto.Descripcion}}</td> -->
               <td >{{ tipocuarto.Personas }} Adultos</td>
-              <td >{{ tipocuarto.Tarifa }}.00</td>
+              <td >$ {{ tipocuarto.Tarifa }}.00</td>
+              <td >$ {{ tipocuarto.Tarifa * diaDif}}.00</td>
             </tr>
           </tbody>
         </ng-container>
@@ -316,6 +323,8 @@
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
+
+     <br>
 
      <div style="background-color:#00506a;" class="modal-tittle">
       <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="text-center modal-title h5 col-12">
@@ -492,7 +501,7 @@
                 style="background-color:#99d284 ;"
                 type="submit"
                 name="estatus"
-                [disabled]="preAsig.size===0||!isControlValid('nombre')"
+                [disabled]="preAsig.size===0||!isControlValid('nombre') || this.todayString!=dpFromDate.value"
                 (click)="setEstatus(1)"
                 >
                   Realiza Walk-In

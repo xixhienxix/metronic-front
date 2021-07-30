@@ -125,7 +125,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   today: NgbDate | null;
   fromDate1: string;
   ToDoListForm:any;
-
+  diaDif:number;
   toDate: NgbDate | null;
   closeResult: string;
 
@@ -169,12 +169,12 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
   estatusID:number;
-
+  todayString:string;
 
   constructor(
     //Date Imports
     private modalService: NgbModal,
-    private calendar: NgbCalendar,
+    public calendar: NgbCalendar,
     public formatter: NgbDateParserFormatter,
     public habitacionService : HabitacionesService,
     public foliosService : FoliosService,
@@ -189,6 +189,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     public i18n: NgbDatepickerI18n
     ) {
       this.today = calendar.getToday();
+      this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
     }
@@ -552,16 +553,19 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.inicio=false;
     this.accordionDisplay="";
     this.mySet.clear();
+    this.sinDisponibilidad=[]
 
     if(this.bandera)
     {
       //DIAS DE DIFERENCIA
     let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    this.diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
     //
+    let i;
+    let x;
 
-    for (let i=0; i<(diaDif+1); i++) {
+    for (i=0; i<(this.diaDif+1); i++) {
 
     this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
     .pipe(map(
@@ -575,7 +579,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         return postArray
       }))
       .subscribe((disponibles)=>{
-        for(let x=0;x<disponibles.length;x++)
+        for(x=0;x<disponibles.length;x++)
         {
           this.disponibilidad=(disponibles)
 
@@ -583,7 +587,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
           {
             if(disponibles[x].Estatus==2||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           }
-          else if (i==(diaDif))
+          else if (i==(this.diaDif))
           {
             if(disponibles[x].Estatus==3||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           } else
@@ -610,7 +614,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       //DIAS DE DIFERENCIA
     let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    this.diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
     //
 
     this.habitacionService.getHabitacionesbyTipo(this.cuarto)
@@ -630,7 +634,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       })
 
 
-    for (let i=0; i<(diaDif+1); i++) {
+    for (let i=0; i<(this.diaDif+1); i++) {
 
     this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
     .pipe(map(
@@ -652,7 +656,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
           {
             if(disponibles[x].Estatus==2||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           }
-          else if (i==(diaDif))
+          else if (i==(this.diaDif))
           {
             if(disponibles[x].Estatus==3||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           } else
@@ -724,7 +728,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.disponibilidad=[]
     this.mySet.clear
     this.cuartos=[]
-    this.sinDisponibilidad=[]
+    // this.sinDisponibilidad=[]
 
     if($event.target.options.selectedIndex==1)
     {
@@ -878,10 +882,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {
       this.disponibilidad=[]
       this.inicio=true
+      this.cuartos=[]
       this.mySet.clear()
+      this.codigoCuarto=[]
     }
-    this.codigoCuarto=[]
-    this.getDispo();
+    // this.cuartos=[]
+    // this.codigoCuarto=[]
+    // this.getDispo();
+    // this.sinDisponibilidad=[]
 
     // }else{this.buscaDispo()}
   }

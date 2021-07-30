@@ -5,7 +5,7 @@
     </div>
     <div  class="card-toolbar">
       <button style="background-color: #319dd7; color: white; ;" type="button" class="btn " (click)="create()">Nueva Reserva</button>
-
+      &nbsp; &nbsp; &nbsp;
       <button style="margin-right: 5px; background-color: #319dd7; color: white;;" type="button" class="btn" (click)="crearBloqueo()">Nuevo Bloqueo</button>
 
     </div>
@@ -13,11 +13,9 @@
 
   <div class="card-body">
     <!-- begin: Filtration form -->
-    <div class="form form-label-right">
       <div class="form-group row">
-        <div class="col-lg-4">
           <div class="row" [formGroup]="filterGroup">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
               <select class="form-control" name="estatus" placeholder="Filtro de Estatus" formControlName="estatus">
                 <option value="">Todos</option>
                 <ng-container *ngFor="let estatus of estatusArray ">
@@ -26,7 +24,7 @@
 
               </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-4">
               <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" formControlName="habitacion">
                 <option selected value="">All</option>
                 <ng-container *ngFor="let tipo of codigoCuarto">
@@ -34,9 +32,9 @@
                     {{tipo.replace("_"," ")}}
                   </option>
                 </ng-container>
-              </select><small class="form-text text-muted"><b>Filtro</b> Por Tipo</small>
+              </select><small class="form-text text-muted"><b>Filtro</b> Por Habitacion</small>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-4">
               <select class="form-control" name="origen" placeholder="Filtro de Origenes" formControlName="origen">
                 <option value="">Todos</option>
                 <ng-container *ngFor="let origen of origenArray ">
@@ -46,13 +44,11 @@
               </select><small class="form-text text-muted"><b>Fitro </b> Por Origen</small>
             </div>
           </div>
-        </div>
-        <div class="col-lg-2" [formGroup]="searchGroup">
+        <div class="col-lg-4" [formGroup]="searchGroup">
           <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Buscar" value=""
             formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
         </div>
       </div>
-    </div>
     <!-- end: Filtration form -->
 
     <!-- begin: Grouping -->
@@ -158,27 +154,20 @@
             <td>{{ huesped.folio }}</td>
             <td>{{ huesped.nombre }}</td>
             <td ><!--cambiaEstatus(huesped)-->
-              <mat-select style="width: 200px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
-                <ng-container *ngFor="let estatus of estatusArray">
-                  <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
-                    <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+              <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+                <mat-select style="width:200px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+                </mat-select>
+              </ng-container>
+              <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+                <mat-select style="width: 200px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+                  <ng-container *ngFor="let estatus of estatusArray">
+                    <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+                      <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+                    </ng-container>
                   </ng-container>
-                  <!-- <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
-                    <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
-                  </ng-container> -->
-                </ng-container>
-              </mat-select>
-
-              <!-- <select (focus)="oldDropValue" (change)="cambiaEstatus(huesped.estatus)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                <ng-container *ngFor="let estatus of estatusArray">
-                  <ng-container  *ngIf="estatus.estatus=='Reserva Sin Pago'">
-                    <option [style.background-color]="estatus.color" [value]="estatus.id">{{estatus.estatus}}</option>>
-                  </ng-container>
-                  <ng-container  *ngIf="estatus.estatus=='Reserva Confirmada'">
-                    <option [style.background-color]="estatus.color" [value]="estatus.id">{{estatus.estatus}}</option>>
-                  </ng-container>
-                </ng-container>
-              </select> -->
+                </mat-select>
+              </ng-container>
             </td>
             <td>
 
