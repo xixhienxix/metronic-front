@@ -177,12 +177,12 @@
                       <select
                           class="form-control form-control-lg form-control-solid"
                           name="habitacion"
-                          #tipodeCuartoDropDown
                           formControlName="habitacion"
                           (change)="habValue($event)"
-                          [value]=tipodeCuartoDropDown
-                        >
-                        <option selected value="0">-- Selecciona Habitación ---</option>
+                          #tipodeCuartoDropDown
+                          value="1"
+                          >
+                        <option value="0">-- Selecciona Habitación ---</option>
                         <option value="1">Todas las Habitaciones</option>
                         <ng-container *ngFor="let tipoCuarto of codigoCuarto">
                           <option> {{tipoCuarto.replace("_"," ")}} </option>
@@ -418,12 +418,12 @@
             autocomplete="off"
             formControlName="email"
             value="{{huesped.email}}"
-            [class.is-invalid]="isControlInvalid('email')"
-            (input)="emailValidator($event.target.value)"
-          /><!--
+            [class.is-invalid]="isControlInvalid('email')"/>
+            <!--(input)="emailValidator($event.target.value)/>"-->
+          <!--
           [class.is-invalid]="isControlInvalid('email')"
             [class.is-valid]="isControlValid('email')"-->
-          <div class="valid-feedback" *ngIf="isControlValid('email')">
+          <!-- <div class="valid-feedback" *ngIf="isControlValid('email')">
             Email Escrito Correctamente
           </div>
           <div
@@ -443,7 +443,7 @@
           *ngIf="controlHasError('pattern', 'email')"
         >
           Escriba un correo valido
-        </div>
+        </div> -->
         </div>
 
         <div class="col-lg-6">
@@ -455,14 +455,14 @@
             placeholder="Teléfono"
             autocomplete="off"
             formControlName="telefono"
-            value="{{huesped.telefono}}"
-            [class.is-invalid]="isControlInvalid('telefono')"
-          /><!--[class.is-invalid]="isControlInvalid('telefono')"
+            value="{{huesped.telefono}}"/>
+           <!--[class.is-invalid]="isControlInvalid('telefono')"/>-->
+          <!--[class.is-invalid]="isControlInvalid('telefono')"
             [class.is-valid]="isControlValid('telefono')"-->
           <!-- <div class="invalid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Invalido
           </div> -->
-          <div class="valid-feedback" *ngIf="isControlValid('telefono')">
+          <!-- <div class="valid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Escrito Correctamente
           </div>
           <div
@@ -482,7 +482,7 @@
           *ngIf="controlHasError('pattern', 'telefono')"
           >
            Solo se permiten números
-        </div>
+        </div> -->
         </div>
 
       </div>

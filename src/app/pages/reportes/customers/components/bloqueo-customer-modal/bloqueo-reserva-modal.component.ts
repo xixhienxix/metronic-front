@@ -518,7 +518,6 @@ initializeBloqueo(){
         };
     }
 
-
     else
     {
 

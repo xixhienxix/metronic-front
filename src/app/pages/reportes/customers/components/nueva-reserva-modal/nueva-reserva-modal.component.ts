@@ -21,6 +21,7 @@ import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
 import { Observable} from  'rxjs';
 import {MatDialog} from '@angular/material/dialog';
+import {MatSelect} from '@angular/material/select';
 import {MatMenuTrigger} from '@angular/material/menu';
 import { DialogComponent } from './components/dialog/dialog.component';
 import {HistoricoService} from '../../../_services/historico.service'
@@ -115,6 +116,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 {
   @ViewChild('error') errorModal: null;
   @ViewChild('exito') exitoModal: null;
+  @ViewChild('tipodeCuartoDropDown') tipodeCuartoDropDown: null;
 
   @Input()
 
@@ -150,6 +152,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   myControl: FormGroup;
   preAsig = new Set<preAsigModel>();
   searchValue:string='';
+  dropDownHabValueIndex:any
+
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
@@ -562,50 +566,49 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
     this.diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
     //
-    let i;
-    let x;
 
-    for (i=0; i<(this.diaDif+1); i++) {
+    for (let i=0; i<(this.diaDif+1); i++) {
 
-    this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-           postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
-      .subscribe((disponibles)=>{
-        for(x=0;x<disponibles.length;x++)
-        {
-          this.disponibilidad=(disponibles)
-
-          if(i==0)
+      this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
+      .pipe(map(
+        (responseData)=>{
+          const postArray = []
+          for(const key in responseData)
           {
-            if(disponibles[x].Estatus==2||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+            if(responseData.hasOwnProperty(key))
+             postArray.push(responseData[key]);
           }
-          else if (i==(this.diaDif))
+          return postArray
+        }))
+        .subscribe((disponibles)=>{
+          for(let x=0;x<disponibles.length;x++)
           {
-            if(disponibles[x].Estatus==3||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
-          } else
+            this.disponibilidad=(disponibles)
 
-              if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
-              {
-                this.sinDisponibilidad.push(disponibles[x].Habitacion)
-              }
+            if(i==0)
+            {
+              if(disponibles[x].Estatus==2||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+            }
+            else if (i==(this.diaDif))
+            {
+              if(disponibles[x].Estatus==3||disponibles[x].Estatus==0||disponibles[x].Estatus==4) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+            }
+            else
 
-          this.mySet.add(this.disponibilidad[x].Habitacion)
-        }
+                if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
+                {
+                  this.sinDisponibilidad.push(disponibles[x].Habitacion)
+                }
 
-        for(i=0;i<this.sinDisponibilidad.length;i++)
-        {
-          this.mySet.delete(this.sinDisponibilidad[i])
-        }
+            this.mySet.add(this.disponibilidad[x].Habitacion)
+          }
 
-      })
+          for(i=0;i<this.sinDisponibilidad.length;i++)
+          {
+            this.mySet.delete(this.sinDisponibilidad[i])
+          }
+
+        })
       fromDate.setDate(fromDate.getDate() + 1);
     };
 
@@ -654,11 +657,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
           if(i==0)
           {
-            if(disponibles[x].Estatus==2||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+            if(disponibles[x].Estatus==2||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           }
           else if (i==(this.diaDif))
           {
-            if(disponibles[x].Estatus==3||disponibles[x].Estatus==4||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
+            if(disponibles[x].Estatus==3||disponibles[x].Estatus==0||disponibles[x].Estatus==4) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
           } else
 
               if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
@@ -732,6 +735,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
     if($event.target.options.selectedIndex==1)
     {
+      this.dropDownHabValueIndex=$event.target.options.selectedIndex
         this.cuarto=""
         this.habitacionService.gethabitaciones()
         .pipe(map(
@@ -751,8 +755,45 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         this.bandera=true
     }else
     {
+      this.dropDownHabValueIndex=$event.target.options[$event.target.options.selectedIndex].text
       this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
       console.log("this.cuarto",this.cuarto)
+      this.bandera=false
+    }
+
+  }
+
+  habValueIndex(value)
+  {
+    this.accordionDisplay="display:none"
+    this.disponibilidad=[]
+    this.mySet.clear
+    this.cuartos=[]
+    // this.sinDisponibilidad=[]
+
+    if(value==1)
+    {
+      this.dropDownHabValueIndex=1
+        this.cuarto=""
+        this.habitacionService.gethabitaciones()
+        .pipe(map(
+          (responseData)=>{
+            const postArray = []
+            for(const key in responseData)
+            {
+              if(responseData.hasOwnProperty(key))
+              postArray.push(responseData[key]);
+            }
+            return postArray
+          }))
+          .subscribe((cuartos)=>{
+            this.cuartos=(cuartos)
+          })
+        this.bandera=true
+    }else
+    {
+      this.dropDownHabValueIndex=""
+      this.cuarto = value.replace(" ","_");
       this.bandera=false
     }
 
@@ -884,14 +925,18 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       this.inicio=true
       this.cuartos=[]
       this.mySet.clear()
-      this.codigoCuarto=[]
-    }
-    // this.cuartos=[]
-    // this.codigoCuarto=[]
-    // this.getDispo();
-    // this.sinDisponibilidad=[]
+      this.habValueIndex(this.dropDownHabValueIndex)
 
-    // }else{this.buscaDispo()}
+      // this.codigoCuarto=[]
+    }
+    this.habValueIndex(this.cuarto)
+    this.codigoCuarto=[]
+    this.getDispo()
+
+    this.formGroup.get("habitacion").patchValue(0);
+
+
+    // this.tipodeCuartoDropDown.value = 0;
   }
 
   isHovered(date: NgbDate) {
