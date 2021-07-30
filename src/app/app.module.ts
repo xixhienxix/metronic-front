@@ -1,4 +1,4 @@
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { NgModule, APP_INITIALIZER,LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
@@ -27,6 +27,10 @@ import { FakeAPIService } from './_fake/fake-api.service';
 // import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import { ClickOutsideDirective } from './pages/directives/click-outside.directive';
 import { DialogComponent } from './pages/reportes/customers/components/nueva-reserva-modal/components/dialog/dialog.component';
+//Locale i18n
+import localeEs from '@angular/common/locales/es-MX';
+import { registerLocaleData } from '@angular/common';
+
 
 
 function appInitializer(authService: AuthService) {
@@ -37,6 +41,7 @@ function appInitializer(authService: AuthService) {
   };
 }
 
+registerLocaleData(localeEs, 'es');
 
 @NgModule({
   declarations: [AppComponent,ClickOutsideDirective, DialogComponent],
@@ -87,6 +92,9 @@ function appInitializer(authService: AuthService) {
           json: () => import('highlight.js/lib/languages/json')
         },
       },
+    },
+    {
+      provide: LOCALE_ID, useValue: 'es-Mx',
     },
   ],
   bootstrap: [AppComponent],

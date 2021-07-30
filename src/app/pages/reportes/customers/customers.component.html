@@ -4,9 +4,10 @@
       <h3 style="color: white;" class="card-label">Lista de Reservas y Huespedes</h3>
     </div>
     <div  class="card-toolbar">
+      <button style="background-color: #319dd7; color: white; ;" type="button" class="btn " (click)="create()">Nueva Reserva</button>
+      &nbsp; &nbsp; &nbsp;
       <button style="margin-right: 5px; background-color: #319dd7; color: white;;" type="button" class="btn" (click)="crearBloqueo()">Nuevo Bloqueo</button>
 
-      <button style="background-color: #319dd7; color: white; ;" type="button" class="btn " (click)="create()">Nueva Reserva</button>
     </div>
 
   </div>
@@ -55,16 +56,43 @@
 
 
     <!-- begin: Filtration form -->
-    <div class="form form-label-right">
       <div class="form-group row">
           <div class="row" [formGroup]="filterGroup">
+            <div class="col-lg-4">
+              <select class="form-control" name="estatus" placeholder="Filtro de Estatus" formControlName="estatus">
+                <option value="">Todos</option>
+                <ng-container *ngFor="let estatus of estatusArray ">
+                  <option>{{estatus.estatus}}</option>
+                </ng-container>
 
             <div class="row" [formGroup]="filterGroup">
 
             </div>
+            <div class="col-lg-4">
+              <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" formControlName="habitacion">
+                <option selected value="">All</option>
+                <ng-container *ngFor="let tipo of codigoCuarto">
+                  <option>
+                    {{tipo.replace("_"," ")}}
+                  </option>
+                </ng-container>
+              </select><small class="form-text text-muted"><b>Filtro</b> Por Habitacion</small>
+            </div>
+            <div class="col-lg-4">
+              <select class="form-control" name="origen" placeholder="Filtro de Origenes" formControlName="origen">
+                <option value="">Todos</option>
+                <ng-container *ngFor="let origen of origenArray ">
+                  <option>{{origen.Descripcion}}</option>
+                </ng-container>
+
+              </select><small class="form-text text-muted"><b>Fitro </b> Por Origen</small>
+            </div>
           </div>
+        <div class="col-lg-4" [formGroup]="searchGroup">
+          <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Buscar" value=""
+            formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
+        </div>
       </div>
-    </div>
     <!-- end: Filtration form -->
 </div>
 
@@ -82,15 +110,15 @@
                     <b>{{ grouping.getSelectedRowsCount() }}</b></span></label>
               </div>
               <div>
-                <button type="button" class="btn btn-danger font-weight-bolder font-size-sm mr-1"
+                <button type="button" class="mr-1 btn btn-danger font-weight-bolder font-size-sm"
                   (click)="deleteSelected()">
                   <i class="fa fa-trash"></i> Delete All
                 </button>&nbsp;
-                <button type="button" class="btn btn-light-primary font-weight-bolder font-size-sm mr-1"
+                <button type="button" class="mr-1 btn btn-light-primary font-weight-bolder font-size-sm"
                   (click)="fetchSelected()">
                   <i class="fa fa-stream"></i> Fetch Selected
                 </button>&nbsp;
-                <button type="button" class="btn btn-light-primary font-weight-bolder font-size-sm mr-1"
+                <button type="button" class="mr-1 btn btn-light-primary font-weight-bolder font-size-sm"
                   (click)="updateStatusForSelected()">
                   <i class="fa fa-sync-alt"></i> Update Status
                 </button>
@@ -103,8 +131,8 @@
     <!-- end: Grouping -->
 
     <!-- begin:Table -->
-    <div id="container" class="table-responsive angular-bootstrap-table">
-      <table class="table table-vertical-center overflow-hidden">
+    <div class="table-responsive angular-bootstrap-table">
+      <table class="table overflow-hidden table-head-custom table-vertical-center">
         <thead>
           <!-- <th class="selection-cell-header" data-row-selection="true">
             <label class="checkbox checkbox-single"><input type="checkbox" (click)="grouping.selectAllRows()"
@@ -120,9 +148,14 @@
             <app-sort-icon column="firstName" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
+          <th style="text-align: center;">
             Estatus de Reserva
             <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th>
+            Habitación
+            <app-sort-icon column="type" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
           <th>
@@ -140,7 +173,7 @@
             <app-sort-icon column="noches" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
+          <!-- <th>
             Tarifa X Noche
             <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
@@ -149,22 +182,18 @@
             Por Pagar
             <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
-          </th>
+          </th> -->
           <th>
             Pago Pendiente
             <app-sort-icon column="pago pendiente" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
+          <th style="display:none;">
             Origen
             <app-sort-icon column="origen" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th>
-            Habitación
-            <app-sort-icon column="type" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
+
           <th>Acciones</th>
         </thead>
         <!-- <tfoot>
@@ -177,36 +206,44 @@
 
             <td>{{ huesped.folio }}</td>
             <td>{{ huesped.nombre }}</td>
-            <td>
-              <select [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                <option>{{huesped.estatus}}</option>
-                <ng-container *ngFor="let estatus of estatusArray;">
-                  <option [style.background-color]="estatus.color" value="{{estatus.id}}">{{estatus.estatus}}</option>
-                </ng-container>
-              </select>
+            <td ><!--cambiaEstatus(huesped)-->
+              <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+                <mat-select style="width:200px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+                </mat-select>
+              </ng-container>
+              <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+                <mat-select style="width: 200px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+                  <ng-container *ngFor="let estatus of estatusArray">
+                    <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+                      <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+                    </ng-container>
+                  </ng-container>
+                </mat-select>
+              </ng-container>
             </td>
+            <td>
 
+              <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
+              </label>
+              <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
+              </label>
+    </td>
             <td>{{ huesped.llegada }}</td>
             <td>{{ huesped.salida }}</td>
             <td style="text-align: center;">{{ huesped.noches }}</td>
-            <td>{{ huesped.tarifa }}</td>
-            <td>{{ huesped.porPagar }}</td>
-            <td>{{ huesped.pendiente }}</td>
-            <td>{{ huesped.origen }}</td>
+            <!-- <td>{{ huesped.tarifa }}</td>
+            <td>{{ huesped.porPagar }}</td> -->
+            <td>$ {{ huesped.pendiente }}</td>
+            <td style="display:none;">{{ huesped.origen }}</td>
             <!-- <td>{{ huesped.habitacion }}</td> -->
-            <td>
 
-                      <label class="btn" style="background-color: #fb7f8c;" *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
-                      </label>
-                      <label class="btn" style="background-color: #3da7e0;" *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
-                      </label>
-            </td>
 
             <td>
 
               <a
                 title="Editar Folio"
-                class="btn btn-icon btn-light btn-hover-primary btn-sm mx-3"
+                class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
                 (click)="edit(huesped.folio)">
                 <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
                   class="svg-icon svg-icon-md svg-icon-primary">
@@ -226,7 +263,37 @@
       </table>
     </div>
     <!-- end: Table -->
-    <app-paginator class="d-flex justify-content-between align-items-center flex-wrap" [paginator]="paginator"
+    <app-paginator class="flex-wrap d-flex justify-content-between align-items-center" [paginator]="paginator"
       [isLoading]="isLoading" (paginate)="paginate($event)"></app-paginator>
   </div>
 </div>
+<ng-template #exito let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Estatus Actualizado Correctamente</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+  </div> -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #error let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Hubo un problema al actualizar el Estatus intente de nuevo mas tarde</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+  </div> -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>
+

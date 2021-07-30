@@ -1,5 +1,5 @@
 // tslint:disable:no-string-literal
-import { Component, NgModule, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgModule, OnDestroy, OnInit, ɵɵtrustConstantResourceUrl,ViewChild} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
@@ -12,6 +12,8 @@ import { Foliador } from '../_models/foliador.model';
 import { HttpClient } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { map, filter, switchMap } from 'rxjs/operators';
+import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {Huesped} from '../_models/customer.model'
 
 import {
   GroupingState,
@@ -42,7 +44,10 @@ import { DisponibilidadService } from '../_services/disponibilidad.service'
 import { EstatusService } from '../_services/estatus.service'
 import { HistoricoService } from '../_services/historico.service'
 import { Estatus } from '../_models/estatus.model';
+import { Origen } from '../_models/origen.model';
 import { BloqueoReservaModalComponent } from './components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
+import { ConfirmationModalComponent } from './components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
+import { OrigenService } from '../_services/origen.service';
 
 @Component({
   selector: 'app-customers',
@@ -50,6 +55,7 @@ import { BloqueoReservaModalComponent } from './components/bloqueo-customer-moda
   styleUrls: ['./customers.component.scss'],
 })
 export class CustomersComponent
+
   implements
   OnInit,
   OnDestroy,
@@ -64,21 +70,32 @@ export class CustomersComponent
   IGroupingView,
   ISearchView,
   IFilterView {
+
+    @ViewChild('exito') exito: null;
+    @ViewChild('error') error: null;
+    @ViewChild('dialog') dialog: null;
+    @ViewChild('option') option: null;
+
   paginator: PaginatorState;
   sorting: SortState;
   grouping: GroupingState;
   isLoading: boolean;
   filterGroup: FormGroup;
   searchGroup: FormGroup;
+  closeResult: string;
+
   // foliador:Foliador;
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public estatusDesc:Estatus[]=[];
   public estatusArray:Estatus[]=[];
+  public origenArray:Origen[]=[];
   public foliosprueba1: [];
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
   public codigoCuarto:Habitaciones[]=[];
+
+  oldDropValue:string
 
   constructor(
     private fb: FormBuilder,
@@ -90,6 +107,7 @@ export class CustomersComponent
     public habitacionesService : HabitacionesService,
     private http: HttpClient,
     public habitacionService : HabitacionesService,
+    public origenService : OrigenService,
     public disponibilidadSercice : DisponibilidadService,
     public estatusService : EstatusService,
 
@@ -104,6 +122,7 @@ export class CustomersComponent
     this.getFolios();
     this.getCuartos();
     this.getEstatus();
+    this.getOrigen();
     this.getTipoCuarto();
     this.filterForm();
     this.searchForm();
@@ -143,6 +162,37 @@ export class CustomersComponent
                           }
                         })
 
+  }
+
+  getOrigen():void{
+this.origenService.getOrigenes()
+.pipe(map(
+  (responseData) => {
+    const origenArrays = []
+    for (const key in responseData)
+    {
+      if(responseData.hasOwnProperty(key))
+      origenArrays.push(responseData[key])
+    }
+    return origenArrays
+  }
+))
+.subscribe(
+  (origen)=>
+  {
+    for(let i=0;i<origen.length;i++)
+    {
+      this.origenArray=origen
+    }
+  },
+  (err)=>{
+    if(err)
+    {
+      console.log(err.message)
+    }
+  },
+  ()=>{}
+  )
   }
 
   getCuartos(): void {
@@ -210,6 +260,7 @@ export class CustomersComponent
   // filtration
   filterForm() {
     this.filterGroup = this.fb.group({
+      origen: [''],
       estatus: [''],
       habitacion: [''],
       searchTerm: [''],
@@ -222,11 +273,15 @@ export class CustomersComponent
     this.subscriptions.push(
       this.filterGroup.controls.habitacion.valueChanges.subscribe(() => this.filter())
     );
+    this.subscriptions.push(
+      this.filterGroup.controls.origen.valueChanges.subscribe(() => this.filter())
+    );
   }
 
   filter() {
     const filter = {};
     const estatus = this.filterGroup.get('estatus').value;
+
     if (estatus) {
       filter['estatus'] = estatus;
     }
@@ -235,6 +290,13 @@ export class CustomersComponent
     if (habitacion) {
       filter['habitacion'] = habitacion;
     }
+
+    const origen = this.filterGroup.get('origen').value;
+    if(origen){
+      filter['origen']=origen;
+    }
+
+
     this.customerService.patchState({ filter });
   }
 
@@ -289,11 +351,8 @@ export class CustomersComponent
     this.bloqueo();
   }
 
-
   bloqueo() {
-
       const modalRef = this.modalService.open(BloqueoReservaModalComponent, { size: 'md' });
-
       modalRef.result.then( () =>
       this.customerService.fetch(),
       () => { }
@@ -431,13 +490,13 @@ export class CustomersComponent
 
   }
 
-  backgroundColor(estatus:number)
+  backgroundColor(estatus:string)
   {
     let color;
 
     for (let i=0;i<this.estatusArray.length;i++)
     {
-      if(estatus==this.estatusArray[i].id)
+      if(estatus==this.estatusArray[i].estatus)
       {
         color = this.estatusArray[i].color
       }
@@ -445,4 +504,73 @@ export class CustomersComponent
     return color;
   }
 
+  // cambiaEstatus(huesped:Huesped)
+  // {
+  //   this.customerService.updateHuesped(huesped)
+  //   .subscribe(
+  //    ()=>
+  //    {
+  //     this.modalService.open(this.exito,{size:'sm'}).result.then((result) => {
+  //       this.closeResult = `Closed with: ${result}`;
+  //       }, (reason) => {
+  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  //       });
+  //       this.customerService.fetch();
+  //   },
+  //    (err)=>
+  //    {
+  //      console.log(err.message)
+  //     this.modalService.open(this.error,{size:'sm'}).result.then((result) => {
+  //       this.closeResult = `Closed with: ${result}`;
+  //       }, (reason) => {
+  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  //       });     },
+  //    ()=>{
+
+  //    }
+
+  //  )
+  // }
+
+  getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+        return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+        return 'by clicking on a backdrop';
+    } else {
+        return  `with: ${reason}`;
+    }
+}
+
+oldDropdownValue(event)
+{
+  this.oldDropValue = event.value
+}
+
+openDialog(huesped:Huesped) {
+  const modalRef = this.modalService.open(ConfirmationModalComponent,
+    {
+      scrollable: true,
+      windowClass: 'myCustomModalClass',
+      // keyboard: false,
+      // backdrop: 'static'
+      // backdrop: If `true`, the backdrop element will be created for a given modal. Alternatively, specify `’static’` for a backdrop that doesn’t close the modal on click. The default value is `true`.
+      // beforeDismiss: Callback right before the modal will be dismissed.
+      // centered: If `true`, the modal will be centered vertically. The default value is `false`.
+      // container: A selector specifying the element all-new modal windows should be appended to. If not specified, it will be `body`.
+      // keyboard: If `true`, the modal will be closed when the `Escape` key is pressed. The default value is `true`.
+      // scrollable: Scrollable modal content (false by default).
+      // size: Size of a new modal window. ‘sm’ | ‘lg’ | ‘xl’ | string;
+      // windowClass: A custom class to append to the modal window.
+      // backdropClass: A custom class to append to the modal backdrop.
+      // Using componetInstance we can pass data object to modal contents.
+    });
+
+
+  modalRef.componentInstance.huesped = huesped;
+  modalRef.result.then((result) => {
+    console.log(result);
+  }, (reason) => {
+  });
+  }
 }

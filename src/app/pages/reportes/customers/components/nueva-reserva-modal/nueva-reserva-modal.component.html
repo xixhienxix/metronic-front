@@ -1,24 +1,26 @@
 <div class="modal-content">
 <ng-container *ngIf="huesped.id == undefined">
   <div style="background-color: #00506a;" class="modal-header">
-    <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center"
+    <div style="text-align: center; color: white;" class="text-center modal-title h4 col-10"
       id="example-modal-sizes-title-lg">
-      NUEVA RESERVA / BLOQUEO
+      NUEVA RESERVA
       <!-- <label>
         {{huesped.folio}}</label> -->
     </div>
+    <button style="background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+
   </div>
 </ng-container>
 
 
 </div>
 
-   <form (submit)="save(); open(content)" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
-    <div class="overlay overlay-block cursor-default modal-body" style="background-color: #e6e9ed">
+    <div class="cursor-default overlay overlay-block modal-body" style="background-color: #e6e9ed">
+   <form (ngSubmit)="onSubmit(); customerServiceFetch()" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
 
 <div class="row">
 <!--Hidden-->
-  <div class="form-group hidden">
+  <div class="hidden form-group">
     <div class="input-group">
       <input hidden name="datepicker"
              class="form-control"
@@ -31,7 +33,8 @@
              [dayTemplate]="t"
              outsideDays="hidden"
              [startDate]="fromDate!"
-             tabindex="-1">
+             tabindex="-1"
+             [minDate]=today>
       <ng-template #t let-date let-focused="focused">
         <span class="custom-day"
               [class.focused]="focused"
@@ -48,7 +51,7 @@
 
 
   <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Rango de Fecha</label>
-  <div class="input-group mb-3 col-lg-9">
+  <div class="mb-3 input-group col-lg-9">
     <div class="input-group-prepend">
       <button style="border-top: 2px solid #dadcdf;border-bottom: 2px solid #dadcdf;border-left: 2px solid #dadcdf; background-color: transparent;" class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
         <i class="fa fa-calendar icon"></i>
@@ -86,7 +89,7 @@
   <!--Calendar Footer-->
     <ng-template #footerTemplate>
     <hr class="my-0">
-    <button class="btn btn-secondary btn-sm m-2 float-right" (click)="datepicker.close()">Confirmar</button>
+    <button class="float-right m-2 btn btn-secondary btn-sm" (click)="datepicker.close()">Confirmar</button>
     </ng-template>
   <!--Calendar Footer-->
 </div>
@@ -103,11 +106,10 @@
                     </div>
                     <input
                       style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;  border-left: 2px solid #e6e9ed;"
-                      class="input-group form-control form-control-lg form-control-solid text-center"
+                      class="text-center input-group form-control form-control-lg form-control-solid"
                       #controladultos
                       placeholder=""
-                      type="number"
-                      max="6"
+                      disabled
                       name="adultos"
                       [value]="quantity"
                       formControlName="adultos"
@@ -143,9 +145,8 @@
                     </div>
                     <input
                       style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; border-left: 2px solid #e6e9ed;"
-                      type="number"
-                      max="6"
-                      class="input-group form-control form-control-lg form-control-solid text-center" placeholder=""
+                      disabled
+                      class="text-center input-group form-control form-control-lg form-control-solid" placeholder=""
                       name="ninos"
                       [value]="quantityNin"
                       value={{huesped.ninos}}
@@ -178,13 +179,18 @@
                           name="habitacion"
                           formControlName="habitacion"
                           (change)="habValue($event)"
-                        >
-                        <option selected value="0">-- Cualquiera ---</option>
-                        <option value="1">Todos los Cuartos</option>
+                          #tipodeCuartoDropDown
+                          value="1"
+                          >
+                        <option value="0">-- Selecciona Habitación ---</option>
+                        <option value="1">Todas las Habitaciones</option>
                         <ng-container *ngFor="let tipoCuarto of codigoCuarto">
                           <option> {{tipoCuarto.replace("_"," ")}} </option>
                         </ng-container>
                       </select>
+                      <mat-error *ngIf="habitacion.errors?.required">
+                        * Campo Obligatorio
+                      </mat-error>
                 </div>
               </div>
 
@@ -196,18 +202,16 @@
                     <button
                       style="background-color: #ffce54;"
                         class="btn btn-block"
-                        (click)="buscaDispo();setStep(1) "
+                        (click)="setStep(1);buscaDispo(); "
                         type="button"
                         > Buscar Disponibilidad
                     </button>
                   </div>
               </div>
           </div>
-      </div>
+<br>
 
-
-
-  <ng-container *ngIf="disponibilidad.length !==0 ">
+  <ng-container *ngIf="mySet.size !==0 ">
       <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel  [expanded]="step === 1"  hideToggle>
             <mat-expansion-panel-header style="background-color:#99d284;">
@@ -218,70 +222,76 @@
              <!-- <mat-icon>account_circle</mat-icon> -->
             </mat-panel-description>
             <mat-panel-description *ngIf="bandera==true">
-
               <!-- <mat-icon>account_circle</mat-icon> -->
              </mat-panel-description>
           </mat-expansion-panel-header>
 
           <!--Contenido del Accordion-->
             <div  class="table-responsive angular-bootstrap-table">
-              <table *ngIf="bandera==false" class="table table-head-custom table-vertical-center overflow-hidden">
+              <table *ngIf="bandera==false" class="table overflow-hidden table-head-custom table-vertical-center">
                 <div class="font-weight-bold text-uppercase modal-header"> {{cuarto.replace("_"," ")}} </div>
                 <thead>
                   <th>
                     # de Cuarto
                   </th>
-                  <th>
+                  <!-- <th>
                     Descripcion
-                  </th>
+                  </th> -->
                   <th>
                     Capacidad
                   </th>
                   <th>
                     Tarifa
                   </th>
+                  <th>
+                    Total
+                  </th>
                 </thead>
                 <ng-container *ngFor="let habitacionesDisponibles of mySet">
                 <ng-container *ngFor="let tipocuarto of cuartos">
                 <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
                   <tr>
-                    <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
-                    <td >{{ tipocuarto.Descripcion}}</td>
+                    <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                    <!-- <td >{{ tipocuarto.Descripcion}}</td> -->
                     <td >{{ tipocuarto.Personas }} Adultos</td>
-                    <td >{{ tipocuarto.Tarifa }}.00</td>
+                    <td >$ {{ tipocuarto.Tarifa }}.00</td>
+                    <td >$ {{ tipocuarto.Tarifa * diaDif}}.00</td>
                   </tr>
                 </tbody>
               </ng-container>
             </ng-container>
               </table>
 
-
 <ng-container *ngIf="bandera==true">
   <ng-container *ngFor="let codigosCuarto of codigoCuarto;  let i = index">
     <div class="font-weight-bold text-uppercase modal-header">{{codigosCuarto.replace("_"," ")}}</div>
-        <table  class="table table-head-custom table-vertical-center overflow-hidden">
+        <table  class="table overflow-hidden table-head-custom table-vertical-center">
           <thead>
             <th>
               # de Cuarto
             </th>
-            <th>
+            <!-- <th>
               Descripcion
-            </th>
+            </th> -->
             <th>
               Capacidad
             </th>
             <th>
               Tarifa
             </th>
+            <th>
+              Total
+            </th>
           </thead>
           <ng-container *ngFor="let habitacionesDisponibles of mySet">
           <ng-container *ngFor="let tipocuarto of cuartos">
           <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
             <tr>
-              <td ><mat-checkbox (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
-              <td >{{ tipocuarto.Descripcion}}</td>
+              <td ><mat-checkbox formControlName="checkbox" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+              <!-- <td >{{ tipocuarto.Descripcion}}</td> -->
               <td >{{ tipocuarto.Personas }} Adultos</td>
-              <td >{{ tipocuarto.Tarifa }}.00</td>
+              <td >$ {{ tipocuarto.Tarifa }}.00</td>
+              <td >$ {{ tipocuarto.Tarifa * diaDif}}.00</td>
             </tr>
           </tbody>
         </ng-container>
@@ -295,8 +305,9 @@
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
-     <ng-container *ngIf="disponibilidad.length === 0 && inicio===false"  >
-      <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
+     <!--SIN DISPONIBILIDAD-->
+     <ng-container *ngIf="mySet.size === 0 && inicio===false"  >
+      <mat-accordion  [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel>
             <mat-expansion-panel-header style="background-color:#fa6d7c;">
             <mat-panel-title>
@@ -308,31 +319,31 @@
               <!-- <mat-icon>account_circle</mat-icon> -->
             </mat-panel-description>
           </mat-expansion-panel-header>
-
           <!--Contenido del Accordion-->
-
-
         </mat-expansion-panel>
       </mat-accordion>
      </ng-container>
 
+     <br>
+
      <div style="background-color:#00506a;" class="modal-tittle">
-      <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="modal-title h5 col-12 text-center">
+      <div style="color: white; padding-top: 1%; padding-bottom: 1%;" class="text-center modal-title h5 col-12">
         Agrega Húesped
       </div>
-  </div>
+     </div>
 
-    <div class="overlay overlay-block cursor-default modal-body" style="background-color: #dadcdf">
+    <div class="cursor-default overlay overlay-block modal-body" style="background-color: #dadcdf">
       <div class="form-group">
         <div class="row">
           <label class="form-label" for="form1">Buscar en Historico</label>
-          <div  class="input-group col-lg-12 text-center">
-              <input  type="search"
+          <div  class="text-center input-group col-lg-12">
+              <input  #filterName
+                      type="search"
                       placeholder="Busca por Nombre"
                       aria-label="Number"
                       matInput
                       formControlName="searchTerm"
-                      class="form-control col-lg-12 text-center"
+                      class="text-center form-control col-lg-12"
                       (keyup)="showList($event)"
                       value="{{searchValue}}"
                       oninput="this.value = this.value.toLowerCase()"
@@ -343,6 +354,7 @@
           </div>
         </div>
         <div  [style]="displayNone" class="name-container-dropdown">
+          <button type="button" (click)="closeList();filterName.value = '';limpiaInput() " class="btn btn-block" style="background-color: #025976; font-weight: bold; color: white;">Cancelar</button>
           <mat-selection-list  (click)="closeList(); onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
             <mat-list-option *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
               {{huesped.nombre}}
@@ -363,10 +375,9 @@
               placeholder="Nombre completo"
               autocomplete="off"
               [class.is-invalid]="isControlInvalid('nombre')"
-              [class.is-valid]="isControlValid('nombre')"
               formControlName="nombre"
               value="{{huesped.nombre}}"
-            />
+            /><!--[class.is-valid]="isControlValid('nombre')"-->
             <div class="valid-feedback" *ngIf="isControlValid('nombre')">
               Nombre Escrito Correctamente
             </div>
@@ -388,6 +399,9 @@
             >
               Maximo 100 letras
             </div>
+            <mat-error *ngIf="nombre.errors?.required">
+              * Escribe tu Nombre
+            </mat-error>
           </div>
         </div>
 
@@ -402,13 +416,14 @@
             name="email"
             placeholder="Escribe tu Email"
             autocomplete="off"
-            [class.is-invalid]="isControlInvalid('email')"
-            [class.is-valid]="isControlValid('email')"
             formControlName="email"
-            (input)="emailValidator($event.target.value)"
             value="{{huesped.email}}"
-          />
-          <div class="valid-feedback" *ngIf="isControlValid('email')">
+            [class.is-invalid]="isControlInvalid('email')"/>
+            <!--(input)="emailValidator($event.target.value)/>"-->
+          <!--
+          [class.is-invalid]="isControlInvalid('email')"
+            [class.is-valid]="isControlValid('email')"-->
+          <!-- <div class="valid-feedback" *ngIf="isControlValid('email')">
             Email Escrito Correctamente
           </div>
           <div
@@ -428,7 +443,7 @@
           *ngIf="controlHasError('pattern', 'email')"
         >
           Escriba un correo valido
-        </div>
+        </div> -->
         </div>
 
         <div class="col-lg-6">
@@ -439,15 +454,15 @@
             name="telefono"
             placeholder="Teléfono"
             autocomplete="off"
-            [class.is-invalid]="isControlInvalid('telefono')"
-            [class.is-valid]="isControlValid('telefono')"
             formControlName="telefono"
-            value="{{huesped.telefono}}"
-          />
+            value="{{huesped.telefono}}"/>
+           <!--[class.is-invalid]="isControlInvalid('telefono')"/>-->
+          <!--[class.is-invalid]="isControlInvalid('telefono')"
+            [class.is-valid]="isControlValid('telefono')"-->
           <!-- <div class="invalid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Invalido
           </div> -->
-          <div class="valid-feedback" *ngIf="isControlValid('telefono')">
+          <!-- <div class="valid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Escrito Correctamente
           </div>
           <div
@@ -467,7 +482,7 @@
           *ngIf="controlHasError('pattern', 'telefono')"
           >
            Solo se permiten números
-        </div>
+        </div> -->
         </div>
 
       </div>
@@ -476,7 +491,7 @@
 
 
     <div style="background-color:#00506a;" class="modal-header">
-      <div style="text-align: center; color: white;" class="modal-title h4 col-12 text-center "
+      <div style="text-align: center; color: white;" class="text-center modal-title h4 col-12 "
         id="example-modal-sizes-title-lg">
        Confirmar el Tipo de Reserva
         <div class="form-group row">
@@ -486,6 +501,7 @@
                 style="background-color:#99d284 ;"
                 type="submit"
                 name="estatus"
+                [disabled]="preAsig.size===0||!isControlValid('nombre') || this.todayString!=dpFromDate.value"
                 (click)="setEstatus(1)"
                 >
                   Realiza Walk-In
@@ -497,6 +513,7 @@
                 style="background-color:#fac34e ;"
                 type="submit"
                 name="estatus"
+                [disabled]="preAsig.size===0||!isControlValid('nombre')"
                 (click)="setEstatus(2); "
                 >
                   Agrega Reserva
@@ -507,8 +524,10 @@
                 class="btn btn-block"
                 style="background-color:#d0aaec ;"
                 type="submit"
+                [disabled]="preAsig.size===0||!isControlValid('nombre')"
                 (click)="setEstatus(5)"
                 >
+
                   Reserva Uso Interno
                 </button>
           </div>
@@ -518,6 +537,7 @@
                   style="background-color:#fab3db ;"
                   type="submit"
                   value="7"
+                  [disabled]="preAsig.size===0||!isControlValid('nombre')"
                   (click)="setEstatus(7)"
                   >
                   Reserva Temporal
@@ -558,3 +578,32 @@
   </div>
 </div>
 
+  <ng-template #error let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Error</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>
+
+  <ng-template #exito let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">Húesped Guardado con exito</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- <div class="modal-body">
+      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+    </div> -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>

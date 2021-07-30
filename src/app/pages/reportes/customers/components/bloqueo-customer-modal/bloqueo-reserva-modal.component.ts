@@ -1,4 +1,4 @@
-import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {  Component, Input, OnDestroy, OnInit, ViewChild,ViewEncapsulation,ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import {  of, Subscription } from 'rxjs';
@@ -16,6 +16,10 @@ import {  NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { BloqueoService } from '../../../_services/bloqueo.service'
 import { Bloqueo } from '../../../_models/bloqueo.model';
+import {FormControl} from '@angular/forms';
+import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { DisponibilidadService } from '../../../_services/disponibilidad.service';
+
 
 let date: Date = new Date();
 declare global {
@@ -25,14 +29,11 @@ declare global {
 }
 
 
-
-
-
-
 @Component({
   selector: 'app-edit-customer-modal',
   templateUrl: './bloqueo-reserva-modal.component.html',
   styleUrls: ['./bloqueo-reserva-modal.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   styles:[`
 
 
@@ -62,6 +63,7 @@ declare global {
 
 
 `],
+
   // NOTE: For this example we are only providing current component, but probably
   // NOTE: you will w  ant to provide your main App Module
   providers: [
@@ -74,69 +76,146 @@ declare global {
 export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 {
   // @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
+  @ViewChild('matSelect') matSelect = null;
+  @ViewChild('exito') miniModal = null;
+  @ViewChild('fechaIncorrecta') fechaIncorrecta = null;
 
   @Input()
 
+  last_selection = null;
 //DATETIMEPICKER RANGE
+
+  habitacionfb = new FormControl();
   hoveredDate: NgbDate | null = null;
 
-  fromDate: NgbDate | null;
-  fromDate1: string;
+  //Date Variables
 
+  fromDate: NgbDate | null;
+  today: NgbDate | null;
   toDate: NgbDate | null;
 
 
+
+
+  fechaInvalida:boolean=false
+
+  checkAll = false;
   isLoading$;
   habitaciones:Habitaciones;
-  formGroup: FormGroup;
+  bloqueoFormGroup: FormGroup;
+  checkboxFormGroup: FormGroup;
   myControl: FormGroup;
+  mySet = new Set();
+  placeHolder:string="-- Seleccione Habitación --"
+  setEmpty:boolean=true;
   public cuartos:Habitaciones[]=[];
-  public codigoCuarto:Habitaciones[]=[];
-  public infoCuarto:Habitaciones[]=[];
+  public codigoCuarto:any[]=[];
+  public infoCuarto:any[]=[];
+  //Busca Dispo
   public disponibilidad:Disponibilidad[]=[];
-  public sinDisponibilidad:any[]=[]
+  public sinDisponibilidad:any[]=[];
+
+
   public estatusArray:Estatus[]=[];
   public folioactualizado:any;
+  public tipodeCuartoFiltrados:Array<string>=[];
   cuarto:string;
-  numCuarto: string;
+  numCuarto: Array<number>=[];
+
   sinSalidasChecked:boolean=false;
   sinLlegadasChecked:boolean=false;
-  fueraDeServicio:boolean;
+  fueraDeServicioChecked:boolean=false;
+
+  sinSalidasCheck:boolean=false;
+  sinLlegadasCheck:boolean=false;
+  // fueraDeServicio:boolean;
   private subscriptions: Subscription[] = [];
   public listaBloqueos:Bloqueo[];
   _isDisabled:boolean=true;
-  tipoDeCuarto:string;
+  tipoDeCuarto:Array<string>=[];
   closeResult: string;
+  habitacionNumero:number;
+  idDelete:string;
+  desdeDelete:string;
+  hastaDelete:string;
+  habitacionDelete:Array<string>;
+  numeroDelete:Array<number>;
+
+  //DOM Properties
+  error:string=null;
+  isLoading:boolean=true
+  statusBloqueo:string
+  fechaInicialBloqueo:string
+  fechaFinalBloqueo:string
+  comparadorInicial:Date
+  comparadorFinal:Date
+  display:boolean=true
+  isSubmitted:boolean
 
 
+  public tipoCuartoForm: FormBuilder
 
-
-
-  constructor(
+    constructor(
     //Date Imports
+    public fb: FormBuilder,
     private modalService: NgbModal,
     private calendar: NgbCalendar,
     public formatter: NgbDateParserFormatter,
     public habitacionService : HabitacionesService,
-    private fb: FormBuilder, public modal: NgbActiveModal,
+    public modal: NgbActiveModal,
     public estatusService: EstatusService,
     public bloqueoService: BloqueoService,
+    public disponibilidadService:DisponibilidadService,
     public postService : ReportesComponent,
     private http: HttpClient,
     public i18n: NgbDatepickerI18n
-    ) {
+    )
+    {
+      this.today= calendar.getToday();
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
+      this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+      this.comparadorInicial=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
+      this.comparadorFinal=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
     }
 
 
 
   ngOnInit(): void {
+
+    this.loadForm();
     this.getCodigosCuarto();
     this.getHabitaciones();
     this.getEstatus();
     this.getBloqueos();
+
   }
+//VALIDATORS & FORM
+myselectedFoods = ['',Validators.required];
+
+foodForm: FormControl = new FormControl(this.myselectedFoods);
+
+loadForm() {
+
+  this.bloqueoFormGroup = this.fb.group({
+    'tipoCuarto': [ undefined, Validators.required ],
+    'numeroHab' : [undefined,Validators.required],
+  });
+
+}
+
+get tipoCuarto() { return this.bloqueoFormGroup.get('tipoCuarto') }
+get numeroHab() { return this.bloqueoFormGroup.get('numeroHab') }
+
+onFormSubmit(value: string) {
+  if (this.bloqueoFormGroup.valid) {
+    this.save(value.trim())  }
+  else {
+    console.log('invalid');
+  }
+}
+
 
 
   getHabitaciones()
@@ -150,6 +229,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   getCodigosCuarto()
   {
+    this.codigoCuarto=[]
     this.habitacionService.getCodigohabitaciones()
     .pipe(map(
       (responseData)=>{
@@ -163,7 +243,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       }))
       .subscribe((codigoCuarto)=>{
         this.codigoCuarto=(codigoCuarto)
-        console.log("distinct Codigos de cuarto",this.codigoCuarto)
       })
   }
 
@@ -189,42 +268,31 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   }
 
+
   getBloqueos()
   {
-    this.bloqueoService.getBloqueos()
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-          postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
-      .subscribe((bloqueos)=>{
-        this.listaBloqueos=(bloqueos)
-        console.log("Lista de Bloqueos: ",this.listaBloqueos)
-      })
+    this.listaBloqueos=[];
+      this.bloqueoService.getBloqueos().subscribe((responseData)=>{
+        this.listaBloqueos=responseData
+        this.isLoading=false
+      }, error=>{
+        this.error="Algo Salio Mal Actualize la pagina"
+      });
   }
 
 
-  // loadForm() {
-
-  //   this.formGroup = this.fb.group({
-  //     cuarto:[this.huesped.llegada, Validators.compose([Validators.required])],
-  //     habitacion:[this.huesped.llegada, Validators.compose([Validators.required])]
-  //   });
-  // }
 
 
   save(text:string) {
   this.postBloqueo(text);
   }
 
-
+  onlyUnique(value, index, self) {
+    return self.indexOf(value) === index;
+  }
 
   private postBloqueo(text:string) {
+
 
     let desde;
     let hasta;
@@ -235,62 +303,133 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     this.numCuarto;
     this.sinLlegadasChecked;
 
-    if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
-    { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+    // if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
+    // { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+
 
         desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
 
-  let post = this.postService.postBloqueo
+        let unique = this.tipodeCuartoFiltrados.filter(this.onlyUnique)
+
+
+  let post = this.bloqueoService.postBloqueo
     (
+      "_id",
       desde,
       hasta,
-      this.tipoDeCuarto,
-      parseInt(this.numCuarto),
+      unique,
+
+      this.numCuarto,
       this.sinLlegadasChecked,
       this.sinSalidasChecked,
-      this.fueraDeServicio,
+      this.fueraDeServicioChecked,
       text
+    ).subscribe(
+      ()=>{
+        this.statusBloqueo="Bloqueo Generado con Exito"
+        this.openMini(this.miniModal)
+        this.initializeBloqueo()
+
+      },
+      (err)=>{
+        if (err)
+        this.statusBloqueo="Hubo un problema al guardar el bloqueo actualize la pagina eh intente nuevamente"
+        this.openMini(this.miniModal)
+      },
+      ()=>
+      {
+       //Complete Regardless
+      },
     );
       this.listaBloqueos=[]
-      this.getBloqueos();
-      this.modal.close();
+      unique=[]
+      this.numCuarto=[]
+      this.tipodeCuartoFiltrados=[]
+      this.sinSalidasChecked=false
+      this.sinLlegadasChecked=false
+      //this.getBloqueos();
+      //this.modal.close();
+
+  }
+
+initializeBloqueo(){
+  this.mySet.clear();
+        this.getBloqueos();
+        this.getCodigosCuarto();
+        this.fromDate = this.calendar.getToday();
+        this.toDate = this.calendar.getNext(this.calendar.getToday(), 'd', 1);
+        this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
+        this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+        this.comparadorInicial=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
+        this.loadForm();
+}
+
+  edit(_id:string,
+    desde:string,
+    hasta:string,
+    habitacion:string[],
+    cuarto:number[],
+    sinLlegadas:boolean,
+    sinSalidas:boolean,
+    fueraDeServicio:boolean,
+    comentarios:string,
+    ) {
+
+ this.bloqueoService.actualizaBloqueos(_id,desde,hasta,habitacion,cuarto,sinLlegadas,sinSalidas,fueraDeServicio,comentarios).subscribe((response)=>{
+   if(response.status==200)
+   {
+     this.statusBloqueo="Bloqueo Actualizado Correctamente"
+     this.openMini(this.miniModal)
+   }else
+   {
+    this.statusBloqueo="Hubo un problema refresque la pagina eh intente nuevamente"
+    this.openMini(this.miniModal)
+   }
+ });
 
   }
 
 
-  edit(id:number) {
+  borrar(_id:string,desde:string,hasta:string,habitacion:Array<string>,numero:Array<number>) {
 
-  //   this.bloqueoService.getBloqueosbyId();
+    this.bloqueoService.deleteBloqueo(_id).subscribe((response)=>{
+      if(response.status==200)
+        {
+          this.statusBloqueo="Bloqueo Borrado Correctamente"
+          this.openMini(this.miniModal)
 
-  //   let desde;
-  //   let hasta;
+          this.bloqueoService.liberaBloqueos(_id,desde,hasta,habitacion,numero).subscribe((response)=>{
+            console.log("liberaDispo response",response)
+          });
 
-  //   this.fromDate.toString();
-  //   this.toDate.toString();
-  //   this.cuarto;
-  //   this.numCuarto;
-  //   this.sinLlegadasChecked;
 
-  //   if(this.sinLlegadasChecked &&  this.sinSalidasChecked)
-  //   { this.fueraDeServicio=true } else {this.fueraDeServicio=false}
+        }
+        else
+        {
+          this.statusBloqueo="Hubo un problema al eliminar el bloqueo, Actualize la pagina y intente nuevamente"
+          this.openMini(this.miniModal)
+        }
+      })
 
-  //       desde=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
-  //       hasta=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
+    //this
+    // .subscribe((response)=>{
+    //   console.log("suscribe",response)
+    //   if(response.status==200)
+    //   {
+    //     this.statusBloqueo="Bloqueo Borrado Correctamente"
+    //     this.openMini(this.miniModal)
 
-  // let post = this.postService.postBloqueo
-  //   (
-  //     desde,
-  //     hasta,
-  //     this.cuarto,
-  //     parseInt(this.numCuarto),
-  //     this.sinLlegadasChecked,
-  //     this.sinSalidasChecked,
-  //     this.fueraDeServicio,
-  //     text
-  //   );
-
-  //   const sbUpdate = this.postService.actualizaBloqueos(id);
+    //     this.bloqueoService.liberaBloqueos(_id,desde,hasta,habitacion,numero).subscribe((response)=>{
+    //       console.log("liberaDispo response",response)
+    //     });
+    //   }
+    //   else
+    //   {
+    //     this.statusBloqueo="Hubo un problema al eliminar el bloqueo, Actualize la pagina y intente nuevamente"
+    //     this.openMini(this.miniModal)
+    //   }
+    // });
 
   }
 
@@ -298,28 +437,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   ngOnDestroy(): void {
     this.subscriptions.forEach(sb => sb.unsubscribe());
   }
-
-  // helpers for View
-  isControlValid(controlName: string): boolean {
-    const control = this.formGroup.controls[controlName];
-    return control.valid && (control.dirty || control.touched);
-  }
-
-  isControlInvalid(controlName: string): boolean {
-    const control = this.formGroup.controls[controlName];
-    return control.invalid && (control.dirty || control.touched);
-  }
-
-  controlHasError(validation, controlName): boolean {
-    const control = this.formGroup.controls[controlName];
-    return control.hasError(validation) && (control.dirty || control.touched);
-  }
-
-  isControlTouched(controlName): boolean {
-    const control = this.formGroup.controls[controlName];
-    return control.dirty || control.touched;
-  }
-
 
 
 
@@ -341,41 +458,169 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     this.sinSalidasChecked=false;
   }
 
+  toggleFuera($event)
+  {
+    if($event.checked==true)
+    {
+      this.fueraDeServicioChecked = true;
+    }else
+    this.fueraDeServicioChecked=false;
+  }
+
   habValue($event)
   {
+    this.cuarto=$event.value;
+    this.sinDisponibilidad=[];
 
+    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
+    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
 
-    if($event.target.options.selectedIndex==1)
+    if(diaDif==0)
     {
-        this.cuarto=""
-        this.tipoDeCuarto="Todos"
-        this.habitacionService.gethabitaciones()
-          .subscribe((cuartos)=>{
-            this.infoCuarto=(cuartos)
+      diaDif=1;
+    }
+
+
+    if($event.value==1)
+    {
+        for (let i=0; i<diaDif; i++) {
+
+        this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
+        .pipe(map(
+          (responseData)=>{
+            const postArray = []
+            for(const key in responseData)
+            {
+              if(responseData.hasOwnProperty(key))
+               postArray.push(responseData[key]);
+            }
+            return postArray
+          }))
+          .subscribe((disponibles)=>{
+            this.mySet.clear()
+
+            for(i=0;i<disponibles.length;i++)
+            {
+              this.disponibilidad=(disponibles)
+              if(disponibles[i].Estatus==0)
+              {
+                this.sinDisponibilidad.push(disponibles[i].Habitacion)
+              }
+            }
+            for(i=0;i<this.sinDisponibilidad.length;i++)
+            {
+              this.mySet.delete(this.sinDisponibilidad[i])
+
+            }
           })
-    }else
+          fromDate.setDate(fromDate.getDate() + 1);
+        };
+    }
+
+    else
     {
-      this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
-      this.tipoDeCuarto=$event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
-      console.log("this.cuarto",this.cuarto)
-      this.infoCuarto = []
 
       this.habitacionService.getHabitacionesbyTipo(this.cuarto)
-      .subscribe((listado)=>{
-        this.infoCuarto=listado;
-      })
+      .pipe(map(
+        (responseData)=>{
+          const postArray = []
+          for(const key in responseData)
+          {
+            if(responseData.hasOwnProperty(key))
+            postArray.push(responseData[key]);
+          }
+          return postArray
+        }))
+        .subscribe((cuartos)=>{
+          this.cuartos=(cuartos)
+        })
+
+
+      for (let i=0; i<diaDif; i++) {
+
+      this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
+      .pipe(map(
+        (responseData)=>{
+          const postArray = []
+          for(const key in responseData)
+          {
+            if(responseData.hasOwnProperty(key))
+             postArray.push(responseData[key]);
+          }
+          return postArray
+        }))
+        .subscribe((disponibles)=>{
+          this.mySet.clear()
+          for(i=0;i<disponibles.length;i++)
+          {
+            this.disponibilidad=(disponibles)
+            if(disponibles[i].Estatus==0)
+            {
+              this.sinDisponibilidad.push(disponibles[i].Habitacion)
+            }
+             this.mySet.add(this.disponibilidad[i].Habitacion)
+          }
+          for(i=0;i<this.sinDisponibilidad.length;i++)
+          {
+            this.mySet.delete(this.sinDisponibilidad[i])
+          }
+
+          console.log("mySet x tipo",this.mySet)
+        })
+        fromDate.setDate(fromDate.getDate() + 1);
+      };
+
 
     }
-    // this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
 
   }
 
-  cuartoValue($event)
+  cuartoValue(selected:boolean,value:any)
   {
-    this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+    let index;
+    let indexTipo;
+    let codigo;
+
+    this.habitacionService.getHabitacionbyNumero(value)
+    .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          if(responseData.hasOwnProperty(key))
+          postArray.push(responseData[key]);
+        }
+        return postArray
+      }))
+      .subscribe((cuartos)=>{
+        codigo=(cuartos)
+        if(selected==true)
+        {
+          this.numCuarto.push(value);
+          this.tipodeCuartoFiltrados.push(codigo[0].Codigo)
+
+        }else if(selected==false)
+        {
+          index=this.numCuarto.indexOf(value,0)
+          this.numCuarto.splice(index,1)
+
+          indexTipo = this.tipodeCuartoFiltrados.indexOf(codigo[0].Codigo,0)
+          this.tipodeCuartoFiltrados.splice(indexTipo,1)
+        }
+      })
+
+    //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
-
+  Allchecked(event:any)
+  {
+    if(this.checkAll==false)
+    {
+      this.checkAll=true;
+    }else
+    this.checkAll=false;
+  }
   numCuartos($event)
   {
     this.cuartos=[]
@@ -412,62 +657,78 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
 
 //Date Helpers
-  onDateSelection(date: NgbDate) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
-      this.toDate = date;
-    } else {
-      this.toDate = null;
-      this.fromDate = date;
-    }
-  }
+fechaSeleccionadaInicial(event:NgbDate){
 
-  isHovered(date: NgbDate) {
-    return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  }
+  this.fromDate = event
 
-  isInside(date: NgbDate) {
-    return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-  }
+  this.comparadorInicial = new Date(event.year,event.month-1,event.day)
 
-  isRange(date: NgbDate) {
-    return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-  }
+  this.fechaInicialBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
 
-  validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
-    const parsed = this.formatter.parse(input);
-    return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
-
-  }
-
-  rangoFechas(llegada:string,salida:string)
+  if(this.comparadorInicial>this.comparadorFinal)
   {
-    let rangodeFechas
-    let toDate =   new Date(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
-    let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
-    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    this.display=false
+  }else if(this.comparadorInicial<this.comparadorFinal)
+  {this.display=true}
+}
 
-    rangodeFechas = llegada.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(llegada.split("/")[0]))+"/"+llegada.split("/")[2]+" - " +salida.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(salida.split("/")[0]))+"/"+salida.split("/")[2]
+fechaSeleccionadaFinal(event:NgbDate){
 
-    return rangodeFechas
-  }
+  this.toDate = event
 
+  this.comparadorFinal = new Date(event.year,event.month-1,event.day)
 
+  this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
 
-
+  if(this.comparadorInicial>this.comparadorFinal)
+  {
+    this.display=false
+  }else if(this.comparadorInicial<this.comparadorFinal)
+  {this.display=true}
+}
 
 
 //MODAL
-open(content) {
+openMini(exito) {
 
-  this.modalService.open(content).result.then((result) => {
+  this.modalService.open(exito,{ size: 'sm' }).result.then((result) => {
   this.closeResult = `Closed with: ${result}`;
   }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
   });
 
 }
+openFechaIncorrecta(fechaIncorrecta) {
+
+  this.modalService.open(fechaIncorrecta,{ size: 'sm' }).result.then((result) => {
+  this.closeResult = `Closed with: ${result}`;
+  }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  });
+
+}
+
+openDelete(borrar,id,desde,hasta,habitacion,numero) {
+
+  const modalRef = this.modalService.open(borrar,{ size: 'sm' });
+  this.idDelete = id
+  this.desdeDelete = desde
+  this.hastaDelete = hasta
+  this.habitacionDelete = habitacion
+  this.numeroDelete = numero
+
+  modalRef.result.then((result) => {
+  this.closeResult = `Closed with: ${result}`;
+  }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  });
+
+}
+
+// actualizaBloqueos()
+// {
+//   this.getBloqueos();
+// }
 
 private getDismissReason(reason: any): string {
   if (reason === ModalDismissReasons.ESC) {
@@ -480,7 +741,14 @@ private getDismissReason(reason: any): string {
 }
 
 
+//CheckBox
+okayChecked() {
+  // this.last_selection = this.formGroup.controls.project.value
+  this.matSelect.close()
+}
 
-
+closeModal(){
+  this.modal.close();
+}
 
   }

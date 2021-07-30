@@ -1,10 +1,5 @@
-thead
-{
-  color: #319dd7;
-}
-tbody
-{
-  color:white;
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 9999 !important;
 }
 
 ngb-pagination ::ng-deep a {

@@ -3,8 +3,9 @@ import { BaseModel } from '../../../_metronic/shared/crud-table';
 
 export interface Bloqueo
 {
-  Habitacion:string,
-  Cuarto:number;
+  _id:string;
+  Habitacion:Array<string>;
+  Cuarto:Array<number>;
   Desde:string;
   Hasta:string;
   sinLlegadas:boolean;

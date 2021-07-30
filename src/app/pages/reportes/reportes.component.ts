@@ -37,100 +37,13 @@ export class ReportesComponent implements OnInit {
     });
 
   }
+
   getPostUpdateListener() {
     return this.postsUpdated.asObservable();
   }
 
-  addPost(
-          id:number,
-          folio:number,
-          adultos:number,
-          ninos:number,
-          nombre:string,
-          estatus:string,
-          llegada:string,
-          salida:string,
-          noches:number,
-          tarifa:number,
-          porPagar:number,
-          pendiente:number,
-          origen:string,
-          habitacion:string,
-          telefono:string,
-          email:string,
-          motivo:string,
-          fechaNacimiento:string,
-          trabajaEn:string,
-          tipoDeID:string,
-          numeroDeID:string,
-          direccion:string,
-          pais:string,
-          ciudad:string,
-          codigoPostal:string,
-          lenguaje:string,
-          numeroCuarto:number) {
-    const post: Huesped = {id:id,folio:folio,adultos:adultos,
-      ninos:ninos,nombre:nombre, estatus:estatus,
-      llegada:llegada,salida:salida,
-      noches:noches,tarifa:tarifa,porPagar:porPagar,
-      pendiente:pendiente,origen:origen,habitacion:habitacion,
-      telefono:telefono,email:email,motivo:motivo,
-      fechaNacimiento:fechaNacimiento,trabajaEn:trabajaEn,
-      tipoDeID:tipoDeID,numeroDeID:numeroDeID,direccion:direccion,pais:pais,ciudad:ciudad,codigoPostal:codigoPostal,lenguaje:lenguaje,
-      numeroCuarto:numeroCuarto
-    };
-    this.http.post<any>(environment.apiUrl+"/reportes/huesped", post)
-
-    //   const promise = new Promise((resolve, reject) => {
-    //     const apiURL = environment.apiUrl;
-    //     this.http
-    //     .post<{ message: string }>(environment.apiUrl+"/reportes/huesped", post)
-    //     .toPromise()
-    //     .then(()=>{
-    //       console.log("Post Enviado Con Exito")
-    //     }).catch(error => console.log(error));
-    //   return promise;
-    // })
-    }
-
-    postBloqueo(
-      desde:string,
-      hasta:string,
-      cuarto:string,
-      numCuarto:number,
-      sinLlegadasChecked:boolean,
-      sinSalidasChecked:boolean,
-      fueraDeServicio:boolean,
-      text:string
-      ) {
-const bloqueos: Bloqueo = {
-  Habitacion:cuarto,
-  Cuarto:numCuarto,
-  Desde:desde,
-  Hasta:hasta,
-  sinLlegadas:sinLlegadasChecked,
-  sinSalidas:sinSalidasChecked,
-  fueraDeServicio:fueraDeServicio,
-  Comentarios:text
-
-};
-    this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", bloqueos)
-    .subscribe((response)=>
-    {
-      console.log("exito",response.msg)
-    })
-
-    }
 
 
-    actualizaBloqueos(id:number)
-    {
-      this.http
-      .post<{ message: string }>(environment.apiUrl+"/post/bloqueos/:id", id)
-      .subscribe(responseData => {
-        console.log(responseData.message);
-      });
-    }
 
   actualizaEstatusHabitacion(id:number)
   {

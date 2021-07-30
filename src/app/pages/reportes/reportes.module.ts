@@ -55,6 +55,13 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatMenuTrigger} from '@angular/material/menu';
 import { DialogComponent } from './customers/components/nueva-reserva-modal/components/dialog/dialog.component';
 import { BloqueoReservaModalComponent } from './customers/components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+import { ConfirmationModalComponent } from './customers/components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
+
+// the second parameter 'fr' is optional
+registerLocaleData(localeEs);
 
 @NgModule({
   declarations: [
@@ -84,6 +91,7 @@ import { BloqueoReservaModalComponent } from './customers/components/bloqueo-cus
     MessagesComponent,
     NuevaReservaModalComponent,
     BloqueoReservaModalComponent,
+    ConfirmationModalComponent,
 
   ],
   imports: [
@@ -150,9 +158,11 @@ import { BloqueoReservaModalComponent } from './customers/components/bloqueo-cus
     BloqueoReservaModalComponent,
 
 
-  ]
+  ],
+  providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' },
+]
 })
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReportesModule {}
