@@ -41,30 +41,30 @@ export const DynamicAsideMenuConfig = {
     //   ]
     // },
 
-    { section: 'Consultas' },
+    // { section: 'Consultas' },
 
 
     /////////////////
 
-     {
+    //  {
 
 
-      title: 'Reportes',
-      bullet: 'dot',
-      icon: 'flaticon2-list-2',
-      svg: './assets/media/svg/icons/Shopping/Cart3.svg',
-      root: true,
-      permission: 'accessToReportesModule',
-      page: '/reportes',
-      submenu: [
-          {
-            title: 'Lista de Huespedes',
-            page: '/reportes/customers',
-            permission: 'accessToReportesModule'
-          },
+    //   title: 'Reportes',
+    //   bullet: 'dot',
+    //   icon: 'flaticon2-list-2',
+    //   svg: './assets/media/svg/icons/Shopping/Cart3.svg',
+    //   root: true,
+    //   permission: 'accessToReportesModule',
+    //   page: '/reportes',
+    //   submenu: [
+    //       {
+    //         title: 'Lista de Huespedes',
+    //         page: '/reportes/customers',
+    //         permission: 'accessToReportesModule'
+    //       },
 
-        ]
-      },
+    //     ]
+    //   },
     //     {
     //       title: 'Navigation',
     //       bullet: 'dot',
