@@ -691,32 +691,20 @@ fechaSeleccionadaFinal(event:NgbDate){
 //MODAL
 openMini(exito) {
 
-  const modalRef = this.modalService.open(exito,{ size: 'sm' });
-  modalRef.result.then((result) => {
+  this.modalService.open(exito,{ size: 'sm' }).result.then((result) => {
   this.closeResult = `Closed with: ${result}`;
   }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
   });
-  setTimeout(() => {
-    modalRef.close('Close click');
-  },4000)
+
 }
-
-
 openFechaIncorrecta(fechaIncorrecta) {
 
- const modalRef = this.modalService.open(fechaIncorrecta,{ size: 'sm' });
-
- modalRef.result.then((result) => {
+  this.modalService.open(fechaIncorrecta,{ size: 'sm' }).result.then((result) => {
   this.closeResult = `Closed with: ${result}`;
   }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
   });
-
-    setTimeout(() => {
-      modalRef.close('Close click');
-    },4000)
-
 
 }
 
@@ -734,9 +722,7 @@ openDelete(borrar,id,desde,hasta,habitacion,numero) {
   }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
   });
-  setTimeout(() => {
-    modalRef.close('Close click');
-  },4000)
+
 }
 
 // actualizaBloqueos()
