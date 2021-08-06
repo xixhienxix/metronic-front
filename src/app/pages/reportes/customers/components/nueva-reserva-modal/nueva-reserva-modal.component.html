@@ -227,39 +227,35 @@
           </mat-expansion-panel-header>
 
           <!--Contenido del Accordion-->
-            <div  class="table-responsive angular-bootstrap-table">
-              <table *ngIf="bandera==false" class="table overflow-hidden table-head-custom table-vertical-center">
-                <div class="font-weight-bold text-uppercase modal-header"> {{cuarto.replace("_"," ")}} </div>
+          <div  class="table-responsive angular-bootstrap-table">
+            <div class="font-weight-bold text-uppercase modal-header">{{cuarto.replace("_"," ")}}</div>
+              <table *ngIf="bandera===false" class="table overflow-hidden table-head-custom table-vertical-center">
                 <thead>
-                  <th>
-                    # de Cuarto
-                  </th>
-                  <!-- <th>
-                    Descripcion
-                  </th> -->
-                  <th>
-                    Capacidad
+                  <th  >
+                    HABITACION
                   </th>
                   <th>
-                    Tarifa
+                  $ TARIFA
                   </th>
                   <th>
-                    Total
+                   $ TOTAL
+                  </th>
+                  <th >
+                    CAPACIDAD
                   </th>
                 </thead>
                 <ng-container *ngFor="let habitacionesDisponibles of mySet">
-                <ng-container *ngFor="let tipocuarto of cuartos">
-                <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
-                  <tr>
-                    <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
-                    <!-- <td >{{ tipocuarto.Descripcion}}</td> -->
-                    <td >{{ tipocuarto.Personas }} Adultos</td>
-                    <td >$ {{ tipocuarto.Tarifa }}.00</td>
-                    <td >$ {{ tipocuarto.Tarifa * diaDif}}.00</td>
-                  </tr>
-                </tbody>
+                  <ng-container *ngFor="let tipocuarto of cuartos">
+                  <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles">
+                    <tr>
+                      <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                      <td >{{ tipocuarto.Tarifa.toLocaleString("es-MX") }}.00</td>
+                      <td >{{ (tipocuarto.Tarifa * diaDif).toLocaleString("es-MX") }}.00</td>
+                      <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td>
+                    </tr>
+                  </tbody>
+                </ng-container>
               </ng-container>
-            </ng-container>
               </table>
 
 <ng-container *ngIf="bandera==true">
@@ -267,35 +263,31 @@
     <div class="font-weight-bold text-uppercase modal-header">{{codigosCuarto.replace("_"," ")}}</div>
         <table  class="table overflow-hidden table-head-custom table-vertical-center">
           <thead>
-            <th>
-              # de Cuarto
-            </th>
-            <!-- <th>
-              Descripcion
-            </th> -->
-            <th>
-              Capacidad
+            <th  >
+              HABITACION
             </th>
             <th>
-              Tarifa
+            $ TARIFA
             </th>
             <th>
-              Total
+             $ TOTAL
+            </th>
+            <th >
+              CAPACIDAD
             </th>
           </thead>
           <ng-container *ngFor="let habitacionesDisponibles of mySet">
-          <ng-container *ngFor="let tipocuarto of cuartos">
-          <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo==codigosCuarto">
-            <tr>
-              <td ><mat-checkbox formControlName="checkbox" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
-              <!-- <td >{{ tipocuarto.Descripcion}}</td> -->
-              <td >{{ tipocuarto.Personas }} Adultos</td>
-              <td >$ {{ tipocuarto.Tarifa }}.00</td>
-              <td >$ {{ tipocuarto.Tarifa * diaDif}}.00</td>
-            </tr>
-          </tbody>
+            <ng-container *ngFor="let tipocuarto of cuartos">
+            <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo == codigosCuarto">
+              <tr>
+                <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                <td >{{ tipocuarto.Tarifa.toLocaleString("es-MX") }}.00</td>
+                <td >{{ (tipocuarto.Tarifa * diaDif).toLocaleString("es-MX") }}.00</td>
+                <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td>
+              </tr>
+            </tbody>
+          </ng-container>
         </ng-container>
-      </ng-container>
         </table>
   </ng-container>
 </ng-container>
