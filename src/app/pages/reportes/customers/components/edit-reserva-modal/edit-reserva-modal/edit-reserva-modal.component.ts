@@ -448,4 +448,8 @@ export class EditReservaModalComponent implements OnInit {
          this.checked=false ;
        }
     }
+
+    closeModal(){
+      this.modal.close();
+    }
   }

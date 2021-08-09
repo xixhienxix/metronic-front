@@ -1,10 +1,16 @@
 
-<div style="background-color:#162F58;" class="modal-header">
-  <div style="color:#162F58; font: bold; color:white" class="modal-title h4 col-12 text-center"
-    id="example-modal-sizes-title-lg">
-    FOLIO: {{huesped.folio}} - {{huesped.nombre}}
-  </div>
-</div>
+<div style="background-color:#00506a;" class="modal-header">
+  <div style=" font: bold; color:white" class="modal-title h4 col-12" id="example-modal-sizes-title-lg">
+     <div class="row">
+      <h2 style="font-size: 1.5em;">{{huesped.nombre}}</h2>  
+      <button style="position:absolute; top:0; right:0; background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+     </div> 
+     <div class="row">
+      <small style="color: white;  font-size: 1em;">ID RVA : &nbsp; <small style="font-size: 1em; font-weight: bold; color:#319dd7">{{huesped.folio}}</small> </small>
+      &nbsp; &nbsp; &nbsp; &nbsp;
+      <small style="color: white;  font-size: 1em;">Hab.: &nbsp; <small style="font-weight: bold; font-size: 1em; color:#319dd7">{{huesped.numeroCuarto}} - {{huesped.habitacion}}</small> </small>
+
+     </div>
 
 
             <div style="background-color: rgba(243, 243, 243, 0.973);" class="col-md-12 cursor-default modal-content ">
@@ -80,6 +86,8 @@
                               </div>
                             </div>
           </div>
+  </div>  
+</div>
 
 <mat-tab-group class="col-md-12" style="min-width: 0;  padding: 3px;">
   <mat-tab label="Reserva">

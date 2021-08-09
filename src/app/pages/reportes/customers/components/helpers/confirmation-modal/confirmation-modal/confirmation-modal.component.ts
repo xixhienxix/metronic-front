@@ -36,26 +36,38 @@ export class ConfirmationModalComponent implements OnInit {
     .subscribe(
      ()=>
      {
-      this.modalService.open(this.exito,{size:'sm'}).result.then((result) => {
+      const modalRef = this.modalService.open(this.exito,{size:'sm'});
+      
+      modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         });
         this.customerService.fetch();
+
+        setTimeout(() => {
+          modalRef.close('Close click');
+        },4000)
     },
      (err)=>
      {
        console.log(err.message)
-      this.modalService.open(this.error,{size:'sm'}).result.then((result) => {
+      const modalRef = this.modalService.open(this.error,{size:'sm'})
+      modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-        });     },
+        });
+        setTimeout(() => {
+          modalRef.close('Close click');
+        },4000)     
+      },
      ()=>{
 
      }
 
    )
+
   }
 
   getDismissReason(reason: any): string {
