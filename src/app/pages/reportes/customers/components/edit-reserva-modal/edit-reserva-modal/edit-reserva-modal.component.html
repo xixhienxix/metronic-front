@@ -1,82 +1,71 @@
 
-<div style="background-color:#162F58;" class="modal-header">
-  <div style="color:#162F58; font: bold; color:white" class="modal-title h4 col-12 text-center"
-    id="example-modal-sizes-title-lg">
-    FOLIO: {{huesped.folio}} - {{huesped.nombre}}
+<div style="background-color:#00506a;" class="modal-header">
+  <div style=" font: bold; color:white" class="modal-title h4 col-12" id="example-modal-sizes-title-lg">
+     <div class="row">
+      <h2 style="font-size: 1.5em;">{{huesped.nombre}}</h2>  
+      <button style="position:absolute; top:0; right:0; background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+    </div> 
+    <div class="row">
+     <small style="color: white;  font-size: 1em;">ID RVA : &nbsp; <small style="font-size: 1em; font-weight: bold; color:#319dd7">{{huesped.folio}}</small> </small>
+     &nbsp; &nbsp; &nbsp; &nbsp;
+     <small style="color: white;  font-size: 1em;">Hab.: &nbsp; <small style="font-weight: bold; font-size: 1em; color:#319dd7">{{huesped.numeroCuarto}} - {{huesped.habitacion}}</small> </small>
+    </div>
   </div>
-</div>
+</div> 
 
+  <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+    <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+      <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+    </mat-select>
+  </ng-container>
+  <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+    <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+      <ng-container *ngFor="let estatus of estatusArray">
+        <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+          <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+        </ng-container>
+      </ng-container>
+    </mat-select>
+  </ng-container>
 
-            <div style="background-color: rgba(243, 243, 243, 0.973);" class="col-md-12 cursor-default modal-content ">
-                      <div style="background-color: rgba(243, 243, 243, 0.973); display: flex; justify-content:space-evenly; flex-direction: row;" class="row">
+    <div style="background-color: #00506a;" class="col-md-12 cursor-default modal-content ">
+     <br>
+                        <div class="row" style="text-align: center; padding-left: 15px;">
 
-                        <div class="container">
-                            <div class="row">
-                              <div style="margin:auto" class="col-sm-6">
-                                <label>
-                                  <h4>{{huesped.nombre}}</h4>
+                              <div style="background-color: #028ebd; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
+                                <div>
+                                  <label style="color: white;">
+                                    A Pagar:
+                                  </label>
+                                </div>
+
+                                <label style="color: white;">
+                                  $ {{huesped.porPagar.toLocaleString("es-MX") }}.00
                                 </label>
                               </div>
-                              <div style="margin: auto;" class="col-sm-6">
-                                <span [style]="setLabel" class="label label-lg label-inline">
-                                    {{huesped.estatus}}
-                                </span>
-                              </div>
-                          </div>
 
-
-                          <div class="row">
-                            <div style="margin: auto;" class="col-sm-6">
-                              <label>
-                                ID DE RESERVA : {{huesped.folio}}
-                              </label>
-                            </div>
-                            <div style="margin: auto;" class="col-sm-6">
-                              # 1101 - {{huesped.habitacion}}
-
-                            </div>
-                          </div>
-                        </div>
-
-                    </div>
-
-
-                        <div class="row">
-
-                              <div  class="col bg-light-primary px-3 py-3 rounded-sm mr-7 mb-7">
+                              <div style="background-color: #ffce54; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
                                 <div>
-                                  <a href="#" class="text-warning font-weight-bold font-size-h6 ">
-                                    A Pagar:
-                                  </a>
-                                </div>
-
-                                <a class="text-warning font-weight-bold font-size-h6" style="text-align: left;">
-                                  {{huesped.porPagar}}
-                                </a>
-                              </div>
-
-                              <div  class="col bg-light-warning px-3 py-3 rounded-sm mr-7 mb-7">
-                                <div>
-                                  <a href="#" class="text-warning font-weight-bold font-size-h6 ">
+                                  <label style="color: white;">
                                     Pagado:
-                                  </a>
+                                  </label>
                                 </div>
 
-                                <a class="text-warning font-weight-bold font-size-h6">
+                                <label style="color: white;">
                                   $0.00
-                                </a>
+                                </label>
                               </div>
 
-                              <div  class="col bg-light-danger px-3 py-3 rounded-sm mr-7 mb-7">
+                              <div style="background-color: #fb7f8c; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
                                 <div>
-                                  <a href="#" class="text-danger font-weight-bold font-size-h6 ">
-                                    Pendiente:
-                                  </a>
+                                  <label style="color: white;">
+                                    Saldo Pendiente:
+                                  </label>
                                 </div>
 
-                                <a class="text-warning font-weight-bold font-size-h6">
-                                  {{huesped.pendiente}}
-                                </a>
+                                <label style="color: white;">
+                                  $ {{huesped.pendiente.toLocaleString("es-MX") }}.00
+                                </label>
                               </div>
                         </div>
           </div>
