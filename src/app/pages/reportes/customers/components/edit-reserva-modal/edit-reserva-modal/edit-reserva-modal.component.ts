@@ -1,6 +1,6 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit,ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar, } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { of, Subscription } from 'rxjs';
 import { catchError, finalize, first, tap } from 'rxjs/operators';
 import { Huesped } from '../../../../_models/customer.model';
@@ -20,8 +20,8 @@ import {EstatusService} from '../../../../_services/estatus.service'
 import { Observable } from 'rxjs';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
-
 let date: Date = new Date();
+import{ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
 
 
 const EMPTY_CUSTOMER: Huesped = {
@@ -64,6 +64,7 @@ const EMPTY_CUSTOMER: Huesped = {
   selector: 'app-edit-customer-modal',
   templateUrl: './edit-reserva-modal.component.html',
   styleUrls: ['./edit-reserva-modal.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   styles:[`
   .form-group.hidden {
     width: 0;
@@ -133,7 +134,7 @@ export class EditReservaModalComponent implements OnInit {
       //Date Imports
       private calendar: NgbCalendar,
       public formatter: NgbDateParserFormatter,
-
+      private modalService: NgbModal,
       //
       public foliosService : FoliosService,
       private customersService: HuespedService,
@@ -380,20 +381,46 @@ export class EditReservaModalComponent implements OnInit {
       }
   }
 
-  backgroundColor(estatus:number)
+  backgroundColor(estatus:string)
   {
     let color;
 
     for (let i=0;i<this.estatusArray.length;i++)
     {
-      if(estatus==this.estatusArray[i].id)
+      if(estatus==this.estatusArray[i].estatus)
       {
         color = this.estatusArray[i].color
       }
     }
     return color;
   }
-
+  openDialog(huesped:Huesped) {
+    const modalRef = this.modalService.open(ConfirmationModalComponent,
+      {
+        scrollable: true,
+        windowClass: 'myCustomModalClass',
+        // keyboard: false,
+        // backdrop: 'static'
+        // backdrop: If `true`, the backdrop element will be created for a given modal. Alternatively, specify `’static’` for a backdrop that doesn’t close the modal on click. The default value is `true`.
+        // beforeDismiss: Callback right before the modal will be dismissed.
+        // centered: If `true`, the modal will be centered vertically. The default value is `false`.
+        // container: A selector specifying the element all-new modal windows should be appended to. If not specified, it will be `body`.
+        // keyboard: If `true`, the modal will be closed when the `Escape` key is pressed. The default value is `true`.
+        // scrollable: Scrollable modal content (false by default).
+        // size: Size of a new modal window. ‘sm’ | ‘lg’ | ‘xl’ | string;
+        // windowClass: A custom class to append to the modal window.
+        // backdropClass: A custom class to append to the modal backdrop.
+        // Using componetInstance we can pass data object to modal contents.
+      });
+  
+  
+    modalRef.componentInstance.huesped = huesped;
+    modalRef.result.then((result) => {
+      console.log(result);
+    }, (reason) => {
+    });
+    }
+  
   // setLabelStyle(id:number)
   // {
   //   if(id==1){this.setLabel="color:#a6e390"}
@@ -448,8 +475,8 @@ export class EditReservaModalComponent implements OnInit {
          this.checked=false ;
        }
     }
-
     closeModal(){
       this.modal.close();
     }
+
   }
