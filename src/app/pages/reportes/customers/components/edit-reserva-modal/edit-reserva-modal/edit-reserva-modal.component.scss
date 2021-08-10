@@ -1,6 +1,8 @@
-
 .mat-select
 {
   width: fit-content;
   min-width: 100%;
+}
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 9999 !important;
 }
