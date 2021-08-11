@@ -229,7 +229,7 @@
           <!--Contenido del Accordion-->
           <div  class="table-responsive angular-bootstrap-table">
             <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
-              <div *ngIf="codigosCuarto.Codigo==cuarto" class="font-weight-bold text-uppercase modal-header">{{codigosCuarto.Codigo.replace("_"," ")}} (Cap. Max.:{{codigosCuarto.Personas}})</div>
+              <div *ngIf="codigosCuarto.Codigo==cuarto" style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
             </ng-container>
               <table *ngIf="bandera===false" class="table overflow-hidden table-head-custom table-vertical-center">
                 <thead>
@@ -262,7 +262,7 @@
 
 <ng-container *ngIf="bandera==true">
   <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
-    <div class="font-weight-bold text-uppercase modal-header">{{codigosCuarto.Codigo.replace("_"," ")}} (Cap. Max.:{{codigosCuarto.Personas}})</div>
+    <div style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
         <table class="table overflow-hidden table-head-custom table-vertical-center">
           <thead>
             <th  >
