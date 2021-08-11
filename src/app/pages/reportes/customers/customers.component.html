@@ -1,7 +1,7 @@
 <div class="card card-custom gutter-b">
-  <div style="background-color: #00506a;" class="card-header">
+  <div class="card-header">
     <div class="card-title ">
-      <h3 style="color: white;" class="card-label">Lista de Reservas y Huespedes</h3>
+      <h3 class="card-label">Lista de húespedes</h3>
     </div>
     <div  class="card-toolbar">
       <button style="background-color: #319dd7; color: white; ;" type="button" class="btn " (click)="create()">Nueva Reserva</button>
@@ -9,52 +9,9 @@
       <button style="margin-right: 5px; background-color: #319dd7; color: white;;" type="button" class="btn" (click)="crearBloqueo()">Nuevo Bloqueo</button>
 
     </div>
-
-  </div>
-  <div name="filtros-container" style="background-color: #00506a; font-size: 0;" class="card-header">
-
-  <div class="col-lg-6">
-    <div class="row">
-
-    </div>
-    <div class="row">
-
-    </div>
-  </div>
-  <div class="col-lg-6">
-    <div class="row">
-      <div class="col-lg-6" [formGroup]="searchGroup">
-        <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Search" value=""
-          formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-4">
-        <select class="form-control" name="estatus" placeholder="Filtro de Estatus" formControlName="estatus">
-          <option value="">Todos</option>
-          <ng-container *ngFor="let estatus of estatusArray ">
-            <option>{{estatus.estatus}}</option>
-          </ng-container>
-
-        </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
-      </div>
-      <div class="col-lg-4">
-        <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" formControlName="habitacion">
-          <option selected value="">All</option>
-          <ng-container *ngFor="let tipo of codigoCuarto">
-            <option>
-              {{tipo.replace("_"," ")}}
-            </option>
-          </ng-container>
-        </select><small class="form-text text-muted"><b>Filtro</b> Por Tipo</small>
-      </div>
-    </div>
   </div>
 
-
-
-
-
+  <div class="card-body">
     <!-- begin: Filtration form -->
       <div class="form-group row">
           <div class="row" [formGroup]="filterGroup">
@@ -65,8 +22,7 @@
                   <option>{{estatus.estatus}}</option>
                 </ng-container>
 
-            <div class="row" [formGroup]="filterGroup">
-
+              </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
             </div>
             <div class="col-lg-4">
               <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" formControlName="habitacion">
@@ -94,11 +50,7 @@
         </div>
       </div>
     <!-- end: Filtration form -->
-</div>
 
-
-
-  <div style="background-color: #025976; " class="card-body">
     <!-- begin: Grouping -->
     <ng-container *ngIf="grouping.getSelectedRowsCount()">
       <div class="form">
@@ -143,7 +95,7 @@
             <app-sort-icon column="id" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
-          <th >
+          <th>
             Nombre
             <app-sort-icon column="firstName" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
@@ -196,11 +148,6 @@
 
           <th>Acciones</th>
         </thead>
-        <!-- <tfoot>
-          <tr>
-             <td colspan = "4">This is the footer of the table</td>
-          </tr>
-       </tfoot> -->
         <tbody>
           <tr *ngFor="let huesped of customerService.items$ | async">
 
@@ -296,4 +243,3 @@
     <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
   </div>
 </ng-template>
-

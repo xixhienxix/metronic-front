@@ -154,6 +154,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   searchValue:string='';
   dropDownHabValueIndex:any
 
+
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
@@ -174,6 +175,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   banderaDisabled:boolean=true;
   estatusID:number;
   todayString:string;
+  personasXCuarto:any[]=[]
 
   constructor(
     //Date Imports
@@ -204,8 +206,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.isLoading$ = this.customersService.isLoading$;
     this.historicoService.fetch();
     this.loadCustomer();
-    this.getDispo();
     this.getHabitaciones();
+    this.getDispo();
     this.getFolios();
     this.getEstatus();
   }
@@ -225,7 +227,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       const sb = this.customersService.getItemById(this.folio).pipe(
         first(),
         catchError((errorMessage) => {
-          console.log("ERROR MESSAGE PIPE DESPUES DEL GETELEMETN BY ID",errorMessage)
           this.modal.dismiss(errorMessage);
           return of(EMPTY_CUSTOMER);
         })
@@ -481,7 +482,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 //     }))
 //     .subscribe((folios)=>{
 //       this.folios=(folios)
-//       console.log("Nuevo folio de Reserva",this.folios)
 //       this.huesped.folio=this.folios[0].Folio
 //     })
 // }
@@ -516,19 +516,17 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   getHabitaciones()
   {
     this.habitacionService.gethabitaciones()
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          postArray.push(responseData)
-        }
-        return postArray
-      }
-    ))
     .subscribe((infoCuartos)=>{
       this.infoCuarto=infoCuartos
-      console.log("InfoCuartos Completa :",this.infoCuarto)
+      for(let i=0;i<this.infoCuarto.length;i++)
+      {
+       const exist = this.personasXCuarto.find(x => x.Codigo === this.infoCuarto[i].Codigo);
+       
+       if(exist===undefined)
+       { 
+         this.personasXCuarto.push(this.infoCuarto[i])//FUNCIONO
+       }
+      }
     })
   }
 
@@ -547,10 +545,16 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       }))
       .subscribe((codigoCuarto)=>{
         this.codigoCuarto=(codigoCuarto)
-        console.log("distinct Codigos de cuarto",this.codigoCuarto)
       })
   }
 
+  searchArray(arr, codigoCuarto, capacidadMaxima) {
+    const { length } = arr;
+    const isObjectPresent = arr.find((o) => o.codigoCuarto === codigoCuarto);
+    // const found = arr.some(el => el.Codigo === codigoCuarto);
+    if (isObjectPresent===undefined) arr.push({ Codigo:codigoCuarto,Personas:capacidadMaxima });
+    return arr;
+  }
 
   buscaDispo()
   {
@@ -633,7 +637,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       }))
       .subscribe((cuartos)=>{
         this.cuartos=(cuartos)
-        console.log("buscaDispo this.cuartos",this.cuartos)
       })
 
 
@@ -711,7 +714,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
     .subscribe((infoCuartos)=>{
       this.infoCuarto=infoCuartos
-      console.log("InforCuartos:",this.infoCuarto)
     });
 
     if(this.quantity>this.infoCuarto[0].Personas)
@@ -750,14 +752,12 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
           }))
           .subscribe((cuartos)=>{
             this.cuartos=(cuartos)
-            console.log("buscaDispo this.cuartos",this.cuartos)
           })
         this.bandera=true
     }else
     {
       this.dropDownHabValueIndex=$event.target.options[$event.target.options.selectedIndex].text
       this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
-      console.log("this.cuarto",this.cuarto)
       this.bandera=false
     }
 
@@ -903,7 +903,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   onSelectHuesped(event : string)
   {
-    console.log(event);
     this.huesped.nombre=event;
 
   }
