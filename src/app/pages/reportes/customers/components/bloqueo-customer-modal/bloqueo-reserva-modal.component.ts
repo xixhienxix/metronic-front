@@ -511,7 +511,6 @@ initializeBloqueo(){
             for(i=0;i<this.sinDisponibilidad.length;i++)
             {
               this.mySet.delete(this.sinDisponibilidad[i])
-
             }
           })
           fromDate.setDate(fromDate.getDate() + 1);

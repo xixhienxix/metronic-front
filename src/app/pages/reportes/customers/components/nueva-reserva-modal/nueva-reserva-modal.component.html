@@ -228,7 +228,9 @@
 
           <!--Contenido del Accordion-->
           <div  class="table-responsive angular-bootstrap-table">
-            <div class="font-weight-bold text-uppercase modal-header">{{cuarto.replace("_"," ")}}</div>
+            <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
+              <div *ngIf="codigosCuarto.Codigo==cuarto" style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
+            </ng-container>
               <table *ngIf="bandera===false" class="table overflow-hidden table-head-custom table-vertical-center">
                 <thead>
                   <th  >
@@ -240,9 +242,9 @@
                   <th>
                    $ TOTAL
                   </th>
-                  <th >
-                    CAP
-                  </th>
+                  <!-- <th >
+                    CAPACIDAD
+                  </th> -->
                 </thead>
                 <ng-container *ngFor="let habitacionesDisponibles of mySet">
                   <ng-container *ngFor="let tipocuarto of cuartos">
@@ -251,7 +253,7 @@
                       <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
                       <td >{{ tipocuarto.Tarifa.toLocaleString("es-MX") }}.00</td>
                       <td >{{ (tipocuarto.Tarifa * diaDif).toLocaleString("es-MX") }}.00</td>
-                      <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td>
+                      <!-- <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td> -->
                     </tr>
                   </tbody>
                 </ng-container>
@@ -259,9 +261,9 @@
               </table>
 
 <ng-container *ngIf="bandera==true">
-  <ng-container *ngFor="let codigosCuarto of codigoCuarto;  let i = index">
-    <div class="font-weight-bold text-uppercase modal-header">{{codigosCuarto.replace("_"," ")}}</div>
-        <table  class="table overflow-hidden table-head-custom table-vertical-center">
+  <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
+    <div style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
+        <table class="table overflow-hidden table-head-custom table-vertical-center">
           <thead>
             <th  >
               HAB
@@ -272,24 +274,24 @@
             <th>
              $ TOTAL
             </th>
-            <th >
-              CAP
-            </th>
+            <!-- <th >
+              CAPACIDAD
+            </th> -->
           </thead>
           <ng-container *ngFor="let habitacionesDisponibles of mySet">
             <ng-container *ngFor="let tipocuarto of cuartos">
-            <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo == codigosCuarto">
+            <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo == codigosCuarto.Codigo">
               <tr>
                 <td ><mat-checkbox formControlName="checkbox" [checked]="tipocuarto.value" #checked (change)="preAsignar(tipocuarto.Numero,tipocuarto.Codigo,checked.checked,tipocuarto.Tarifa)"></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
                 <td >{{ tipocuarto.Tarifa.toLocaleString("es-MX") }}.00</td>
                 <td >{{ (tipocuarto.Tarifa * diaDif).toLocaleString("es-MX") }}.00</td>
-                <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td>
+                <!-- <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td> -->
               </tr>
             </tbody>
           </ng-container>
         </ng-container>
-        </table>
-  </ng-container>
+      </table>
+    </ng-container>
 </ng-container>
 
 
