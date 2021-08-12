@@ -23,6 +23,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import{ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
 import {NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 
+const todayDate = new Date();
+const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -54,7 +56,9 @@ const EMPTY_CUSTOMER: Huesped = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'Español',
-  numeroCuarto:0
+  numeroCuarto:0,
+  creada:todayString,
+  tipoHuesped:"Regular"
 };
 
 

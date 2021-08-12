@@ -350,11 +350,11 @@
         <div  [style]="displayNone" class="name-container-dropdown">
           <button type="button" (click)="closeList();filterName.value = '';limpiaInput() " class="btn btn-block" style="background-color: #fa6d7c; font-weight: bold; color: white;">Cancelar</button>
           <mat-selection-list  (click)="closeList(); onSelectHuesped(nombres.selectedOptions.selected[0]?.value)" #nombres [multiple]="false" >
-            <mat-list-option *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped.nombre">
+            <mat-list-option *ngFor="let huesped of historicoService.items$ | async"  [value]="huesped">
               {{huesped.nombre}}
             </mat-list-option>
           </mat-selection-list>
-          <!-- <span id='close' onclick='this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false;'>x</span> -->
+          <!-- <span id='close'   .selected[0]?.value     onclick='this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false;'>x</span> -->
         </div>
       </div>
 

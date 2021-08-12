@@ -31,5 +31,7 @@ export interface Huesped extends BaseModel {
   codigoPostal:string;
   lenguaje:string;
   numeroCuarto:number;
+  creada:string;
+  tipoHuesped:string;
 }
 
