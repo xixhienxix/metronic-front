@@ -20,8 +20,8 @@ import {EstatusService} from '../../../../_services/estatus.service'
 import { Observable } from 'rxjs';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
-let date: Date = new Date();
 import{ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
+import {NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 
 
 const EMPTY_CUSTOMER: Huesped = {
@@ -108,6 +108,8 @@ export class EditReservaModalComponent implements OnInit {
 
     fromDate: NgbDate | null;
     toDate: NgbDate | null;
+    fullFechaSalida:string
+    fullFechaLlegada:string
     noches:number;
     id:number;
     folio:number;
@@ -142,6 +144,7 @@ export class EditReservaModalComponent implements OnInit {
       public customerService: HuespedService,
       public postService : ReportesComponent,
       public estatusService : EstatusService,
+      public i18n: NgbDatepickerI18n,
       private http: HttpClient
       ) {
         this.fromDate = calendar.getToday();
@@ -160,6 +163,21 @@ export class EditReservaModalComponent implements OnInit {
     //   const response = await this.http.get(this.currentPriceUrl).toPromise();
     //   return response.json().bpi[currency].rate;
     // }
+
+    formatFechas()
+    {
+      const diaLlegada = parseInt(this.huesped.llegada.split("/")[0])
+      const mesLlegada = parseInt(this.huesped.llegada.split("/")[1])
+      const anoLlegada = parseInt(this.huesped.llegada.split("/")[2])
+      const fechaLlegada = new Date(anoLlegada,mesLlegada,diaLlegada)
+      this.fullFechaLlegada = fechaLlegada.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaLlegada.getUTCMonth()) + "/" + fechaLlegada.getFullYear().toString()
+
+      const diaSalida = parseInt(this.huesped.salida.split("/")[0])
+      const mesSalida = parseInt(this.huesped.salida.split("/")[1])
+      const anoSalida = parseInt(this.huesped.salida.split("/")[2])
+      const fechaSalida = new Date(anoSalida,mesSalida,diaSalida)
+      this.fullFechaSalida = fechaSalida.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaSalida.getUTCMonth()) + "/" + fechaSalida.getFullYear().toString()
+    }
     getEstatus(): void {
       this.estatusService.getEstatus()
                         .pipe(map(
@@ -193,6 +211,7 @@ export class EditReservaModalComponent implements OnInit {
         this.huesped.origen = "Online";
         this.loadForm();
 
+
       } else {
 
 
@@ -206,6 +225,8 @@ export class EditReservaModalComponent implements OnInit {
         ).subscribe((huesped1: Huesped) => {
           this.huesped = huesped1;
           this.loadForm();
+          this.formatFechas();
+
           // this.setLabelStyle(this.huesped.estatus);
         });
         this.subscriptions.push(sb);
