@@ -103,35 +103,26 @@
 
 
          <div class="row">
-            <div class="col-md-6">
+          <div class="col-md-6">
+            <br>
+              <label class="font-weight-bold">ID de Reserva:</label>
+              <br>
+              &nbsp;
+              <label>{{huesped.folio}}</label>
+            </div>
+          <div class="col-md-6">
               <br>
                 <label class="font-weight-bold">Habitacion / Cama:</label>
                 <br>
                 &nbsp;
-                <label>1101 - {{huesped.habitacion}}
-              </label>
-              </div>
-              <div class="col-md-6">
-                <label>            <br>
-                  Origen de Reserva:
-                </label>
-                <br>
-                &nbsp;<select class="btn btn-white">
-                  <option selected> {{huesped.origen}}</option>
-                  <option > Pagina Web</option>
-                  <option > Booking</option>
-  
-                </select>
-  
-              </div>
-
-              
+                <label>1101 - {{huesped.habitacion}}</label>
           </div>
+        </div>
 
           <div class="row">
             <div class="col-md-6">
               <br>
-                <label class="font-weight-bold">Adultos:</label>
+                <label class="font-weight-bold">Adultos / Personas:</label>
                 <br>
                 &nbsp;
                 <label>{{huesped.adultos}}
@@ -145,11 +136,28 @@
                   <label>{{huesped.ninos}}
                 </label>
                 </div>
-
-              
           </div>
-
-    </div>
+          <div class="row">
+            <div class="col-md-6">
+              <br>
+                <label class="font-weight-bold">Creada:</label>
+                <br>
+                &nbsp;
+                <label>{{huesped.adultos}}
+              </label>
+              </div>
+            <div class="col-md-6">
+              <label> <br> Origen de Reserva:  </label>
+                <br>
+                &nbsp;
+                <select class="btn btn-white">
+                  <option selected> {{huesped.origen}}</option>
+                  <option > Pagina Web</option>
+                  <option > Booking</option>
+                </select>
+            </div>  
+          </div>
+        </div>
 
 <br>
     <div style="background-color:#162F58;" >

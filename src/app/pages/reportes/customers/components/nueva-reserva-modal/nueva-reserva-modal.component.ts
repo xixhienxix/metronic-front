@@ -35,6 +35,8 @@ declare global {
   }
 }
 
+const todayDate = new Date();
+const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
 
 
 const EMPTY_CUSTOMER: Huesped = {
@@ -67,7 +69,9 @@ const EMPTY_CUSTOMER: Huesped = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'Español',
-  numeroCuarto: 0
+  numeroCuarto: 0,
+  creada:todayString,
+  tipoHuesped:"Regular"
 };
 
 @Component({
@@ -208,6 +212,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.getHabitaciones();
     this.getFolios();
     this.getEstatus();
+
   }
 
 
@@ -240,9 +245,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   loadForm() {
 
     this.formGroup = this.fb.group({
-      nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-      email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
-      telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.pattern('[0-9]+'),Validators.minLength(10),Validators.maxLength(14)])],
+      nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
+      email: ['', Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
+      telefono: ['', Validators.compose([Validators.nullValidator,Validators.pattern('[0-9]+'),Validators.minLength(10),Validators.maxLength(14)])],
       salida:[this.huesped.salida, Validators.compose([])],
       llegada:[this.huesped.llegada, Validators.compose([])],
       adultos:[this.huesped.adultos, Validators.compose([Validators.max(this.maxAdultos)])],
@@ -376,6 +381,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   private prepareHuesped() {
 
+    const todayDate = new Date();
+    const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
+    
     for(let habitaciones of this.preAsig)
     {
 
@@ -396,7 +404,23 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         this.huesped.motivo=formData.motivo
         this.huesped.id=this.huesped.folio
         this.huesped.numeroCuarto=habitaciones.habitacion
+        this.huesped.creada=todayString
+        this.huesped.tipoHuesped="Regular"
 
+  //HISTORICO--------------------------------------------------------
+
+  this.historicoService.addPost(this.huesped).subscribe(
+    ()=>{
+    },
+    (err)=>{
+      if(err)
+      {
+        console.log("Error al Guardar en el Historico log: "+ err)
+      }
+    },
+    ()=>{
+      console.log("Exito al Guardar en el historico folio: "+this.huesped.folio)
+    })
 
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
@@ -422,7 +446,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
             this.banderaExito=false;
         }
 
+
       });
+
       this.huesped.folio=this.huesped.folio+1
     }
 
@@ -465,7 +491,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.huesped.ciudad=''
     this.huesped.codigoPostal=''
     this.huesped.lenguaje='Español'
-    this.huesped.numeroCuarto=0  }
+    this.huesped.numeroCuarto=0,
+    this.huesped.creada=todayString,
+    this.huesped.tipoHuesped="Regular"  
+  }
 
 // resetFoliador()
 // {
@@ -901,10 +930,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 }
 
 
-  onSelectHuesped(event : string)
+  onSelectHuesped(event)
   {
-    console.log(event);
-    this.huesped.nombre=event;
+    this.huesped.nombre=event.nombre;
+    this.huesped.email=event.email;
+    this.huesped.telefono=event.telefono;
 
   }
 

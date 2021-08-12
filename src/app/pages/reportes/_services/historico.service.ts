@@ -7,7 +7,7 @@ import { Historico } from '../_models/historico.model';
 import { baseFilter } from '../../../_fake/fake-helpers/http-extenstions';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
-
+import {Huesped} from '../_models/customer.model'
 const DEFAULT_STATE: ITableState = {
   filter: {},
   paginator: new PaginatorState(),
@@ -77,6 +77,11 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
       })
     );
   }
+
+  addPost(huesped:Huesped) {
+    return this.http.post<any>(environment.apiUrl+"/reportes/historico", huesped)
+    }
+
 
   ngOnDestroy() {
     this.subscriptions.forEach(sb => sb.unsubscribe());
