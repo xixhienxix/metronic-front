@@ -1,50 +1,57 @@
 
-<div style="background-color:#00506a;" class="modal-header">
+<div style="background-color:#00506a;" class="modal-content">
+  <button style="position:absolute; top:2%; right:1%; background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+<br>
+<div class="container">
   <div style=" font: bold; color:white" class="modal-title h4 col-12" id="example-modal-sizes-title-lg">
-     <div class="row">
-      <h2 style="font-size: 1.5em;">{{huesped.nombre}}</h2>  
-      <button style="position:absolute; top:0; right:0; background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
-    </div> 
     <div class="row">
-     <small style="color: white;  font-size: 1em;">ID RVA : &nbsp; <small style="font-size: 1em; font-weight: bold; color:#319dd7">{{huesped.folio}}</small> </small>
-     &nbsp; &nbsp; &nbsp; &nbsp;
-     <small style="color: white;  font-size: 1em;">Hab.: &nbsp; <small style="font-weight: bold; font-size: 1em; color:#319dd7">{{huesped.numeroCuarto}} - {{huesped.habitacion}}</small> </small>
-    </div>
-  </div>
-</div> 
+     <h2 style="font-size: 1.5em;">{{huesped.nombre}}</h2>  
+   </div> 
+   <div class="row">
+    <small style="color: white;  font-size: 1em;">ID RVA : &nbsp; <small style="font-size: 1em; font-weight: bold; color:#319dd7">{{huesped.folio}}</small> </small>
+    &nbsp; &nbsp; &nbsp; &nbsp;
+    <small style="color: white;  font-size: 1em;">Hab.: &nbsp; <small style="font-weight: bold; font-size: 1em; color:#319dd7">{{huesped.numeroCuarto}} - {{huesped.habitacion}}</small> </small>
+   </div>
+ </div>
 
-  <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
-    <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-      <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
-    </mat-select>
-  </ng-container>
-  <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
-    <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
-      <ng-container *ngFor="let estatus of estatusArray">
-        <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
-          <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+</div>
+ 
+  <br>
+<!-- </div>  -->
+        <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+          <mat-select style="width:160px;" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+            <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+          </mat-select>
         </ng-container>
-      </ng-container>
-    </mat-select>
-  </ng-container>
+        <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+          <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+            <ng-container *ngFor="let estatus of estatusArray">
+              <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+                <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+              </ng-container>
+            </ng-container>
+          </mat-select>
+        </ng-container>
+  <br>
 
-    <div style="background-color: #00506a;" class="col-md-12 cursor-default modal-content ">
-     <br>
+    <!-- <div style="background-color: #00506a;" class="col-md-12 cursor-default modal-content "> -->
+     <!-- <br> -->
+
                         <div class="row" style="text-align: center; padding-left: 15px;">
-
-                              <div style="background-color: #028ebd; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
+                          &nbsp;&nbsp;&nbsp;
+                              <div style="background-color: #e43748; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
                                 <div>
                                   <label style="color: white;">
-                                    A Pagar:
+                                    Pendiente:
                                   </label>
                                 </div>
 
                                 <label style="color: white;">
-                                  $ {{huesped.porPagar.toLocaleString("es-MX") }}.00
+                                  $ {{huesped.pendiente.toLocaleString("es-MX") }}.00
                                 </label>
                               </div>
 
-                              <div style="background-color: #ffce54; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
+                              <div style="background-color: #da8f27; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
                                 <div>
                                   <label style="color: white;">
                                     Pagado:
@@ -56,95 +63,91 @@
                                 </label>
                               </div>
 
-                              <div style="background-color: #fb7f8c; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
+                              <div style="background-color: #0083b2; color: white;" class="col px-3 py-3 rounded-sm mr-7 mb-7">
                                 <div>
                                   <label style="color: white;">
-                                    Saldo Pendiente:
+                                    Su Cuenta:
                                   </label>
                                 </div>
 
                                 <label style="color: white;">
-                                  $ {{huesped.pendiente.toLocaleString("es-MX") }}.00
+                                  $ {{huesped.porPagar.toLocaleString("es-MX") }}.00
                                 </label>
                               </div>
-                            </div>
-          </div>
+                        </div>
+</div>
 
 
 <mat-tab-group class="col-md-12" style="min-width: 0;  padding: 3px;">
   <mat-tab label="Reserva">
-        <div style="background-color: rgba(243, 243, 243, 0.973);" class=" cursor-default modal-content ">
+        <div class="container">
           <div class="row">
-              <div class="col-md-6">
+              
+            <div class="col-md-6">
               <br>
-                <label class="font-weight-bold">Habitacion / Cama</label>
+                <label class="font-weight-bold">Periodo:</label>
+                <br>
+                &nbsp;
+                <label>{{fullFechaLlegada}} - {{fullFechaSalida}}
+              </label>
+              </div>
+          <div class="col-md-6">
+            <br>
+              <label class="font-weight-bold">Número de Noches:</label>
+              <br>
+              &nbsp;
+              <label>{{huesped.noches}}
+            </label>
+            </div>
+
+        </div>
+
+
+         <div class="row">
+            <div class="col-md-6">
+              <br>
+                <label class="font-weight-bold">Habitacion / Cama:</label>
                 <br>
                 &nbsp;
                 <label>1101 - {{huesped.habitacion}}
               </label>
               </div>
+              <div class="col-md-6">
+                <label>            <br>
+                  Origen de Reserva:
+                </label>
+                <br>
+                &nbsp;<select class="btn btn-white">
+                  <option selected> {{huesped.origen}}</option>
+                  <option > Pagina Web</option>
+                  <option > Booking</option>
+  
+                </select>
+  
+              </div>
 
+              
+          </div>
 
+          <div class="row">
+            <div class="col-md-6">
+              <br>
+                <label class="font-weight-bold">Adultos:</label>
+                <br>
+                &nbsp;
+                <label>{{huesped.adultos}}
+              </label>
+              </div>
               <div class="col-md-6">
                 <br>
-                <label>Tipo :</label>
+                  <label class="font-weight-bold">Niños:</label>
                   <br>
-                  &nbsp; <label>Villa</label>
-              </div>
-          </div>
-
-
-          <div class="row">
-            <div class="col-md-6">
-              <label>Tarifa Automatica</label>
-              <br>
-              &nbsp; <label>
-              $ {{huesped.tarifa}}.00
-              </label>
-            </div>
-            <div>
-              <select style="width:fit-content" class="btn btn-primary"  >
-                <option selected>Por Noche</option>
-                <!-- <option>Por Toda La Estancia</option> -->
-              </select>
-            </div>
-          </div>
-
-          <div class= "row">
-                <div class="col-md-6">
-                  <label>
-                    <br>Tarifa Manual
-                    <br>(Total Por Noche)</label>
+                  &nbsp;
+                  <label>{{huesped.ninos}}
+                </label>
                 </div>
 
-                <div >
-                  <br>
-                  <mat-slide-toggle (change)="tarifaAutomatica()" >  </mat-slide-toggle>
-                  <input  [disabled]="checked" placeholder="$ 0.00" value=" ${{huesped.tarifa}}.00">
-                </div>
-          </div>
-
-
-          <div class="row">
-            <div class="col-md-6">
-              <label>            <br>
-                Metodo de Pago Online: </label>
-              <br>
-              &nbsp; <label>Paypal</label>
-            </div>
-            <div class="col-md-6">
-              <label>            <br>
-                Origen de Reserva
-              </label>
-              <br>
-              &nbsp;<select class="btn btn-white">
-                <option selected> {{huesped.origen}}</option>
-                <option > Pagina Web</option>
-                <option > Booking</option>
-
-              </select>
-
-            </div>
+              
           </div>
 
     </div>
