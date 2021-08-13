@@ -43,7 +43,21 @@
 
   <br />
   <!-- </div>  -->
-
+  <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+    <mat-select  disabled style="width:160px; color: white; font-weight: bold; font-size: larger; " [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+      <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)"  [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+    </mat-select>
+  </ng-container>
+  <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+    <mat-select style="width: 160px; color: white; font-weight: bold; font-size: larger;  " #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+      <ng-container *ngFor="let estatus of estatusArray">
+        <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+          <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+        </ng-container>
+      </ng-container>
+    </mat-select>
+  </ng-container>
+<br>
 
   <!-- <div style="background-color: #00506a;" class="col-md-12 cursor-default modal-content "> -->
   <!-- <br> -->
@@ -58,8 +72,8 @@
         <label style="color: white"> Pendiente: </label>
       </div>
 
-      <label style="color: white">
-        $ {{ huesped.pendiente.toLocaleString("es-MX") }}.00
+      <label style="color: white;font-size: large;">
+        $ {{ (huesped.pendiente).toLocaleString("es-MX") }}.00
       </label>
     </div>
 
@@ -71,7 +85,7 @@
         <label style="color: white"> Pagado: </label>
       </div>
 
-      <label style="color: white"> $0.00 </label>
+      <label style="color: white;font-size: large;"> $0.00 </label>
     </div>
 
     <div
@@ -82,8 +96,8 @@
         <label style="color: white"> Su Cuenta: </label>
       </div>
 
-      <label style="color: white">
-        $ {{ huesped.porPagar.toLocaleString("es-MX") }}.00
+      <label  style="color: white; font-size: large;">
+        $ {{ (huesped.porPagar).toLocaleString("es-MX") }}.00
       </label>
     </div>
   </div>
@@ -122,7 +136,7 @@
           <label class="control-label">Habitacion / Cama:</label>
           <br />
           &nbsp;
-          <label>1101 - {{ huesped.habitacion }}</label>
+          <label>{{ huesped.habitacion.replace("_"," ") }} - {{huesped.numeroCuarto}}</label>
         </div>
       </div>
 
@@ -210,7 +224,7 @@
           class="form-control"
           type="text"
           value="$ {{
-            (huesped.tarifa * huesped.noches).toLocaleString('es-MX')
+            ((huesped.tarifa)/(huesped.noches)).toLocaleString('es-MX')
           }}    MXN"
         />
       </div>
@@ -243,16 +257,14 @@
     <div class="row col-md-12">
       <div class="col-sm-6">
         <br />
-        <label class="control-label">A Pagar por Noche:</label>
+        <label class="control-label">Cantidad Acordada:</label>
         <br />
         <input
           disabled
           style="width: 150px"
           class="form-control"
           type="text"
-          value="$ {{
-            (huesped.tarifa * huesped.noches).toLocaleString('es-MX')
-          }}    MXN"
+          value="$ 0.00    MXN"
         />
       </div>
 
@@ -282,7 +294,7 @@
         class="h4"
         style="color: aliceblue; text-align: center; padding-top: 5px"
       >
-        Servicios Adicionales
+        SERVICIOS ADICIONALES
       </label>
     </div>
 <br>
@@ -291,7 +303,9 @@
       <div style="text-align: center; justify-content:space-evenly;" class="col-md-12">
         <section class="example-section">
           <ng-container *ngFor="let adicional of adicionalArray">
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<mat-checkbox style="color:#00506a; font-weight: bold;">{{adicional.Descripcion}} </mat-checkbox>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <mat-checkbox (change)="servicioAdicional($event,adicional.Adicional,adicional.Descripcion)"
+            style="color:#00506a; font-weight: bold;">{{adicional.Descripcion}} </mat-checkbox>
           </ng-container>
         </section>      
         <br>
@@ -303,7 +317,7 @@
         class="h4"
         style="color: aliceblue; text-align: center; padding-top: 5px"
       >
-        Servicios Adicionales
+        NOTAS DEL CLIENTE
       </label>
     </div>
     <br />
@@ -962,7 +976,7 @@
 </mat-tab-group>
 
 
-<div *ngIf="huesped.estatus=='Reserva Confirmada'||huesped.estatus=='Reserva Sin Pago'">
+<div *ngIf="huesped.estatus=='Reserva Confirmada'||huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Reserva Temporal'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Totalmente Pagada'">
   <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
     <label style="color: aliceblue"> Estado de Reserva / Folio </label>
     <div style="justify-content: space-around;" class="row">
@@ -972,7 +986,7 @@
           class="btn btn-primary btn-block"
           type="submit"
           name="estatus"
-          (click)="confirmaReserva(1,huesped.folio)"
+          (click)="confirmaReserva(3,huesped.folio);closeModal()"
         >
           Confirma Resereva
         </button>
@@ -983,7 +997,7 @@
           class="btn btn-success btn-block"
           type="submit"
           name="estatus"
-          (click)="setEstatus(3); changeVisible()"
+          (click)="confirmaReserva(1,huesped.folio);closeModal()"
         >
           Realiza Check-In
         </button>
@@ -1050,7 +1064,7 @@
     <div style="justify-content: space-around;" class="row">
 
       <div class="col-lg-12">
-        <button
+        <button disabled
           class="btn btn-primary btn-block"
           type="submit"
           name="estatus"
@@ -1075,7 +1089,7 @@
 
       <div class="f col-lg-12">
         <button
-          disabled
+          (click)="checkOut(4,huesped.folio)"
           class="btn btn-danger btn-block"
           type="submit"
           value="7"
@@ -1087,7 +1101,7 @@
 
       <div class="f col-lg-12">
         <button
-          disabled
+          (click)="openModifica()"
           class="btn btn-primary btn-block"
           type="submit"
           value="7"
@@ -1119,7 +1133,7 @@
 
 <ng-template #exito let-modal>
   <div class="modal-header">
-    <h4 class="modal-title">Húesped Actualizado con exito</h4>
+    <h4 class="modal-title">{{mensaje_exito}}</h4>
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>

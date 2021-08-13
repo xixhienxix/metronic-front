@@ -40,7 +40,7 @@ export class EstatusService  {
 
   actualizaEstatus(estatus,folio){
 
-    return this.http.post(environment.apiUrl+"/actualiza/estatus",estatus)
+    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio})
 
   }
 

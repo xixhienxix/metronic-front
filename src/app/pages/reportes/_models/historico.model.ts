@@ -31,5 +31,6 @@ export interface Historico extends BaseModel {
   codigoPostal:string;
   lenguaje:string;
   numeroCuarto:number;
+  estatus_historico:string;
 }
 

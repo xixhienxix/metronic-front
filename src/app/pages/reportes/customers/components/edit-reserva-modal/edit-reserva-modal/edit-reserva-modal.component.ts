@@ -1,30 +1,24 @@
-import { Component, Input, OnDestroy, OnInit,ViewEncapsulation,ViewChild } from '@angular/core';
+import { Component, Input,  OnInit,ViewEncapsulation,ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { of, Subscription } from 'rxjs';
-import { catchError, finalize, first, tap } from 'rxjs/operators';
+import { catchError, first, tap } from 'rxjs/operators';
 import { Huesped } from '../../../../_models/customer.model';
 import { Foliador } from '../../../../_models/foliador.model';
 import { Estatus } from '../../../../_models/estatus.model';
 import { HuespedService } from '../../../../_services';
-import { CustomAdapter, CustomDateParserFormatter, getDateFromString } from '../../../../../../_metronic/core';
-import { NgModule } from "@angular/core";
+import { CustomAdapter, CustomDateParserFormatter } from '../../../../../../_metronic/core';
 import { ReportesComponent } from '../../../../reportes.component'
-import {Injectable}from '@angular/core'
-import { FormsModule } from '@angular/forms';
 import { HttpClient } from "@angular/common/http";
-import {environment} from "../../../../../../../environments/environment"
-import {map} from 'rxjs/operators'
-import {FoliosService} from '../../../../_services/folios.service'
-import {EstatusService} from '../../../../_services/estatus.service'
-import { Observable } from 'rxjs';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatTabsModule} from '@angular/material/tabs';
-import{ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
-import {NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
+import { map} from 'rxjs/operators'
+import { FoliosService} from '../../../../_services/folios.service'
+import { EstatusService} from '../../../../_services/estatus.service'
+import { ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
+import { NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.service';
 import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { ModificaHuespedComponent } from '../../helpers/modifica-huesped/modifica-huesped.component';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -138,6 +132,8 @@ export class EditReservaModalComponent implements OnInit {
     comparadorInicial:Date
     comparadorFinal:Date
     fechaInicialBloqueo:string
+    mensaje_exito:string
+    mensaje_error:string
 
     estatusArray:Estatus[]=[];
     adicionalArray:Adicional[]=[];
@@ -160,7 +156,8 @@ export class EditReservaModalComponent implements OnInit {
       public foliosService : FoliosService,
       public adicionalService : AdicionalService,
       private customersService: HuespedService,
-      private fb: FormBuilder, public modal: NgbActiveModal,
+      private fb: FormBuilder, 
+      public modal: NgbActiveModal,
       public customerService: HuespedService,
       public postService : ReportesComponent,
       public estatusService : EstatusService,
@@ -551,7 +548,6 @@ export class EditReservaModalComponent implements OnInit {
 //Butons
     confirmaReserva(estatus,folio)
     {
-
           this.estatusService.actualizaEstatus(estatus,folio)
           .subscribe(
             ()=>
@@ -560,25 +556,115 @@ export class EditReservaModalComponent implements OnInit {
             },
             (err)=>{
               if(err){
-                this.modalService.open(this.errorModal,{size:'sm'}).result.then((result) => {
+                const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
+                modalRef.result.then((result) => {
                   this.closeResult = `Closed with: ${result}`;
                   }, (reason) => {
                       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
                   });
+                  setTimeout(() => {
+                    modalRef.close('Close click');
+                  },4000)
                     }
             },
             ()=>{
       
-                this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
+                const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+                modalRef.result.then((result) => {
                   this.closeResult = `Closed with: ${result}`;
                   }, (reason) => {
                       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
                   });
-              
+                  setTimeout(() => {
+                    modalRef.close('Close click');
+                  },4000)
+                  if(estatus==3){this.mensaje_exito="Reservacion Confirmada"}
+                  if(estatus==1){this.mensaje_exito="Check-In realizado con exito"}
+
+              this.customerService.fetch();
             }
           )
         
     }
+    servicioAdicional(event,adicional,descripcion){
+      if(event.checked)
+      {     
+        this.huesped.tarifa=adicional+this.huesped.tarifa
+        this.huesped.pendiente=this.huesped.pendiente+adicional
+        this.huesped.porPagar=this.huesped.porPagar+adicional
+      }
+      else if(!event.checked){
+        this.huesped.tarifa=this.huesped.tarifa-adicional
+        this.huesped.pendiente=this.huesped.pendiente-adicional
+        this.huesped.porPagar=this.huesped.porPagar-adicional
+  }
+      
+    }
+    checkOut(estatus:number,folio:number)
+    {
+      if (this.huesped.pendiente==0)
+      {
+        this.estatusService.actualizaEstatus(estatus,folio)
+          .subscribe(
+            ()=>
+            {
+    
+            },
+            (err)=>{
+              if(err){
+                const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
+                modalRef.result.then((result) => {
+                  this.closeResult = `Closed with: ${result}`;
+                  }, (reason) => {
+                      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                  });
+                  setTimeout(() => {
+                    modalRef.close('Close click');
+                  },4000)
+                    }
+            },
+            ()=>{
+      
+              const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+              modalRef.result.then((result) => {
+                this.closeResult = `Closed with: ${result}`;
+                }, (reason) => {
+                    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                });
+                setTimeout(() => {
+                  modalRef.close('Close click');
+                },4000)
+                this.mensaje_exito="Chek-Out Realizado con Exito"
+
+            this.customerService.fetch();
+          });
+
+      }else
+      {
+        const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+          this.mensaje_error = "Aun queda Saldo pendiente en el húesped"
+      }
+    }
+
+    openModifica(){
+      const modalRef = this.modalService.open(ModificaHuespedComponent,{size:'md'})
+      modalRef.componentInstance.huesped = this.huesped;
+
+      modalRef.result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });
+    }
+
 
     getDismissReason(reason: any): string 
     {

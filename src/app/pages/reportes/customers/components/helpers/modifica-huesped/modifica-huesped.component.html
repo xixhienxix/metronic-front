@@ -1,0 +1,285 @@
+<div style="background-color: #00506a" class="modal-content">
+  <button
+    style="
+      position: absolute;
+      top: 2%;
+      right: 1%;
+      background-color: #fa6d7c;
+      font-weight: bold;
+      color: white;
+    "
+    class="btn"
+    (click)="closeModal()"
+  >
+    X
+  </button>
+  <br />
+  <h2  style="font: bold; color: white; text-align: center;">Modifica Reserva</h2>
+</div>
+<br>
+
+  <div class="container">
+    <div
+      style="font: bold; "
+      class="modal-title h4 col-12"
+      id="example-modal-sizes-title-lg"
+    >
+      <div class="row">
+        <h2 style="font-size: 1.5em; text-align: center;">{{ huesped.nombre }}</h2>
+      </div>
+      <div class="row">
+        <small style=" font-size: 1em"
+          >ID RVA : &nbsp;
+          <small style="font-size: 1em; font-weight: bold; color: #319dd7">{{
+            huesped.folio
+          }}</small>
+        </small>
+        &nbsp; &nbsp; &nbsp; &nbsp;
+        <small style="color: white; font-size: 1em"
+          >Hab.: &nbsp;
+          <small style="font-weight: bold; font-size: 1em; color: #319dd7"
+            >{{ huesped.numeroCuarto }} - {{ huesped.habitacion.replace("_"," ") }}</small
+          >
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <br />
+  <!-- </div>  -->
+  <!-- <div style="background-color: #00506a;" class="col-md-12 cursor-default modal-content "> -->
+  <!-- <br> -->
+
+
+<div style="background-color: #319dd7" class="modal-content sub-menu">
+  <label
+    class="h4"
+    style="color: aliceblue; text-align: center; padding-top: 5px"
+  >
+    DATOS ACTUALES</label>
+</div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <br />
+          <label class="control-label">Periodo:</label>
+          <br />
+          &nbsp;
+          <label>{{ fullFechaLlegada }} - {{ fullFechaSalida }} </label>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <br />
+          <label class="control-label">Adultos / Personas:</label>
+          <br />
+          &nbsp;
+          <label>{{ huesped.adultos }} </label>
+        </div>
+        <div class="col-md-6">
+          <br />
+          <label class="control-label">Niños:</label>
+          <br />
+          &nbsp;
+          <label>{{ huesped.ninos }} </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <br />
+          <label class="control-label">Habitacion / Cama:</label>
+          <br />
+          &nbsp;
+          <label>{{ huesped.habitacion.replace("_"," ") }}</label>
+        </div>
+        <div class="col-md-6">
+          <br />
+          <label class="control-label">No.Habitacion:</label>
+          <br />
+          &nbsp;
+          <label>{{ huesped.numeroCuarto }}</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <br />
+          <label class="control-label">Nombre de Tarifa:</label>
+          <br />
+          &nbsp;
+          <label>Precio Base</label>
+        </div>
+        <div class="col-md-6">
+          <br />
+          <label class="control-label">Tarifa: </label>
+          <br />
+          &nbsp;
+          <label>$ {{ huesped.tarifa.toLocaleString('es-MX') }} .00</label>
+        </div>
+      </div>
+
+
+    </div>
+
+<br>
+
+    <div style="background-color: #319dd7" class="modal-content sub-menu">
+      <label
+        class="h4"
+        style="color: aliceblue; text-align: center; padding-top: 5px"
+      >
+        Datos Despues de Modificar
+      </label>
+    </div>
+
+    <div class="row col-md-12">
+      <div class="col-sm-6">
+        <br>
+        <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Inicial</label>
+        <div class="form-group" >
+          <div class="input-group">
+            <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+            (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker">
+
+            <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaLlegada" >
+
+            <div class="input-group-append">
+              <button class="btn btn-primary" (click)="d.toggle()" type="button">
+                <i class="fa fa-calendar icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="col-sm-6">
+          <br>
+          <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Final</label>
+          <div class="form-group" >
+            <div class="input-group">
+              <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+              (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
+
+              <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaSalida" >
+
+              <div class="input-group-append">
+                <button class="btn btn-primary" (click)="f.toggle()" type="button">
+                  <i class="fa fa-calendar icon"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>    
+    </div>
+
+    <div *ngIf="display==false" class="row">
+      <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
+    </div>
+
+
+    <div class="row col-md-12">
+
+        <div class="col-sm-6">
+          <label style="color:#00506a; font-weight: bold;" class="form-label">Tipo de Habitación </label>
+          <mat-select 
+                      class="form-control form-control-lg form-control-solid"
+                      name="habitacion"
+                      (selectionChange)="habValue($event)"
+                      placeholder="-- Seleccione Tipo de Habitación -- " required
+                      >
+              <!-- <mat-option value="1">Todos los Tipos de Cuartos</mat-option> -->
+              <mat-option *ngFor="let tipoCuarto of codigoCuarto" [value]="tipoCuarto">{{tipoCuarto.replace("_"," ")}} </mat-option>
+          </mat-select>
+              <!--Error Block-->
+          <!-- <mat-error *ngIf="tipoCuarto.hasError('required')">
+            <strong>*Campo Obligatorio</strong>
+          </mat-error> -->
+        </div>
+
+      <div class="col-sm-6">
+        <label style="color:#00506a; font-weight: bold;" class="form-label">Numero de Habitacion </label>
+        <mat-select #matSelect
+                      class="form-control form-control-lg form-control-solid"
+                      [formControl]="numeroHab"
+                      placeholder="-- {{placeHolder}} -- ">
+            <footer>
+              <button style="background-color: #319dd7;" (click)="okayChecked()" mat-raised-button class="btn btn-blocked">Confirmar</button>
+            </footer>
+            <!-- <mat-option (click)="Allchecked($event)">Todos</mat-option> -->
+              <div>
+                <mat-option #matOption (click)="cuartoValue(matOption.selected,matOption.value);" *ngFor="let numero of mySet" [value]="numero">{{numero}}</mat-option>
+              </div>
+          </mat-select>
+                      <!--Error Block-->
+        <!-- <mat-error *ngIf="numeroHab.hasError('required')">
+          <strong>*Campo Obligatorio</strong>
+        </mat-error> -->
+      </div>
+ </div>
+
+    <br>
+
+  <div style=" text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
+    <label style="color: aliceblue"> Estado de Reserva / Folio </label>
+    <div style="justify-content: space-around;" class="row">
+
+      <div class="col-lg-6">
+        <button 
+          (click)="closeModal()"
+          class="btn btn-secondary btn-block"
+          type="submit"
+          name="estatus"
+        >
+          Cerrar
+        </button>
+        <br>
+      </div>
+      
+
+      <div class="col-lg-6">
+        <button disabled class="btn btn-warning btn-block" type="submit">
+          Actualizar y Guardar
+        </button>
+        <br>
+      </div>
+      <br>
+
+    
+      <br>
+    </div>
+  </div>
+
+
+<ng-template #error let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Error</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Ocurrio un Error al actualizar al Húesped intente de nuevo mas tarde&hellip;</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #exito let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{mensaje_exito}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
+  </div> -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>

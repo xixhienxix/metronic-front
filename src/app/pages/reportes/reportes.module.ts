@@ -59,6 +59,7 @@ import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { ConfirmationModalComponent } from './customers/components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
+import { ModificaHuespedComponent } from './customers/components/helpers/modifica-huesped/modifica-huesped.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -92,6 +93,7 @@ registerLocaleData(localeEs);
     NuevaReservaModalComponent,
     BloqueoReservaModalComponent,
     ConfirmationModalComponent,
+    ModificaHuespedComponent,
 
   ],
   imports: [
