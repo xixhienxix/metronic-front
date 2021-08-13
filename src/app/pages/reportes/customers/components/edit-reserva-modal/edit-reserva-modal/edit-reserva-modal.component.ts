@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit,ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit,ViewEncapsulation,ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { of, Subscription } from 'rxjs';
@@ -22,6 +22,9 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatTabsModule} from '@angular/material/tabs';
 import{ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
 import {NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
+import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.service';
+import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
+import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -105,7 +108,11 @@ const EMPTY_CUSTOMER: Huesped = {
 })
 
 export class EditReservaModalComponent implements OnInit {
+  @ViewChild('error') errorModal: null;
+  @ViewChild('exito') exitoModal: null;
+
   @Input()
+
 
   //DATETIMEPICKER RANGE
     hoveredDate: NgbDate | null = null;
@@ -115,6 +122,8 @@ export class EditReservaModalComponent implements OnInit {
     fullFechaSalida:string
     fullFechaLlegada:string
     noches:number;
+    closeResult: string;
+
     id:number;
     folio:number;
     isLoading$;
@@ -125,7 +134,13 @@ export class EditReservaModalComponent implements OnInit {
     formGroup: FormGroup;
     public folios:Foliador[]=[];
     public folioactualizado:any;
+    fechaFinalBloqueo:string
+    comparadorInicial:Date
+    comparadorFinal:Date
+    fechaInicialBloqueo:string
+
     estatusArray:Estatus[]=[];
+    adicionalArray:Adicional[]=[];
     checked: boolean = true;
     modifica:boolean = true;
     changeStyleHidden:string = 'display:none'
@@ -143,6 +158,7 @@ export class EditReservaModalComponent implements OnInit {
       private modalService: NgbModal,
       //
       public foliosService : FoliosService,
+      public adicionalService : AdicionalService,
       private customersService: HuespedService,
       private fb: FormBuilder, public modal: NgbActiveModal,
       public customerService: HuespedService,
@@ -152,7 +168,9 @@ export class EditReservaModalComponent implements OnInit {
       private http: HttpClient
       ) {
         this.fromDate = calendar.getToday();
-        this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); }
+        this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
+        this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+      }
 
 
 
@@ -160,6 +178,7 @@ export class EditReservaModalComponent implements OnInit {
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
       this.getEstatus();
+      this.getAdicionales();
     }
 
 
@@ -198,6 +217,17 @@ export class EditReservaModalComponent implements OnInit {
                             for(let i=0;i<estatus.length;i++)
                             {
                               this.estatusArray=estatus
+                            }
+                          })
+
+    }    
+    
+    getAdicionales(): void {
+      this.adicionalService.getAdicionales()
+                          .subscribe((adicional)=>{
+                            for(let i=0; i<adicional.length;i++)
+                            {
+                              this.adicionalArray.push(adicional[i])
                             }
                           })
 
@@ -503,5 +533,61 @@ export class EditReservaModalComponent implements OnInit {
     closeModal(){
       this.modal.close();
     }
+    fechaSeleccionadaFinal(event){
+      this.fromDate = event
 
+      this.comparadorInicial = new Date(event.year,event.month-1,event.day)
+    
+      this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
+    
+      if(this.comparadorInicial>this.comparadorFinal)
+      {
+      }
+      else if(this.comparadorInicial<this.comparadorFinal)
+      {
+        
+      }
+    }
+//Butons
+    confirmaReserva(estatus,folio)
+    {
+
+          this.estatusService.actualizaEstatus(estatus,folio)
+          .subscribe(
+            ()=>
+            {
+    
+            },
+            (err)=>{
+              if(err){
+                this.modalService.open(this.errorModal,{size:'sm'}).result.then((result) => {
+                  this.closeResult = `Closed with: ${result}`;
+                  }, (reason) => {
+                      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                  });
+                    }
+            },
+            ()=>{
+      
+                this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
+                  this.closeResult = `Closed with: ${result}`;
+                  }, (reason) => {
+                      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                  });
+              
+            }
+          )
+        
+    }
+
+    getDismissReason(reason: any): string 
+    {
+          if (reason === ModalDismissReasons.ESC) {
+              return 'by pressing ESC';
+          } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+              return 'by clicking on a backdrop';
+          } else {
+              return  `with: ${reason}`;
+          }
+    }
   }

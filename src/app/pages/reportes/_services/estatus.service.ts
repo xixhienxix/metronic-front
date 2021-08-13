@@ -38,6 +38,12 @@ export class EstatusService  {
 
   }
 
+  actualizaEstatus(estatus,folio){
+
+    return this.http.post(environment.apiUrl+"/actualiza/estatus",estatus)
+
+  }
+
 
   constructor(private http: HttpClient) { }
 }
