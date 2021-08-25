@@ -31,6 +31,7 @@ export class ModificaHuespedComponent implements OnInit {
   closeResult: string;
   //mensajes personalizados
   mensaje_exito:string;
+  mensaje_error:string;
   placeHolder:string="-- Seleccione Habitación --"
 
   //Fechas
@@ -50,8 +51,8 @@ export class ModificaHuespedComponent implements OnInit {
   numCuarto: Array<number>=[];
   tipodeCuartoFiltrados:Array<string>=[];
   infoCuarto:any[]=[];
-
-
+  codigo:Habitaciones[]=[]
+  disponibilidadUpdate:Disponibilidad[]=[];
 
   //Forms
   modificaHuespedFormGroup: FormGroup;
@@ -74,6 +75,8 @@ export class ModificaHuespedComponent implements OnInit {
     this.today= calendar.getToday();
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      this.comparadorInicial=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
+      this.comparadorFinal=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
   }
 
   ngOnInit(): void {
@@ -280,34 +283,11 @@ export class ModificaHuespedComponent implements OnInit {
   {
     let index;
     let indexTipo;
-    let codigo;
+    ;
 
     this.habitacionService.getHabitacionbyNumero(value)
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-          postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
       .subscribe((cuartos)=>{
-        codigo=(cuartos)
-        if(selected==true)
-        {
-          this.numCuarto.push(value);
-          this.tipodeCuartoFiltrados.push(codigo[0].Codigo)
-
-        }else if(selected==false)
-        {
-          index=this.numCuarto.indexOf(value,0)
-          this.numCuarto.splice(index,1)
-
-          indexTipo = this.tipodeCuartoFiltrados.indexOf(codigo[0].Codigo,0)
-          this.tipodeCuartoFiltrados.splice(indexTipo,1)
-        }
+        this.codigo=(cuartos)
       })
 
     //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
@@ -328,6 +308,7 @@ export class ModificaHuespedComponent implements OnInit {
             },
             (err)=>{
               if(err){
+                this.mensaje_error="El estatus no se pudo actualizar intente de nuevo mas tarde"
                 const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
                 modalRef.result.then((result) => {
                   this.closeResult = `Closed with: ${result}`;
@@ -340,7 +321,8 @@ export class ModificaHuespedComponent implements OnInit {
                     }
             },
             ()=>{
-      
+              this.mensaje_exito="Datos del Húesped actualizados con exito"
+
               const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
               modalRef.result.then((result) => {
                 this.closeResult = `Closed with: ${result}`;
@@ -350,7 +332,6 @@ export class ModificaHuespedComponent implements OnInit {
                 setTimeout(() => {
                   modalRef.close('Close click');
                 },4000)
-                this.mensaje_exito="Chek-Out Realizado con Exito"
 
             this.customerService.fetch();
           });
@@ -372,6 +353,58 @@ export class ModificaHuespedComponent implements OnInit {
     okayChecked() {
       // this.last_selection = this.formGroup.controls.project.value
       this.matSelect.close()
+    }
+
+    actualizarYGuardar()
+    {
+      let numero
+      let Codigo
+      for(let i:0;i<this.codigo.length;i++)
+      {
+        this.codigo[i].Numero=numero
+        this.codigo[i].Codigo=Codigo
+      }
+
+      this.customerService.modificaHuesped(Codigo,numero,this.comparadorInicial,this.comparadorFinal)
+      .subscribe(
+        ()=>
+        {
+
+        },
+        (err)=>{
+          if(err){
+            this.mensaje_error="El húsped no se pudo actualizar intente de nuevo mas tarde"
+
+            const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              });
+              setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
+                }
+        },
+        ()=>{
+
+          this.mensaje_exito="Chek-Out Realizado con Exito"
+          const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+          modalRef.result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
+
+        this.customerService.fetch();
+      });
+
+
+      //this.disponibilidadService.actualizaDisponibilidad()
+
     }
 
 }

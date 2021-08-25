@@ -7,6 +7,7 @@ import { Huesped } from '../_models/customer.model';
 import { baseFilter } from '../../../_fake/fake-helpers/http-extenstions';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
+import { Habitaciones } from '../_models/habitaciones.model';
 
 const DEFAULT_STATE: ITableState = {
   filter: {},
@@ -87,6 +88,12 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   {
     return this.http
     .post(environment.apiUrl+'/reportes/actualiza/huesped',huesped)
+  }
+
+  modificaHuesped(codigo,numero,llegada,salida)
+  {
+    return this.http
+    .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida})
   }
 
   ngOnDestroy() {
