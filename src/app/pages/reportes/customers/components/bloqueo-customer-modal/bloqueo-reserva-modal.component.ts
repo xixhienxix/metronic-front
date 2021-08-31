@@ -103,7 +103,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   isLoading$;
   habitaciones:Habitaciones;
   bloqueoFormGroup: FormGroup;
-  checkboxFormGroup: FormGroup;
   myControl: FormGroup;
   mySet = new Set();
   placeHolder:string="-- Seleccione Habitación --"

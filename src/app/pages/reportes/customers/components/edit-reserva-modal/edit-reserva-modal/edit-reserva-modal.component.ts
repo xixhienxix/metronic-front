@@ -198,6 +198,7 @@ export class EditReservaModalComponent implements OnInit {
       const fechaSalida = new Date(anoSalida,mesSalida,diaSalida)
       this.fullFechaSalida = fechaSalida.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaSalida.getUTCMonth()) + "/" + fechaSalida.getFullYear().toString()
     }
+
     getEstatus(): void {
       this.estatusService.getEstatus()
                         .pipe(map(
@@ -658,13 +659,26 @@ export class EditReservaModalComponent implements OnInit {
       const modalRef = this.modalService.open(ModificaHuespedComponent,{size:'md'})
       modalRef.componentInstance.huesped = this.huesped;
 
+      modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+        //Recibir Data del Modal usando EventEmitter
+        console.log("EventEmmiter: ",receivedEntry);
+        this.huesped=receivedEntry;
+        })
+        //Recibir Data del Modal usando modal.close(data)
+        modalRef.result.then((result) => {
+          if (result) {
+          this.huesped=result
+            this.formatFechas();
+          console.log("modal.close():", result);
+          }
+          });
+
       modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         });
     }
-
 
     getDismissReason(reason: any): string 
     {
