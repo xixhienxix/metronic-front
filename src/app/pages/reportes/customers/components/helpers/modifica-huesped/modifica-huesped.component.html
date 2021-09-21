@@ -142,13 +142,13 @@
         <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Inicial</label>
         <div class="form-group" >
           <div class="input-group">
-            <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+            <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
             (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker">
 
             <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaLlegada" >
 
             <div class="input-group-append">
-              <button class="btn btn-primary" (click)="d.toggle()" type="button">
+              <button class="btn btn-primary" (click)="toggleCalendarioInicial()" type="button">
                 <i class="fa fa-calendar icon"></i>
               </button>
             </div>
@@ -164,39 +164,51 @@
           <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Final</label>
           <div class="form-group" >
             <div class="input-group">
-              <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+              <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
               (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
 
               <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaSalida" >
 
               <div class="input-group-append">
-                <button class="btn btn-primary" (click)="f.toggle()" type="button">
+                <button class="btn btn-primary" (click)="toggleCalendarioFinal()" type="button">
                   <i class="fa fa-calendar icon"></i>
                 </button>
               </div>
             </div>
           </div>
-          <div *ngIf="display==false" class="row">
-            <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
-          </div>  
-        </div>  
-       
+        </div> 
+        
+        <div  class="col-sm-6">
+          <ngb-datepicker [hidden]="fechaInicialDisplay" #dp [minDate]=minDate
+          (dateSelect)="fechaSeleccionadaInicial($event)" ></ngb-datepicker>
+        </div>
+        <div   class="col-sm-6">
+          <ngb-datepicker [hidden]="fechaFinalDisplay" [minDate]=minDate
+          (dateSelect)="fechaSeleccionadaFinal($event)" #df ></ngb-datepicker>
+        </div>
     </div>
+<br>
 
-  
+    <div class="col-sm-12">
+      <div *ngIf="display==false" class="row col-sm-10" >
+        <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
+      </div>
+    </div>
+   
 
-
+<br>
     <div class="row col-md-12">
 
         <div class="col-sm-6">
           <label style="color:#00506a; font-weight: bold;" class="form-label">Tipo de Habitación </label>
-          <mat-select 
+          <mat-select #habValues
                       class="form-control form-control-lg form-control-solid"
                       name="habitacion"
-                      (selectionChange)="habValue($event)"
+                      (selectionChange)="habValue($event.value)"
                       placeholder="-- Seleccione Tipo de Habitación -- " required
                       >
-              <!-- <mat-option value="1">Todos los Tipos de Cuartos</mat-option> -->
+                      <mat-option value="0">-- Selecciona Habitación --</mat-option>
+              <mat-option value="1">Todos los Tipos de Cuartos</mat-option>
               <mat-option *ngFor="let tipoCuarto of codigoCuarto" [value]="tipoCuarto">{{tipoCuarto.replace("_"," ")}} </mat-option>
           </mat-select>
               <!--Error Block-->
@@ -206,32 +218,139 @@
         </div>
 
       <div class="col-sm-6">
-        <label style="color:#00506a; font-weight: bold;" class="form-label">Numero de Habitacion </label>
+        <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Numero de Habitacion </label>
         <mat-select #matSelect
+                      disabled={{!bandera}}
                       class="form-control form-control-lg form-control-solid"
-                      [formControl]="numeroHab"
+                     
                       placeholder="-- {{placeHolder}} -- ">
             <!-- <footer>
               <button style="background-color: #319dd7;" (click)="okayChecked()" mat-raised-button class="btn btn-blocked">Confirmar</button>
-            </footer> -->
-            <!-- <mat-option (click)="Allchecked($event)">Todos</mat-option> -->
+            </footer>
               <div>
-                <mat-option #matOption (click)="cuartoValue(matOption.selected,matOption.value);" *ngFor="let numero of mySet" [value]="numero">{{numero}}</mat-option>
+                  <mat-option *ngFor="let numero of mySet" #matOption (click)="cuartoValue(matOption.selected,matOption.value);" [value]="numero">{{numero}}</mat-option>
               </div>
-          </mat-select>
-                      <!--Error Block-->
-        <!-- <mat-error *ngIf="numeroHab.hasError('required')">
-          <strong>*Campo Obligatorio</strong>
-        </mat-error> -->
-      </div>
+          </mat-select> -->
+        <small *ngIf="mySet.size==0 && bandera==true"> No hay Disponibilidad para ese tipo de Habitacion en ese rango de fechas, consulte disponibilidad para otras opciones</small>
+      </div> 
  </div>
 
     <br>
 
+
+  <ng-container *ngIf="mySet.size !==0 ">
+    <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
+      <mat-expansion-panel  [expanded]="expandedPane"  hideToggle>
+          <mat-expansion-panel-header style="background-color:#99d284;">
+          <mat-panel-title>
+            CON DISPONIBILIDAD
+          </mat-panel-title>
+          <mat-panel-description *ngIf="bandera==false">
+           <!-- <mat-icon>account_circle</mat-icon> -->
+          </mat-panel-description>
+          <mat-panel-description *ngIf="bandera==true">
+            <!-- <mat-icon>account_circle</mat-icon> -->
+           </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <!--Contenido del Accordion 1 Habitacion-->
+        <div  class="table-responsive angular-bootstrap-table">
+          <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
+            <div *ngIf="codigosCuarto.Codigo==cuarto" style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
+          </ng-container>
+            <table *ngIf="bandera===false" class="table overflow-hidden table-head-custom table-vertical-center">
+              <thead>
+                <th  >
+                  HAB
+                </th>
+                <th>
+                $ NOCHE
+                </th>
+                <th>
+                 $ TOTAL
+                </th>
+                <!-- <th >
+                  CAPACIDAD
+                </th> -->
+              </thead>
+              <ng-container *ngFor="let habitacionesDisponibles of mySet">
+                <ng-container *ngFor="let tipocuarto of cuartos let i = index">
+                <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles" >
+                  <tr><!--[checked=tipocuarto.value]-->
+                    <td ><!--(change)="checkedUp($event,tipocuarto.Numero,tipocuarto.Codigo)" [checked]="tipocuarto.checkBox"-->
+                        <mat-checkbox [checked]="selected === i" (change)="selected = i; habitacionSeleccionada(tipocuarto.Numero,tipocuarto.Codigo,tipocuarto.Tarifa)"  ></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}
+                    </td>
+                    <td >{{ tipocuarto.Tarifa.toLocaleString("es-MX") }}.00</td>
+                    <td >{{ (tipocuarto.Tarifa * diaDif).toLocaleString("es-MX") }}.00</td>
+                    <!-- <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td> -->
+                  </tr>
+                </tbody>
+              </ng-container>
+            </ng-container>
+            </table>
+            <!--Contenido del Acordion Todas Las Habitaciones-->
+            <ng-container *ngIf="bandera==true">
+            <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
+              <div style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
+                  <table class="table overflow-hidden table-head-custom table-vertical-center">
+                    <thead>
+                      <th  >
+                        HAB
+                      </th>
+                      <th>
+                      $ NOCHE
+                      </th>
+                      <th>
+                      $ TOTAL
+                      </th>
+                      <!-- <th >
+                        CAPACIDAD
+                      </th> -->
+                    </thead>
+                    <ng-container *ngFor="let habitacionesDisponibles of mySet">
+                      <ng-container *ngFor="let tipocuarto of cuartos let i = index">
+                      <tbody *ngIf="tipocuarto.Numero == habitacionesDisponibles && tipocuarto.Codigo == codigosCuarto.Codigo">
+                        <tr>
+                          <td ><mat-checkbox  [checked]="selected === i" (change)="selected = i; habitacionSeleccionada(tipocuarto.Numero,tipocuarto.Codigo,tipocuarto.Tarifa)" #checked ></mat-checkbox> &nbsp; {{ tipocuarto.Numero }}</td>
+                          <td >{{ tipocuarto.Tarifa.toLocaleString("es-MX") }}.00</td>
+                          <td >{{ (tipocuarto.Tarifa * diaDif).toLocaleString("es-MX") }}.00</td>
+                          <!-- <td style="text-align: center;">{{ tipocuarto.Personas }} - {{tipocuarto.Personas_Extra}} </td> -->
+                        </tr>
+                      </tbody>
+                    </ng-container>
+                  </ng-container>
+                </table>
+              </ng-container>
+            </ng-container>
+
+
+          </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+   </ng-container>
+   <!--SIN DISPONIBILIDAD-->
+   <ng-container *ngIf="mySet.size === 0 && inicio === false"  >
+    <mat-accordion  [style]="accordionDisplay" class="example-headers-align" multi>
+      <mat-expansion-panel>
+          <mat-expansion-panel-header style="background-color:#fa6d7c;">
+          <mat-panel-title>
+            SIN DISPONIBILIDAD
+          </mat-panel-title>
+          <mat-panel-description>
+           <!--Type your name and age-->
+           Consulte Otro Tipo de Habitacion
+            <!-- <mat-icon>account_circle</mat-icon> -->
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <!--Contenido del Accordion-->
+      </mat-expansion-panel>
+    </mat-accordion>
+   </ng-container>
+
+
   <div style=" text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
     <label style="color: aliceblue"> Estado de Reserva / Folio </label>
     <div style="justify-content: space-around;" class="row">
-
       <div class="col-lg-6">
         <button 
           (click)="closeModal()"
@@ -246,8 +365,7 @@
       
 
       <div class="col-lg-6">
-        <button (click)="actualizarYGuardar()"
-                class="btn btn-warning btn-block" type="submit">
+        <button  (click)="revisaDatos()"  class="btn btn-warning btn-block" type="submit">
           Actualizar y Guardar
         </button>
         <br>

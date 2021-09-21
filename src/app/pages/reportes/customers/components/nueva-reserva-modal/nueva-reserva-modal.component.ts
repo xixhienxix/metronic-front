@@ -542,6 +542,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     return control.dirty || control.touched;
   }
 
+  
   getHabitaciones()
   {
     this.habitacionService.gethabitaciones()
@@ -587,6 +588,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   buscaDispo()
   {
+    this.formGroup.controls['checkbox'].setValue(false);
+
     this.inicio=false;
     this.accordionDisplay="";
     this.mySet.clear();
@@ -989,6 +992,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   rangoFechas(llegada:string,salida:string)
   {
+    
     let rangodeFechas
     let toDate =   new Date(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
     let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));

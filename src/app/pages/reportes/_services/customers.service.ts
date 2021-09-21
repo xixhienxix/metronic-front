@@ -84,6 +84,12 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
     return this.http.post<any>(environment.apiUrl+"/reportes/huesped", huesped)
     }
 
+  updateEstatusHuesped(huesped:Huesped)
+  {
+    return this.http
+    .post(environment.apiUrl+'/reportes/actualiza/estatus/huesped',huesped)
+  }
+
   updateHuesped(huesped:Huesped)
   {
     return this.http
