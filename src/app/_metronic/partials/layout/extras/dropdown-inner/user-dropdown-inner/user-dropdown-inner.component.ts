@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { LayoutService } from '../../../../../core';
-import { UserModel } from '../../../../../../modules/auth/_models/user.model';
+import { AuthModel } from '../../../../../../modules/auth/_services/auth.service';
 import { AuthService } from '../../../../../../modules/auth/_services/auth.service';
 @Component({
   selector: 'app-user-dropdown-inner',
@@ -10,7 +10,7 @@ import { AuthService } from '../../../../../../modules/auth/_services/auth.servi
 })
 export class UserDropdownInnerComponent implements OnInit {
   extrasUserDropdownStyle: 'light' | 'dark' = 'light';
-  user$: Observable<UserModel>;
+  user$: Observable<AuthModel>;
 
   constructor(private layout: LayoutService, private auth: AuthService) {}
 

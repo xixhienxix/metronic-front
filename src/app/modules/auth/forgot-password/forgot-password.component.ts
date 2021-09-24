@@ -47,7 +47,7 @@ export class ForgotPasswordComponent implements OnInit {
           Validators.required,
           Validators.email,
           Validators.minLength(3),
-          Validators.maxLength(320), // https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+          Validators.maxLength(320), 
         ]),
       ],
     });
@@ -55,12 +55,12 @@ export class ForgotPasswordComponent implements OnInit {
 
   submit() {
     this.errorState = ErrorStates.NotSubmitted;
-    const forgotPasswordSubscr = this.authService
-      .forgotPassword(this.f.email.value)
-      .pipe(first())
-      .subscribe((result: boolean) => {
-        this.errorState = result ? ErrorStates.NoError : ErrorStates.HasError;
-      });
-    this.unsubscribe.push(forgotPasswordSubscr);
+    // const forgotPasswordSubscr = this.authService
+    //   .forgotPassword(this.f.email.value)
+    //   .pipe(first())
+    //   .subscribe((result: boolean) => {
+    //     this.errorState = result ? ErrorStates.NoError : ErrorStates.HasError;
+    //   });
+    // this.unsubscribe.push(forgotPasswordSubscr);
   }
 }

@@ -60,7 +60,7 @@ export class ModificaHuespedComponent implements OnInit {
   numCuartoNumber:number;
   tarifa:number;
   codigoCuartoString:string;
-
+  codigo:any[]=[]
 
   sinDisponibilidad:any[]=[]
   mySet = new Set();
@@ -78,8 +78,6 @@ export class ModificaHuespedComponent implements OnInit {
   //Forms
   modificaHuespedFormGroup: FormGroup;
   public tipoCuartoForm: FormBuilder;
-
-
 
   constructor(
     public modal: NgbActiveModal,
