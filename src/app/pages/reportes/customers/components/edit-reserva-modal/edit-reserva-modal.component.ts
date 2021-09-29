@@ -1,24 +1,24 @@
 import { Component, Input,  OnInit,ViewEncapsulation,ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { of, Subscription } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, of, Subject, Subscription } from 'rxjs';
 import { catchError, first, tap } from 'rxjs/operators';
-import { Huesped } from '../../../../_models/customer.model';
-import { Foliador } from '../../../../_models/foliador.model';
-import { Estatus } from '../../../../_models/estatus.model';
-import { HuespedService } from '../../../../_services';
-import { CustomAdapter, CustomDateParserFormatter } from '../../../../../../_metronic/core';
-import { ReportesComponent } from '../../../../reportes.component'
+import { Huesped } from '../../../_models/customer.model';
+import { Foliador } from '../../../_models/foliador.model';
+import { Estatus } from '../../../_models/estatus.model';
+import { HuespedService } from '../../../_services';
+import { CustomAdapter, CustomDateParserFormatter } from '../../../../../_metronic/core';
+import { ReportesComponent } from '../../../reportes.component'
 import { HttpClient } from "@angular/common/http";
 import { map} from 'rxjs/operators'
-import { FoliosService} from '../../../../_services/folios.service'
-import { EstatusService} from '../../../../_services/estatus.service'
-import { ConfirmationModalComponent} from '../../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
+import { FoliosService} from '../../../_services/folios.service'
+import { EstatusService} from '../../../_services/estatus.service'
+import { ConfirmationModalComponent} from '../helpers/confirmation-modal/confirmation-modal/confirmation-modal.component'
 import { NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.service';
 import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-import { ModificaHuespedComponent } from '../../helpers/modifica-huesped/modifica-huesped.component';
+import { ModificaHuespedComponent } from '../helpers/modifica-huesped/modifica-huesped.component';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -106,16 +106,17 @@ export class EditReservaModalComponent implements OnInit {
   @ViewChild('exito') exitoModal: null;
 
   @Input()
+        
+    huespedUpdate$: Observable<Huesped>;
+    private currentHuesped$=new BehaviorSubject<Huesped>(EMPTY_CUSTOMER);
 
-
-  //DATETIMEPICKER RANGE
-    hoveredDate: NgbDate | null = null;
-
-    fromDate: NgbDate | null;
-    toDate: NgbDate | null;
+    //DATETIMEPICKER RANGE
     fullFechaSalida:string
     fullFechaLlegada:string
-    noches:number;
+    hoveredDate: NgbDate | null = null;
+
+    toDate: NgbDate | null;
+
     closeResult: string;
 
     id:number;
@@ -125,21 +126,14 @@ export class EditReservaModalComponent implements OnInit {
     huesped: Huesped;
     foliador:Foliador;
     folioLetra:string;
-    formGroup: FormGroup;
     public folios:Foliador[]=[];
     public folioactualizado:any;
-    fechaFinalBloqueo:string
-    comparadorInicial:Date
-    comparadorFinal:Date
-    fechaInicialBloqueo:string
+
     mensaje_exito:string
     mensaje_error:string
 
     estatusArray:Estatus[]=[];
-    adicionalArray:Adicional[]=[];
     checked: boolean = true;
-    modifica:boolean = true;
-    changeStyleHidden:string = 'display:none'
     changeStyleVisible:string = ''
     setLabel:string="label label-lg label-light-primary label-inline"
 
@@ -149,24 +143,19 @@ export class EditReservaModalComponent implements OnInit {
 
     constructor(
       //Date Imports
-      private calendar: NgbCalendar,
-      public formatter: NgbDateParserFormatter,
       private modalService: NgbModal,
       //
       public foliosService : FoliosService,
       public adicionalService : AdicionalService,
       private customersService: HuespedService,
-      private fb: FormBuilder, 
       public modal: NgbActiveModal,
       public customerService: HuespedService,
       public postService : ReportesComponent,
       public estatusService : EstatusService,
-      public i18n: NgbDatepickerI18n,
+      public i18n:NgbDatepickerI18n,
       private http: HttpClient
       ) {
-        this.fromDate = calendar.getToday();
-        this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
-        this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+      this.huespedUpdate$=this.currentHuesped$.asObservable();
       }
 
 
@@ -175,9 +164,15 @@ export class EditReservaModalComponent implements OnInit {
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
       this.getEstatus();
-      this.getAdicionales();
     }
 
+    get getCurrentHuespedValue(): Huesped {
+      return this.currentHuesped$.value;
+    }
+  
+    set setCurrentHuespedValue(huesped: Huesped) {
+      this.currentHuesped$.next(huesped);
+    }
 
     // async getPrice(currency: string): Promise<number> {
     //   const response = await this.http.get(this.currentPriceUrl).toPromise();
@@ -220,32 +215,23 @@ export class EditReservaModalComponent implements OnInit {
 
     }    
     
-    getAdicionales(): void {
-      this.adicionalService.getAdicionales()
-                          .subscribe((adicional)=>{
-                            for(let i=0; i<adicional.length;i++)
-                            {
-                              this.adicionalArray.push(adicional[i])
-                            }
-                          })
-
-    }
+    
 
     loadCustomer() {
 
-      if (!this.folio) {
+    if (!this.folio) {
+
         console.log("Load Costumer !this.folio", this.folio)
 
         this.huesped = EMPTY_CUSTOMER;
-        this.huesped.nombre=this.huesped.nombre;
-
+        // this.currentHuesped$.next(EMPTY_CUSTOMER)
+        this.setCurrentHuespedValue=EMPTY_CUSTOMER
+        // this.huesped.nombre=this.huesped.nombre;
         this.huesped.folio=this.folio;
         this.huesped.origen = "Online";
-        this.loadForm();
-
-
-      } else {
-
+        // this.loadForm();
+      }
+       else {
 
         const sb = this.customersService.getItemById(this.folio).pipe(
           first(),
@@ -256,171 +242,85 @@ export class EditReservaModalComponent implements OnInit {
           })
         ).subscribe((huesped1: Huesped) => {
           this.huesped = huesped1;
-          this.loadForm();
-          this.formatFechas();
 
-          // this.setLabelStyle(this.huesped.estatus);
+          this.setCurrentHuespedValue=huesped1
+          
+          // this.loadForm();
+          this.formatFechas();
         });
         this.subscriptions.push(sb);
       }
     }
 
-    loadForm() {
-
-      this.formGroup = this.fb.group({
-        nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-        email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
-        telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.minLength(10),Validators.maxLength(14)])],
-        trabajaEn: [this.huesped.trabajaEn, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        fechaNacimiento: [this.huesped.fechaNacimiento, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        tipoDeID: [this.huesped.tipoDeID, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        numeroDeID: [this.huesped.numeroDeID, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        direccion: [this.huesped.direccion, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        pais: [this.huesped.pais, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        ciudad: [this.huesped.ciudad, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        codigoPostal: [this.huesped.codigoPostal, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-        lenguaje: [this.huesped.lenguaje, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      });
-
-      this.noches=-parseInt((this.huesped.llegada.toString()).split("/")[0])+parseInt((this.huesped.salida.toString()).split("/")[0])
-      console.log("",(this.huesped.llegada.toString()).split("/")[0])
-      console.log("",(this.huesped.llegada.toString()).split("/")[0])
-      console.log("this.noches",this.noches)
-    }
 
 
+    // edit() {
+    //   const sbUpdate = this.customersService.update(this.huesped).pipe(
+    //     tap(() => {
+    //       this.modal.close();
+    //     }),
+    //     catchError((errorMessage) => {
+    //       this.modal.dismiss(errorMessage);
+    //       return of(this.huesped);
+    //     }),
+    //   ).subscribe(res => this.huesped = res);
+    //   this.subscriptions.push(sbUpdate);
+    // }
 
-    save() {
-      this.prepareHuesped();
-
-    this.create();
-    }
-
-    edit() {
-      const sbUpdate = this.customersService.update(this.huesped).pipe(
-        tap(() => {
-          this.modal.close();
-        }),
-        catchError((errorMessage) => {
-          this.modal.dismiss(errorMessage);
-          return of(this.huesped);
-        }),
-      ).subscribe(res => this.huesped = res);
-      this.subscriptions.push(sbUpdate);
-    }
-
-    create() {
-      const sbCreate = this.customersService.create(this.huesped).pipe(
-        tap(() => {
-          this.modal.close();
-        }),
-        catchError((errorMessage) => {
-          this.modal.dismiss(errorMessage);
-          return of(this.huesped);
-        }),
-      ).subscribe((res: Huesped) => this.huesped = res);
-      this.subscriptions.push(sbCreate);
-    }
-
-    private prepareHuesped() {
-
-      const formData = this.formGroup.value;
-
-
-      this.huesped.llegada = this.fromDate.toString();
-      this.huesped.salida = this.toDate.toString();
-      this.huesped.nombre = formData.nombre;
-
-          this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
-          this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-          this.huesped.noches=(this.fromDate.day)-(this.toDate.day)
-          this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
-          this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
-          this.huesped.habitacion=formData.habitacion
-          this.huesped.telefono=formData.telefono
-          this.huesped.email=formData.email
-          this.huesped.motivo=formData.motivo
-          this.huesped.id=this.huesped.folio
-
-      this.customerService.addPost(this.huesped);
-        console.log("AddPost Succesfull")
-
-
-    }
 
     ngOnDestroy(): void {
       this.subscriptions.forEach(sb => sb.unsubscribe());
     }
 
-    // helpers for View
-    isControlValid(controlName: string): boolean {
-      const control = this.formGroup.controls[controlName];
-      return control.valid && (control.dirty || control.touched);
-    }
-
-    isControlInvalid(controlName: string): boolean {
-      const control = this.formGroup.controls[controlName];
-      return control.invalid && (control.dirty || control.touched);
-    }
-
-    controlHasError(validation, controlName): boolean {
-      const control = this.formGroup.controls[controlName];
-      return control.hasError(validation) && (control.dirty || control.touched);
-    }
-
-    isControlTouched(controlName): boolean {
-      const control = this.formGroup.controls[controlName];
-      return control.dirty || control.touched;
-    }
+    
 
 
+    // isNumber(val): boolean { return typeof val === 'number'; }
+    // isNotNumber(val): boolean { return typeof val !== 'number'; }
 
-    isNumber(val): boolean { return typeof val === 'number'; }
-    isNotNumber(val): boolean { return typeof val !== 'number'; }
 
+    // quantity:number=1;
+    // quantityNin:number=1;
 
-    quantity:number=1;
-    quantityNin:number=1;
+    // plus()
+    // {
+    //   this.quantity++;
+    //   this.huesped.adultos=this.quantity
+    // }
+    // minus()
+    // {
+    //   if(this.quantity>1)
+    //   {
+    //   this.quantity--;
+    //   this.huesped.adultos=this.quantity;
+    //   }
+    //   else
+    //   this.quantity
+    //   this.huesped.adultos=this.quantity;
+    // }
+    // plusNin()
+    // {
+    //   this.quantityNin++;
+    //   this.huesped.ninos=this.quantityNin;
+    // }
+    // minusNin()
+    // {
+    //   if(this.quantityNin>1)
+    //   {
+    //   this.quantityNin--;
+    //   this.huesped.ninos=this.quantityNin;
+    //   }
+    //   else
+    //   this.quantityNin
+    //   this.huesped.ninos=this.quantityNin;
 
-    plus()
-    {
-      this.quantity++;
-      this.huesped.adultos=this.quantity
-    }
-    minus()
-    {
-      if(this.quantity>1)
-      {
-      this.quantity--;
-      this.huesped.adultos=this.quantity;
-      }
-      else
-      this.quantity
-      this.huesped.adultos=this.quantity;
-    }
-    plusNin()
-    {
-      this.quantityNin++;
-      this.huesped.ninos=this.quantityNin;
-    }
-    minusNin()
-    {
-      if(this.quantityNin>1)
-      {
-      this.quantityNin--;
-      this.huesped.ninos=this.quantityNin;
-      }
-      else
-      this.quantityNin
-      this.huesped.ninos=this.quantityNin;
+    // }
 
-    }
-
-    changeVisible()
-    {
-      this.changeStyleHidden='';
-      this.changeStyleVisible='display:none'
-    }
+    // changeVisible()
+    // {
+    //   this.changeStyleHidden='';
+    //   this.changeStyleVisible='display:none'
+    // }
 
     setEstatus(value): void {
 
@@ -492,60 +392,18 @@ export class EditReservaModalComponent implements OnInit {
 
     }
 
-    onDateSelection(date: NgbDate) {
-      if (!this.fromDate && !this.toDate) {
-        this.fromDate = date;
-      } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
-        this.toDate = date;
-      } else {
-        this.toDate = null;
-        this.fromDate = date;
-      }
-    }
-
-    isHovered(date: NgbDate) {
-      return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-    }
-
-    isInside(date: NgbDate) {
-      return this.toDate && date.after(this.fromDate) && date.before(this.toDate);
-    }
-
-    isRange(date: NgbDate) {
-      return date.equals(this.fromDate) || (this.toDate && date.equals(this.toDate)) || this.isInside(date) || this.isHovered(date);
-    }
-
-    validateInput(currentValue: NgbDate | null, input: string): NgbDate | null {
-      const parsed = this.formatter.parse(input);
-      return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
-    }
-
-    tarifaAutomatica()
-    {
-      if (!this.checked) {
-        this.checked=true ;
-       } else {
-         this.checked=false ;
-       }
-    }
+    // tarifaAutomatica()
+    // {
+    //   if (!this.checked) {
+    //     this.checked=true ;
+    //    } else {
+    //      this.checked=false ;
+    //    }
+    // }
     closeModal(){
       this.modal.close();
     }
-    fechaSeleccionadaFinal(event){
-      this.fromDate = event
-
-      this.comparadorInicial = new Date(event.year,event.month-1,event.day)
     
-      this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
-    
-      if(this.comparadorInicial>this.comparadorFinal)
-      {
-      }
-      else if(this.comparadorInicial<this.comparadorFinal)
-      {
-        
-      }
-    }
 //Butons
     confirmaReserva(estatus,folio)
     {
@@ -587,20 +445,7 @@ export class EditReservaModalComponent implements OnInit {
           )
         
     }
-    servicioAdicional(event,adicional,descripcion){
-      if(event.checked)
-      {     
-        this.huesped.tarifa=adicional+this.huesped.tarifa
-        this.huesped.pendiente=this.huesped.pendiente+adicional
-        this.huesped.porPagar=this.huesped.porPagar+adicional
-      }
-      else if(!event.checked){
-        this.huesped.tarifa=this.huesped.tarifa-adicional
-        this.huesped.pendiente=this.huesped.pendiente-adicional
-        this.huesped.porPagar=this.huesped.porPagar-adicional
-  }
-      
-    }
+
     checkOut(estatus:number,folio:number)
     {
       if (this.huesped.pendiente==0)
@@ -609,7 +454,19 @@ export class EditReservaModalComponent implements OnInit {
           .subscribe(
             ()=>
             {
-    
+          
+              const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+              modalRef.result.then((result) => {
+                this.closeResult = `Closed with: ${result}`;
+                }, (reason) => {
+                    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                });
+                setTimeout(() => {
+                  modalRef.close('Close click');
+                },4000)
+                this.mensaje_exito="Chek-Out Realizado con Exito"
+
+            this.customerService.fetch();
             },
             (err)=>{
               if(err){
@@ -625,24 +482,12 @@ export class EditReservaModalComponent implements OnInit {
                     }
             },
             ()=>{
-      
-              const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
-              modalRef.result.then((result) => {
-                this.closeResult = `Closed with: ${result}`;
-                }, (reason) => {
-                    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-                });
-                setTimeout(() => {
-                  modalRef.close('Close click');
-                },4000)
-                this.mensaje_exito="Chek-Out Realizado con Exito"
 
-            this.customerService.fetch();
           });
 
       }else
       {
-        const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+        const modalRef = this.modalService.open(this.errorModal,{size:'sm'})
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {

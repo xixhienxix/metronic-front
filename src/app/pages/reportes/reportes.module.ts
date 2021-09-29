@@ -36,7 +36,7 @@ import { EditRemarkModalComponent } from './products/product-edit/remarks/edit-r
 import { EditSpecModalComponent } from './products/product-edit/specifications/edit-spec-modal/edit-spec-modal.component';
 import { Injectable } from '@angular/core';
 import { MessagesComponent } from './messages/messages.component';
-import { EditReservaModalComponent } from './customers/components/edit-reserva-modal/edit-reserva-modal/edit-reserva-modal.component'
+import { EditReservaModalComponent } from './customers/components/edit-reserva-modal/edit-reserva-modal.component';
 import { MatSlideToggleModule} from '@angular/material/slide-toggle';
 import { MatTabsModule} from '@angular/material/tabs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -60,7 +60,10 @@ import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { ConfirmationModalComponent } from './customers/components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
 import { ModificaHuespedComponent } from './customers/components/helpers/modifica-huesped/modifica-huesped.component';
-
+import { TransaccionesComponentComponent } from './customers/components/edit-reserva-modal/components/transacciones/transacciones-component/transacciones-component.component';
+import { ReservasComponentComponent } from './customers/components/edit-reserva-modal/components/reserva/reservas-component/reservas-component.component';
+import { HuespedComponentComponent } from './customers/components/edit-reserva-modal/components/huesped/huesped-component/huesped-component.component';
+import { EdoCuentaComponentComponent } from './customers/components/edit-reserva-modal/components/estado-de-cuenta/edo-cuenta-component/edo-cuenta-component.component';
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
 
@@ -94,7 +97,10 @@ registerLocaleData(localeEs);
     BloqueoReservaModalComponent,
     ConfirmationModalComponent,
     ModificaHuespedComponent,
-
+    TransaccionesComponentComponent,
+    ReservasComponentComponent,
+    HuespedComponentComponent,
+    EdoCuentaComponentComponent,
   ],
   imports: [
     MatSlideToggleModule,

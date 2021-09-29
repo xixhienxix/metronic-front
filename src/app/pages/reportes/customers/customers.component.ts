@@ -34,7 +34,7 @@ import { DeleteHuespedModalComponent } from './components/delete-customer-modal/
 import { DeleteHuespedesModalComponent } from './components/delete-customers-modal/delete-customers-modal.component';
 import { UpdateCustomersStatusModalComponent } from './components/update-customers-status-modal/update-customers-status-modal.component';
 import { FetchCustomersModalComponent } from './components/fetch-customers-modal/fetch-customers-modal.component';
-import { EditReservaModalComponent } from './components/edit-reserva-modal/edit-reserva-modal/edit-reserva-modal.component';
+import { EditReservaModalComponent } from './components/edit-reserva-modal/edit-reserva-modal.component';
 import { CompileShallowModuleMetadata } from '@angular/compiler';
 import { isJSDocThisTag } from 'typescript';
 import { NuevaReservaModalComponent } from './components/nueva-reserva-modal/nueva-reserva-modal.component';

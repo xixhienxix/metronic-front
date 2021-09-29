@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription, Observable, BehaviorSubject } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { delay, first } from 'rxjs/operators';
 import { UserModel } from '../_models/user.model';
 import { AuthService } from '../_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,6 +16,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   returnUrl: string;
   isLoading$: Observable<boolean>;
+  isLoading:boolean
+  
   loading:boolean;
   private subscription: Subscription;
   message: any;
@@ -62,6 +64,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   submit() {
+    this.isLoading=true
     this.authService.login(this.f.username.value,this.f.password.value).subscribe(
       (value)=>
       {
@@ -69,7 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         {
           this.router.navigate(['reportes/customers'])
         }
-
+        this.isLoading=false
       },
       (err)=>{
         if(err)
