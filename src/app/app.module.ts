@@ -32,7 +32,6 @@ import localeEs from '@angular/common/locales/es-MX';
 import { registerLocaleData } from '@angular/common';
 
 
-
 function appInitializer(authService: AuthService) {
   return () => {
     return new Promise((resolve) => {

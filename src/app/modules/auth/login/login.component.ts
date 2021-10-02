@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           {          this.message='Fallo en la solicitud intente de nuevo mas tarde'        }
           else {           this.message='Usuario o Contraseña Incorrectos'        }
         }
-        this.loading = false;  
+        this.isLoading = false;  
       },
       ()=>{
         console.log('finalize')

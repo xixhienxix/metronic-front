@@ -1,0 +1,77 @@
+
+ <mat-form-field appearance="standard">
+        <mat-label>Filtro</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Buscar" #input>
+ </mat-form-field>
+      
+ <div class="example-container mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" matSort>
+      
+          <!-- ID Column -->
+          <ng-container  matColumnDef="_id">
+            <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> ID </th>
+            <td mat-cell *matCellDef="let row"> {{row._id}} </td>
+          </ng-container>
+      
+          <!-- Folio Column -->
+          <ng-container matColumnDef="Folio">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Folio </th>
+            <td mat-cell *matCellDef="let row"> {{row.Folio}}% </td>
+          </ng-container>
+      
+          <!-- Fecha Column -->
+          <ng-container matColumnDef="Fecha">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+            <td mat-cell *matCellDef="let row"> {{row.Fecha}} </td>
+          </ng-container>
+      
+          <!-- Referencia Column -->
+          <ng-container matColumnDef="Referencia">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Referencia </th>
+            <td mat-cell *matCellDef="let row"> {{row.Referencia}} </td>
+          </ng-container>
+    
+        <!-- Descripcion Column -->
+          <ng-container matColumnDef="Descripcion">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripcion </th>
+            <td mat-cell *matCellDef="let row"> {{row.Descripcion}} </td>
+          </ng-container>
+    
+              <!-- Forma_De_Pago Column -->
+          <ng-container matColumnDef="Forma_De_Pago">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Forma_De_Pago </th>
+            <td mat-cell *matCellDef="let row"> {{row.Forma_De_Pago}} </td>
+          </ng-container>
+    
+                    <!-- Cantidad Column -->
+          <ng-container matColumnDef="Cantidad">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cantidad </th>
+            <td mat-cell *matCellDef="let row"> {{row.Cantidad}} </td>
+          </ng-container>
+    
+          
+                    <!-- Cargo Column -->
+          <ng-container matColumnDef="Cargo">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cargo </th>
+            <td mat-cell *matCellDef="let row"> {{row.Cargo}} </td>
+          </ng-container>
+    
+                          <!-- Abono Column -->
+          <ng-container matColumnDef="Abono">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Abono </th>
+            <td mat-cell *matCellDef="let row"> {{row.Abono}} </td>
+          </ng-container>
+      
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      
+          <!-- Row shown when there is no matching data. -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="4">No se encontraron datos para el filtro"{{input.value}}"</td>
+          </tr>
+
+        </table>
+      
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+      </div>
+

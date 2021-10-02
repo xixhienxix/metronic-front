@@ -1,1 +1,247 @@
-<p>transacciones-component works!</p>
+<div style="background-color: #319dd7" class="modal-content sub-menu">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    >
+      Agregar un Movimiento
+    </label>
+  </div>
+<div>
+<br>
+<form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+  <div style="text-align: right;" class="row col-md-12">
+    <small *ngIf="submitted" style=" color: red;">Captura los Datos Faltantes</small>
+  </div>
+  <div class="row col-md-12">
+      <div class="col-sm-6">
+        <mat-form-field style=" width: 100%;" appearance="fill">
+            <mat-label>Cargo / Abono</mat-label>
+            <mat-select  formControlName="cargo_abono">
+              <mat-option>Seleccione Tipo de Concepto</mat-option>
+              <th>
+              <mat-option (click)="filtroCodigosDeCargo($event)" value="Cargo">Cargo</mat-option>
+              <mat-option (click)="filtroCodigosDeCargo($event)" value="Abono">Abono</mat-option>
+            </mat-select>
+        </mat-form-field>
+      </div>
+        <div class="col-sm-6">
+            <mat-form-field style=" width: 100%;" appearance="fill">
+                <mat-label>Concepto / Porducto / Servicio</mat-label>
+                <mat-select [disabled]="conceptosDisabled"  formControlName="concepto">
+                  <ng-container *ngFor="let concepto of codigos">
+                    <mat-option (click)="selectedValue(concepto)" value={{concepto}}>{{concepto.Descripcion}}</mat-option>
+                  </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+<div class="row col-md-12">
+    <div class="col-sm-6">
+        <input
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="precio"
+        placeholder="Precio"
+        autocomplete="off"
+        formControlName="precio"
+        [class.is-invalid]="isControlInvalid('precio')"
+        [class.is-valid]="isControlValid('precio')" 
+        value=""
+      />
+    </div>
+    
+    <div class="col-sm-6">
+            <input
+            #cantidad
+            type="number"
+            class="form-control form-control-lg form-control-solid"
+            name="cantidad"
+            placeholder="Cantidad"
+            autocomplete="off"
+            formControlName="cantidad"
+            [class.is-invalid]="isControlInvalid('cantidad')"
+            [class.is-valid]="isControlValid('cantidad')" 
+            value="1"
+            (change)="onChangeQty(cantidad.value)"
+            />
+       
+    </div>
+</div>
+<br>
+    <div class="row col-md-12">
+        <div class="col-sm-6" >
+                <input
+                type="text"
+                class="form-control form-control-lg form-control-solid"
+                name="idDeposit"
+                placeholder="ID de Deposito"
+                autocomplete="off"
+                formControlName="idDeposito"
+                [class.is-invalid]="isControlInvalid('idDeposito')"
+                [class.is-valid]="isControlValid('idDeposito')"                
+                value=''
+              />
+        </div>
+    
+        <div class="col-sm-6">
+          <div class="col-sm-6">
+            <mat-form-field appearance="fill">
+                <mat-label>Forma de Pago</mat-label>
+                <mat-select formControlName="pago">
+                    <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        </div>
+    </div>
+    <br>
+    <div style="text-align: center;" class="row col-md-12" *ngIf="isLoading">
+      <app-loader-spinner></app-loader-spinner>
+    </div>
+    <div class="col-lg-12">
+        <button
+          [disabled]="isLoading"
+          class="btn btn-primary btn-block"
+          type="submit"
+          name="estatus"
+        >
+          Agregar Pago
+        </button>
+        <br>
+      </div>
+      
+
+      <div class="col-lg-12">
+        <button           
+        [disabled]="isLoading"
+        (click)="ajustes()"
+        class="btn btn-danger btn-block" 
+        type="submit">
+          Ajustes o Devolucion
+        </button>
+        <br>
+      </div>
+      <br>
+</form>
+  
+  <br />
+
+</div>
+<div style="background-color: #319dd7" class="modal-content sub-menu">
+  <label
+    class="h4"
+    style="color: aliceblue; text-align: center; padding-top: 5px"
+  >
+    Descuento
+  </label>
+</div>
+<br>
+<form [formGroup]="secondFormGroup" (ngSubmit)="aplicaDescuento()"> 
+  <div class="row col-md-12" style="justify-content: center;">
+      <div style="margin-top: 5px" class="col-sm-4">
+        <mat-radio-button 
+        (change)="selectedRadioButton($event)"
+        [checked]="porcentajeChecked"
+        id="porcentaje"
+        class="example-margin">POERCENTAJE</mat-radio-button>
+      </div>
+      <div style="margin-top: 5px" class="col-sm-4">
+        <mat-radio-button 
+        class="example-margin" 
+        [checked]="precioFijoChecked"
+        id="precioFijo"
+        (change)="selectedRadioButton($event)">PRECIO FIJO</mat-radio-button>
+      </div>
+      <div class="col-sm-4"  >
+        <input
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="qtyPrecio"
+        placeholder="Cantidad"
+        autocomplete="off"
+        formControlName="qtyPrecio"
+        [class.is-invalid]="isSecondControlInvalid('qtyPrecio')"
+        [class.is-valid]="isSecondControlValid('qtyPrecio')"                
+        value=""
+      />
+      <small style="color: red;" *ngIf="secondFormInvalid">Capture la cantidad del descuento</small>
+    </div>
+  </div>
+  <br>
+  <div class="col-lg-12">
+    <button           
+    [disabled]="descuentoButton"
+    class="btn btn-success btn-block" 
+    type="submit">
+      Aplicar o Autorixzar Descuento
+    </button>
+    <br>
+  </div>
+  <ng-container *ngIf="isLoadingDesc">
+    <app-loader-spinner></app-loader-spinner>
+  </ng-container>
+  <br>
+</form>
+<br>
+<div style="background-color: #319dd7" class="modal-content sub-menu">
+  <label
+    class="h4"
+    style="color: aliceblue; text-align: center; padding-top: 5px"
+  >
+    MOVIMIENTOS
+  </label>
+</div>
+<div class="row col-md-12" style="justify-content: center;">
+<table class="table overflow-hidden table-head-custom table-vertical-center">
+  <thead>
+    <th>Fecha</th>
+    <th>Concepto</th>
+    <th>F.P.</th>
+    <th>Valor</th>
+  </thead>
+  <tbody>
+    <tr *ngFor="let edo_cuenta of estadoDeCuenta">
+      <td> {{edo_cuenta.Fecha.split('T')[0]}}</td>
+      <td> {{edo_cuenta.Descripcion}}</td>
+      <td> {{edo_cuenta.Forma_de_Pago}}</td>
+      <ng-container *ngIf="edo_cuenta.Cargo==0">
+        <td>$-{{edo_cuenta.Abono.toLocaleString("es-MX")}}.00</td>
+      </ng-container>
+      <ng-container *ngIf="edo_cuenta.Abono==0">
+        <td>${{edo_cuenta.Cargo.toLocaleString("es-MX")}}.00</td>
+      </ng-container>
+    </tr>
+  </tbody>
+  <footer style="position: absolute; right: 10%;">
+    <hr>
+Total :  ${{totalCalculado.toLocaleString("es-MX")}}.00
+  </footer>
+</table>
+<app-paginator class="flex-wrap d-flex justify-content-between align-items-center" [paginator]="paginator"
+[isLoading]="isLoading" (paginate)="paginate($event)"></app-paginator>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<ng-template #modal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title">{{modalHeader}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>{{mensaje}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+    </div>
+  </ng-template>

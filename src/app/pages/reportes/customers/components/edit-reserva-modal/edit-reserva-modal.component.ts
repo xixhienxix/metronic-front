@@ -19,6 +19,7 @@ import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.ser
 import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { ModificaHuespedComponent } from '../helpers/modifica-huesped/modifica-huesped.component';
+import { TransaccionesComponentComponent } from './components/transacciones/transacciones-component/transacciones-component.component';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -107,6 +108,8 @@ export class EditReservaModalComponent implements OnInit {
 
   @Input()
         
+      
+    /*Oservables*/
     huespedUpdate$: Observable<Huesped>;
     private currentHuesped$=new BehaviorSubject<Huesped>(EMPTY_CUSTOMER);
 
@@ -140,6 +143,8 @@ export class EditReservaModalComponent implements OnInit {
     private subscriptions: Subscription[] = [];
     public listaFolios:Foliador[];
 
+    /*INDEXES*/
+    selectedIndex:number
 
     constructor(
       //Date Imports
@@ -254,73 +259,12 @@ export class EditReservaModalComponent implements OnInit {
 
 
 
-    // edit() {
-    //   const sbUpdate = this.customersService.update(this.huesped).pipe(
-    //     tap(() => {
-    //       this.modal.close();
-    //     }),
-    //     catchError((errorMessage) => {
-    //       this.modal.dismiss(errorMessage);
-    //       return of(this.huesped);
-    //     }),
-    //   ).subscribe(res => this.huesped = res);
-    //   this.subscriptions.push(sbUpdate);
-    // }
-
 
     ngOnDestroy(): void {
       this.subscriptions.forEach(sb => sb.unsubscribe());
     }
 
     
-
-
-    // isNumber(val): boolean { return typeof val === 'number'; }
-    // isNotNumber(val): boolean { return typeof val !== 'number'; }
-
-
-    // quantity:number=1;
-    // quantityNin:number=1;
-
-    // plus()
-    // {
-    //   this.quantity++;
-    //   this.huesped.adultos=this.quantity
-    // }
-    // minus()
-    // {
-    //   if(this.quantity>1)
-    //   {
-    //   this.quantity--;
-    //   this.huesped.adultos=this.quantity;
-    //   }
-    //   else
-    //   this.quantity
-    //   this.huesped.adultos=this.quantity;
-    // }
-    // plusNin()
-    // {
-    //   this.quantityNin++;
-    //   this.huesped.ninos=this.quantityNin;
-    // }
-    // minusNin()
-    // {
-    //   if(this.quantityNin>1)
-    //   {
-    //   this.quantityNin--;
-    //   this.huesped.ninos=this.quantityNin;
-    //   }
-    //   else
-    //   this.quantityNin
-    //   this.huesped.ninos=this.quantityNin;
-
-    // }
-
-    // changeVisible()
-    // {
-    //   this.changeStyleHidden='';
-    //   this.changeStyleVisible='display:none'
-    // }
 
     setEstatus(value): void {
 
@@ -374,16 +318,6 @@ export class EditReservaModalComponent implements OnInit {
     });
     }
   
-  // setLabelStyle(id:number)
-  // {
-  //   if(id==1){this.setLabel="color:#a6e390"}
-  //   if(id==2){this.setLabel="color:#ffce54"}
-  //   if(id==3){this.setLabel="color:#a8d5e5"}
-  //   if(id==4){this.setLabel="color:fb7f8c"}
-  //   if(id==5){this.setLabel="color:#d8b8f0"}
-  //   if(id==6){this.setLabel="color:#e6e9ed"}
-  //   if(id==7){this.setLabel="color:#fac3e2"}
-  // }
 
     onSelectHuesped(event : string)
     {
@@ -392,19 +326,13 @@ export class EditReservaModalComponent implements OnInit {
 
     }
 
-    // tarifaAutomatica()
-    // {
-    //   if (!this.checked) {
-    //     this.checked=true ;
-    //    } else {
-    //      this.checked=false ;
-    //    }
-    // }
     closeModal(){
       this.modal.close();
     }
     
 //Butons
+
+
     confirmaReserva(estatus,folio)
     {
           this.estatusService.actualizaEstatus(estatus,folio)
@@ -523,6 +451,10 @@ export class EditReservaModalComponent implements OnInit {
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         });
+    }
+
+    setStep(index:number){
+      this.selectedIndex=index;
     }
 
     getDismissReason(reason: any): string 

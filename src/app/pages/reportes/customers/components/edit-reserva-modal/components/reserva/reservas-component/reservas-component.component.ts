@@ -117,21 +117,6 @@ export class ReservasComponentComponent implements OnInit {
 
   loadForm() {
 
-    this.formGroup = this.fb.group({
-      nombre: [this.huesped.nombre, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
-      email: [this.huesped.email, Validators.compose([Validators.email,Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"),Validators.minLength(3),Validators.maxLength(50)])],
-      telefono: [this.huesped.telefono, Validators.compose([Validators.nullValidator,Validators.minLength(10),Validators.maxLength(14)])],
-      trabajaEn: [this.huesped.trabajaEn, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      fechaNacimiento: [this.huesped.fechaNacimiento, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      tipoDeID: [this.huesped.tipoDeID, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      numeroDeID: [this.huesped.numeroDeID, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      direccion: [this.huesped.direccion, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      pais: [this.huesped.pais, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      ciudad: [this.huesped.ciudad, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      codigoPostal: [this.huesped.codigoPostal, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      lenguaje: [this.huesped.lenguaje, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-    });
-
     this.noches=-parseInt((this.huesped.llegada.toString()).split("/")[0])+parseInt((this.huesped.salida.toString()).split("/")[0])
     console.log("",(this.huesped.llegada.toString()).split("/")[0])
     console.log("",(this.huesped.llegada.toString()).split("/")[0])

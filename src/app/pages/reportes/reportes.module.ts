@@ -64,6 +64,14 @@ import { TransaccionesComponentComponent } from './customers/components/edit-res
 import { ReservasComponentComponent } from './customers/components/edit-reserva-modal/components/reserva/reservas-component/reservas-component.component';
 import { HuespedComponentComponent } from './customers/components/edit-reserva-modal/components/huesped/huesped-component/huesped-component.component';
 import { EdoCuentaComponentComponent } from './customers/components/edit-reserva-modal/components/estado-de-cuenta/edo-cuenta-component/edo-cuenta-component.component';
+import {MatInputModule} from '@angular/material/input';
+import {LoadingSpinnerComponent} from './helpers/loader-spinner/loader-spinner.component'
+import {MatRadioModule} from '@angular/material/radio';
+import { AtLeastOne_ValidatorDirective } from './_directives/at-least-one.validator.directive';
+import { AjustesComponent } from './customers/components/helpers/ajustes-huesped/ajustes.component';
+import {MatTableModule} from '@angular/material/table';
+import {MatPaginatorModule} from '@angular/material/paginator';
+
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
 
@@ -101,6 +109,9 @@ registerLocaleData(localeEs);
     ReservasComponentComponent,
     HuespedComponentComponent,
     EdoCuentaComponentComponent,
+    LoadingSpinnerComponent,
+    AtLeastOne_ValidatorDirective,
+    AjustesComponent,
   ],
   imports: [
     MatSlideToggleModule,
@@ -136,6 +147,11 @@ registerLocaleData(localeEs);
     MatFormFieldModule,
     MatSelectModule,
     MatDialogModule,
+    MatInputModule,
+    MatRadioModule,
+    MatTableModule,
+    MatPaginatorModule
+    
 
        // RouterModule.forChild([
     //   {
