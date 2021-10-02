@@ -2,7 +2,7 @@ export interface edoCuenta {
     _id?:string,
     Folio:number,
     Referencia:string,
-    Forma_De_Pago:string,
+    Forma_de_Pago:string,
     Fecha:Date,
     Descripcion:string,
     Cantidad:number,

@@ -10,12 +10,52 @@ import { PaginatorState } from 'src/app/_metronic/shared/crud-table';
 import { EditReservaModalComponent } from '../../../edit-reserva-modal.component';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { AjustesComponent } from '../../../../helpers/ajustes-huesped/ajustes.component';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
+
+const EMPTY_CUSTOMER: Huesped = {
+  id:undefined,
+  folio:undefined,
+  adultos:1,
+  ninos:1,
+  nombre: '',
+  estatus:'',
+  // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
+  // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
+  llegada:'',
+  salida:'',
+  noches: 1,
+  tarifa:500,
+  porPagar: 500,
+  pendiente:500,
+  origen: 'Online',
+  habitacion: "",
+  telefono:"",
+  email:"",
+  motivo:"",
+  //OTROS DATOs
+  fechaNacimiento:'',
+  trabajaEn:'',
+  tipoDeID:'',
+  numeroDeID:'',
+  direccion:'',
+  pais:'',
+  ciudad:'',
+  codigoPostal:'',
+  lenguaje:'Español',
+  numeroCuarto:0,
+  creada:'',
+  tipoHuesped:"Regular"
+};
+
 @Component({
   selector: 'app-transacciones-component',
   templateUrl: './transacciones-component.component.html',
   styleUrls: ['./transacciones-component.component.scss']
 })
 export class TransaccionesComponentComponent implements OnInit {
+
+  
   @ViewChild('modal') Modal: null;
   /*Mensajes**/
   mensaje:string
@@ -53,6 +93,7 @@ export class TransaccionesComponentComponent implements OnInit {
   submitted:boolean=false
   secondFormInvalid:boolean=false
 
+  
   formasDePago:string[]=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
 
   constructor(
@@ -63,7 +104,8 @@ export class TransaccionesComponentComponent implements OnInit {
     private modalService: NgbModal,
     private customerService:HuespedService
 
-    ) { }
+    ) {
+     }
 
   ngOnInit(): void {
     this.loadForm();
@@ -93,11 +135,14 @@ export class TransaccionesComponentComponent implements OnInit {
   get f() {return this.formGroup.controls}
   get second() {return this.secondFormGroup.controls}
 
+
   getEdoCuenta(){
+    
+
     this.edoCuentaService.getCuentas(this.editService.getCurrentHuespedValue.folio).subscribe(
       (result)=>{
           this.estadoDeCuenta=result
-
+          this.edoCuentaService.edoCuentaSubject.next(result)
           let totalCargos=0;
           let totalAbonos=0;
 
@@ -296,7 +341,7 @@ export class TransaccionesComponentComponent implements OnInit {
         Fecha:new Date(),
         Referencia:this.f.idDeposito.value,
         Descripcion:this.codigoDeCargo.Descripcion,
-        Forma_De_Pago:this.f.pago.value,
+        Forma_de_Pago:this.f.pago.value,
         Cantidad:this.f.cantidad.value,
         Cargo:this.f.precio.value,
         Abono:0
@@ -310,7 +355,7 @@ export class TransaccionesComponentComponent implements OnInit {
         Fecha:new Date(),
         Referencia:this.f.idDeposito.value,
         Descripcion:this.codigoDeCargo.Descripcion,
-        Forma_De_Pago:this.f.pago.value,
+        Forma_de_Pago:this.f.pago.value,
         Cantidad:this.f.cantidad.value,
         Cargo:0,
         Abono:this.f.precio.value,
@@ -389,7 +434,7 @@ export class TransaccionesComponentComponent implements OnInit {
         Fecha:new Date(),
         Referencia:'',
         Descripcion:'Descuento Aplicado',
-        Forma_De_Pago:'Descuento',
+        Forma_de_Pago:'Descuento',
         Cantidad:1,
         Cargo:0,
         Abono:parseInt(this.second.qtyPrecio.value),
@@ -406,7 +451,7 @@ export class TransaccionesComponentComponent implements OnInit {
         Fecha:new Date(),
         Referencia:'',
         Descripcion:'Descuento Aplicado',
-        Forma_De_Pago:'Descuento',
+        Forma_de_Pago:'Descuento',
         Cantidad:1,
         Cargo:0,
         Abono:((this.totalCalculado * (this.second.qtyPrecio.value) ) / 100),
@@ -462,13 +507,16 @@ export class TransaccionesComponentComponent implements OnInit {
   }
   /*MODALS*/
   ajustes(){
-    const modalRef = this.modalService.open(AjustesComponent,{size:'md'})
+    const modalRef = this.modalService.open(AjustesComponent,{size:'lg'})
     modalRef.componentInstance.huesped = this.editService.getCurrentHuespedValue
     modalRef.componentInstance.estadoDeCuenta=this.estadoDeCuenta
     modalRef.result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
       }, (reason) => {
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          this.estadoDeCuenta=[]
+          this.getEdoCuenta();
+          
       });
       
   }
