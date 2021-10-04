@@ -20,6 +20,8 @@ import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { ModificaHuespedComponent } from '../helpers/modifica-huesped/modifica-huesped.component';
 import { TransaccionesComponentComponent } from './components/transacciones/transacciones-component/transacciones-component.component';
+import { EmailService } from '../../../_services/email.service';
+import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -105,6 +107,7 @@ const EMPTY_CUSTOMER: Huesped = {
 export class EditReservaModalComponent implements OnInit {
   @ViewChild('error') errorModal: null;
   @ViewChild('exito') exitoModal: null;
+  @ViewChild('email') emailModal: null;
 
   @Input()
         
@@ -143,6 +146,8 @@ export class EditReservaModalComponent implements OnInit {
     private subscriptions: Subscription[] = [];
     public listaFolios:Foliador[];
 
+    /**LOADING */
+    enviandoEmail:boolean=false;
     /*INDEXES*/
     selectedIndex:number
 
@@ -158,7 +163,8 @@ export class EditReservaModalComponent implements OnInit {
       public postService : ReportesComponent,
       public estatusService : EstatusService,
       public i18n:NgbDatepickerI18n,
-      private http: HttpClient
+      private http: HttpClient,
+      private emailService:EmailService
       ) {
       this.huespedUpdate$=this.currentHuesped$.asObservable();
       }
@@ -451,6 +457,42 @@ export class EditReservaModalComponent implements OnInit {
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         });
+    }
+
+    openEnviarConfirmacion(){
+      const modalRef=this.modalService.open(this.emailModal,{size:'md'})
+      modalRef.result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });
+    }
+
+    enviarConfirmacion(emailSender:string){
+      this.huesped.email=emailSender
+      this.enviandoEmail=true
+      this.emailService.enviarConfirmacion(this.huesped).subscribe(
+        (result)=>{
+          console.log(result)
+          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          modalRef.componentInstance.alertHeader = 'EXITO'
+          modalRef.componentInstance.mensaje = 'Email Enviado Con Exito'
+          this.enviandoEmail=false
+        },
+        (err)=>{
+          if(err){
+            const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+            modalRef.componentInstance.alertHeader = 'ERROR'
+            modalRef.componentInstance.mensaje = err.message
+            this.enviandoEmail=false
+
+          }
+        },
+        ()=>{
+          this.enviandoEmail=false
+
+        }
+      )
     }
 
     setStep(index:number){

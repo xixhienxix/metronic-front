@@ -153,7 +153,7 @@
 
       <div class="col-lg-6">
         <button 
-        (click)="setStep(2)">
+        (click)="setStep(2)"
         class="btn btn-warning btn-block" 
         type="submit">
           Realiza un Pago
@@ -162,11 +162,14 @@
       </div>
       <br>
 
+
+
       <div class="f col-lg-6">
         <button
-          disabled
+          [disabled]="!(huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada')"
           class="btn btn-secondary btn-block"
           type="submit"
+          (click)="openEnviarConfirmacion()"
           value="7"
         >
           Enviar Confirmacion
@@ -296,6 +299,26 @@
     <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
   </div> -->
   <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
+  </div>
+</ng-template>
+
+<ng-template #email let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirmar E-mail</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>Se enviara la confirmacion de la reservacion al siguiente email: </p>
+      <input #emailSender [value]="huesped.email">
+      <p>En caso de requerir que el envio sea a un email diferente corrigalo en la casilla</p> 
+    
+  </div>
+  <div class="modal-footer">
+    <app-loader-spinner *ngIf="enviandoEmail"></app-loader-spinner>
+    <button type="button" class="btn btn-success" (click)="enviarConfirmacion(emailSender.value)">Enviar</button>
     <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
   </div>
 </ng-template>
