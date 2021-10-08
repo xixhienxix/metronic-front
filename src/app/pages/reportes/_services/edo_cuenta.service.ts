@@ -27,6 +27,11 @@ export class Edo_Cuenta_Service {
        return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',pago)
     }
 
+    deleteRow(_id:string){
+      return this.http.delete(environment.apiUrl+"/edo_cuenta/pagos/"+_id)
+    }
+
+
     getCuentas(folio:number ){
         return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuenta/'+folio)
         .pipe(

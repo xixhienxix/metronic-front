@@ -1,9 +1,9 @@
 // tslint:disable:no-string-literal
 import { Component, NgModule, OnDestroy, OnInit, ɵɵtrustConstantResourceUrl,ViewChild} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, elementAt } from 'rxjs/operators';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { of, Subscription } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, elementAt, first } from 'rxjs/operators';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HuespedService } from '../_services';
 import {FoliosService} from '../_services/folios.service'
 import { ReportesComponent } from '../reportes.component';
@@ -49,6 +49,43 @@ import { BloqueoReservaModalComponent } from './components/bloqueo-customer-moda
 import { ConfirmationModalComponent } from './components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
 import { OrigenService } from '../_services/origen.service';
 
+const EMPTY_CUSTOMER: Huesped = {
+  id:undefined,
+  folio:undefined,
+  adultos:1,
+  ninos:1,
+  nombre: '',
+  estatus:'',
+  // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
+  // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
+  llegada:'',
+  salida:'',
+  noches: 1,
+  tarifa:500,
+  porPagar: 500,
+  pendiente:500,
+  origen: 'Online',
+  habitacion: "",
+  telefono:"",
+  email:"",
+  motivo:"",
+  //OTROS DATOs
+  fechaNacimiento:'',
+  trabajaEn:'',
+  tipoDeID:'',
+  numeroDeID:'',
+  direccion:'',
+  pais:'',
+  ciudad:'',
+  codigoPostal:'',
+  lenguaje:'Español',
+  numeroCuarto:0,
+  creada: new Date().toString(),
+  tipoHuesped:"Regular"
+};
+
+
+
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
@@ -91,6 +128,7 @@ export class CustomersComponent
   public estatusArray:Estatus[]=[];
   public origenArray:Origen[]=[];
   public foliosprueba1: [];
+  public huesped:Huesped;
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
   public codigoCuarto:Habitaciones[]=[];
@@ -110,6 +148,7 @@ export class CustomersComponent
     public origenService : OrigenService,
     public disponibilidadSercice : DisponibilidadService,
     public estatusService : EstatusService,
+
 
   ) {
 
@@ -378,14 +417,26 @@ this.origenService.getOrigenes()
     }
     else
     {
-      const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md' });
 
-    modalRef.componentInstance.folio = id;
-    modalRef.componentInstance.id = id;
-    modalRef.result.then(() =>
-      this.customerService.fetch(),
-      () => { }
-    );
+    const sb = this.customerService.getItemById(id).pipe(
+          first(),
+          catchError((errorMessage) => {
+            console.log("ERROR MESSAGE PIPE DESPUES DEL GETELEMETN BY ID",errorMessage)
+            return of(EMPTY_CUSTOMER);
+          })
+        ).subscribe((huesped1: Huesped) => {
+          this.huesped = huesped1;
+          this.customerService.setCurrentHuespedValue=huesped1
+          
+          const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md' });
+          modalRef.componentInstance.folio = id;
+          modalRef.componentInstance.id = id;
+          modalRef.result.then(() =>
+            this.customerService.fetch(),
+            () => { }
+          );
+        });
+        this.subscriptions.push(sb);
     }
   }
 
@@ -569,6 +620,7 @@ openDialog(huesped:Huesped) {
 
   modalRef.componentInstance.huesped = huesped;
   modalRef.result.then((result) => {
+    this.customerService.fetch()
     console.log(result);
   }, (reason) => {
   });

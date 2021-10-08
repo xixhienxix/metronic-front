@@ -32,6 +32,7 @@ export class ConfirmationModalComponent implements OnInit {
 
   cambiaEstatus(huesped:Huesped)
   {
+    
     this.customerService.updateHuesped(huesped)
     .subscribe(
      ()=>

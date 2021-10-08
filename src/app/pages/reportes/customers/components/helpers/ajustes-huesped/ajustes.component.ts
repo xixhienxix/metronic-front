@@ -152,7 +152,6 @@ export class AjustesComponent implements OnInit {
         }
       }
     )
-    
   }
 
   initForm(){

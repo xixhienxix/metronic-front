@@ -68,36 +68,39 @@
     </div>
 </div>
 <br>
-    <div class="row col-md-12">
-        <div class="col-sm-6" >
-                <input
-                type="text"
-                class="form-control form-control-lg form-control-solid"
-                name="idDeposit"
-                placeholder="ID de Deposito"
-                autocomplete="off"
-                formControlName="idDeposito"
-                [class.is-invalid]="isControlInvalid('idDeposito')"
-                [class.is-valid]="isControlValid('idDeposito')"                
-                value=''
-              />
-        </div>
-    
-        <div class="col-sm-6">
-          <div class="col-sm-6">
-            <mat-form-field appearance="fill">
-                <mat-label>Forma de Pago</mat-label>
-                <mat-select formControlName="pago">
-                    <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
-                </mat-select>
-            </mat-form-field>
-        </div>
-        </div>
+<ng-container *ngIf="!disabledFP">
+  <div  class="row col-md-12">
+    <div class="col-sm-6" >
+            <input
+            type="text"
+            class="form-control form-control-lg form-control-solid"
+            name="idDeposit"
+            placeholder="ID de Deposito"
+            autocomplete="off"
+            formControlName="idDeposito"
+            [class.is-invalid]="isControlInvalid('idDeposito')"
+            [class.is-valid]="isControlValid('idDeposito')"                
+            value=''
+          />
     </div>
-    <br>
-    <div style="text-align: center;" class="row col-md-12" *ngIf="isLoading">
-      <app-loader-spinner></app-loader-spinner>
+
+    <div class="col-sm-6">
+      <div class="col-sm-6">
+        <mat-form-field appearance="fill">
+            <mat-label>Forma de Pago</mat-label>
+            <mat-select 
+            style="font-weight: bold;"
+            formControlName="pago">
+                <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
+            </mat-select>
+        </mat-form-field>
     </div>
+    </div>
+</div>
+</ng-container>
+<br>
+
+
     <div class="col-lg-12">
         <button
           [disabled]="isLoading"
@@ -177,9 +180,7 @@
     </button>
     <br>
   </div>
-  <ng-container *ngIf="isLoadingDesc">
-    <app-loader-spinner></app-loader-spinner>
-  </ng-container>
+
   <br>
 </form>
 <br>
@@ -194,13 +195,15 @@
 <div class="row col-md-12" style="justify-content: center;">
 <table class="table overflow-hidden table-head-custom table-vertical-center">
   <thead>
+    <th></th>
     <th>Fecha</th>
     <th>Concepto</th>
     <th>F.P.</th>
     <th>Valor</th>
   </thead>
   <tbody>
-    <tr *ngFor="let edo_cuenta of estadoDeCuenta">
+    <tr *ngFor="let edo_cuenta of estadoDeCuenta let index">
+      <td> <button [disabled]="huesped.estatus=='Check-Out'" (click)="deleteRow(edo_cuenta)" class="btn btn-danger">X</button></td>
       <td> {{edo_cuenta.Fecha.split('T')[0]}}</td>
       <td> {{edo_cuenta.Descripcion}}</td>
       <td> {{edo_cuenta.Forma_de_Pago}}</td>
@@ -245,3 +248,5 @@ Total :  ${{totalCalculado.toLocaleString("es-MX")}}.00
       <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
     </div>
   </ng-template>
+
+  <div *ngIf="isLoading" class="spinner_overlay"><app-loader-spinner></app-loader-spinner></div>

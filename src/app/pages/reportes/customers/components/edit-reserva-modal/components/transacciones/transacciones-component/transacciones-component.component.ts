@@ -57,6 +57,7 @@ export class TransaccionesComponentComponent implements OnInit {
 
   
   @ViewChild('modal') Modal: null;
+  folio:number
   /*Mensajes**/
   mensaje:string
   modalHeader:string
@@ -71,10 +72,12 @@ export class TransaccionesComponentComponent implements OnInit {
     Precio : 0
   }
 
-
+  /*Models*/
+  huesped:Huesped
   /*Site Helpers*/
   precioFijoChecked:boolean=false;
   porcentajeChecked:boolean=false;
+  disabledFP:boolean=true;
   descuentoButton=true;
   totalCalculado:number=0;
   conceptosDisabled:boolean=true;
@@ -94,12 +97,11 @@ export class TransaccionesComponentComponent implements OnInit {
   secondFormInvalid:boolean=false
 
   
-  formasDePago:string[]=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
+  formasDePago:string[]=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
 
   constructor(
     private fb : FormBuilder,
     private edoCuentaService:Edo_Cuenta_Service,
-    private editService:EditReservaModalComponent,
     private codigosService:CodigosDeCargoService,
     private modalService: NgbModal,
     private customerService:HuespedService
@@ -121,8 +123,8 @@ export class TransaccionesComponentComponent implements OnInit {
       concepto : ['',Validators.required],
       pago : ['',Validators.required],
       idDeposito : [''],
-      cantidad : [1,Validators.required],
-      precio : [0,Validators.required],
+      cantidad : ['',Validators.required],
+      precio : ['',Validators.required],
       cargo_abono : ['',Validators.required]
     })
 
@@ -138,8 +140,8 @@ export class TransaccionesComponentComponent implements OnInit {
 
   getEdoCuenta(){
     
-
-    this.edoCuentaService.getCuentas(this.editService.getCurrentHuespedValue.folio).subscribe(
+    // this.editService.getCurrentHuespedValue.folio
+    this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result)=>{
           this.estadoDeCuenta=result
           this.edoCuentaService.edoCuentaSubject.next(result)
@@ -150,10 +152,15 @@ export class TransaccionesComponentComponent implements OnInit {
           {
             totalCargos = totalCargos + this.estadoDeCuenta[i].Cargo
             totalAbonos = totalAbonos + this.estadoDeCuenta[i].Abono
-
           }
 
           this.totalCalculado=totalCargos-totalAbonos
+
+          this.huesped = this.customerService.getCurrentHuespedValue
+          this.huesped.pendiente = this.totalCalculado
+          this.huesped.porPagar = totalCargos
+
+          this.customerService.setCurrentHuespedValue=this.huesped
       },
       (err)=>
       {
@@ -218,6 +225,18 @@ export class TransaccionesComponentComponent implements OnInit {
     this.conceptosDisabled=false
     this.codigos=[]
 
+    if(this.f.cargo_abono.value=='Cargo')
+    {
+      this.formasDePago=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
+      this.formGroup.patchValue({pago:'Servicio'})
+      this.disabledFP=true
+    }
+    else
+    {
+      this.formasDePago=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
+      this.formGroup.patchValue({pago:''})
+      this.disabledFP=false
+    }
 
     this.codigosService.getCodigosDeCargo().subscribe(
       (result:Codigos[])=>{
@@ -289,6 +308,42 @@ export class TransaccionesComponentComponent implements OnInit {
 
   }  
 
+  deleteRow(edo_cuenta:any){
+    this.isLoading=true
+
+
+    this.edoCuentaService.deleteRow(edo_cuenta._id).subscribe(
+      (value)=>{
+        this.isLoading=false
+        this.modalHeader='Exito'
+        this.mensaje="Cargo Borrado con Exito"
+        const modalRef = this.modalService.open(this.Modal, {size:'sm'});
+      
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+
+          this.estadoDeCuenta=[]
+          this.getEdoCuenta();
+      },
+      (error)=>{
+        this.isLoading=false
+        if(error)
+        {
+          this.modalHeader='Error'
+          this.mensaje="No se pudo Guardar el Pago Intente Nuevamente"
+          const modalRef = this.modalService.open(this.Modal, {size:'sm'});
+        
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
+              
+          this.isLoading=false
+      }
+    }
+      )
+  }
+
   selectedRadioButton(event:any)
   {
     if(event.source.id=='precioFijo')
@@ -337,7 +392,7 @@ export class TransaccionesComponentComponent implements OnInit {
     {
        pago = {
 
-        Folio:this.editService.getCurrentHuespedValue.folio,
+        Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
         Referencia:this.f.idDeposito.value,
         Descripcion:this.codigoDeCargo.Descripcion,
@@ -351,7 +406,7 @@ export class TransaccionesComponentComponent implements OnInit {
     {
       pago = {
 
-        Folio:this.editService.getCurrentHuespedValue.folio,
+        Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
         Referencia:this.f.idDeposito.value,
         Descripcion:this.codigoDeCargo.Descripcion,
@@ -363,23 +418,19 @@ export class TransaccionesComponentComponent implements OnInit {
     }
 
     
-
+this.isLoading=true
     this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
+        this.isLoading=false
         this.modalHeader='Exito'
         this.mensaje='Movimiento agregado al Estado de cuenta del cliente'
         const modalRef = this.modalService.open(this.Modal, {size:'sm'})
-        modalRef.result.then((result) => {
-          this.closeResult = `Closed with: ${result}`;
-          }, (reason) => {
-              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          });
+        
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
             
 
-        this.isLoading=false
         this.formGroup.reset();
         this.estadoDeCuenta=[]
         this.getEdoCuenta();
@@ -387,16 +438,13 @@ export class TransaccionesComponentComponent implements OnInit {
       },
       (err)=>
       {
+        this.isLoading=false
         if(err)
         {
           this.modalHeader='Error'
           this.mensaje="No se pudo Guardar el Pago Intente Nuevamente"
           const modalRef = this.modalService.open(this.Modal, {size:'sm'});
-          modalRef.result.then((result) => {
-            this.closeResult = `Closed with: ${result}`;
-            }, (reason) => {
-                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-            });
+        
             setTimeout(() => {
               modalRef.close('Close click');
             },4000)
@@ -430,7 +478,7 @@ export class TransaccionesComponentComponent implements OnInit {
     { 
       descuento = {
 
-        Folio:this.editService.getCurrentHuespedValue.folio,
+        Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
         Referencia:'',
         Descripcion:'Descuento Aplicado',
@@ -447,7 +495,7 @@ export class TransaccionesComponentComponent implements OnInit {
     {
       descuento = {
 
-        Folio:this.editService.getCurrentHuespedValue.folio,
+        Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
         Referencia:'',
         Descripcion:'Descuento Aplicado',
@@ -459,9 +507,10 @@ export class TransaccionesComponentComponent implements OnInit {
 
     }
 
-    
+    this.isLoading=true
     this.edoCuentaService.agregarPago(descuento).subscribe(
       ()=>{
+        this.isLoading=false
         this.modalHeader='Exito'
         this.mensaje='Descuento aplicado sobre total de la cuenta'
         const modalRef = this.modalService.open(this.Modal, {size:'sm'});
@@ -483,6 +532,7 @@ export class TransaccionesComponentComponent implements OnInit {
       },
       (err)=>
       {
+        this.isLoading=false
         if(err)
         {
           this.modalHeader='Error'
@@ -508,7 +558,7 @@ export class TransaccionesComponentComponent implements OnInit {
   /*MODALS*/
   ajustes(){
     const modalRef = this.modalService.open(AjustesComponent,{size:'lg'})
-    modalRef.componentInstance.huesped = this.editService.getCurrentHuespedValue
+    modalRef.componentInstance.huesped = this.customerService.getCurrentHuespedValue
     modalRef.componentInstance.estadoDeCuenta=this.estadoDeCuenta
     modalRef.result.then((result) => {
       this.closeResult = `Closed with: ${result}`;

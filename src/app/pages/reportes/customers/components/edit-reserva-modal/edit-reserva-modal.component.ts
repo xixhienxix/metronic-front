@@ -22,6 +22,8 @@ import { ModificaHuespedComponent } from '../helpers/modifica-huesped/modifica-h
 import { TransaccionesComponentComponent } from './components/transacciones/transacciones-component/transacciones-component.component';
 import { EmailService } from '../../../_services/email.service';
 import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import { Edo_Cuenta_Service } from '../../../_services/edo_cuenta.service';
+import { HistoricoService } from '../../../_services/historico.service';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -108,13 +110,11 @@ export class EditReservaModalComponent implements OnInit {
   @ViewChild('error') errorModal: null;
   @ViewChild('exito') exitoModal: null;
   @ViewChild('email') emailModal: null;
+  @ViewChild('spinner') spinnerModal: null;
 
   @Input()
         
-      
-    /*Oservables*/
-    huespedUpdate$: Observable<Huesped>;
-    private currentHuesped$=new BehaviorSubject<Huesped>(EMPTY_CUSTOMER);
+
 
     //DATETIMEPICKER RANGE
     fullFechaSalida:string
@@ -129,14 +129,13 @@ export class EditReservaModalComponent implements OnInit {
     folio:number;
     isLoading$;
     model:NgbDateStruct;
-    huesped: Huesped;
+    huesped: Huesped=EMPTY_CUSTOMER;
     foliador:Foliador;
     folioLetra:string;
     public folios:Foliador[]=[];
     public folioactualizado:any;
 
     mensaje_exito:string
-    mensaje_error:string
 
     estatusArray:Estatus[]=[];
     checked: boolean = true;
@@ -148,6 +147,11 @@ export class EditReservaModalComponent implements OnInit {
 
     /**LOADING */
     enviandoEmail:boolean=false;
+    isLoading:boolean=false;
+
+    /*Disabled*/
+    reservaCancelada:boolean=false
+
     /*INDEXES*/
     selectedIndex:number
 
@@ -164,9 +168,10 @@ export class EditReservaModalComponent implements OnInit {
       public estatusService : EstatusService,
       public i18n:NgbDatepickerI18n,
       private http: HttpClient,
-      private emailService:EmailService
+      private emailService:EmailService,
+      private estadoDeCuentaService:Edo_Cuenta_Service,
+      private historicoService : HistoricoService
       ) {
-      this.huespedUpdate$=this.currentHuesped$.asObservable();
       }
 
 
@@ -175,15 +180,9 @@ export class EditReservaModalComponent implements OnInit {
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
       this.getEstatus();
+    
     }
 
-    get getCurrentHuespedValue(): Huesped {
-      return this.currentHuesped$.value;
-    }
-  
-    set setCurrentHuespedValue(huesped: Huesped) {
-      this.currentHuesped$.next(huesped);
-    }
 
     // async getPrice(currency: string): Promise<number> {
     //   const response = await this.http.get(this.currentPriceUrl).toPromise();
@@ -236,7 +235,7 @@ export class EditReservaModalComponent implements OnInit {
 
         this.huesped = EMPTY_CUSTOMER;
         // this.currentHuesped$.next(EMPTY_CUSTOMER)
-        this.setCurrentHuespedValue=EMPTY_CUSTOMER
+        this.customersService.setCurrentHuespedValue=EMPTY_CUSTOMER
         // this.huesped.nombre=this.huesped.nombre;
         this.huesped.folio=this.folio;
         this.huesped.origen = "Online";
@@ -254,7 +253,7 @@ export class EditReservaModalComponent implements OnInit {
         ).subscribe((huesped1: Huesped) => {
           this.huesped = huesped1;
 
-          this.setCurrentHuespedValue=huesped1
+          this.customersService.setCurrentHuespedValue=huesped1
           
           // this.loadForm();
           this.formatFechas();
@@ -297,6 +296,7 @@ export class EditReservaModalComponent implements OnInit {
     }
     return color;
   }
+
   openDialog(huesped:Huesped) {
     const modalRef = this.modalService.open(ConfirmationModalComponent,
       {
@@ -341,15 +341,57 @@ export class EditReservaModalComponent implements OnInit {
 
     confirmaReserva(estatus,folio)
     {
+      this.isLoading=true
+
+      if(estatus==12||estatus==11||estatus==4){
+        if(this.estadoDeCuentaService.currentCuentaValue.filter((result)=> result.Abono>0)    ){
+          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje='El huesped tiene saldo a Favor, aplique una devolucion antes de darle Check-Out'
+        }
+        this.isLoading=false
+        return
+      }
+
+
           this.estatusService.actualizaEstatus(estatus,folio)
           .subscribe(
             ()=>
             {
-    
+              this.isLoading=false
+
+              if(estatus==3){this.mensaje_exito="Reservacion Confirmada"}
+              if(estatus==2){this.mensaje_exito="Reservacion Realizada con Exito"}
+              if(estatus==1){this.mensaje_exito="Check-In realizado con exito"}
+              if(estatus==4){this.mensaje_exito="Check-Out realizado con exito"}
+              if(estatus==11){this.mensaje_exito="No-Show, para reactivar la reservacion haga click en el boton en la parte inferior"}
+              if(estatus==12){this.mensaje_exito="Reservacion Cancelada con exito"}
+              
+              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+              modalRef.componentInstance.alertHeader='EXITO'
+              modalRef.componentInstance.mensaje=this.mensaje_exito
+              modalRef.result.then((result) => {
+              
+                this.closeResult = `Closed with: ${result}`;
+                }, (reason) => {
+                    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                });
+                setTimeout(() => {
+                  modalRef.close('Close click');
+                },4000)
+
+                this.customerService.fetch();
+                this.closeModal()
+
             },
             (err)=>{
               if(err){
-                const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
+
+                this.isLoading=false
+
+                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                modalRef.componentInstance.alertHeader='ERROR'
+                modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar el estatus, vuelve a intentarlo'
                 modalRef.result.then((result) => {
                   this.closeResult = `Closed with: ${result}`;
                   }, (reason) => {
@@ -362,19 +404,7 @@ export class EditReservaModalComponent implements OnInit {
             },
             ()=>{
       
-                const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
-                modalRef.result.then((result) => {
-                  this.closeResult = `Closed with: ${result}`;
-                  }, (reason) => {
-                      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-                  });
-                  setTimeout(() => {
-                    modalRef.close('Close click');
-                  },4000)
-                  if(estatus==3){this.mensaje_exito="Reservacion Confirmada"}
-                  if(estatus==1){this.mensaje_exito="Check-In realizado con exito"}
-
-              this.customerService.fetch();
+            
             }
           )
         
@@ -382,38 +412,43 @@ export class EditReservaModalComponent implements OnInit {
 
     checkOut(estatus:number,folio:number)
     {
+      this.isLoading=true
+
       if (this.huesped.pendiente==0)
       {
         this.estatusService.actualizaEstatus(estatus,folio)
           .subscribe(
             ()=>
             {
-          
-              const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
-              modalRef.result.then((result) => {
-                this.closeResult = `Closed with: ${result}`;
-                }, (reason) => {
-                    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-                });
+              this.isLoading=false
+              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+              modalRef.componentInstance.alertHeader='EXITO'
+              modalRef.componentInstance.mensaje = 'Chek-Out Realizado con Exito '
+              
                 setTimeout(() => {
                   modalRef.close('Close click');
                 },4000)
-                this.mensaje_exito="Chek-Out Realizado con Exito"
+
+                this.postHistorico(this.huesped.folio);
 
             this.customerService.fetch();
+
             },
             (err)=>{
-              if(err){
-                const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
-                modalRef.result.then((result) => {
-                  this.closeResult = `Closed with: ${result}`;
-                  }, (reason) => {
-                      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-                  });
+              this.isLoading=false
+
+              if(err)
+              {
+
+                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                modalRef.componentInstance.alertHeader='ERROR'
+                modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento del Check-out intente de nuevo mas tarde'
+               
                   setTimeout(() => {
                     modalRef.close('Close click');
                   },4000)
                     }
+                    this.isLoading=false
             },
             ()=>{
 
@@ -421,7 +456,11 @@ export class EditReservaModalComponent implements OnInit {
 
       }else
       {
-        const modalRef = this.modalService.open(this.errorModal,{size:'sm'})
+        this.isLoading=false
+
+        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertHeader='ERROR'
+        modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en el húesped '
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
@@ -430,8 +469,43 @@ export class EditReservaModalComponent implements OnInit {
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
-          this.mensaje_error = "Aun queda Saldo pendiente en el húesped"
       }
+    }
+
+    postHistorico(folio:number){
+      this.isLoading=true
+
+      const sb = this.customersService.getItemById(this.folio).pipe(
+        first(),
+        catchError((errorMessage) => {
+          console.log("ERROR MESSAGE PIPE DESPUES DEL GETELEMETN BY ID",errorMessage)
+          this.modal.dismiss(errorMessage);
+          return of(EMPTY_CUSTOMER);
+        })
+      ).subscribe((huesped1: Huesped) => {
+          this.historicoService.addPost(huesped1).subscribe(
+            (value)=>{
+              console.log(value)
+              this.isLoading=false
+
+            },
+            (error)=>{
+              if(error){
+                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                modalRef.componentInstance.alertHeader='ERROR'
+                modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento de Guardar al huesped en el historico'
+                setTimeout(() => {
+                  modalRef.close('Close click');
+                },4000)
+              }
+              this.isLoading=false
+            }
+            )
+
+        // this.loadForm();
+        this.formatFechas();
+      });
+      this.subscriptions.push(sb);
     }
 
     openModifica(){
@@ -469,10 +543,13 @@ export class EditReservaModalComponent implements OnInit {
     }
 
     enviarConfirmacion(emailSender:string){
+      this.isLoading=true
       this.huesped.email=emailSender
       this.enviandoEmail=true
       this.emailService.enviarConfirmacion(this.huesped).subscribe(
         (result)=>{
+          this.isLoading=false
+
           console.log(result)
           const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
           modalRef.componentInstance.alertHeader = 'EXITO'
@@ -480,6 +557,8 @@ export class EditReservaModalComponent implements OnInit {
           this.enviandoEmail=false
         },
         (err)=>{
+          this.isLoading=false
+
           if(err){
             const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
             modalRef.componentInstance.alertHeader = 'ERROR'
