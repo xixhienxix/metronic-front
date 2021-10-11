@@ -72,6 +72,10 @@ export class AuthService implements OnDestroy {
     }))
   } 
 
+  olvidoPassword(email:string){
+    return this.http.post(environment.apiUrl+"/auth/forgot",email)
+  }
+
   registro(fullname:string,email:string,username:string,password:string,terminos:boolean)
   {
     return this.http.post(environment.apiUrl+"/auth/registro",{fullname,email,username,password,terminos})

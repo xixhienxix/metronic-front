@@ -1,5 +1,5 @@
 <!--begin::Signin-->
-<div class="login-form login-signin">
+<div class="login-form login-signin ">
 
   <!--begin::Form-->
   <form
@@ -12,9 +12,9 @@
     <!--begin::Title-->
     <div class="pb-13 pt-lg-0 pt-5">
       <h3 class="font-weight-bolder text-dark font-size-h4 font-size-h1-lg">
-        Bienvenido a MovNext
+        Bienvenid@ a MovNext
       </h3>
-      <span class="text-muted font-weight-bold font-size-h4"
+      <!-- <span class="text-muted font-weight-bold font-size-h4"
         >Nuevo Usuario?
         <a
           routerLink="/auth/registration"
@@ -22,7 +22,7 @@
           class="text-primary font-weight-bolder"
           >{{ "AUTH.GENERAL.SIGNUP_BUTTON" | translate }}</a
         >
-      </span>
+      </span> -->
     </div>
     <!--end::Title-->
 
@@ -48,9 +48,9 @@
 
     <!--begin::Form group-->
     <div class="form-group">
-      <label class="font-size-h6 font-weight-bolder text-dark">username</label>
+      <label class="font-size-h6 font-weight-bolder text-dark">Usuario</label>
       <input
-        class="form-control form-control-solid h-auto py-7 px-6 rounded-lg"
+        class="form-control form-control h-auto py-7 px-6 rounded-lg"
         name="username"
         formControlName="username"
         autocomplete="off"
@@ -101,7 +101,7 @@
       </div>
 
       <input
-        class="form-control form-control-solid h-auto py-7 px-6 rounded-lg"
+        class="form-control form-control h-auto py-7 px-6 rounded-lg"
         type="password"
         name="password"
         autocomplete="off"
@@ -152,7 +152,7 @@
       >
         Ingresar
       </button>
-
+<!-- 
       <button
         type="button"
         disabled
@@ -162,7 +162,7 @@
           <img src="./assets/media/svg/social-icons/google.svg" />
         </span>
         Ingresar con Google
-      </button>
+      </button> -->
 
       <ng-container *ngIf="isLoading$ | async">
         <loading-spinner></loading-spinner>

@@ -3,7 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { first } from 'rxjs/operators';
-
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 enum ErrorStates {
   NotSubmitted,
   HasError,
@@ -25,7 +25,8 @@ export class ForgotPasswordComponent implements OnInit {
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private modalService : NgbModal
   ) {
     this.isLoading$ = this.authService.isLoading$;
   }
@@ -42,7 +43,7 @@ export class ForgotPasswordComponent implements OnInit {
   initForm() {
     this.forgotPasswordForm = this.fb.group({
       email: [
-        'admin@demo.com',
+        '',
         Validators.compose([
           Validators.required,
           Validators.email,
@@ -55,6 +56,13 @@ export class ForgotPasswordComponent implements OnInit {
 
   submit() {
     this.errorState = ErrorStates.NotSubmitted;
+
+    this.authService.olvidoPassword(this.f.email.value).subscribe(
+      (value)=>{
+        
+      },
+      ()=>{}
+      )
     // const forgotPasswordSubscr = this.authService
     //   .forgotPassword(this.f.email.value)
     //   .pipe(first())
