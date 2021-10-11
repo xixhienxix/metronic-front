@@ -4,6 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { first } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsComponent } from 'src/app/pages/reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
 enum ErrorStates {
   NotSubmitted,
   HasError,
@@ -20,6 +21,7 @@ export class ForgotPasswordComponent implements OnInit {
   errorState: ErrorStates = ErrorStates.NotSubmitted;
   errorStates = ErrorStates;
   isLoading$: Observable<boolean>;
+  isLoading:boolean=false
 
   // private fields
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
@@ -56,12 +58,26 @@ export class ForgotPasswordComponent implements OnInit {
 
   submit() {
     this.errorState = ErrorStates.NotSubmitted;
+    this.isLoading=true
 
-    this.authService.olvidoPassword(this.f.email.value).subscribe(
+    const forgotPasswordSubscr = this.authService.olvidoPassword(this.f.email.value).subscribe(
       (value)=>{
-        
+        this.isLoading=false
+
+        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertHeader = 'Email Enviado'
+        modalRef.componentInstance.mensaje = 'Contraseña enviada al correo '+this.f.email.value
+
       },
-      ()=>{}
+      (error)=>{
+        this.isLoading=false
+
+        if(error){
+          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje = 'Error al enviar contraseña al correo '+this.f.email.value
+        }
+      }
       )
     // const forgotPasswordSubscr = this.authService
     //   .forgotPassword(this.f.email.value)
@@ -70,5 +86,10 @@ export class ForgotPasswordComponent implements OnInit {
     //     this.errorState = result ? ErrorStates.NoError : ErrorStates.HasError;
     //   });
     // this.unsubscribe.push(forgotPasswordSubscr);
+       
+    this.unsubscribe.push(forgotPasswordSubscr);
+    this.isLoading=false
+
   }
+
 }
