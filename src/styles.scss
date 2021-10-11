@@ -107,3 +107,19 @@
 .cdk-overlay-connected-position-bounding-box {
   z-index: 99999 !important;
 }
+
+
+.ngb-dp-day {
+  width: 3rem !important;
+  height: 3rem !important;
+}
+
+.ngb-dp-day > div {
+  width: 3rem !important;
+  height: 3rem !important;
+  line-height: 3rem !important;
+}
+
+.ngb-dp-weekday {
+  width: 3rem !important;
+}
