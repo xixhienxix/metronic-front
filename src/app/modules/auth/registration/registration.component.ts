@@ -18,7 +18,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   isLoading$: Observable<boolean>;
 
   // private fields
-  private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
+  private unsubscribe: Subscription[] = []; 
 
   constructor(
     private fb: FormBuilder,
@@ -53,12 +53,20 @@ export class RegistrationComponent implements OnInit, OnDestroy {
           ]),
         ],
         email: [
-          'qwe@qwe.qwe',
+          '',
           Validators.compose([
             Validators.required,
             Validators.email,
             Validators.minLength(3),
-            Validators.maxLength(320), // https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+            Validators.maxLength(320), 
+          ]),
+        ],
+        username: [
+          '',
+          Validators.compose([
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(8), 
           ]),
         ],
         password: [
@@ -87,23 +95,20 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   submit() {
     this.hasError = false;
-    const result = {};
-    Object.keys(this.f).forEach(key => {
-      result[key] = this.f[key].value;
-    });
-    const newUser = new UserModel();
-    newUser.setUser(result);
-    const registrationSubscr = this.authService
-      .registration(newUser)
-      .pipe(first())
-      .subscribe((user: UserModel) => {
-        if (user) {
-          this.router.navigate(['/']);
-        } else {
-          this.hasError = true;
+    
+    this.authService.registro(this.f.fullname.value,this.f.email.value,this.f.username.value,this.f.password.value,this.f.agree.value).subscribe(
+      (value)=>{
+        console.log(value)
+        this.router.navigate(['auth/login'])
+      },
+      (err)=>{
+        if(err){
+          console.log(err)
         }
-      });
-    this.unsubscribe.push(registrationSubscr);
+      },
+      ()=>{
+        
+      })
   }
 
   ngOnDestroy() {

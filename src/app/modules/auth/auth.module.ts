@@ -9,14 +9,14 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { LogoutComponent } from './logout/logout.component';
 import { AuthComponent } from './auth.component';
 import {TranslationModule} from '../i18n/translation.module';
-
+import { LoaderSpinnerComponent } from './login/loader-spinner/loading-spinner.component';
 @NgModule({
-  declarations: [
+  declarations: [LoaderSpinnerComponent,
     LoginComponent,
     RegistrationComponent,
     ForgotPasswordComponent,
     LogoutComponent,
-    AuthComponent,
+    AuthComponent
   ],
   imports: [
     CommonModule,

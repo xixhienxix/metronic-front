@@ -410,40 +410,48 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   //HISTORICO--------------------------------------------------------
 
-  this.historicoService.addPost(this.huesped).subscribe(
-    ()=>{
-    },
-    (err)=>{
-      if(err)
-      {
-        console.log("Error al Guardar en el Historico log: "+ err)
-      }
-    },
-    ()=>{
-      console.log("Exito al Guardar en el historico folio: "+this.huesped.folio)
-    })
+  // this.historicoService.addPost(this.huesped).subscribe(
+  //   ()=>{
+  //   },
+  //   (err)=>{
+  //     if(err)
+  //     {
+  //       console.log("Error al Guardar en el Historico log: "+ err)
+  //     }
+  //   },
+  //   ()=>{
+  //     console.log("Exito al Guardar en el historico folio: "+this.huesped.folio)
+  //   })
 
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
       ()=>{},
       (err)=>{
         if(err){
-          this.modalService.open(this.errorModal,{size:'sm'}).result.then((result) => {
+          const modalRef = this.modalService.open(this.errorModal,{size:'sm'})
+          modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
                 this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
             });
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
               }
       },
       ()=>{
 
         if(this.banderaExito)
         {
-          this.modalService.open(this.exitoModal,{size:'sm'}).result.then((result) => {
+          const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
+          modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
                 this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
             });
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
             this.banderaExito=false;
         }
 
@@ -542,6 +550,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     return control.dirty || control.touched;
   }
 
+  
   getHabitaciones()
   {
     this.habitacionService.gethabitaciones()
@@ -587,6 +596,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   buscaDispo()
   {
+    this.formGroup.controls['checkbox'].setValue(false);
+
     this.inicio=false;
     this.accordionDisplay="";
     this.mySet.clear();
@@ -910,6 +921,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   }
 
   setEstatus(value): void {
+    
     for(let i=0; i<this.estatusArray.length; i++)
     {
       if(value==this.estatusArray[i].id)
@@ -989,6 +1001,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   rangoFechas(llegada:string,salida:string)
   {
+    
     let rangodeFechas
     let toDate =   new Date(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
     let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));

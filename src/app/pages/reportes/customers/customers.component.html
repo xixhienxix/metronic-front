@@ -168,6 +168,11 @@
                   </ng-container>
                 </mat-select>
               </ng-container>
+              <ng-container *ngIf="huesped.estatus=='No Show'||huesped.estatus=='Reserva Cancelada'">
+                <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+                </mat-select>
+              </ng-container>
             </td>
             <td>
 

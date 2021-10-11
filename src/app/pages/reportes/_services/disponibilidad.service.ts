@@ -46,7 +46,9 @@ export class DisponibilidadService {
      )
    }
 
-
+   actualizaDisponibilidad(disponibilidad:Disponibilidad){
+     this.http.post(environment.apiUrl+"/update/disponibilidad",disponibilidad)
+   }
   //  buscaDispo(llegada:string,salida:string,tipoCuarto:string)
   //  {
   //    //DIAS DE DIFERENCIA

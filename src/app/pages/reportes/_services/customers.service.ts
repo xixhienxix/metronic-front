@@ -7,7 +7,41 @@ import { Huesped } from '../_models/customer.model';
 import { baseFilter } from '../../../_fake/fake-helpers/http-extenstions';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
-
+import { Habitaciones } from '../_models/habitaciones.model';
+const EMPTY_CUSTOMER: Huesped = {
+  id:undefined,
+  folio:undefined,
+  adultos:1,
+  ninos:1,
+  nombre: '',
+  estatus:'',
+  // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
+  // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
+  llegada:'',
+  salida:'',
+  noches: 1,
+  tarifa:500,
+  porPagar: 500,
+  pendiente:500,
+  origen: 'Online',
+  habitacion: "",
+  telefono:"",
+  email:"",
+  motivo:"",
+  //OTROS DATOs
+  fechaNacimiento:'',
+  trabajaEn:'',
+  tipoDeID:'',
+  numeroDeID:'',
+  direccion:'',
+  pais:'',
+  ciudad:'',
+  codigoPostal:'',
+  lenguaje:'Español',
+  numeroCuarto:0,
+  creada: new Date().toString(),
+  tipoHuesped:"Regular"
+};
 const DEFAULT_STATE: ITableState = {
   filter: {},
   paginator: new PaginatorState(),
@@ -23,10 +57,26 @@ const DEFAULT_STATE: ITableState = {
 
 export class HuespedService extends TableService<Huesped> implements OnDestroy {
    API_URL = `${environment.apiUrl}/reportes/huesped`;
+   /*Oservables*/
+   huespedUpdate$: Observable<Huesped>;
+   private currentHuesped$=new BehaviorSubject<Huesped>(EMPTY_CUSTOMER);
+
+
   constructor(@Inject(HttpClient) http) {
     super(http);
+    this.huespedUpdate$=this.currentHuesped$.asObservable();
+
   }
   //
+  
+  get getCurrentHuespedValue(): Huesped {
+    return this.currentHuesped$.value;
+  }
+
+  set setCurrentHuespedValue(huesped: Huesped) {
+    this.currentHuesped$.next(huesped);
+  }
+
   getAll() :Observable<Huesped[]> {
     return this.http
      .get<Huesped[]>(environment.apiUrl + '/reportes/huesped')
@@ -78,15 +128,26 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
     );
   }
 
-
   addPost(huesped:Huesped) {
     return this.http.post<any>(environment.apiUrl+"/reportes/huesped", huesped)
     }
+
+  updateEstatusHuesped(huesped:Huesped)
+  {
+    return this.http
+    .post(environment.apiUrl+'/reportes/actualiza/estatus/huesped',huesped)
+  }
 
   updateHuesped(huesped:Huesped)
   {
     return this.http
     .post(environment.apiUrl+'/reportes/actualiza/huesped',huesped)
+  }
+
+  modificaHuesped(codigo,numero,llegada,salida)
+  {
+    return this.http
+    .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida})
   }
 
   ngOnDestroy() {
