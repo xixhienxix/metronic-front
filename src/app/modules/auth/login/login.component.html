@@ -145,6 +145,7 @@
     <!--begin::Action-->
     <div class="pb-lg-0 pb-5">
       <button
+      [disabled]="isLoading"
         type="submit"
         id="kt_login_signin_submit"
         class="btn btn-primary font-weight-bolder font-size-h6 px-8 py-4 my-3 mr-3"
@@ -152,10 +153,9 @@
       >
         Ingresar
       </button>
-<!-- 
       <button
         type="button"
-        disabled
+        [disabled]="isLoading"
         class="btn btn-light-primary font-weight-bolder px-8 py-4 my-3 font-size-lg"
       >
         <span class="svg-icon svg-icon-md">
@@ -164,12 +164,12 @@
         Ingresar con Google
       </button> -->
 
-      <ng-container *ngIf="isLoading$ | async">
-        <loading-spinner></loading-spinner>
-      </ng-container>
     </div>
     <!--end::Action-->
   </form>
+  <ng-container *ngIf="isLoading">
+    <loading-spinner></loading-spinner>
+  </ng-container>
   <!--end::Form-->
 </div>
 <!--end::Signin-->
