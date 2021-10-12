@@ -39,18 +39,17 @@ select {
   text-align: center;
   vertical-align: middle;
 }
-
-//   .ngb-dp-day {
-//   width: 4rem !important;
-//   height: 4rem !important;
-// }
-
-// .ngb-dp-day > div {
-//   width: 4rem !important;
-//   height: 4rem !important;
-//   line-height: 4rem !important;
-// }
-
-// .ngb-dp-weekday {
-//   width: 4rem !important;
-// }
+.day {      
+  text-align: center;
+  padding: 7px;
+  border-radius: 1rem;
+  width: 100% !important;
+}
+.ngb-dp-day{
+  width: 100% !important;
+  height: 100% !important;
+}
+.ngb-dp-weekday{
+ width: 100% !important;
+ height: 100% !important;
+}

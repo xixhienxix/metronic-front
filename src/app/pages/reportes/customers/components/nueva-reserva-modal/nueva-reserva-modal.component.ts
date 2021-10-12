@@ -36,8 +36,8 @@ declare global {
 }
 
 const todayDate = new Date();
-const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
-
+// const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
+const todayString=todayDate.getDate().toString().padStart(2, '0')+"/"+(todayDate.getMonth()+1).toString().padStart(2, '0')+"/"+todayDate.getFullYear().toString().padStart(4, '0')+"-"+todayDate.getHours().toString().padStart(2, '0')+":"+todayDate.getMinutes().toString().padStart(2, '0')+":"+todayDate.getSeconds().toString().padStart(2, '0')
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -214,7 +214,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.getDispo();
     this.getFolios();
     this.getEstatus();
-
+    console.log(todayString)
   }
 
 
@@ -383,7 +383,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   private prepareHuesped() {
 
     const todayDate = new Date();
-    const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
+    const todayString=todayDate.getDate().toString().padStart(2, '0')+"/"+(todayDate.getMonth()+1).toString().padStart(2, '0')+"/"+todayDate.getFullYear().toString().padStart(4, '0')+"-"+todayDate.getHours().toString().padStart(2, '0')+":"+todayDate.getMinutes().toString().padStart(2, '0')+":"+todayDate.getSeconds().toString().padStart(2, '0')
     
     for(let habitaciones of this.preAsig)
     {
