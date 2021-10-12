@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 
 @Component({
     selector:'loading-spinner',
-    template:'<div class="lds-hourglass"></div>',
+    templateUrl:'./loading-spinner.component.html',
     styleUrls:['./loading-spinner.component.css']
 })
 export class LoaderSpinnerComponent {
