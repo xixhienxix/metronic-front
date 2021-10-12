@@ -17,9 +17,8 @@ export class PromesaService {
         return this.http.delete(environment.apiUrl+'/reportes/promesa/delete/'+_id)
     }
 
-    guardarPromesa (folio:number,fecha:string,cantidad:number){
-        let fechas = fecha.split(" ")[0]
-        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fechas,cantidad:cantidad})
+    guardarPromesa (folio:number,fecha:Date,cantidad:number){
+        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad})
       }
 
     getPromesas(folio:number ){
@@ -29,6 +28,7 @@ export class PromesaService {
             let promesa:Promesa[]=[];
               for(let i=0;i<datosCuenta.length;i++)
               {
+
                     promesa.push(datosCuenta[i])
               }
 

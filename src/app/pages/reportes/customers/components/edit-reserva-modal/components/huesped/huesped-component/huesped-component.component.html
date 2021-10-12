@@ -455,4 +455,6 @@ class="form form-label-right"
 </mat-accordion> -->
 </form>
 
-<div *ngIf="isLoading" class="spinner_overlay"><app-loader-spinner></app-loader-spinner></div>
+<ng-container *ngIf="isLoading">
+  <app-loader-spinner></app-loader-spinner>
+</ng-container>
