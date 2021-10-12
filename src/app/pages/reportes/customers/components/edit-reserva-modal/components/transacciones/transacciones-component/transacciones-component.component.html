@@ -249,4 +249,6 @@ Total :  ${{totalCalculado.toLocaleString("es-MX")}}.00
     </div>
   </ng-template>
 
-  <div *ngIf="isLoading" class="spinner_overlay"><app-loader-spinner></app-loader-spinner></div>
+  <ng-container *ngIf="isLoading">
+    <app-loader-spinner></app-loader-spinner>
+  </ng-container>

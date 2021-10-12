@@ -87,7 +87,7 @@ export class ReservasComponentComponent implements OnInit {
   clickedRow = new Set<any>()
 
   /*TABLE*/
-  displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad'];
+  displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad', 'Expirado'];
   dataSource: MatTableDataSource<Promesa>;
 
   /*Diseño Dinamico*/
@@ -96,7 +96,9 @@ export class ReservasComponentComponent implements OnInit {
   promesasDisplay:boolean=false;
   expired:boolean=false;
   isLoading:boolean=false;
-
+  expirado:boolean
+  today: NgbDate | null;
+  todayString:string;
 
   constructor(
     public i18n: NgbDatepickerI18n,
@@ -107,6 +109,8 @@ export class ReservasComponentComponent implements OnInit {
     public modalService: NgbModal,
     public promesaService : PromesaService
   ) {  
+    this.today=calendar.getToday();
+    this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
     this.fromDate = calendar.getToday();
     // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
     this.toDate=calendar.getToday();
@@ -169,19 +173,38 @@ export class ReservasComponentComponent implements OnInit {
                           (result)=>{
                             
                             for(let i =0;i<result.length;i++){
-                                let today= new Date
+                                let fecha = result[i].Fecha.toString() 
 
-                              const dia = parseInt(result[i].Fecha.split("/")[0])
-                              const mes = parseInt(result[i].Fecha.split("/")[1])
-                              const ano = parseInt(result[i].Fecha.split("/")[2])
-                              const fechaPromesa = new Date(ano,mes-1,dia)
+                              const dia = parseInt(fecha.toString().split('/')[0])
+                              const mes = parseInt(fecha.toString().split('/')[1])
+                              const ano = parseInt(fecha.toString().split('/')[2])
+                              const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
+                              
+                              console.log('Fecha Promesa ',fechaPromesa )
 
                               let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
+
+                              console.log('Fecha Promesa ',fullFecha )
+
+
+                              var dateParts50 = result[i].Fecha.toString().split(" ")[0];
+                              var dateParts = dateParts50.toString().split("/");
+                              var dateObject = new Date(+dateParts[2], parseInt(dateParts[1]) - 1, +dateParts[0]); 
                               
+                             console.log('fedcha promesa',fullFecha)
+
+                              if(dateObject.getTime()<fechaPromesa.getTime()){
+                                this.expirado=true
+                              }
+                              if(dateObject.getTime()>fechaPromesa.getTime()){
+                                this.expirado=false
+                              }
+
                               this.promesasPagoList[i] = {
                                 _id:result[i]._id,
-                                Fecha:fullFecha,
+                                Fecha:result[i].Fecha.toString().split('T')[0],
                                 Cantidad:result[i].Cantidad,
+                                Expirado:this.expirado
                               }
                             }
                             this.dataSource = new MatTableDataSource(this.promesasPagoList);   
