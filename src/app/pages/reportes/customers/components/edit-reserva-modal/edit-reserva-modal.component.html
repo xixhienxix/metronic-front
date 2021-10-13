@@ -111,7 +111,7 @@
 <mat-tab-group [selectedIndex]="selectedIndex" class="col-md-12" style="min-width: 0; padding: 3px">
 
   <mat-tab label="Reserva">
-    <app-reservas-component></app-reservas-component>
+    <app-reservas-component (next)="setStep(2)"></app-reservas-component>
   </mat-tab>
 
   <!--HUESPED TAB-->

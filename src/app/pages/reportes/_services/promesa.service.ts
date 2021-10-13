@@ -37,4 +37,7 @@ export class PromesaService {
         
 
     }
+    updatePromesa(id:string){
+        return this.http.put(environment.apiUrl+"/reportes/promesas/update",{id})
+    }
 }

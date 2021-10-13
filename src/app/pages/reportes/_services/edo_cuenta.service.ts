@@ -1,17 +1,38 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 import { ITableState } from "src/app/_metronic/shared/crud-table";
 import { environment } from "src/environments/environment";
 import { edoCuenta } from "../_models/edoCuenta.model";
 
-@Injectable({ providedIn: 'root' })
+const EMPTY_EDO = {
+  Folio:0,
+  Referencia:'',
+  Forma_de_Pago:'',
+  Fecha:new Date(),
+  Descripcion:'',
+  Cantidad:1,
+  Cargo:0,
+  Abono:0,
+}
 
+@Injectable({ providedIn: 'root' })
 export class Edo_Cuenta_Service {
 
-    edoCuentaSubject:BehaviorSubject<edoCuenta[]>
-    edoCuenta$:Observable<edoCuenta>
+    public edoCuentaSubject = new BehaviorSubject<edoCuenta[]>(null)
+    private subject =new Subject<any>();
+
+sendNotification(value:any)
+{
+    this.subject.next({text:value});
+}
+
+//this will be subscribed by the listing component which needs to display the //added/deleted ie updated list.
+
+getNotification(){
+    return this.subject.asObservable();
+}
 
     get currentCuentaValue(): edoCuenta[] {
       return this.edoCuentaSubject.value;
@@ -24,11 +45,19 @@ export class Edo_Cuenta_Service {
     constructor(private http: HttpClient) { }
 
     agregarPago(pago:edoCuenta ){
-       return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',pago)
+       return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',pago).pipe(
+        map((data=>{
+          this.sendNotification(true);
+          }
+      )));
     }
 
     deleteRow(_id:string){
-      return this.http.delete(environment.apiUrl+"/edo_cuenta/pagos/"+_id)
+      return this.http.delete(environment.apiUrl+"/edo_cuenta/pagos/"+_id).pipe(
+        map((data=>{
+          this.sendNotification(true);
+          }
+      )));;
     }
 
 

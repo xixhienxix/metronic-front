@@ -78,7 +78,6 @@ export class HuespedComponentComponent implements OnInit {
 
   ngOnInit(): void {
     this.customerService.huespedUpdate$.subscribe((value)=>{
-      console.log(value)
       this.huesped=value
       
 
