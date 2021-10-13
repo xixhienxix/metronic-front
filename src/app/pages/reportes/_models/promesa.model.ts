@@ -5,4 +5,5 @@ export interface Promesa
   Folio:number;
 Fecha:Date;
 Cantidad:number;
+Aplicado:boolean;
 }

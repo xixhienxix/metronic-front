@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -7,13 +7,15 @@ import { ModalDismissReasons, NgbCalendar, NgbDate, NgbDatepickerI18n, NgbModal 
 import { Subscription } from 'rxjs';
 import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
+import { edoCuenta } from 'src/app/pages/reportes/_models/edoCuenta.model';
 import { Estatus } from 'src/app/pages/reportes/_models/estatus.model';
 import { Promesa } from 'src/app/pages/reportes/_models/promesa.model';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.service';
+import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 import { PromesaService } from 'src/app/pages/reportes/_services/promesa.service';
 import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
-import { EditReservaModalComponent } from '../../../edit-reserva-modal.component';
+import { TransaccionesComponentComponent } from '../../transacciones/transacciones-component/transacciones-component.component';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -62,10 +64,19 @@ export class ReservasComponentComponent implements OnInit {
   /*PaginATION*/
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('pregunta') preguntaPrevia: null;
 
+  @Output() next = new EventEmitter();
+  
+  /**INDEX */
+  idPromesa:''
+
+/**FORMS */
   formGroup:FormGroup
   formGroupPromesa:FormGroup
   serviciosAdicionaledForm:FormGroup
+  thirdForm:FormGroup
+
   /*Date Variables*/
   fullFechaSalida:string
   fullFechaLlegada:string
@@ -85,9 +96,11 @@ export class ReservasComponentComponent implements OnInit {
   promesasPagoList:any[]=[];
   private subscriptions: Subscription[] = [];
   clickedRow = new Set<any>()
+  clickedRows = new Set<any>();
+
 
   /*TABLE*/
-  displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad', 'Expirado'];
+  displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad', 'Expirado','Aplicar'];
   dataSource: MatTableDataSource<Promesa>;
 
   /*Diseño Dinamico*/
@@ -99,6 +112,7 @@ export class ReservasComponentComponent implements OnInit {
   expirado:boolean
   today: NgbDate | null;
   todayString:string;
+  pagoManual:boolean=false
 
   constructor(
     public i18n: NgbDatepickerI18n,
@@ -107,7 +121,8 @@ export class ReservasComponentComponent implements OnInit {
     public customerService : HuespedService,
     public fb : FormBuilder,
     public modalService: NgbModal,
-    public promesaService : PromesaService
+    public promesaService : PromesaService,
+    public edoCuentaService:Edo_Cuenta_Service,
   ) {  
     this.today=calendar.getToday();
     this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
@@ -130,7 +145,7 @@ export class ReservasComponentComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    this.dataSource.paginator = this.paginator ;
     this.dataSource.sort = this.sort;
   }
 
@@ -173,6 +188,7 @@ export class ReservasComponentComponent implements OnInit {
                           (result)=>{
                             
                             for(let i =0;i<result.length;i++){
+
                                 let fecha = result[i].Fecha.toString() 
 
                               const dia = parseInt(fecha.toString().split('/')[0])
@@ -180,18 +196,15 @@ export class ReservasComponentComponent implements OnInit {
                               const ano = parseInt(fecha.toString().split('/')[2])
                               const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
                               
-                              console.log('Fecha Promesa ',fechaPromesa )
 
                               let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
 
-                              console.log('Fecha Promesa ',fullFecha )
 
 
                               var dateParts50 = result[i].Fecha.toString().split(" ")[0];
                               var dateParts = dateParts50.toString().split("/");
                               var dateObject = new Date(+dateParts[2], parseInt(dateParts[1]) - 1, +dateParts[0]); 
                               
-                             console.log('fedcha promesa',fullFecha)
 
                               if(dateObject.getTime()<fechaPromesa.getTime()){
                                 this.expirado=true
@@ -199,12 +212,14 @@ export class ReservasComponentComponent implements OnInit {
                               if(dateObject.getTime()>fechaPromesa.getTime()){
                                 this.expirado=false
                               }
+                            
 
                               this.promesasPagoList[i] = {
                                 _id:result[i]._id,
                                 Fecha:result[i].Fecha.toString().split('T')[0],
                                 Cantidad:result[i].Cantidad,
-                                Expirado:this.expirado
+                                Expirado:this.expirado,
+                                Aplicado:result[i].Aplicado
                               }
                             }
                             this.dataSource = new MatTableDataSource(this.promesasPagoList);   
@@ -258,6 +273,10 @@ export class ReservasComponentComponent implements OnInit {
       // adicional:['']
     })
 
+    this.thirdForm = this.fb.group({
+      pagoManualInput:[''],
+      // adicional:['']
+    })
   }
 
   get promesa (){
@@ -265,6 +284,9 @@ export class ReservasComponentComponent implements OnInit {
   }
   get getServiciosAdicionales (){
     return this.serviciosAdicionaledForm.controls
+  }
+  get getThirdForm (){
+    return this.thirdForm.controls
   }
 
   guardarAdicionales(){
@@ -377,20 +399,7 @@ this.isLoading=true
 
   }
 
-//   servicioAdicional(event,adicional,descripcion){
-//     if(event.checked)
-//     {     
-//       this.huesped.tarifa=adicional+this.huesped.tarifa
-//       this.huesped.pendiente=this.huesped.pendiente+adicional
-//       this.huesped.porPagar=this.huesped.porPagar+adicional
-//     }
-//     else if(!event.checked){
-//       this.huesped.tarifa=this.huesped.tarifa-adicional
-//       this.huesped.pendiente=this.huesped.pendiente-adicional
-//       this.huesped.porPagar=this.huesped.porPagar-adicional
-// }
-    
-  //}
+
 
   fechaSeleccionadaFinal(event){
     this.fromDate = event
@@ -418,7 +427,135 @@ this.isLoading=true
         this.setLabel= this.estatusArray[i].color
       }
     }
-}
+  }
+
+  preguntasPrevias(row:any){
+    
+    const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
+    modalRef.result.then( (value) =>
+    {
+      let pago
+      if(value==3)
+      {
+        return
+      }
+      if(value==1)
+      {
+        pago = {
+        
+          _id : row._id,
+          Fecha:row.Fecha,
+          Cantidad:row.Cantidad,
+          Expirado:row.Expirado ? 'Expirado' : 'Vigente',
+          Aplicado : true
+      }
+      this.idPromesa=row._id
+      this.aplicarPromesa(row)
+
+      }
+      if(value==2)
+      {
+        pago = {
+        
+          _id : row._id,
+          Fecha:row.Fecha,
+          Cantidad:this.getThirdForm.pagoManualInput.value,
+          Expirado:row.Expirado ? 'Expirado' : 'Vigente',
+          Aplicado : true
+
+      }
+      this.idPromesa=row._id
+        this.aplicarPromesa(row)
+
+      }
+
+      
+    }
+  );
+  }
+
+  aplicarPromesa(row:any){
+    let pago : edoCuenta
+
+    const dia = parseInt(row.Fecha.toString().split('/')[1])
+    const mes = parseInt(row.Fecha.toString().split('/')[2])
+    const ano = parseInt(row.Fecha.toString().split('/')[0])
+    const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
+    let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
+
+    pago = {
+
+      Folio:this.customerService.getCurrentHuespedValue.folio,
+      Fecha:new Date(),
+      Referencia:'',
+      Descripcion:'Promesa de Pago:' + fullFecha ,
+      Forma_de_Pago:'Deposito a Reservacion',
+      Cantidad:1,
+      Cargo:0,
+      Abono:row.Cantidad
+    }
+
+
+    this.isLoading=true
+    this.edoCuentaService.agregarPago(pago).subscribe(
+      (value)=>{
+        this.isLoading=false
+        
+        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'})
+        modalRef.componentInstance.alertHeader ='Exito'
+        modalRef.componentInstance.mensaje ='Movimiento agregado al Estado de cuenta del cliente'
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+          this.promesaService.updatePromesa(this.idPromesa).subscribe(
+            (value)=>
+            {
+              this.promesasPagoList=[]
+              this.getPromesa();
+            },
+            (error)=>{
+              if(error)
+              {
+      
+                const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                modalRef.componentInstance.alertHeader ='Error'
+                modalRef.componentInstance.mensaje ='No se pudo actualizar el estatus de la Promesa'
+  
+                  setTimeout(() => {
+                    modalRef.close('Close click');
+                  },4000)
+              }
+            }
+          )
+      },
+      (err)=>
+      {
+        this.isLoading=false
+        if(err)
+        {
+
+          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          modalRef.componentInstance.alertHeader ='Error'
+        modalRef.componentInstance.mensaje ='No se pudo Guardar el Pago Intente Nuevamente'
+
+        
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
+              
+          this.isLoading=false
+      
+        }
+      },
+      ()=>{//FINALLY
+      }
+      )
+      this.isLoading=false
+ 
+  }
+  muestraInput(){
+    this.pagoManual=true
+  }
   /*Modal HELPERS*/
 
   getDismissReason(reason: any): string 
@@ -431,6 +568,7 @@ this.isLoading=true
             return  `with: ${reason}`;
         }
   }
+
 
   isControlValid(controlName: string): boolean {
     const control = this.formGroupPromesa.controls[controlName];

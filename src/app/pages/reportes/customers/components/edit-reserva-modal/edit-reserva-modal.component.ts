@@ -231,7 +231,6 @@ export class EditReservaModalComponent implements OnInit {
 
     if (!this.folio) {
 
-        console.log("Load Costumer !this.folio", this.folio)
 
         this.huesped = EMPTY_CUSTOMER;
         // this.currentHuesped$.next(EMPTY_CUSTOMER)

@@ -10,8 +10,10 @@ import { PaginatorState } from 'src/app/_metronic/shared/crud-table';
 import { EditReservaModalComponent } from '../../../edit-reserva-modal.component';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { AjustesComponent } from '../../../../helpers/ajustes-huesped/ajustes.component';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
+import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import { MatTableDataSource } from '@angular/material/table';
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -53,14 +55,13 @@ const EMPTY_CUSTOMER: Huesped = {
   templateUrl: './transacciones-component.component.html',
   styleUrls: ['./transacciones-component.component.scss']
 })
+
 export class TransaccionesComponentComponent implements OnInit {
 
   
-  @ViewChild('modal') Modal: null;
   folio:number
   /*Mensajes**/
-  mensaje:string
-  modalHeader:string
+
 
   /*Listas*/
   codigos:Codigos[]=[]
@@ -71,7 +72,8 @@ export class TransaccionesComponentComponent implements OnInit {
     Tipo:'',
     Precio : 0
   }
-
+  /**Subscription */
+  subscription:Subscription
   /*Models*/
   huesped:Huesped
   /*Site Helpers*/
@@ -96,6 +98,9 @@ export class TransaccionesComponentComponent implements OnInit {
   submitted:boolean=false
   secondFormInvalid:boolean=false
 
+  /**MAT TABLE */
+  dataSource = new MatTableDataSource<edoCuenta>();
+  displayedColumns:string[] = ['select','Fecha','Concepto','F.P.','Valor']
   
   formasDePago:string[]=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
 
@@ -107,6 +112,12 @@ export class TransaccionesComponentComponent implements OnInit {
     private customerService:HuespedService
 
     ) {
+      this.subscription=this.edoCuentaService.getNotification().subscribe(data=>{
+        if(data)
+        {
+          this.getEdoCuenta();
+        }
+      });
      }
 
   ngOnInit(): void {
@@ -117,6 +128,7 @@ export class TransaccionesComponentComponent implements OnInit {
 
   }
 
+  
   loadForm(){
 
     this.formGroup= this.fb.group({
@@ -138,13 +150,18 @@ export class TransaccionesComponentComponent implements OnInit {
   get second() {return this.secondFormGroup.controls}
 
 
+
+
   getEdoCuenta(){
     
     // this.editService.getCurrentHuespedValue.folio
     this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
-      (result)=>{
-          this.estadoDeCuenta=result
-          this.edoCuentaService.edoCuentaSubject.next(result)
+      (result:edoCuenta[])=>{
+        
+
+          this.dataSource.data = result
+          this.estadoDeCuenta = result
+
           let totalCargos=0;
           let totalAbonos=0;
 
@@ -167,11 +184,10 @@ export class TransaccionesComponentComponent implements OnInit {
         if (err)
         {
 
-            this.modalHeader='Error'
-            this.mensaje=err.message
+            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje=err.message
 
-
-            const modalRef = this.modalService.open(this.Modal, {size:'sm'});
             modalRef.result.then((result) => {
               this.closeResult = `Closed with: ${result}`;
               }, (reason) => {
@@ -201,10 +217,12 @@ export class TransaccionesComponentComponent implements OnInit {
         {
           if(err.statusText='Not Found')
           {
-            this.modalHeader='Error'
-            this.mensaje=err.message
 
-           const modalRef = this.modalService.open(this.Modal, {size:'sm'});
+
+
+            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje=err.message
             modalRef.result.then((result) => {
               this.closeResult = `Closed with: ${result}`;
               }, (reason) => {
@@ -257,9 +275,12 @@ export class TransaccionesComponentComponent implements OnInit {
       (err)=>{
         if (err)
         {
-            this.modalHeader='Error'
-            this.mensaje="No hay codigos de cargo disponibles, vuelva a abrir la ventana"
-           const modalRef = this.modalService.open(this.Modal, {size:'sm'})
+
+
+            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='No hay codigos de cargo disponibles, vuelva a abrir la ventana'
+            
             modalRef.result.then((result) => {
               this.closeResult = `Closed with: ${result}`;
               }, (reason) => {
@@ -315,10 +336,10 @@ export class TransaccionesComponentComponent implements OnInit {
     this.edoCuentaService.deleteRow(edo_cuenta._id).subscribe(
       (value)=>{
         this.isLoading=false
-        this.modalHeader='Exito'
-        this.mensaje="Cargo Borrado con Exito"
-        const modalRef = this.modalService.open(this.Modal, {size:'sm'});
-      
+
+        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje='Cargo Borrado con Exito'   
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
@@ -330,9 +351,9 @@ export class TransaccionesComponentComponent implements OnInit {
         this.isLoading=false
         if(error)
         {
-          this.modalHeader='Error'
-          this.mensaje="No se pudo Guardar el Pago Intente Nuevamente"
-          const modalRef = this.modalService.open(this.Modal, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje='No se pudo guardar el pago intente nuevamente'
         
             setTimeout(() => {
               modalRef.close('Close click');
@@ -422,9 +443,9 @@ this.isLoading=true
     this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
-        this.modalHeader='Exito'
-        this.mensaje='Movimiento agregado al Estado de cuenta del cliente'
-        const modalRef = this.modalService.open(this.Modal, {size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
         
           setTimeout(() => {
             modalRef.close('Close click');
@@ -441,9 +462,9 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          this.modalHeader='Error'
-          this.mensaje="No se pudo Guardar el Pago Intente Nuevamente"
-          const modalRef = this.modalService.open(this.Modal, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje=err.message
         
             setTimeout(() => {
               modalRef.close('Close click');
@@ -511,9 +532,9 @@ this.isLoading=true
     this.edoCuentaService.agregarPago(descuento).subscribe(
       ()=>{
         this.isLoading=false
-        this.modalHeader='Exito'
-        this.mensaje='Descuento aplicado sobre total de la cuenta'
-        const modalRef = this.modalService.open(this.Modal, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        modalRef.componentInstance.alertHeader = 'Error'
+        modalRef.componentInstance.mensaje='Descuento Aplicado sobre el total de la cuenta'
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
@@ -535,9 +556,9 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          this.modalHeader='Error'
-          this.mensaje="No se pudo aplicar el descuento intente nuevamente"
-          const modalRef = this.modalService.open(this.Modal, {size:'sm'});  
+          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje=err.message
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
@@ -608,11 +629,7 @@ this.isLoading=true
     return control.invalid && (control.dirty || control.touched);
   }
 
-  /**TABLE HELPERS */
-   // pagination
-   paginate(paginator: PaginatorState) {
-    this.customerService.patchState({ paginator });
-  }
+
   
   /*Modal HELPERS*/
 
