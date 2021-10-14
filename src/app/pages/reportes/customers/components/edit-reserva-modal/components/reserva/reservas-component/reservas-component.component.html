@@ -223,6 +223,7 @@
         <th class="header-align-right" mat-header-cell *matHeaderCellDef>
           <td class="header-align-right" mat-cell *matCellDef="let row">
           <button 
+          [disabled]="row.Aplicado"
           (click)="eliminarPromesa(row._id)"
           class="btn btn-danger">
               x
@@ -236,6 +237,18 @@
         <td mat-cell hidden *matCellDef="let row"> {{row._id}} </td>
       </ng-container>
 
+      <!-- Color Column -->
+      <ng-container matColumnDef="Color">
+        <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> Color </th>
+        <td mat-cell hidden *matCellDef="let row"> {{row.Color}} </td>
+      </ng-container>
+
+      <!-- ColorAplicado Column -->
+      <ng-container matColumnDef="ColorAplicado">
+        <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> ColorAplicado </th>
+        <td mat-cell hidden *matCellDef="let row"> {{row.ColorAplicado}} </td>
+      </ng-container> 
+
       <!-- Fecha Column -->
       <ng-container matColumnDef="Fecha">
         <th mat-header-cell  *matHeaderCellDef mat-sort-header> Fecha </th>
@@ -248,16 +261,35 @@
         <td mat-cell *matCellDef="let row">$ {{row.Cantidad.toLocaleString("es-MX")}}.00 </td>
       </ng-container>
 
-      <!-- Expirado Column -->
-      <ng-container hidden matColumnDef="Expirado">
-        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Expirado </th>
-        <td style="color: white; font-weight: bold;" [ngStyle]="{'background-color': row.Expirado ? '#f7347a' : '#00c688' }" mat-cell *matCellDef="let row"> {{row.Expirado ? 'Expirado' : 'Vigente' }} </td>
+      <ng-container hidden matColumnDef="Estatus">
+        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Estatus </th>
+        <td style="color: white; font-weight: bold;" 
+        [style.background]="row.Color"
+        at-cell *matCellDef="let row"> {{row.Expirado }} </td>
       </ng-container>
+      <!-- [ngStyle]="{'background-color': row.Expirado ? '#f7347a' : '#00c688' }"  -->
 
-                  <!-- Aplicar PAgo Column -->
-      <ng-container hidden matColumnDef="Aplicar">
-        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Aplicar </th>
-        <td mat-cell  *matCellDef="let row"> <button [disabled]="row.Aplicado" (click)="preguntasPrevias(row)" [ngStyle]="{'background-color': row.Aplicado ? '#B1C292' : '#ffd867' }" class="btn btn-info"><i class="fa fa-check" aria-hidden="true"></i></button> </td>
+      <!-- Aplicar PAgo Column -->
+      <ng-container hidden matColumnDef="Accion">
+        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Accion </th>
+        <td mat-cell  *matCellDef="let row"> 
+          <ng-container *ngIf="row.Aplicado==false">
+            <button 
+              (click)="preguntasPrevias(row);estatusAplicado(row)" 
+              style="background-color: #FBCF67;"
+              class="btn btn-info">
+                <i  class="fa fa-check" aria-hidden="false"></i>
+            </button>
+            </ng-container>
+            <ng-container *ngIf="row.Aplicado">
+              <button 
+              (click)="preguntasPrevias(row);estatusAplicado(row)" 
+              style="background-color: #319DD7;"
+              class="btn btn-info">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </button>
+          </ng-container>          
+         </td>
       </ng-container>
 
   
@@ -410,33 +442,44 @@
 
   <ng-template #pregunta let-modal>
     <div class="modal-header">
-      <h4 class="modal-title">Que desea Hacer?</h4>
+      <h4 class="modal-title">Realizar Deposito</h4>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-    <!-- <div class="modal-body">
-      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
-    </div> -->
-    <div class="modal-footer">
-      <div class="row">
-        <button type="button" class="btn btn-success col-md-12" (click)="modal.close(1);next.emit();">Agregar el Pago a esta Cuenta</button>
+<div class="modal-body">
+    <button type="button" class="btn btn-success col-md-12" (click)="modal.close(1);">Agregar Pago Completo a la Cuenta</button>
+<p></p>
+    <ng-container *ngIf="pagoManual">
+      <form [formGroup]="thirdForm">
+        <input 
+        class="form-control col-md-6"
+        formControlName='pagoManualInput'
+        > 
+        <button class="btn btn-info col-md-6" (click)="modal.close(2);">Aceptar
+        </button>
         <br>
-        <ng-container *ngIf="pagoManual">
-          <br>
-          <form [formGroup]="thirdForm">
-            <input 
-            class="form-field col-md-6"
-            formControlName='pagoManualInput'
-            > 
-            <button class="btn-success col-md-6" (click)="modal.close(2);next.emit();">Aceptar</button>
-            <br>
-          </form>
-        </ng-container>
-        <button type="button" class="btn btn-secondary col-md-12" (click)="muestraInput()">Agregar Manual</button>
-        <br>
-        <button type="button" class="btn btn-warning col-md-12" (click)="modal.close(3)">Cerrar</button>
-      </div>
+      </form>
+    </ng-container>
+    <p></p>
+
+  <button type="button" class="btn btn-secondary col-md-12" (click)="muestraInput()">Agregar Pago Parcial</button>
+  <p></p>
+  <div class="col-sm-12">
+    <mat-form-field appearance="fill">
+        <mat-label>Forma de Pago</mat-label>
+        <mat-select 
+        style="font-weight: bold;"
+        formControlName="pago">
+            <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+</div>
+<p></p>
+
      
+    <div class="modal-footer">
+      <button type="button" class="btn btn-warning col-md-12" (click)="modal.close(3)">Cerrar</button>
     </div>
   </ng-template>

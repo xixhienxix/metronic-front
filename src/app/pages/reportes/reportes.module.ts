@@ -111,8 +111,7 @@ registerLocaleData(localeEs);
     EdoCuentaComponentComponent,
     LoadingSpinnerComponent,
     AtLeastOne_ValidatorDirective,
-    AjustesComponent,
-  ],
+    AjustesComponent  ],
   imports: [
     MatSlideToggleModule,
     CommonModule,

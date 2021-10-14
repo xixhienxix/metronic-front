@@ -15,7 +15,6 @@ import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.ser
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 import { PromesaService } from 'src/app/pages/reportes/_services/promesa.service';
 import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
-import { TransaccionesComponentComponent } from '../../transacciones/transacciones-component/transacciones-component.component';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -76,6 +75,7 @@ export class ReservasComponentComponent implements OnInit {
   formGroupPromesa:FormGroup
   serviciosAdicionaledForm:FormGroup
   thirdForm:FormGroup
+  forthForm:FormGroup
 
   /*Date Variables*/
   fullFechaSalida:string
@@ -94,13 +94,14 @@ export class ReservasComponentComponent implements OnInit {
   adicionalArray:Adicional[]=[];
   estatusArray:Estatus[]=[];
   promesasPagoList:any[]=[];
+  formasDePago:string[]=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
   private subscriptions: Subscription[] = [];
   clickedRow = new Set<any>()
   clickedRows = new Set<any>();
 
 
   /*TABLE*/
-  displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad', 'Expirado','Aplicar'];
+  displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad', 'Estatus','Accion','Color','ColorAplicado'];
   dataSource: MatTableDataSource<Promesa>;
 
   /*Diseño Dinamico*/
@@ -109,10 +110,9 @@ export class ReservasComponentComponent implements OnInit {
   promesasDisplay:boolean=false;
   expired:boolean=false;
   isLoading:boolean=false;
-  expirado:boolean
   today: NgbDate | null;
   todayString:string;
-  pagoManual:boolean=false
+  pagoManual:boolean=false;
 
   constructor(
     public i18n: NgbDatepickerI18n,
@@ -186,40 +186,76 @@ export class ReservasComponentComponent implements OnInit {
     {
     this.promesaService.getPromesas(this.huesped.folio).subscribe(
                           (result)=>{
-                            
+                            let today = new Date()
+
                             for(let i =0;i<result.length;i++){
-
-                                let fecha = result[i].Fecha.toString() 
-
-                              const dia = parseInt(fecha.toString().split('/')[0])
-                              const mes = parseInt(fecha.toString().split('/')[1])
-                              const ano = parseInt(fecha.toString().split('/')[2])
-                              const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
+                              let color =''
+                              let colorAplicado='' //amarillo
+                              let fecha = result[i].Fecha.toString()
+                              let expirado 
+                              // const dia = parseInt(fecha.toString().split('/')[0])
+                              // const mes = parseInt(fecha.toString().split('/')[1])
+                              // const ano = parseInt(fecha.toString().split('/')[2])
+                              // const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
                               
 
-                              let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
+                              // let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
 
-
-
-                              var dateParts50 = result[i].Fecha.toString().split(" ")[0];
-                              var dateParts = dateParts50.toString().split("/");
-                              var dateObject = new Date(+dateParts[2], parseInt(dateParts[1]) - 1, +dateParts[0]); 
+                              var dateParts50 = result[i].Fecha.toString().split("T")[0];
+                              var dateParts = dateParts50.toString().split("-");
+                              var dateObject = new Date(+dateParts[0], parseInt(dateParts[2]) - 1, +dateParts[1]); 
                               
+                              if(result[i].Aplicado==false)
+                              {
+                                colorAplicado='#f7347a'//amarillo
 
-                              if(dateObject.getTime()<fechaPromesa.getTime()){
-                                this.expirado=true
-                              }
-                              if(dateObject.getTime()>fechaPromesa.getTime()){
-                                this.expirado=false
-                              }
-                            
+                                if(dateObject.getTime()<today.getTime()){
+                                  this.promesaService.updatePromesaEstatus(result[i]._id).subscribe(
+                                    ()=>{
+                                      expirado='Expirado'
+                                      color='#D47070'//rosa
+                                  })
+                                }
+                                if(dateObject.getTime()>today.getTime()){
+                                  expirado='Vigente'
+                                  color='#68B29A'//verde
+                                }
 
-                              this.promesasPagoList[i] = {
-                                _id:result[i]._id,
-                                Fecha:result[i].Fecha.toString().split('T')[0],
-                                Cantidad:result[i].Cantidad,
-                                Expirado:this.expirado,
-                                Aplicado:result[i].Aplicado
+                                this.promesasPagoList[i] = {
+                                  _id:result[i]._id,
+                                  Fecha:result[i].Fecha.toString().split('T')[0],
+                                  Cantidad:result[i].Cantidad,
+                                  Expirado:expirado,
+                                  Aplicado:result[i].Aplicado,
+                                  Color:color,
+                                  ColorAplicado:colorAplicado,
+                                  Estatus:result[i].Estatus
+                                }
+
+                              }else if(result[i].Aplicado==true)
+                              {
+                                expirado=result[i].Estatus
+
+                                if(result[i].Estatus=="Parcial")
+                                {
+                                  color='#65BABD'//Azul CLARO
+                                  colorAplicado='#65BABD'//Azul Claro
+                                }
+                                else if(result[i].Estatus=="Completo"){
+                                  color='#0A506A'//Azul
+                                  colorAplicado='#0A506A' //
+                                }
+
+                                this.promesasPagoList[i] = {
+                                  _id:result[i]._id,
+                                  Fecha:result[i].Fecha.toString().split('T')[0],
+                                  Cantidad:result[i].Cantidad,
+                                  Expirado:expirado,
+                                  Aplicado:result[i].Aplicado,
+                                  Color:color,
+                                  ColorAplicado:colorAplicado,
+                                  Estatus:result[i].Estatus
+                                }
                               }
                             }
                             this.dataSource = new MatTableDataSource(this.promesasPagoList);   
@@ -277,6 +313,11 @@ export class ReservasComponentComponent implements OnInit {
       pagoManualInput:[''],
       // adicional:['']
     })
+
+    this.forthForm = this.fb.group({
+      pago:['',Validators.required]
+
+    })
   }
 
   get promesa (){
@@ -287,6 +328,9 @@ export class ReservasComponentComponent implements OnInit {
   }
   get getThirdForm (){
     return this.thirdForm.controls
+  }
+  get getforthForm (){
+    return this.forthForm.controls
   }
 
   guardarAdicionales(){
@@ -327,8 +371,7 @@ export class ReservasComponentComponent implements OnInit {
   }
 
   guardarPromesa(){
-    if(this.formGroupPromesa.invalid){
-      
+    if(this.formGroupPromesa.invalid){  
       const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
       modalRef.componentInstance.alertHeader = 'Error'
       modalRef.componentInstance.mensaje='Complete los Datos' 
@@ -338,7 +381,8 @@ export class ReservasComponentComponent implements OnInit {
       return
     }
 this.isLoading=true
-    this.promesaService.guardarPromesa(this.huesped.folio,this.promesa.fechaPromesaPago.value,this.promesa.promesaPago.value).subscribe(
+let estatus='Pendiente'
+    this.promesaService.guardarPromesa(this.huesped.folio,this.promesa.fechaPromesaPago.value,this.promesa.promesaPago.value,estatus).subscribe(
       (value)=>{
         this.isLoading=false
 
@@ -429,50 +473,84 @@ this.isLoading=true
     }
   }
 
-  preguntasPrevias(row:any){
-    
-    const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
-    modalRef.result.then( (value) =>
-    {
-      let pago
-      if(value==3)
-      {
-        return
-      }
-      if(value==1)
-      {
-        pago = {
-        
-          _id : row._id,
-          Fecha:row.Fecha,
-          Cantidad:row.Cantidad,
-          Expirado:row.Expirado ? 'Expirado' : 'Vigente',
-          Aplicado : true
-      }
-      this.idPromesa=row._id
-      this.aplicarPromesa(row)
-
-      }
-      if(value==2)
-      {
-        pago = {
-        
-          _id : row._id,
-          Fecha:row.Fecha,
-          Cantidad:this.getThirdForm.pagoManualInput.value,
-          Expirado:row.Expirado ? 'Expirado' : 'Vigente',
-          Aplicado : true
-
-      }
-      this.idPromesa=row._id
-        this.aplicarPromesa(row)
-
-      }
-
-      
+  estatusAplicado(row:any){
+    if (row.Aplicado==true){
+      this.next.emit()
     }
-  );
+    else return
   }
+
+  preguntasPrevias(row:any){
+
+
+
+    if(row.Aplicado==false){
+      const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
+      
+      modalRef.result.then( (value) =>
+      
+      {
+
+        // if(this.forthForm.invalid)
+        // {
+        //   const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        //   modalRef.componentInstance.alertHeader = 'Error'
+        //   modalRef.componentInstance.mensaje='Complete todos los Datos' 
+          
+        //   this.forthForm.markAllAsTouched();
+    
+        //   return
+          
+        // }
+
+        let pago
+        if(value==3)
+        {
+          return
+        }
+        if(value==1)
+        {
+          pago = {
+          
+            _id : row._id,
+            Fecha:row.Fecha,
+            Cantidad:row.Cantidad,
+            Expirado:'Completo',
+            Aplicado : true,
+            Forma_De_Pago : this.getThirdForm.pago.value
+        }
+        this.idPromesa=row._id
+        this.aplicarPromesa(pago)
+        this.next.emit();
+        }
+        if(value==2)
+        {
+          pago = {
+          
+            _id : row._id,
+            Fecha:row.Fecha,
+            Cantidad:this.getThirdForm.pagoManualInput.value,
+            Expirado:'Parcial',
+            Aplicado : true,
+            Forma_De_Pago : this.getThirdForm.pago.value
+
+  
+        }
+        this.next.emit()
+
+        this.idPromesa=row._id
+          this.aplicarPromesa(pago)
+  
+        }
+  
+        
+      }
+    );
+    }else if (row.Aplicado==true)
+    {return}
+  }
+
+
 
   aplicarPromesa(row:any){
     let pago : edoCuenta
@@ -489,7 +567,7 @@ this.isLoading=true
       Fecha:new Date(),
       Referencia:'',
       Descripcion:'Promesa de Pago:' + fullFecha ,
-      Forma_de_Pago:'Deposito a Reservacion',
+      Forma_de_Pago: row.Forma_De_Pago,
       Cantidad:1,
       Cargo:0,
       Abono:row.Cantidad
@@ -510,6 +588,19 @@ this.isLoading=true
           this.promesaService.updatePromesa(this.idPromesa).subscribe(
             (value)=>
             {
+              if(this.huesped.estatus=='Reserva Sin Pago'||this.huesped.estatus=='Esperando Deposito')
+              {
+                this.huesped.estatus='Deposito Realizado'
+              }
+              this.customerService.updateEstatusHuesped(this.huesped).subscribe(
+                (value)=>{
+                  this.customerService.setCurrentHuespedValue=this.huesped
+                  this.customerService.fetch();
+                },
+                (error)=>{
+
+                }
+              )
               this.promesasPagoList=[]
               this.getPromesa();
             },

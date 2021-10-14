@@ -17,8 +17,8 @@ export class PromesaService {
         return this.http.delete(environment.apiUrl+'/reportes/promesa/delete/'+_id)
     }
 
-    guardarPromesa (folio:number,fecha:Date,cantidad:number){
-        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad})
+    guardarPromesa (folio:number,fecha:Date,cantidad:number,estatus:string){
+        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad,estatus:estatus})
       }
 
     getPromesas(folio:number ){
@@ -39,5 +39,9 @@ export class PromesaService {
     }
     updatePromesa(id:string){
         return this.http.put(environment.apiUrl+"/reportes/promesas/update",{id})
+    }
+    updatePromesaEstatus(id:string){
+            return this.http.put(environment.apiUrl+"/reportes/promesas/update/estatus",{id})
+        
     }
 }
