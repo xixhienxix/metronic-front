@@ -113,6 +113,7 @@ export class ReservasComponentComponent implements OnInit {
   today: NgbDate | null;
   todayString:string;
   pagoManual:boolean=false;
+  formadePago:string='Efectivo';
 
   constructor(
     public i18n: NgbDatepickerI18n,
@@ -189,6 +190,7 @@ export class ReservasComponentComponent implements OnInit {
                             let today = new Date()
 
                             for(let i =0;i<result.length;i++){
+                              
                               let color =''
                               let colorAplicado='' //amarillo
                               let fecha = result[i].Fecha.toString()
@@ -204,11 +206,12 @@ export class ReservasComponentComponent implements OnInit {
                               var dateParts50 = result[i].Fecha.toString().split("T")[0];
                               var dateParts = dateParts50.toString().split("-");
                               var dateObject = new Date(+dateParts[0], parseInt(dateParts[2]) - 1, +dateParts[1]); 
-                              
+                              color='#68B29A'
                               if(result[i].Aplicado==false)
                               {
-                                colorAplicado='#f7347a'//amarillo
 
+                                colorAplicado='#f7347a'//amarillo
+                                color='#68B29A'
                                 if(dateObject.getTime()<today.getTime()){
                                   this.promesaService.updatePromesaEstatus(result[i]._id).subscribe(
                                     ()=>{
@@ -315,7 +318,7 @@ export class ReservasComponentComponent implements OnInit {
     })
 
     this.forthForm = this.fb.group({
-      pago:['',Validators.required]
+      pago:['Efectivo',Validators.required]
 
     })
   }
@@ -381,7 +384,7 @@ export class ReservasComponentComponent implements OnInit {
       return
     }
 this.isLoading=true
-let estatus='Pendiente'
+let estatus='Vigente'
     this.promesaService.guardarPromesa(this.huesped.folio,this.promesa.fechaPromesaPago.value,this.promesa.promesaPago.value,estatus).subscribe(
       (value)=>{
         this.isLoading=false
@@ -517,11 +520,10 @@ let estatus='Pendiente'
             Cantidad:row.Cantidad,
             Expirado:'Completo',
             Aplicado : true,
-            Forma_De_Pago : this.getThirdForm.pago.value
+            Forma_De_Pago : this.getforthForm.pago.value
         }
         this.idPromesa=row._id
         this.aplicarPromesa(pago)
-        this.next.emit();
         }
         if(value==2)
         {
@@ -532,11 +534,10 @@ let estatus='Pendiente'
             Cantidad:this.getThirdForm.pagoManualInput.value,
             Expirado:'Parcial',
             Aplicado : true,
-            Forma_De_Pago : this.getThirdForm.pago.value
+            Forma_De_Pago : this.getforthForm.pago.value
 
   
         }
-        this.next.emit()
 
         this.idPromesa=row._id
           this.aplicarPromesa(pago)

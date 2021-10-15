@@ -448,7 +448,7 @@
       </button>
     </div>
 <div class="modal-body">
-    <button type="button" class="btn btn-success col-md-12" (click)="modal.close(1);">Agregar Pago Completo a la Cuenta</button>
+    <button type="button" class="btn btn-success col-md-12" (click)="modal.close(1);next.emit();">Agregar Pago Completo a la Cuenta</button>
 <p></p>
     <ng-container *ngIf="pagoManual">
       <form [formGroup]="thirdForm">
@@ -456,7 +456,7 @@
         class="form-control col-md-6"
         formControlName='pagoManualInput'
         > 
-        <button class="btn btn-info col-md-6" (click)="modal.close(2);">Aceptar
+        <button class="btn btn-info col-md-6" (click)="modal.close(2);next.emit();">Aceptar
         </button>
         <br>
       </form>
@@ -466,14 +466,18 @@
   <button type="button" class="btn btn-secondary col-md-12" (click)="muestraInput()">Agregar Pago Parcial</button>
   <p></p>
   <div class="col-sm-12">
-    <mat-form-field appearance="fill">
+    <form [formGroup]="forthForm">
+      <mat-form-field appearance="fill">
         <mat-label>Forma de Pago</mat-label>
         <mat-select 
         style="font-weight: bold;"
-        formControlName="pago">
+        formControlName="pago"
+        #pago>
             <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
         </mat-select>
     </mat-form-field>
+    </form>
+    
 </div>
 </div>
 <p></p>
