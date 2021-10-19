@@ -84,7 +84,7 @@ export class ReservasComponentComponent implements OnInit {
   toDate: NgbDate | null;
   comparadorInicial:Date
   comparadorFinal:Date
-  fechaFinalBloqueo:string
+  fechaFinalBloqueo:string=''
   fechaInicialBloqueo:string
   noches:number;
   closeResult:string;
@@ -130,7 +130,8 @@ export class ReservasComponentComponent implements OnInit {
     this.fromDate = calendar.getToday();
     // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
     this.toDate=calendar.getToday();
-    this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year }
+    // this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
+  }
 
   ngOnInit(): void {
 
@@ -145,10 +146,9 @@ export class ReservasComponentComponent implements OnInit {
 
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator ;
-    this.dataSource.sort = this.sort;
-  }
+  // ngAfterViewInit() {
+
+  // }
 
   
     eliminarPromesa(_id:any){
@@ -205,21 +205,25 @@ export class ReservasComponentComponent implements OnInit {
 
                               var dateParts50 = result[i].Fecha.toString().split("T")[0];
                               var dateParts = dateParts50.toString().split("-");
-                              var dateObject = new Date(+dateParts[0], parseInt(dateParts[2]) - 1, +dateParts[1]); 
-                              color='#68B29A'
+                              var dateObject = new Date(result[i].Fecha); 
+                              // var dateObject = new Date(parseInt(dateParts[0]), (parseInt(dateParts[2]) - 1), parseInt(dateParts[1])); 
+                              console.log(dateObject)
+
                               if(result[i].Aplicado==false)
                               {
 
-                                colorAplicado='#f7347a'//amarillo
+                                colorAplicado='#f7347a'//rosa
                                 color='#68B29A'
-                                if(dateObject.getTime()<today.getTime()){
-                                  this.promesaService.updatePromesaEstatus(result[i]._id).subscribe(
-                                    ()=>{
-                                      expirado='Expirado'
-                                      color='#D47070'//rosa
-                                  })
+                                if(dateObject.getTime()<today.getTime())
+                                {
+                                  let status = 'Expirado'
+                                  expirado='Expirado'
+                                  color='#D47070'//rosa
+                                  this.promesaService.updatePromesaEstatus(result[i]._id,status).subscribe()
                                 }
-                                if(dateObject.getTime()>today.getTime()){
+
+                                if(dateObject.getTime()>today.getTime())
+                                {
                                   expirado='Vigente'
                                   color='#68B29A'//verde
                                 }
@@ -236,19 +240,14 @@ export class ReservasComponentComponent implements OnInit {
                                 }
 
                               }else if(result[i].Aplicado==true)
+                              
                               {
                                 expirado=result[i].Estatus
 
-                                if(result[i].Estatus=="Parcial")
-                                {
-                                  color='#65BABD'//Azul CLARO
-                                  colorAplicado='#65BABD'//Azul Claro
-                                }
-                                else if(result[i].Estatus=="Completo"){
-                                  color='#0A506A'//Azul
-                                  colorAplicado='#0A506A' //
-                                }
+                                  color='#0A506A'//Azul 
+                                  colorAplicado='#0A506A'//Azul 
 
+                              
                                 this.promesasPagoList[i] = {
                                   _id:result[i]._id,
                                   Fecha:result[i].Fecha.toString().split('T')[0],
@@ -262,6 +261,8 @@ export class ReservasComponentComponent implements OnInit {
                               }
                             }
                             this.dataSource = new MatTableDataSource(this.promesasPagoList);   
+                            this.dataSource.paginator = this.paginator ;
+                            this.dataSource.sort = this.sort;
                           },
                           (err)=>{
                             if (err)
@@ -377,7 +378,7 @@ export class ReservasComponentComponent implements OnInit {
     if(this.formGroupPromesa.invalid){  
       const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
       modalRef.componentInstance.alertHeader = 'Error'
-      modalRef.componentInstance.mensaje='Complete los Datos' 
+      modalRef.componentInstance.mensaje='Seleccione una Fecha' 
       
       this.formGroupPromesa.markAllAsTouched();
 
@@ -489,66 +490,33 @@ let estatus='Vigente'
 
     if(row.Aplicado==false){
       const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
-      
       modalRef.result.then( (value) =>
-      
       {
-
-        // if(this.forthForm.invalid)
-        // {
-        //   const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-        //   modalRef.componentInstance.alertHeader = 'Error'
-        //   modalRef.componentInstance.mensaje='Complete todos los Datos' 
-          
-        //   this.forthForm.markAllAsTouched();
-    
-        //   return
-          
-        // }
-
-        let pago
-        if(value==3)
-        {
-          return
-        }
-        if(value==1)
-        {
-          pago = {
-          
-            _id : row._id,
-            Fecha:row.Fecha,
-            Cantidad:row.Cantidad,
-            Expirado:'Completo',
-            Aplicado : true,
-            Forma_De_Pago : this.getforthForm.pago.value
-        }
-        this.idPromesa=row._id
-        this.aplicarPromesa(pago)
-        }
-        if(value==2)
-        {
-          pago = {
+  
+        let  pago = {
           
             _id : row._id,
             Fecha:row.Fecha,
             Cantidad:this.getThirdForm.pagoManualInput.value,
-            Expirado:'Parcial',
+            Estatus:'Pago Hecho',
             Aplicado : true,
             Forma_De_Pago : this.getforthForm.pago.value
-
-  
-        }
-
+                }
         this.idPromesa=row._id
           this.aplicarPromesa(pago)
   
-        }
-  
-        
       }
     );
     }else if (row.Aplicado==true)
-    {return}
+    {
+      const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+      modalRef.componentInstance.alertHeader='Error'
+      modalRef.componentInstance.mensaje='Este pago ya fue aplicado'
+      setTimeout(() => {
+        modalRef.close('Close click');
+      },4000)      
+    }
+
   }
 
 
@@ -567,7 +535,7 @@ let estatus='Vigente'
       Folio:this.customerService.getCurrentHuespedValue.folio,
       Fecha:new Date(),
       Referencia:'',
-      Descripcion:'Promesa de Pago:' + fullFecha ,
+      Descripcion:'Anticipo',
       Forma_de_Pago: row.Forma_De_Pago,
       Cantidad:1,
       Cargo:0,
@@ -586,7 +554,7 @@ let estatus='Vigente'
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
-          this.promesaService.updatePromesa(this.idPromesa).subscribe(
+          this.promesaService.updatePromesa(this.idPromesa,row.Estatus).subscribe(
             (value)=>
             {
               if(this.huesped.estatus=='Reserva Sin Pago'||this.huesped.estatus=='Esperando Deposito')
@@ -645,9 +613,7 @@ let estatus='Vigente'
       this.isLoading=false
  
   }
-  muestraInput(){
-    this.pagoManual=true
-  }
+
   /*Modal HELPERS*/
 
   getDismissReason(reason: any): string 

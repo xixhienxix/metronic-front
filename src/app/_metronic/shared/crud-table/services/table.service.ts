@@ -97,11 +97,9 @@ export abstract class TableService<T> {
   }
 
   getItemById(id: number): Observable<BaseModel> {
-    console.log("ID del getelemntbyID",id)
     this._isLoading$.next(true);
     this._errorMessage.next('');
     const url = `${this.API_URL}/${id}`;
-    console.log("URL GET ELEMNT BY ID",url)
 
     return this.http.get<BaseModel>(url)
     .pipe(

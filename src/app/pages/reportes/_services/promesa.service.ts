@@ -37,11 +37,11 @@ export class PromesaService {
         
 
     }
-    updatePromesa(id:string){
-        return this.http.put(environment.apiUrl+"/reportes/promesas/update",{id})
+    updatePromesa(id:string,estatus:string){
+        return this.http.put(environment.apiUrl+"/reportes/promesas/update",{id,estatus})
     }
-    updatePromesaEstatus(id:string){
-            return this.http.put(environment.apiUrl+"/reportes/promesas/update/estatus",{id})
+    updatePromesaEstatus(id:string,estatus:string){
+            return this.http.put(environment.apiUrl+"/reportes/promesas/update/estatus",{id,estatus})
         
     }
 }
