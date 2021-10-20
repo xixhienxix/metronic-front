@@ -152,6 +152,11 @@
                 <i class="fa fa-calendar icon"></i>
               </button>
             </div>
+            <ng-template #footerTemplate>
+              <hr class="my-0">
+              <button class="btn btn-secondary btn-sm m-2 float-right" (click)="f.close()">Aceptar</button>
+              <button class="btn btn-secondary btn-sm m-2 float-right" (click)="f.close()">Cerrar</button>
+            </ng-template>
           </div>
         </div>
         <div *ngIf="display==false" class="row">
@@ -165,7 +170,7 @@
           <div class="form-group" >
             <div class="input-group">
               <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
-              (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
+              (dateSelect)="fechaSeleccionadaFinal($event)" [footerTemplate]="footerTemplate" #f="ngbDatepicker">
 
               <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaSalida" >
 
@@ -177,7 +182,11 @@
             </div>
           </div>
         </div> 
-        
+        <ng-template #footerTemplate>
+          <hr class="my-0">
+          <button class="btn btn-primary btn-sm m-2 float-left" (click)="f.close()">Today</button>
+          <button class="btn btn-secondary btn-sm m-2 float-right" (click)="f.close()">Close</button>
+        </ng-template>
         <div  class="col-sm-6">
           <ngb-datepicker [hidden]="fechaInicialDisplay" #dp [minDate]=minDate
           (dateSelect)="fechaSeleccionadaInicial($event)" ></ngb-datepicker>
@@ -188,6 +197,8 @@
         </div>
     </div>
 <br>
+
+
 
     <div class="col-sm-12">
       <div *ngIf="display==false" class="row col-sm-10" >

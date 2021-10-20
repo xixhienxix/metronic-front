@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, EventEmitter,Output } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { EstatusService } from 'src/app/pages/reportes/_services/estatus.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -46,7 +46,7 @@ export class ModificaHuespedComponent implements OnInit {
   selected:boolean = false;
 
   //Fechas
-
+  model: NgbDateStruct;
   fromDate: Date | null;
   today: NgbDate | null;
   comparadorInicial:Date;
