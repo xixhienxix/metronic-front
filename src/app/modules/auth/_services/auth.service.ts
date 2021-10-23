@@ -146,6 +146,10 @@ export class AuthService implements OnDestroy {
     else {return false}
    }
 
+   autoriza(usuario:string,password:string){
+    return this.http.post(environment.apiUrl+'/auth/autoriza',{usuario,password})
+   }
+
   ngOnDestroy(){
 
   }

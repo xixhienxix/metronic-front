@@ -20,3 +20,13 @@ table {
   }
 
 
+
+  .mat-row:hover .mat-cell {
+    border-color: currentColor;
+    background-color: rgba(183, 183, 223, 0.966);
+
+  }
+  .mat-row .mat-cell {
+    cursor: pointer;
+  }
+

@@ -216,7 +216,8 @@ onSubmit()
         Forma_de_Pago:this.f.pago.value,
         Cantidad:1,
         Abono:this.f.monto.value,
-        Cargo:0
+        Cargo:0,
+        Estatus:'Ajuste'
         
       }
     }else if(this.f.tipo.value=='Devolucion')
@@ -230,7 +231,9 @@ onSubmit()
         Forma_de_Pago:this.f.pago.value,
         Cantidad:1,
         Abono:0,
-        Cargo:this.f.monto.value
+        Cargo:this.f.monto.value,
+        Estatus:'Devolucion'
+
       }
     }
 

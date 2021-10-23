@@ -145,10 +145,7 @@ export class ReservasComponentComponent implements OnInit {
 
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator ;
-    this.dataSource.sort = this.sort;
-  }
+
 
   
     eliminarPromesa(_id:any){
@@ -261,7 +258,9 @@ export class ReservasComponentComponent implements OnInit {
                                 }
                               }
                             }
-                            this.dataSource = new MatTableDataSource(this.promesasPagoList);   
+                            this.dataSource = new MatTableDataSource(this.promesasPagoList); 
+                            this.dataSource.paginator = this.paginator ;
+                            this.dataSource.sort = this.sort;  
                           },
                           (err)=>{
                             if (err)
@@ -571,7 +570,8 @@ let estatus='Vigente'
       Forma_de_Pago: row.Forma_De_Pago,
       Cantidad:1,
       Cargo:0,
-      Abono:row.Cantidad
+      Abono:row.Cantidad,
+      Estatus:'Activo'
     }
 
 
