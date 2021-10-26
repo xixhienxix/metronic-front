@@ -3,22 +3,34 @@ table {
   }
   
 
-  td, th {
-    text-align: center;
-    width: 15%;
-  }
+  // td, th {
+  //   text-align: center;
+  //   width: 15%;
+  // }
 
   th.mat-header-cell {
     font-size: medium;
     font-weight : bold;
-    text-align : center !important;
+    // text-align : center !important;
   }
 
   .header-align-right{
-      width: 5%;
+      width: 2%;
       text-align: left;
   }
 
+  .fecha-columna{
+    width: 5%;
+    text-align: left;
+}
+.concepto-columna{
+  width: 5%;
+  text-align: left;
+}
+.valor-columna{
+  width: 5%;
+  text-align: right;
+}
 
 
   .mat-row:hover .mat-cell {

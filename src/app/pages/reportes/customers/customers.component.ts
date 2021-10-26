@@ -428,7 +428,7 @@ this.origenService.getOrigenes()
           this.huesped = huesped1;
           this.customerService.setCurrentHuespedValue=huesped1
           
-          const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md' });
+          const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md', });
           modalRef.componentInstance.folio = id;
           modalRef.componentInstance.id = id;
           modalRef.result.then(() =>

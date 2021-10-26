@@ -3,7 +3,7 @@ import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ModalDismissReasons, NgbCalendar, NgbDate, NgbDatepickerI18n, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbCalendar, NgbDate, NgbDatepickerI18n, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
@@ -88,6 +88,7 @@ export class ReservasComponentComponent implements OnInit {
   fechaInicialBloqueo:string
   noches:number;
   closeResult:string;
+  minDate:NgbDateStruct;
 
   /*Models*/
   huesped: Huesped = EMPTY_CUSTOMER;
@@ -98,6 +99,7 @@ export class ReservasComponentComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   clickedRow = new Set<any>()
   clickedRows = new Set<any>();
+  model: NgbDateStruct;
 
 
   /*TABLE*/
@@ -128,10 +130,14 @@ export class ReservasComponentComponent implements OnInit {
     this.today=calendar.getToday();
     this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
     this.fromDate = calendar.getToday();
-    // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
     this.toDate=calendar.getToday();
-    this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year }
 
+    // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
+    this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
+    console.log(this.fechaFinalBloqueo)
+    this.minDate = {year: this.today.year, month: this.today.month, day: this.today.day};
+
+  }
   ngOnInit(): void {
 
     this.getAdicionales();
@@ -192,28 +198,24 @@ export class ReservasComponentComponent implements OnInit {
                               let colorAplicado='' //amarillo
                               let fecha = result[i].Fecha.toString()
                               let expirado 
-                              // const dia = parseInt(fecha.toString().split('/')[0])
-                              // const mes = parseInt(fecha.toString().split('/')[1])
-                              // const ano = parseInt(fecha.toString().split('/')[2])
-                              // const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
-                              
-
-                              // let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
-
+                             
                               var dateParts50 = result[i].Fecha.toString().split("T")[0];
                               var dateParts = dateParts50.toString().split("-");
-                              var dateObject = new Date(+dateParts[0], parseInt(dateParts[2]) - 1, +dateParts[1]); 
+                              var dateObject = new Date(+dateParts[0], parseInt(dateParts[1])-1, parseInt(dateParts[2])); 
                               color='#68B29A'
                               if(result[i].Aplicado==false)
                               {
 
                                 colorAplicado='#f7347a'//amarillo
                                 color='#68B29A'
+                                expirado='Vigente'
                                 if(dateObject.getTime()<today.getTime()){
+                                  expirado='Expirado'
+                                      color='#D47070'//rosa
+                                      
                                   this.promesaService.updatePromesaEstatus(result[i]._id).subscribe(
                                     ()=>{
-                                      expirado='Expirado'
-                                      color='#D47070'//rosa
+                                    
                                   })
                                 }
                                 if(dateObject.getTime()>today.getTime()){
@@ -235,16 +237,9 @@ export class ReservasComponentComponent implements OnInit {
                               }else if(result[i].Aplicado==true)
                               {
                                 expirado=result[i].Estatus
-
-                                if(result[i].Estatus=="Parcial")
-                                {
-                                  color='#65BABD'//Azul CLARO
-                                  colorAplicado='#65BABD'//Azul Claro
-                                }
-                                else if(result[i].Estatus=="Completo"){
-                                  color='#0A506A'//Azul
-                                  colorAplicado='#0A506A' //
-                                }
+                                  color='#658ebd'//Azul
+                                  colorAplicado='#658ebd' //
+                                
 
                                 this.promesasPagoList[i] = {
                                   _id:result[i]._id,
@@ -258,6 +253,7 @@ export class ReservasComponentComponent implements OnInit {
                                 }
                               }
                             }
+
                             this.dataSource = new MatTableDataSource(this.promesasPagoList); 
                             this.dataSource.paginator = this.paginator ;
                             this.dataSource.sort = this.sort;  
@@ -303,7 +299,7 @@ export class ReservasComponentComponent implements OnInit {
 
     this.formGroupPromesa = this.fb.group({
       promesaPago:['',Validators.required],
-      fechaPromesaPago : [new Date(Date.now()).toLocaleString(),Validators.required]
+      fechaPromesaPago : [this.fechaFinalBloqueo,Validators.required]
     })
 
     this.serviciosAdicionaledForm = this.fb.group({
@@ -484,70 +480,37 @@ let estatus='Vigente'
 
   preguntasPrevias(row:any){
 
-
-
     if(row.Aplicado==false){
       const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
-      
       modalRef.result.then( (value) =>
-      
       {
+        if(value!=0){
+          let pago
 
-        // if(this.forthForm.invalid)
-        // {
-        //   const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-        //   modalRef.componentInstance.alertHeader = 'Error'
-        //   modalRef.componentInstance.mensaje='Complete todos los Datos' 
-          
-        //   this.forthForm.markAllAsTouched();
-    
-        //   return
-          
-        // }
-
-        let pago
-        if(value==3)
-        {
-          return
-        }
-        if(value==1)
-        {
-          pago = {
-          
-            _id : row._id,
-            Fecha:row.Fecha,
-            Cantidad:row.Cantidad,
-            Expirado:'Completo',
-            Aplicado : true,
-            Forma_De_Pago : this.getforthForm.pago.value
-        }
-        this.idPromesa=row._id
-        this.aplicarPromesa(pago)
-        }
-        if(value==2)
-        {
           pago = {
           
             _id : row._id,
             Fecha:row.Fecha,
             Cantidad:this.getThirdForm.pagoManualInput.value,
-            Expirado:'Parcial',
+            Expirado:'Completo',
             Aplicado : true,
-            Forma_De_Pago : this.getforthForm.pago.value
-
-  
+            Forma_De_Pago : this.getforthForm.pago.value,
+            Estatus:'Realizada'
         }
 
         this.idPromesa=row._id
           this.aplicarPromesa(pago)
   
         }
-  
-        
+       
+      
       }
     );
-    }else if (row.Aplicado==true)
-    {return}
+    }
+    else if (row.Aplicado==true)
+    {
+      return
+    }
   }
 
 
@@ -571,7 +534,7 @@ let estatus='Vigente'
       Cantidad:1,
       Cargo:0,
       Abono:row.Cantidad,
-      Estatus:'Activo'
+      Estatus:'Pago Hecho'
     }
 
 

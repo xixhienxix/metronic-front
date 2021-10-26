@@ -22,3 +22,38 @@ table {
       width: 5%;
       text-align: left;
   }
+  
+  // .q-datepicker{
+  //   ngb-datepicker{
+  //     left:0 !important;
+  //     width: 350px;
+  //     .ngb-dp-months{
+  //       .ngb-dp-month{
+  //         width: 100%;
+  //         .ngb-dp-weekday{
+  //           width: 2.5rem;
+  //           margin-right: .5rem;
+  //         }
+  //         .ngb-dp-week{
+  //           .ngb-dp-day{
+  //               width: 2.5rem;
+  //               margin-right: .5rem;
+  //               div{
+  //                   width: 100%;
+  //               }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  ngb-datepicker{
+    left: 0px !important;
+    top: 0px !important;
+    padding-top: 0px !important;
+    padding-right: 0px !important;
+    padding-bottom: 0px !important;
+    padding-left: 0px !important;
+    position: absolute !important;
+    transform: translate(0px, 28px)!important;
+  }

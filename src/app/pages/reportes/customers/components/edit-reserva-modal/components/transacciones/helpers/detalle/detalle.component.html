@@ -1,4 +1,4 @@
-<div style="background-color: #319dd7" class="modal-content sub-menu">
+<div style="background-color: #319dd7; text-align: center;" class="modal-header">
     <button
     style="
       position: absolute;
@@ -46,7 +46,7 @@
                 <label class="control-label">Fecha:</label>
                 <br />
                 &nbsp;
-                <label>{{row.Fecha}}</label>
+                <label>{{row.Fecha.split('T')[0]}}</label>
             </div>
         </ng-container>
         <ng-container *ngIf="fechaCancelado!=''">
@@ -64,7 +64,7 @@
         <label class="control-label">ID de Pago:</label>
         <br />
         &nbsp;
-        <label></label>
+        <label>{{row._id}}</label>
       </div>
     </div>
 

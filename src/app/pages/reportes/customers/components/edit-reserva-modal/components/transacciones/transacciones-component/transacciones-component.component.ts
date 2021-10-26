@@ -120,7 +120,7 @@ export class TransaccionesComponentComponent implements OnInit {
 
   /**MAT TABLE */
   dataSource = new MatTableDataSource<edoCuenta>();
-  displayedColumns:string[] = ['select','Fecha','Concepto','F.P.','Valor','Fecha_Cancelado','Cantidad']
+  displayedColumns:string[] = ['select','Fecha','Concepto','F.P.','_id','Valor','Fecha_Cancelado','Cantidad']
   
   /**Obseervables */
   formasDePago:string[]=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
@@ -192,6 +192,7 @@ export class TransaccionesComponentComponent implements OnInit {
     // this.editService.getCurrentHuespedValue.folio
     this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result:edoCuenta[])=>{
+        
         this.estadoDeCuenta=[]
         this.edoCuentaActivos=[]
         this.edoCuentaCancelados=[]
@@ -822,7 +823,7 @@ this.isLoading=true
         Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
         Referencia:'',
-        Descripcion:this.second.motivoDesc.value,
+        Descripcion:this.second.motivoDesc.value + ' ('+this.second.qtyPrecio.value+'%'+')',
         Forma_de_Pago:'Descuento',
         Cantidad:1,
         Cargo:0,

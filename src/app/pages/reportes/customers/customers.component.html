@@ -176,9 +176,9 @@
             </td>
             <td>
 
-              <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion}}
+              <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion.replace("_"," ")}}
               </label>
-              <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion}}
+              <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion.replace("_"," ")}}
               </label>
     </td>
             <td>{{ huesped.llegada }}</td>
