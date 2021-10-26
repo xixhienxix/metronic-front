@@ -134,6 +134,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   diaDif:number;
   toDate: NgbDate | null;
   closeResult: string;
+  minDate:NgbDateStruct;
 
   filteredOptions: Observable<string[]>;
   public dialog: MatDialog
@@ -199,9 +200,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     public i18n: NgbDatepickerI18n
     ) {
       this.today = calendar.getToday();
+      // this.minDate = {year: this.today.year, month: this.today.month, day: this.today.day};
       this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
       this.fromDate = calendar.getToday();
       this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      this.minDate=calendar.getToday();
     }
 
 
@@ -384,7 +387,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
     const todayDate = new Date();
     const todayString=todayDate.getDate().toString().padStart(2, '0')+"/"+(todayDate.getMonth()+1).toString().padStart(2, '0')+"/"+todayDate.getFullYear().toString().padStart(4, '0')+"-"+todayDate.getHours().toString().padStart(2, '0')+":"+todayDate.getMinutes().toString().padStart(2, '0')+":"+todayDate.getSeconds().toString().padStart(2, '0')
-    
+    let fromDate : Date
+    let toDate : Date
+
     for(let habitaciones of this.preAsig)
     {
 
@@ -394,9 +399,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.huesped.salida = this.toDate.toString();
     this.huesped.nombre = formData.nombre;
 
+    fromDate=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
+    toDate=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
+    var Difference_In_Time=toDate.getTime()-fromDate.getTime()
+    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+
         this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-        this.huesped.noches=(this.toDate.day)-(this.fromDate.day)
+        this.huesped.noches=Math.trunc(Difference_In_Days-1)
         this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
         this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
         this.huesped.habitacion=habitaciones.codigo

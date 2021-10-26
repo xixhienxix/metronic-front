@@ -148,6 +148,7 @@
       </div>
       <div class="col-lg-6">
         <button
+        [disabled]='llegaHoy'
           class="btn btn-success btn-block"
           type="submit"
           name="estatus"
@@ -211,7 +212,7 @@
           class="btn btn-primary btn-block"
           type="submit"
           value="7"
-          (click)="setStep(1)"
+          (click)="openModifica()"
         >
           Modifica Reserva
         </button>
@@ -272,7 +273,7 @@
           type="submit"
           value="7"
         >
-          Modifica Reserva
+          Modifica Húesped
         </button>
         <br>
       </div>

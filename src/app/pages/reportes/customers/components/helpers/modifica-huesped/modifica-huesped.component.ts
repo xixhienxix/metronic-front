@@ -100,8 +100,8 @@ export class ModificaHuespedComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fromDate = new Date(parseInt(this.huesped.llegada.split("/")[2]), parseInt(this.huesped.llegada.split("/")[1]), parseInt(this.huesped.llegada.split("/")[0]));
-    this.toDate = new Date(parseInt(this.huesped.salida.split("/")[2]), parseInt(this.huesped.salida.split("/")[1]), parseInt(this.huesped.salida.split("/")[0]));
+    this.fromDate = new Date(parseInt(this.huesped.llegada.split("/")[2]), parseInt(this.huesped.llegada.split("/")[1])-1, parseInt(this.huesped.llegada.split("/")[0]));
+    this.toDate = new Date(parseInt(this.huesped.salida.split("/")[2]), parseInt(this.huesped.salida.split("/")[1])-1, parseInt(this.huesped.salida.split("/")[0]));
     this.formatFechas();
     this.loadForm();
     this.getCodigosCuarto();
@@ -241,16 +241,14 @@ export class ModificaHuespedComponent implements OnInit {
     this.accordionDisplay="";
     //  let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     //  let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    // let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
-
-    console.log("this.cuartos :", this.cuartos)
-    console.log("this.diadif :", this.diaDif)
+    // let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24))
 
     if(codigoHabitacion=='1')
     {
           this.bandera=true
           // this.bandera=false;
-            for (let i=0; i<this.diaDif; i++) {
+            for (let i=0; i<this.diaDif; i++) 
+            {
             this.disponibilidadService.getdisponibilidadTodos(this.fromDate.getDate(), this.fromDate.getMonth()+1, this.fromDate.getFullYear())
             .pipe(map(
               (responseData)=>{
@@ -391,6 +389,19 @@ export class ModificaHuespedComponent implements OnInit {
     // this.huesped.salida=this.toDate.getUTCDay()+'/'+(this.toDate.getUTCMonth()-1)+'/'+this.toDate.getUTCFullYear()
 
     this.huesped.noches=parseInt(this.huesped.salida.split("/")[0])-parseInt(this.huesped.llegada.split("/")[0])
+
+    let toDate : Date
+    let fromDate : Date
+
+    console.log(this.toDate)
+    console.log(this.fromDate)
+    this.fromDate=new Date(this.fromDate.getFullYear(),this.fromDate.getMonth()-1,this.fromDate.getDate())
+    this.toDate=new Date(this.toDate.getFullYear(),this.toDate.getMonth()-1,this.toDate.getDate())
+    var Difference_In_Time=toDate.getTime()-fromDate.getTime()
+    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+    
+    this.huesped.noches=Math.trunc(Difference_In_Days)-1
+
     this.huesped.tarifa=this.tarifa
    
     this.huesped.habitacion=this.codigoCuartoString

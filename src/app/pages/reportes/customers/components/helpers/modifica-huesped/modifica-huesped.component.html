@@ -14,7 +14,12 @@
     X
   </button>
   <br />
+<ng-container *ngIf="huesped.estatus=='Huesped en Casa'">
+  <h2  style="font: bold; color: white; text-align: center;">Modifica Húesped</h2>
+</ng-container>
+<ng-container *ngIf="huesped.estatus!='Huesped en Casa'">
   <h2  style="font: bold; color: white; text-align: center;">Modifica Reserva</h2>
+</ng-container>
 </div>
 <br>
 
@@ -224,7 +229,7 @@
                       class="form-control form-control-lg form-control-solid"
                      
                       placeholder="-- {{placeHolder}} -- ">
-            <!-- <footer>
+             <footer>
               <button style="background-color: #319dd7;" (click)="okayChecked()" mat-raised-button class="btn btn-blocked">Confirmar</button>
             </footer>
               <div>
