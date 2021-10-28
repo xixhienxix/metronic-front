@@ -140,58 +140,60 @@
         Datos Despues de Modificar
       </label>
     </div>
+<form [formGroup]="fechasFormGroup">
+  <div class="row col-md-12">
+    <div class="col-sm-6">
+      <br>
+      <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Inicial</label>
+      <div class="form-group" >
+        <div class="input-group">
+          <input formControlName="fechaInicial" hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
+          (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker">
 
-    <div class="row col-md-12">
+          <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaLlegada" >
+
+          <div class="input-group-append">
+            <button class="btn btn-primary" (click)="toggleCalendarioInicial()" type="button">
+              <i class="fa fa-calendar icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="display==false" class="row">
+        <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
+      </div>  
+    </div>
+
       <div class="col-sm-6">
         <br>
-        <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Inicial</label>
+        <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Final</label>
         <div class="form-group" >
           <div class="input-group">
-            <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
-            (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker">
+            <input formControlName="fechaFinal" hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
+            (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
 
-            <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaLlegada" >
+            <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaSalida" >
 
             <div class="input-group-append">
-              <button class="btn btn-primary" (click)="toggleCalendarioInicial()" type="button">
+              <button class="btn btn-primary" (click)="toggleCalendarioFinal()" type="button">
                 <i class="fa fa-calendar icon"></i>
               </button>
             </div>
           </div>
         </div>
-        <div *ngIf="display==false" class="row">
-          <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
-        </div>  
+      </div> 
+      
+      <div  class="col-sm-6">
+        <ngb-datepicker [hidden]="fechaInicialDisplay" #dp [minDate]=minDate
+        (dateSelect)="fechaSeleccionadaInicial($event)" ></ngb-datepicker>
       </div>
-
-        <div class="col-sm-6">
-          <br>
-          <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Final</label>
-          <div class="form-group" >
-            <div class="input-group">
-              <input hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
-              (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
-
-              <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaSalida" >
-
-              <div class="input-group-append">
-                <button class="btn btn-primary" (click)="toggleCalendarioFinal()" type="button">
-                  <i class="fa fa-calendar icon"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div> 
-        
-        <div  class="col-sm-6">
-          <ngb-datepicker [hidden]="fechaInicialDisplay" #dp [minDate]=minDate
-          (dateSelect)="fechaSeleccionadaInicial($event)" ></ngb-datepicker>
-        </div>
-        <div   class="col-sm-6">
-          <ngb-datepicker [hidden]="fechaFinalDisplay" [minDate]=minDate
-          (dateSelect)="fechaSeleccionadaFinal($event)" #df ></ngb-datepicker>
-        </div>
-    </div>
+      <div   class="col-sm-6">
+        <ngb-datepicker [hidden]="fechaFinalDisplay" [minDate]=minDate
+        (dateSelect)="fechaSeleccionadaFinal($event)" #df ></ngb-datepicker>
+      </div>
+  </div>
+</form>
+    
 <br>
 
     <div class="col-sm-12">
@@ -383,32 +385,3 @@
   </div>
 
 
-<ng-template #error let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Error</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>{{mensaje_error}}&hellip;</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
-
-<ng-template #exito let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">{{mensaje_exito}}</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <!-- <div class="modal-body">
-    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
-  </div> -->
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>

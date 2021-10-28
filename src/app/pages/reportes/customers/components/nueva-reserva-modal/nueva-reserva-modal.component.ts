@@ -406,7 +406,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
         this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-        this.huesped.noches=Math.trunc(Difference_In_Days-1)
+        this.huesped.noches=Math.trunc((Difference_In_Days>1) ? (Difference_In_Days-1) : Difference_In_Days )
         this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
         this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
         this.huesped.habitacion=habitaciones.codigo
@@ -843,7 +843,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     }else
     {
       this.dropDownHabValueIndex=""
-      this.cuarto = value.replace(" ","_");
+      if(value!=undefined)
+      {this.cuarto = value.replace(" ","_");}
       this.bandera=false
     }
 

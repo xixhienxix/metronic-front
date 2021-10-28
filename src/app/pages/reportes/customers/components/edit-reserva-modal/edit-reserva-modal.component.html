@@ -21,20 +21,20 @@
       id="example-modal-sizes-title-lg"
     >
       <div class="row col-md-6">
-        <h2 style="font-size: 1.5em">{{ huesped.nombre}}</h2>
+        <h2 style="font-size: 1.5em">{{ customerService.getCurrentHuespedValue.nombre}}</h2>
       </div>
       <div class="row">
         <small style="color: white; font-size: 1em"
           >ID RVA : &nbsp;
           <small style="font-size: 1em; font-weight: bold; color: #319dd7">{{
-            huesped.folio
+            customerService.getCurrentHuespedValue.folio
           }}</small>
         </small>
         &nbsp; &nbsp; &nbsp; &nbsp;
         <small style="color: white; font-size: 1em"
           >Hab.: &nbsp;
           <small style="font-weight: bold; font-size: 1em; color: #319dd7"
-            >{{ huesped.numeroCuarto }} - {{ huesped.habitacion.replace("_"," ") }}</small
+            >{{ customerService.getCurrentHuespedValue.numeroCuarto }} - {{ customerService.getCurrentHuespedValue.habitacion.replace("_"," ") }}</small
           >
         </small>
       </div>
@@ -43,13 +43,13 @@
 
   <br />
   <!-- </div>  -->
-  <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
-    <mat-select  disabled style="width:160px; color: white; font-weight: bold; font-size: larger; " [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-      <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)"  [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+  <ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='Huesped en Casa'||customerService.getCurrentHuespedValue.estatus=='Check-Out'||customerService.getCurrentHuespedValue.estatus=='Uso Interno'||customerService.getCurrentHuespedValue.estatus=='Bloqueo / Sin Llegadas'||customerService.getCurrentHuespedValue.estatus=='Reserva Temporal'">
+    <mat-select  disabled style="width:160px; color: white; font-weight: bold; font-size: larger; " [(value)]="customerService.getCurrentHuespedValue.estatus" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn">
+      <mat-option #option [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)"  [value]="customerService.getCurrentHuespedValue.estatus">{{customerService.getCurrentHuespedValue.estatus}}</mat-option>
     </mat-select>
   </ng-container>
-  <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
-    <mat-select style="width: 160px; color: white; font-weight: bold; font-size: larger;  " #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+  <ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='Reserva Sin Pago'||customerService.getCurrentHuespedValue.estatus=='Deposito Realizado'||customerService.getCurrentHuespedValue.estatus=='Esperando Deposito'||customerService.getCurrentHuespedValue.estatus=='Totalmente Pagada'||customerService.getCurrentHuespedValue.estatus=='Reserva Confirmada'">
+    <mat-select style="width: 160px; color: white; font-weight: bold; font-size: larger;  " #selected [(value)]="customerService.getCurrentHuespedValue.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn" >
       <ng-container *ngFor="let estatus of estatusArray">
         <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
           <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
@@ -57,9 +57,9 @@
       </ng-container>
     </mat-select>
   </ng-container>
-  <ng-container *ngIf="huesped.estatus=='No Show'||huesped.estatus=='Reserva Cancelada'">
-    <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-      <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+  <ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='No Show'||customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'">
+    <mat-select style="width:160px" [(value)]="customerService.getCurrentHuespedValue.estatus" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn">
+      <mat-option #option [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" [value]="customerService.getCurrentHuespedValue.estatus">{{customerService.getCurrentHuespedValue.estatus}}</mat-option>
     </mat-select>
   </ng-container>
 <br>
@@ -129,18 +129,18 @@
 </mat-tab-group>
 
 
-<div *ngIf="huesped.estatus=='Reserva Confirmada'||huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Reserva Temporal'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Totalmente Pagada'">
+<div *ngIf="customerService.getCurrentHuespedValue.estatus=='Reserva Confirmada'||customerService.getCurrentHuespedValue.estatus=='Reserva Sin Pago'||customerService.getCurrentHuespedValue.estatus=='Reserva Temporal'||customerService.getCurrentHuespedValue.estatus=='Esperando Deposito'||customerService.getCurrentHuespedValue.estatus=='Deposito Realizado'||customerService.getCurrentHuespedValue.estatus=='Totalmente Pagada'">
   <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
     <label style="color: aliceblue"> Estado de Reserva / Folio </label>
     <div style="justify-content: space-around;" class="row">
 
       <div class="col-lg-6">
         <button 
-          [disabled]="huesped.estatus!='Reserva Sin Pago'"
+          [disabled]="customerService.getCurrentHuespedValue.estatus!='Reserva Sin Pago'"
           class="btn btn-primary btn-block"
           type="submit"
           name="estatus"
-          (click)="confirmaReserva(3,huesped.folio);closeModal()"
+          (click)="confirmaReserva(3,customerService.getCurrentHuespedValue.folio);closeModal()"
         >
           Confirma Resereva
         </button>
@@ -152,7 +152,7 @@
           class="btn btn-success btn-block"
           type="submit"
           name="estatus"
-          (click)="confirmaReserva(1,huesped.folio);closeModal()"
+          (click)="confirmaReserva(1,customerService.getCurrentHuespedValue.folio);closeModal()"
         >
           Realiza Check-In
         </button>
@@ -173,7 +173,7 @@
 
       <div class="f col-lg-6">
         <button
-          [disabled]="!(huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada')"
+          [disabled]="!(customerService.getCurrentHuespedValue.estatus=='Reserva Sin Pago'||customerService.getCurrentHuespedValue.estatus=='Deposito Realizado'||customerService.getCurrentHuespedValue.estatus=='Esperando Deposito'||customerService.getCurrentHuespedValue.estatus=='Totalmente Pagada'||customerService.getCurrentHuespedValue.estatus=='Reserva Confirmada')"
           class="btn btn-secondary btn-block"
           type="submit"
           (click)="openEnviarConfirmacion()"
@@ -186,7 +186,7 @@
 
       <div class="col-lg-6">
         <button
-        (click)="confirmaReserva(11,huesped.folio);"
+        (click)="confirmaReserva(11,customerService.getCurrentHuespedValue.folio);"
          class="btn btn-danger btn-block" type="submit">
           No se presento
         </button>
@@ -196,7 +196,7 @@
 
       <div class="f col-lg-6">
         <button
-        (click)="confirmaReserva(12,huesped.folio);"
+        (click)="confirmaReserva(12,customerService.getCurrentHuespedValue.folio);"
           class="btn btn-danger btn-block"
           type="submit"
           value="7"
@@ -222,7 +222,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="huesped.estatus=='Huesped en Casa'">
+<div *ngIf="customerService.getCurrentHuespedValue.estatus=='Huesped en Casa'">
   <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
     <label style="color: aliceblue"> Estado de Reserva / Folio </label>
     <div style="justify-content: space-around;" class="row">
@@ -256,7 +256,7 @@
 
       <div class="f col-lg-12">
         <button
-          (click)="checkOut(4,huesped.folio)"
+          (click)="checkOut(4,customerService.getCurrentHuespedValue.folio)"
           class="btn btn-danger btn-block"
           type="submit"
           value="7"
@@ -281,12 +281,12 @@
     </div>
   </div>
 </div>
-<div *ngIf="huesped.estatus=='Reserva Cancelada'">
+<div *ngIf="customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'">
   <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
     <br>
   <div class="f col-lg-12">
     <button
-      (click)="confirmaReserva(2,huesped.folio);closeModal()"
+      (click)="confirmaReserva(2,customerService.getCurrentHuespedValue.folio);closeModal()"
       class="btn btn-success btn-block"
       type="submit"
       value="7"
@@ -338,7 +338,7 @@
   </div>
   <div class="modal-body">
     <p>Se enviara la confirmacion de la reservacion al siguiente email: </p>
-      <input #emailSender [value]="huesped.email">
+      <input #emailSender [value]="customerService.getCurrentHuespedValue.email">
       <p>En caso de requerir que el envio sea a un email diferente corrigalo en la casilla</p> 
     
   </div>

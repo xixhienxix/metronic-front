@@ -545,6 +545,7 @@ export class EditReservaModalComponent implements OnInit {
         //Recibir Data del Modal usando EventEmitter
         console.log("EventEmmiter: ",receivedEntry);
         this.huesped=receivedEntry;
+        this.customerService.fetch()
         })
         //Recibir Data del Modal usando modal.close(data)
         modalRef.result.then((result) => {
