@@ -108,9 +108,9 @@
   </div>
 </div>
 
-<mat-tab-group [selectedIndex]="selectedIndex" class="col-md-12" style="min-width: 0; padding: 3px">
+<mat-tab-group mat-stretch-tabs [selectedIndex]="selectedIndex" class="col-md-12" style=" padding: 3px">
 
-  <mat-tab label="Reserva">
+  <mat-tab style="min-width: 72px" class="stretch-tab-reserva" label="Reserva">
     <app-reservas-component (next)="setStep(2)"></app-reservas-component>
   </mat-tab>
 

@@ -1,1 +1,110 @@
-<p></p>
+<div style="background-color: #dde0e2" class="modal-content sub-menu">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px; color: red;"
+    >
+      Estado de Cuenta
+    </label>
+  </div>
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6">
+            <label style="color: black;" class="control-label">Tarifa / Plan:</label>
+        </div>
+      
+        <div class="col-sm-6">
+            <label class="control-label">{{customerService.getCurrentHuespedValue.habitacion}}</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <label style="color: black;" class="control-label">Adultos:</label>           
+          </div>
+      
+          <div class="col-sm-6">
+            <label class="control-label">{{customerService.getCurrentHuespedValue.adultos}}</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <label style="color: black;" class="control-label">Niños:</label>
+           
+          </div>
+      
+          <div class="col-sm-6">
+            <label class="control-label">{{customerService.getCurrentHuespedValue.ninos}}</label>
+          </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <label style="color: black;" class="control-label">Noches:</label>
+          </div>
+    
+          <div class="col-sm-6">
+            <label class="control-label">{{customerService.getCurrentHuespedValue.noches}}</label>
+        </div>
+    </div>
+</div>
+    
+   <br>
+
+<div style="background-color: #319dd7" class="modal-content sub-menu">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    >
+      Alojamiento
+    </label>
+</div>
+<div style="background-color: #dde0e2" class="modal-content sub-menu">
+        <div class="row container">
+            <div  class="col-sm-6">
+                <label
+                style="text-align: center;"
+                  class="control-label"
+                >
+                Fechas:
+                </label>
+            </div>
+            <div style="text-align: right;" class="col-sm-6">
+                <label
+                style="text-align: right;"
+                class="control-label" 
+                >Cantidad a Pagar:
+            </label>
+            </div>
+        </div>
+</div> 
+<br>
+
+<div class="container">
+    <ng-container *ngFor="let edoAlojamiento of edoCuentaAlojamientosActivos">
+            <div class="row ">
+                <div style="text-align: left;" class="col-sm-6">
+                    <label style="color: black;" class="control-label"> {{edoAlojamiento.Fecha}}
+                    </label>
+                </div>
+
+                <div style="text-align: center;" class="col-sm-6">
+                    <label class="control-label">$ {{edoAlojamiento.Cargo.toLocaleString('es-MX')}}
+                    </label>
+                </div>
+            </div>
+    </ng-container>
+</div>
+<br><hr>
+<div class="container">
+            <div class="row ">
+                <div style="text-align: left;" class="col-sm-6">
+                    <label style="font-weight:bold; color: black;" class="control-label"> Subtotal de Alojamiento
+                    </label>
+                </div>
+
+                <div style="text-align: center;" class="col-sm-6">
+                    <label class="control-label">$ {{subTotalAlojamiento.toLocaleString('es-MX')}}
+                    </label>
+                </div>
+            </div>
+</div>
