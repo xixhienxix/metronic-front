@@ -401,12 +401,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
     fromDate=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
     toDate=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
+    
     var Difference_In_Time=toDate.getTime()-fromDate.getTime()
     var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
         this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
         this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-        this.huesped.noches=Math.trunc((Difference_In_Days>1) ? (Difference_In_Days-1) : Difference_In_Days )
+        this.huesped.noches=Math.trunc((Difference_In_Days>1) ? Difference_In_Days : (Difference_In_Days-1))
         this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
         this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
         this.huesped.habitacion=habitaciones.codigo

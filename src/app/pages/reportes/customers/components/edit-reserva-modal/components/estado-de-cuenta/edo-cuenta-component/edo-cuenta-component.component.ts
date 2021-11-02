@@ -19,10 +19,21 @@ export class EdoCuentaComponentComponent implements OnInit {
   edoCuentaCancelados:edoCuenta[]=[]
   edoCuentaDevoluciones:edoCuenta[]=[]
   edoCuentaAlojamientosActivos:any[]=[]
+  edoCuentaServiciosExtra:any[]=[]
+  edoCuentaDescuentosLista:any[]=[]
+  edoCuentaAbonosLista:any[]=[]
+
 
   closeResult: string;
-  subTotalAlojamiento:number;
+  subTotalAlojamiento:string;
   totalCalculado:number
+  subTotalServiciosExtra:number=0;
+  impuestoSobreHospedaje:number=0;
+  iva:number=0;
+  totalimpuestos:number=0;
+  totalDescuentos:number=0;
+  totalAbonos:number=0;
+  totalCargos:number=0;
 
   constructor(
     public customerService:HuespedService,
@@ -47,6 +58,12 @@ export class EdoCuentaComponentComponent implements OnInit {
         this.edoCuentaActivos=[]
         this.edoCuentaCancelados=[]
         this.edoCuentaDevoluciones=[]
+        this.alojamientoPorNoche=[]
+
+        this.edoCuentaAlojamientosActivos=[]
+        this.edoCuentaServiciosExtra=[]
+        this.edoCuentaDescuentosLista=[]
+        this.edoCuentaAbonosLista=[]
 
         for(let i=0;i<result.length;i++){
 
@@ -55,27 +72,24 @@ export class EdoCuentaComponentComponent implements OnInit {
             let fechaIncial : Date 
             let edoCuentaAlojamientoTemp
 
+            let fromDate
+
+            var anoLlegada = parseInt(this.customerService.getCurrentHuespedValue.llegada.split("/")[2])
+            var mesLlegada = parseInt(this.customerService.getCurrentHuespedValue.llegada.split("/")[1])
+            var diaLlegada = parseInt(this.customerService.getCurrentHuespedValue.llegada.split("/")[0])
+
+            fromDate = new Date(anoLlegada,mesLlegada-1,diaLlegada)
+
             if(result[i].Descripcion=='Alojamiento')
             {
-              let toDate = new Date()
-              let fromDate
-
-              const anoLlegada = parseInt(result[i].Fecha.toString().split("T").toString().split('-')[0])
-              const mesLlegada = parseInt(result[i].Fecha.toString().split("T").toString().split('-')[1])
-              const diaLlegada = parseInt(result[i].Fecha.toString().split("T").toString().split('-')[2])
-              fromDate = new Date(anoLlegada,mesLlegada-1,diaLlegada)
-
-
-              toDate.setDate(fromDate.getDate() + this.customerService.getCurrentHuespedValue.noches);
               
-              for  (fromDate; fromDate <= toDate; fromDate.setDate(fromDate.getDate()+1))
+               
+               fromDate = new Date(anoLlegada,mesLlegada-1,diaLlegada)
+
+              for (let y=0; y<this.customerService.getCurrentHuespedValue.noches; y++)
               {
-                let fullFechaSalida=new Date(fromDate).getDate()+" de "+this.i18n.getMonthFullName(new Date(fromDate).getMonth()+1)+" del "+new Date(fromDate).getFullYear()
-                // // fechaIncial.toLocaleString('es-MX')
-                // const anoLlegada = parseInt(result[i].Fecha.toString().split("T").toString().split('-')[0])
-                // const mesLlegada = parseInt(result[i].Fecha.toString().split("T").toString().split('-')[1])
-                // const diaLlegada = parseInt(result[i].Fecha.toString().split("T").toString().split('-')[2])
-                // fechaIncial = new Date(anoLlegada,mesLlegada-1,diaLlegada)
+
+                let fullFechaSalida=new Date(fromDate).getUTCDate()+" de "+this.i18n.getMonthFullName(new Date(fromDate).getUTCMonth()+1)+" del "+new Date(fromDate).getFullYear()
 
                 edoCuentaAlojamientoTemp = {
 
@@ -94,14 +108,104 @@ export class EdoCuentaComponentComponent implements OnInit {
                   Autorizo:result[i].Autorizo
                 }
 
+                this.impuestoSobreHospedaje = result[i].Total*3/100
                 this.edoCuentaAlojamientosActivos.push(edoCuentaAlojamientoTemp)
 
                 // fechaIncial.setDate(fechaIncial.getDate() + 1);
-                this.subTotalAlojamiento = result[i].Total
+                this.subTotalAlojamiento = result[i].Total.toLocaleString()
+
+                fromDate.setDate(fromDate.getDate() + 1);
               }
             }
+
+            if(result[i].Descripcion!='Alojamiento'&& result[i].Cargo!=0)
+            {
+             
+              let fechaLarga = new Date(anoLlegada,mesLlegada-1,diaLlegada)
+
+              let fullFechaServicio=new Date(fechaLarga).getUTCDate()+" de "+this.i18n.getMonthFullName(new Date(fechaLarga).getUTCMonth()+1)+" del "+new Date(fechaLarga).getFullYear()
+
+
+              let edoCuentaserviciosExtraTemp = {
+
+                _id:result[i]._id,
+                Folio:result[i].Folio,
+                Referencia:result[i].Referencia,
+                Forma_de_Pago:result[i].Forma_de_Pago,
+                Fecha:fullFechaServicio,
+                Fecha_Cancelado:result[i].Fecha_Cancelado,
+                Descripcion:result[i].Descripcion,
+                Cantidad:result[i].Cantidad,
+                Cargo:result[i].Cargo,
+                Abono:result[i].Abono,
+                Total:result[i].Total,
+                Estatus:result[i].Estatus,
+                Autorizo:result[i].Autorizo
+              }
+
+              this.edoCuentaServiciosExtra.push(edoCuentaserviciosExtraTemp)
+              this.subTotalServiciosExtra += result[i].Cargo
+            }
+            if(result[i].Forma_de_Pago=='Descuento')
+            {
+            
+              let fechaLargaDesc = new Date(anoLlegada,mesLlegada-1,diaLlegada)
+
+              let fullFechaDescuento=new Date(fechaLargaDesc).getUTCDate()+" de "+this.i18n.getMonthFullName(new Date(fechaLargaDesc).getUTCMonth()+1)+" del "+new Date(fechaLargaDesc).getFullYear()
+
+              let edoCuentaDescuentos = {
+
+                _id:result[i]._id,
+                Folio:result[i].Folio,
+                Referencia:result[i].Referencia,
+                Forma_de_Pago:result[i].Forma_de_Pago,
+                Fecha:fullFechaDescuento,
+                Fecha_Cancelado:result[i].Fecha_Cancelado,
+                Descripcion:result[i].Descripcion,
+                Cantidad:result[i].Cantidad,
+                Cargo:result[i].Cargo,
+                Abono:result[i].Abono,
+                Total:result[i].Total,
+                Estatus:result[i].Estatus,
+                Autorizo:result[i].Autorizo
+              }
+
+              this.edoCuentaDescuentosLista.push(edoCuentaDescuentos)
+              this.totalDescuentos+=result[i].Abono
+            }
+
+            if(result[i].Abono!=0 && result[i].Forma_de_Pago!='Descuento')
+            {
+              let fechaLargaAbonos = new Date(anoLlegada,mesLlegada-1,diaLlegada)
+
+              let fullFechaAbonos=new Date(fechaLargaAbonos).getUTCDate()+" de "+this.i18n.getMonthFullName(new Date(fechaLargaAbonos).getUTCMonth()+1)+" del "+new Date(fechaLargaAbonos).getFullYear()
+
+              let edoCuentaAbonos = {
+
+                _id:result[i]._id,
+                Folio:result[i].Folio,
+                Referencia:result[i].Referencia,
+                Forma_de_Pago:result[i].Forma_de_Pago,
+                Fecha:fullFechaAbonos,
+                Fecha_Cancelado:result[i].Fecha_Cancelado,
+                Descripcion:result[i].Descripcion,
+                Cantidad:result[i].Cantidad,
+                Cargo:result[i].Cargo,
+                Abono:result[i].Abono,
+                Total:result[i].Total,
+                Estatus:result[i].Estatus,
+                Autorizo:result[i].Autorizo
+              }
+
+              this.edoCuentaAbonosLista.push(edoCuentaAbonos)
+              this.totalAbonos+=result[i].Abono
+
+            }
+
             this.edoCuentaActivos.push(result[i]) 
+            this.totalCargos+=result[i].Cargo
           }
+
 
           if(result[i].Estatus=='Cancelado')
           { this.edoCuentaCancelados.push(result[i]) }
@@ -125,6 +229,9 @@ export class EdoCuentaComponentComponent implements OnInit {
           }
 
           this.totalCalculado=totalCargos-totalAbonos
+
+          this.iva = this.subTotalServiciosExtra*16/100
+          this.totalimpuestos=this.iva+(this.impuestoSobreHospedaje)
 
       },
       (err)=>
