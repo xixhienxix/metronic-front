@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" >
     <div class="row">
       <div class="col-md-6">
         <br />
@@ -142,53 +142,54 @@
   </div>
   <form [formGroup]="formGroupPromesa">
   <div class="row col-md-12">
-      <div class="col-sm-6">
-        <br />
-        <label class="control-label">Cantidad Acordada:</label>
-        <br />
-        <input
-          formControlName="promesaPago"
-          style="width: 150px"
-          class="form-control"
-          type="number"
-          placeholder="$ 0.00    MXN"
-          [class.is-invalid]="isControlInvalid('promesaPago')"
-          [class.is-valid]="isControlValid('promesaPago')"
-        />
-      </div>
-  
-        <div class="col-sm-6">
-          <br>
-          <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha</label>
-          <div class="form-group" >
+        <div class="col-sm-7">
+          <br />
+          <div class="form-group">
+            <label style="color:#00506a; font-weight: bold;" class="form-label">Fecha de Promesa</label>
             <div class="input-group">
-              <input  
+              <input 
               formControlName="fechaPromesaPago"  
-              hidden 
-              class="form-control"  
-              placeholder="--Seleccione Fecha--" 
-              name="dp"  
-              [startDate]="fromDate!"
-              ngbDatepicker
-              (dateSelect)="fechaSeleccionadaFinal($event)" 
-              [minDate]=today
-              #f="ngbDatepicker"
-              >
-              <!-- [disabled]="huesped.estatus=='Reserva Cancelada'||huesped.estatus=='No Show'||huesped.estatus=='Check-Out'" -->
-
-              <input  
-              disabled
-              class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff [value]="fechaFinalBloqueo" 
-              >
-              <!-- [value]="fechaFinalBloqueo"  -->
+                     class="form-control form-control-lg form-control-solid" 
+                     name="dp" 
+                     ngbDatepicker 
+                     autocomplete="off"
+                     [minDate]="minDate"
+                     placeholder="Seleccione Fecha de Promesa"
+                     [footerTemplate]="footerTemplate" 
+                     #d="ngbDatepicker"
+                     [value]="fechaFinalBloqueo"
+                     [(ngModel)]="model"
+                     (click)="d.toggle()"
+                     (dateSelect)="fechaSeleccionadaFinal($event)" >
               <div class="input-group-append">
-                <button class="btn btn-primary" (click)="f.toggle()" type="button">
+                <button [disabled]="huesped.estatus=='Reserva Cancelada'||huesped.estatus=='No Show'" class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
                   <i class="fa fa-calendar icon"></i>
                 </button>
               </div>
             </div>
           </div>
+        <ng-template #footerTemplate>
+          <hr class="my-0">
+          <button class="btn btn-primary btn-sm m-2 float-left" (click)="model = today; d.close()">Today</button>
+          <button class="btn btn-secondary btn-sm m-2 float-right" (click)="d.close()">Close</button>
+        </ng-template>
+        
         </div>
+        <div class="col-sm-5">
+          <br />
+          <label class="control-label">Cantidad Acordada:</label>
+          <br />
+          <input
+            formControlName="promesaPago"
+            style="width: 150px"
+            class="form-control"
+            type="number"
+            placeholder="$ 0.00    MXN"
+            [class.is-invalid]="isControlInvalid('promesaPago')"
+            [class.is-valid]="isControlValid('promesaPago')"
+          />
+        </div>
+    
   </div>
 </form>
 <div class="row">
@@ -268,7 +269,7 @@
         <th mat-header-cell  *matHeaderCellDef mat-sort-header> Estatus </th>
         <td style="color: white; font-weight: bold;" 
         [style.background]="row.Color"
-        at-cell *matCellDef="let row"> {{row.Expirado }} </td>
+        at-cell *matCellDef="let row"> {{row.Expirado}} </td>
       </ng-container>
       <!-- [ngStyle]="{'background-color': row.Expirado ? '#f7347a' : '#00c688' }"  -->
 
@@ -443,59 +444,53 @@
     <app-loader-spinner></app-loader-spinner>
   </ng-container>
 
+
+
+
   <ng-template #pregunta let-modal>
-    <div style="background-color: #00506a" class="modal-header">
-      <button
-      style="
-        position: absolute;
-        top: 2%;
-        right: 1%;
-        background-color: #fa6d7c;
-        font-weight: bold;
-        color: white;
-      "
-      class="btn"
-      (click)="modal.dismiss('Cross click')"
-    >
-      X
-    </button>
-    <br />
-      <h4 class="modal-title" style="color: white;">REALIZAR DEPÓSITO</h4>
+    <div class="modal-header">
+      <h4 class="modal-title">Realizar Deposito</h4>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
 <div class="modal-body">
-    <!-- <button type="button" class="btn btn-successf col-md-12" (click)="modal.close(1);next.emit();">Agregar Pago Completo a la Cuenta</button>
-<p></p> -->
+    <button type="button" class="btn btn-success col-md-12" (click)="modal.close(1);next.emit();">Agregar Pago Completo a la Cuenta</button>
+<p></p>
+    <ng-container *ngIf="pagoManual">
       <form [formGroup]="thirdForm">
         <input 
-        class="form-control col-md-12"
+        class="form-control col-md-6"
         formControlName='pagoManualInput'
-        placeholder="$ Cantidad Recibida"
         > 
-        <!-- <button class="btn btn-info col-md-6" (click)="modal.close(2);next.emit();">Aceptar 
-        </button>-->
+        <button class="btn btn-info col-md-6" (click)="modal.close(2);next.emit();">Aceptar
+        </button>
         <br>
       </form>
-      <p></p>
-<div class="row col-md-12">
-  <form [formGroup]="forthForm">
-    <mat-form-field style="width: 100%;" appearance="fill">
-      <mat-label>Forma de Pago</mat-label>
-      <mat-select 
-      style="font-weight: bold;"
-      formControlName="pago"
-      #pago>
-          <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
-      </mat-select>
-  </mat-form-field>
-</form>
-</div>  
+    </ng-container>
+    <p></p>
+
+  <button type="button" class="btn btn-secondary col-md-12" (click)="muestraInput()">Agregar Pago Parcial</button>
   <p></p>
-  <button type="button" class="btn btn-secondary col-md-12"(click)="modal.close();next.emit();">Agregar Anticipo</button>
-  <p></p>
+  <div class="col-sm-12">
+    <form [formGroup]="forthForm">
+      <mat-form-field appearance="fill">
+        <mat-label>Forma de Pago</mat-label>
+        <mat-select 
+        style="font-weight: bold;"
+        formControlName="pago"
+        #pago>
+            <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    </form>
+    
+</div>
 </div>
 <p></p>
 
+     
+    <div class="modal-footer">
+      <button type="button" class="btn btn-warning col-md-12" (click)="modal.close(3)">Cerrar</button>
+    </div>
   </ng-template>

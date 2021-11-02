@@ -71,6 +71,8 @@ import { AtLeastOne_ValidatorDirective } from './_directives/at-least-one.valida
 import { AjustesComponent } from './customers/components/helpers/ajustes-huesped/ajustes.component';
 import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
+import { DetalleComponent } from './customers/components/edit-reserva-modal/components/transacciones/helpers/detalle/detalle.component';
+import { SuperUserComponent } from './customers/helpers/authorization/super.user/super.user.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -111,7 +113,10 @@ registerLocaleData(localeEs);
     EdoCuentaComponentComponent,
     LoadingSpinnerComponent,
     AtLeastOne_ValidatorDirective,
-    AjustesComponent  ],
+    AjustesComponent,
+    DetalleComponent,
+    SuperUserComponent
+      ],
   imports: [
     MatSlideToggleModule,
     CommonModule,

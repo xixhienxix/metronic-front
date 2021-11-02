@@ -236,6 +236,7 @@ export class HuespedComponentComponent implements OnInit {
   formReset(){
     this.formGroup.reset()
   }
+  
   getNumeroSocio(){
     this.detallesService.getDetails().subscribe(
       (value)=>{

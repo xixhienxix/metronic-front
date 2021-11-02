@@ -15,6 +15,7 @@ import { Habitaciones } from 'src/app/pages/reportes/_models/habitaciones.model'
 import { FormBuilder,FormGroup,Validators } from '@angular/forms';
 import { NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 import { isThisTypeNode } from 'typescript';
+import { AlertsComponent } from '../alerts-component/alerts/alerts.component';
 
 
 @Component({
@@ -25,11 +26,10 @@ import { isThisTypeNode } from 'typescript';
 export class ModificaHuespedComponent implements OnInit {
   @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
-  @ViewChild('error') errorModal: null;
-  @ViewChild('exito') exitoModal: null;
   @ViewChild('matSelect') matSelect = null;
 
   huesped:Huesped;
+  huespedAnterior:any;
   fullFechaSalida:string;
   fullFechaLlegada:string;
   closeResult: string;
@@ -77,6 +77,7 @@ export class ModificaHuespedComponent implements OnInit {
 
   //Forms
   modificaHuespedFormGroup: FormGroup;
+  fechasFormGroup: FormGroup;
   public tipoCuartoForm: FormBuilder;
 
   constructor(
@@ -100,8 +101,8 @@ export class ModificaHuespedComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fromDate = new Date(parseInt(this.huesped.llegada.split("/")[2]), parseInt(this.huesped.llegada.split("/")[1]), parseInt(this.huesped.llegada.split("/")[0]));
-    this.toDate = new Date(parseInt(this.huesped.salida.split("/")[2]), parseInt(this.huesped.salida.split("/")[1]), parseInt(this.huesped.salida.split("/")[0]));
+    this.fromDate = new Date(parseInt(this.huesped.llegada.split("/")[2]), parseInt(this.huesped.llegada.split("/")[1])-1, parseInt(this.huesped.llegada.split("/")[0]));
+    this.toDate = new Date(parseInt(this.huesped.salida.split("/")[2]), parseInt(this.huesped.salida.split("/")[1])-1, parseInt(this.huesped.salida.split("/")[0]));
     this.formatFechas();
     this.loadForm();
     this.getCodigosCuarto();
@@ -152,10 +153,23 @@ export class ModificaHuespedComponent implements OnInit {
 
   loadForm() {
 
-    this.modificaHuespedFormGroup = this.fb.group({
-      'tipoCuarto': [ undefined, Validators.required ],
-      'numeroHab' : [undefined,Validators.required],
-    });
+    // this.modificaHuespedFormGroup = this.fb.group({
+    //   'tipoCuarto': [ undefined, Validators.required ],
+    //   'numeroHab' : [undefined,Validators.required],
+
+    // });
+    this.huespedAnterior = {
+      Habitacion:this.huesped.habitacion,
+      Cuarto:this.huesped.numeroCuarto,
+      Llegada:this.huesped.llegada,
+      Salida:this.huesped.salida
+    }
+
+    this.fechasFormGroup = this.fb.group({
+      fechaInicial:[''],
+      fechaFinal:['']
+    })
+
 
     this.diasDiferencia();
     
@@ -165,8 +179,8 @@ export class ModificaHuespedComponent implements OnInit {
     }
   }
 
-  get tipoCuarto() { return this.modificaHuespedFormGroup.get('tipoCuarto') }
-  get numeroHab() { return this.modificaHuespedFormGroup.get('numeroHab') }
+ get fechas (){return this.fechasFormGroup.controls}
+
 
   formatFechas()
   {
@@ -200,6 +214,8 @@ export class ModificaHuespedComponent implements OnInit {
     }else if(this.comparadorInicial<this.comparadorFinal)
     {this.display=true}
 
+    this.expandedPane=true;
+    this.sinDisponibilidad=[];
     this.diasDiferencia();
   }
 
@@ -221,6 +237,8 @@ export class ModificaHuespedComponent implements OnInit {
     }else if(this.comparadorInicial<this.comparadorFinal)
     {this.display=true}
 
+    this.expandedPane=true;
+    this.sinDisponibilidad=[];
    this.diasDiferencia();
 
   }
@@ -228,7 +246,10 @@ export class ModificaHuespedComponent implements OnInit {
   diasDiferencia(){
     // let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     // let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    this.diaDif = Math.floor((Date.UTC(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate()) - Date.UTC(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    var Difference_In_Time=this.toDate.getTime()-this.fromDate.getTime()
+    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+    this.diaDif=Math.floor(Difference_In_Days)
+    // this.diaDif = Math.floor((Date.UTC(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate()) - Date.UTC(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
 
   }
 
@@ -241,16 +262,16 @@ export class ModificaHuespedComponent implements OnInit {
     this.accordionDisplay="";
     //  let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     //  let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    // let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+    // let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24))
 
-    console.log("this.cuartos :", this.cuartos)
-    console.log("this.diadif :", this.diaDif)
+
 
     if(codigoHabitacion=='1')
     {
           this.bandera=true
           // this.bandera=false;
-            for (let i=0; i<this.diaDif; i++) {
+            for (let i=0; i<this.diaDif; i++) 
+            {
             this.disponibilidadService.getdisponibilidadTodos(this.fromDate.getDate(), this.fromDate.getMonth()+1, this.fromDate.getFullYear())
             .pipe(map(
               (responseData)=>{
@@ -370,8 +391,9 @@ export class ModificaHuespedComponent implements OnInit {
     revisaDatos(){
       if(this.numCuartoNumber==undefined||this.codigoCuartoString==undefined)
       {
-        this.mensaje_error="Debes seleccionar una habitacion antes de guardar los cambios"
-        const modalRef = this.modalService.open(this.errorModal,{size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertHeader='Error'
+        modalRef.componentInstance.mensaje='Debes seleccionar una habitacion antes de guardar los cambios'
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
@@ -387,23 +409,27 @@ export class ModificaHuespedComponent implements OnInit {
     }
     actualizarDatos(){
 
-    // this.huesped.llegada=this.fromDate.getUTCDay()+'/'+(this.fromDate.getUTCMonth()-1)+'/'+this.fromDate.getUTCFullYear()
-    // this.huesped.salida=this.toDate.getUTCDay()+'/'+(this.toDate.getUTCMonth()-1)+'/'+this.toDate.getUTCFullYear()
+    this.huesped.noches=this.diaDif
 
-    this.huesped.noches=parseInt(this.huesped.salida.split("/")[0])-parseInt(this.huesped.llegada.split("/")[0])
     this.huesped.tarifa=this.tarifa
    
     this.huesped.habitacion=this.codigoCuartoString
     this.huesped.numeroCuarto=this.numCuartoNumber,
-    this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
-    this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
+    this.huesped.pendiente=this.huesped.tarifa*this.diaDif
+    this.huesped.porPagar=this.huesped.tarifa*this.diaDif
+
+    console.log(this.huesped.pendiente)
+    console.log(this.huesped.porPagar)
+    console.log(this.huesped.noches)
 
       this.customerService.updateHuesped(this.huesped).subscribe(
         ()=>{},
         (err)=>{
           if(err)
           {
-            const modalRef=this.modalService.open(this.errorModal,{size:'sm'})
+            const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar al húesped'
             modalRef.result.then((result) => {
               this.closeResult = `Closed with: ${result}`;
               }, (reason) => {
@@ -413,12 +439,33 @@ export class ModificaHuespedComponent implements OnInit {
                 modalRef.close('Close click');
               },4000)
             }
+
         },
         ()=>{
-          this.mensaje_exito= "Datos del Húesped Actualizados con Exito"
-          this.passEntry.emit(this.huesped);
+          //
+          this.customerService.updateHuespedModifica(this.huespedAnterior).subscribe(
+            (err)=>{
+              if(err)
+              {
+                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                modalRef.componentInstance.alertHeader = 'Error'
+                modalRef.componentInstance.mensaje='No se pudo liberar la Disponibilidad'
+              }
+            },
+            (value)=>{
+              const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+              modalRef.componentInstance.alertHeader = 'Exito'
+              modalRef.componentInstance.mensaje='Disponibilidad liberada con exito'
+            }
+            )
+            
 
-          const modalRef=this.modalService.open(this.exitoModal,{size:'sm'})
+          this.passEntry.emit(this.huesped);
+          this.customerService.setCurrentHuespedValue=this.huesped
+
+          const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+          modalRef.componentInstance.alertHeader='Exito'
+          modalRef.componentInstance.mensaje='Datos del Húesped Actualizados con Exito'
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {

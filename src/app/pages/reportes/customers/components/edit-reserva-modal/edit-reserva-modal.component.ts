@@ -120,7 +120,7 @@ export class EditReservaModalComponent implements OnInit {
     fullFechaSalida:string
     fullFechaLlegada:string
     hoveredDate: NgbDate | null = null;
-
+    llegaHoy:Boolean;
     toDate: NgbDate | null;
 
     closeResult: string;
@@ -242,6 +242,7 @@ export class EditReservaModalComponent implements OnInit {
       }
        else {
 
+
         const sb = this.customersService.getItemById(this.folio).pipe(
           first(),
           catchError((errorMessage) => {
@@ -251,6 +252,15 @@ export class EditReservaModalComponent implements OnInit {
           })
         ).subscribe((huesped1: Huesped) => {
           this.huesped = huesped1;
+
+          //REVISAR SI LLEGA HOY EL HUESPED
+
+          let fechaDeLlegada =new Date(parseInt(this.huesped.llegada.split('/')[2]),parseInt(this.huesped.llegada.split('/')[1])-1,parseInt(this.huesped.llegada.split('/')[0])) 
+          let diaHoy= new Date()
+
+          var Difference_In_Time=fechaDeLlegada.getTime()-diaHoy.getTime()
+          var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+          if(Difference_In_Days>=1){this.llegaHoy=true}
 
           this.customersService.setCurrentHuespedValue=huesped1
           
@@ -341,15 +351,35 @@ export class EditReservaModalComponent implements OnInit {
     confirmaReserva(estatus,folio)
     {
       this.isLoading=true
+      let edoFiltrado : any
+      let totalCargos
+      let totalAbonos
 
       if(estatus==12||estatus==11||estatus==4){
-        if(this.estadoDeCuentaService.currentCuentaValue.filter((result)=> result.Abono>0)    ){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-          modalRef.componentInstance.alertHeader = 'Error'
-          modalRef.componentInstance.mensaje='El huesped tiene saldo a Favor, aplique una devolucion antes de darle Check-Out'
+         
+        edoFiltrado = this.estadoDeCuentaService.currentCuentaValue.filter((result)=> result.Abono>1)
+        
+        console.log(edoFiltrado) 
+
+        if(edoFiltrado.length<0)
+        { 
+          for(let i=0; i<edoFiltrado.length; i++)
+          {
+            totalCargos = totalCargos + edoFiltrado[i].Cargo
+            totalAbonos = totalAbonos + edoFiltrado[i].Abono
+          }
+          if(totalAbonos<totalCargos)
+          {
+            const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='El huesped tiene saldo a Favor, aplique una devolucion antes de darle Check-Out'
+
+            return
+
+          }
+          
         }
         this.isLoading=false
-        return
       }
 
 
@@ -515,6 +545,7 @@ export class EditReservaModalComponent implements OnInit {
         //Recibir Data del Modal usando EventEmitter
         console.log("EventEmmiter: ",receivedEntry);
         this.huesped=receivedEntry;
+        this.customerService.fetch()
         })
         //Recibir Data del Modal usando modal.close(data)
         modalRef.result.then((result) => {

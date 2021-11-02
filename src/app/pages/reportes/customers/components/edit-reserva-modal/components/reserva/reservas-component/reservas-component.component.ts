@@ -3,7 +3,7 @@ import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { ModalDismissReasons, NgbCalendar, NgbDate, NgbDatepickerI18n, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbCalendar, NgbDate, NgbDatepickerI18n, NgbDateStruct, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { Adicional } from 'src/app/pages/reportes/_models/adicional.model';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
@@ -88,6 +88,7 @@ export class ReservasComponentComponent implements OnInit {
   fechaInicialBloqueo:string
   noches:number;
   closeResult:string;
+  minDate:NgbDateStruct;
 
   /*Models*/
   huesped: Huesped = EMPTY_CUSTOMER;
@@ -98,6 +99,7 @@ export class ReservasComponentComponent implements OnInit {
   private subscriptions: Subscription[] = [];
   clickedRow = new Set<any>()
   clickedRows = new Set<any>();
+  model: NgbDateStruct;
 
 
   /*TABLE*/
@@ -128,11 +130,14 @@ export class ReservasComponentComponent implements OnInit {
     this.today=calendar.getToday();
     this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
     this.fromDate = calendar.getToday();
-    // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
     this.toDate=calendar.getToday();
-    // this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
-  }
 
+    // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
+    this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
+    console.log(this.fechaFinalBloqueo)
+    this.minDate = {year: this.today.year, month: this.today.month, day: this.today.day};
+
+  }
   ngOnInit(): void {
 
     this.getAdicionales();
@@ -146,9 +151,10 @@ export class ReservasComponentComponent implements OnInit {
 
   }
 
-  // ngAfterViewInit() {
-
-  // }
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator ;
+    this.dataSource.sort = this.sort;
+  }
 
   
     eliminarPromesa(_id:any){
@@ -195,31 +201,22 @@ export class ReservasComponentComponent implements OnInit {
                               let colorAplicado='' //amarillo
                               let fecha = result[i].Fecha.toString()
                               let expirado 
-                              // const dia = parseInt(fecha.toString().split('/')[0])
-                              // const mes = parseInt(fecha.toString().split('/')[1])
-                              // const ano = parseInt(fecha.toString().split('/')[2])
-                              // const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
-                              
-
-                              // let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
-
+                             
                               var dateParts50 = result[i].Fecha.toString().split("T")[0];
                               var dateParts = dateParts50.toString().split("-");
-                              var dateObject = new Date(result[i].Fecha); 
-                              // var dateObject = new Date(parseInt(dateParts[0]), (parseInt(dateParts[2]) - 1), parseInt(dateParts[1])); 
-                              console.log(dateObject)
-
+                              var dateObject = new Date(+dateParts[0], parseInt(dateParts[2]) - 1, +dateParts[1]); 
+                              color='#68B29A'
                               if(result[i].Aplicado==false)
                               {
 
                                 colorAplicado='#f7347a'//rosa
                                 color='#68B29A'
-                                if(dateObject.getTime()<today.getTime())
-                                {
-                                  let status = 'Expirado'
-                                  expirado='Expirado'
-                                  color='#D47070'//rosa
-                                  this.promesaService.updatePromesaEstatus(result[i]._id,status).subscribe()
+                                if(dateObject.getTime()<today.getTime()){
+                                  this.promesaService.updatePromesaEstatus(result[i]._id).subscribe(
+                                    ()=>{
+                                      expirado='Expirado'
+                                      color='#D47070'//rosa
+                                  })
                                 }
 
                                 if(dateObject.getTime()>today.getTime())
@@ -243,11 +240,20 @@ export class ReservasComponentComponent implements OnInit {
                               
                               {
                                 expirado=result[i].Estatus
+                                  color='#658ebd'//Azul
+                                  colorAplicado='#658ebd' //
+                                
 
-                                  color='#0A506A'//Azul 
-                                  colorAplicado='#0A506A'//Azul 
+                                if(result[i].Estatus=="Parcial")
+                                {
+                                  color='#65BABD'//Azul CLARO
+                                  colorAplicado='#65BABD'//Azul Claro
+                                }
+                                else if(result[i].Estatus=="Completo"){
+                                  color='#0A506A'//Azul
+                                  colorAplicado='#0A506A' //
+                                }
 
-                              
                                 this.promesasPagoList[i] = {
                                   _id:result[i]._id,
                                   Fecha:result[i].Fecha.toString().split('T')[0],
@@ -261,8 +267,6 @@ export class ReservasComponentComponent implements OnInit {
                               }
                             }
                             this.dataSource = new MatTableDataSource(this.promesasPagoList);   
-                            this.dataSource.paginator = this.paginator ;
-                            this.dataSource.sort = this.sort;
                           },
                           (err)=>{
                             if (err)
@@ -305,7 +309,7 @@ export class ReservasComponentComponent implements OnInit {
 
     this.formGroupPromesa = this.fb.group({
       promesaPago:['',Validators.required],
-      fechaPromesaPago : [new Date(Date.now()).toLocaleString(),Validators.required]
+      fechaPromesaPago : [this.fechaFinalBloqueo,Validators.required]
     })
 
     this.serviciosAdicionaledForm = this.fb.group({
@@ -486,37 +490,66 @@ let estatus='Vigente'
 
   preguntasPrevias(row:any){
 
-
-
     if(row.Aplicado==false){
       const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
       modalRef.result.then( (value) =>
       {
-  
-        let  pago = {
+
+        // if(this.forthForm.invalid)
+        // {
+        //   const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        //   modalRef.componentInstance.alertHeader = 'Error'
+        //   modalRef.componentInstance.mensaje='Complete todos los Datos' 
+          
+        //   this.forthForm.markAllAsTouched();
+    
+        //   return
+          
+        // }
+
+        let pago
+        if(value==3)
+        {
+          return
+        }
+        if(value==1)
+        {
+          pago = {
+          
+            _id : row._id,
+            Fecha:row.Fecha,
+            Cantidad:row.Cantidad,
+            Expirado:'Completo',
+            Aplicado : true,
+            Forma_De_Pago : this.getforthForm.pago.value
+        }
+        this.idPromesa=row._id
+        this.aplicarPromesa(pago)
+        }
+        if(value==2)
+        {
+          pago = {
           
             _id : row._id,
             Fecha:row.Fecha,
             Cantidad:this.getThirdForm.pagoManualInput.value,
-            Estatus:'Pago Hecho',
+            Expirado:'Parcial',
             Aplicado : true,
             Forma_De_Pago : this.getforthForm.pago.value
-                }
+
+  
+        }
+
         this.idPromesa=row._id
           this.aplicarPromesa(pago)
   
+        }
+  
+        
       }
     );
     }else if (row.Aplicado==true)
-    {
-      const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-      modalRef.componentInstance.alertHeader='Error'
-      modalRef.componentInstance.mensaje='Este pago ya fue aplicado'
-      setTimeout(() => {
-        modalRef.close('Close click');
-      },4000)      
-    }
-
+    {return}
   }
 
 
@@ -539,7 +572,8 @@ let estatus='Vigente'
       Forma_de_Pago: row.Forma_De_Pago,
       Cantidad:1,
       Cargo:0,
-      Abono:row.Cantidad
+      Abono:row.Cantidad,
+      Estatus:'Pago Hecho'
     }
 
 

@@ -14,6 +14,10 @@ import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
 import { MatTableDataSource } from '@angular/material/table';
+import { map, startWith } from 'rxjs/operators';
+import { DetalleComponent } from '../helpers/detalle/detalle.component';
+import { SuperUserComponent } from 'src/app/pages/reportes/customers/helpers/authorization/super.user/super.user.component';
+import { MatPaginator } from '@angular/material/paginator';
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -57,6 +61,7 @@ const EMPTY_CUSTOMER: Huesped = {
 })
 
 export class TransaccionesComponentComponent implements OnInit {
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   
   folio:number
@@ -64,8 +69,12 @@ export class TransaccionesComponentComponent implements OnInit {
 
 
   /*Listas*/
-  codigos:Codigos[]=[]
+  codigosCargo:Codigos[]=[]
+  codigosAbono:Codigos[]=[]
   estadoDeCuenta:edoCuenta[]=[]
+  edoCuentaActivos:edoCuenta[]=[]
+  edoCuentaCancelados:edoCuenta[]=[]
+  edoCuentaDevoluciones:edoCuenta[]=[]
 
   codigoDeCargo:Codigos={
     Descripcion:'',
@@ -76,7 +85,10 @@ export class TransaccionesComponentComponent implements OnInit {
   subscription:Subscription
   /*Models*/
   huesped:Huesped
+
   /*Site Helpers*/
+  nuevaSeleccion:string='Seleccione un Concepto'
+  nuevosConceptos:boolean=false
   precioFijoChecked:boolean=false;
   porcentajeChecked:boolean=false;
   disabledFP:boolean=true;
@@ -84,25 +96,34 @@ export class TransaccionesComponentComponent implements OnInit {
   totalCalculado:number=0;
   conceptosDisabled:boolean=true;
   closeResult: string;
-
-  /*PAGINATOR*/
-  paginator: PaginatorState;
+  quantity:number=1;
+  quantityNin:number=0;
+  todosChecked:boolean=false;
+  activosChecked:boolean=true;
+  canceladosChecked:boolean=false;
+  devolucionesChecked:boolean=false;
+  fechaCancelado:Date;
 
   /**Forms */
+  nuevosConceptosFormGroup:FormGroup;
+  abonoFormGroup:FormGroup;
   formGroup:FormGroup;
   secondFormGroup:FormGroup;
+  myControl = new FormControl();
   
   /**Loading  */
   isLoading:boolean=false
   isLoadingDesc:boolean=false
   submitted:boolean=false
+  submittedAbono:boolean=false
   secondFormInvalid:boolean=false
 
   /**MAT TABLE */
   dataSource = new MatTableDataSource<edoCuenta>();
-  displayedColumns:string[] = ['select','Fecha','Concepto','F.P.','Valor']
+  displayedColumns:string[] = ['select','Fecha','Concepto','F.P.','_id','Valor','Fecha_Cancelado','Cantidad']
   
-  formasDePago:string[]=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
+  /**Obseervables */
+  formasDePago:string[]=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
 
   constructor(
     private fb : FormBuilder,
@@ -121,11 +142,12 @@ export class TransaccionesComponentComponent implements OnInit {
      }
 
   ngOnInit(): void {
+
     this.loadForm();
     this.getCodigosDeCargo();
     this.getEdoCuenta();
-    this.paginator = this.customerService.paginator;
 
+    
   }
 
   
@@ -133,21 +155,34 @@ export class TransaccionesComponentComponent implements OnInit {
 
     this.formGroup= this.fb.group({
       concepto : ['',Validators.required],
-      pago : ['',Validators.required],
-      idDeposito : [''],
       cantidad : ['',Validators.required],
       precio : ['',Validators.required],
-      cargo_abono : ['',Validators.required]
+    })
+
+    this.nuevosConceptosFormGroup = this.fb.group({
+      nuevoConcepto:['',Validators.required],
+      nuevoPrecio:['',Validators.required],
+      nuevaCantidad :[this.quantity,Validators.required]
+    })
+
+    this.abonoFormGroup= this.fb.group({
+      conceptoManual : ['',Validators.required],
+      cantidadAbono : ['',Validators.required],
+      formaDePagoAbono : ['',Validators.required],
+      notaAbono : [''],
     })
 
     this.secondFormGroup=this.fb.group({
       qtyPrecio:['',Validators.required],
+      motivoDesc:['']
     },)
   }
 
   /**Useful Getter */
   get f() {return this.formGroup.controls}
+  get abonosf() {return this.abonoFormGroup.controls}
   get second() {return this.secondFormGroup.controls}
+  get nuevas() {return this.nuevosConceptosFormGroup.controls}
 
 
 
@@ -158,17 +193,35 @@ export class TransaccionesComponentComponent implements OnInit {
     this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result:edoCuenta[])=>{
         
+        this.estadoDeCuenta=[]
+        this.edoCuentaActivos=[]
+        this.edoCuentaCancelados=[]
+        this.edoCuentaDevoluciones=[]
 
-          this.dataSource.data = result
-          this.estadoDeCuenta = result
+        for(let i=0;i<result.length;i++){
+
+          if(result[i].Estatus=='Activo')
+          { this.edoCuentaActivos.push(result[i]) }
+          if(result[i].Estatus=='Cancelado')
+          { this.edoCuentaCancelados.push(result[i]) }
+          if(result[i].Estatus=='Devolucion')
+          { this.edoCuentaDevoluciones.push(result[i]) }
+          this.estadoDeCuenta.push(result[i]) 
+
+        }
+
+          this.dataSource.data = this.edoCuentaActivos
+          this.dataSource.paginator = this.paginator;
 
           let totalCargos=0;
           let totalAbonos=0;
 
-          for(let i=0;i<this.estadoDeCuenta.length;i++)
+          for(let i=0;i<this.edoCuentaActivos.length;i++)
           {
-            totalCargos = totalCargos + this.estadoDeCuenta[i].Cargo
-            totalAbonos = totalAbonos + this.estadoDeCuenta[i].Abono
+      
+              totalCargos = totalCargos + this.edoCuentaActivos[i].Cargo
+              totalAbonos = totalAbonos + this.edoCuentaActivos[i].Abono
+            
           }
 
           this.totalCalculado=totalCargos-totalAbonos
@@ -209,8 +262,16 @@ export class TransaccionesComponentComponent implements OnInit {
       (result:Codigos[])=>{
         for(let i=0;i<result.length;i++)
         {
-          this.codigos.push(result[i])
+          if(result[i].Tipo=='C')
+          {
+            this.codigosCargo.push(result[i])
+          }
+          if(result[i].Tipo=='A')
+          {
+            this.codigosAbono.push(result[i])
+          }
         }
+        
       },
       (err)=>{
         if (err)
@@ -238,67 +299,92 @@ export class TransaccionesComponentComponent implements OnInit {
 
     );
   }
-  
-  filtroCodigosDeCargo(event:any){
-    this.conceptosDisabled=false
-    this.codigos=[]
-
-    if(this.f.cargo_abono.value=='Cargo')
+  nuevoConcepto(){
+    if(this.nuevosConceptos==true)
     {
-      this.formasDePago=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
-      this.formGroup.patchValue({pago:'Servicio'})
-      this.disabledFP=true
+      this.nuevosConceptos=false
+    }else if(this.nuevosConceptos==false)
+    {
+      this.nuevosConceptos=true;
+    }
+  }
+
+  plusNin()
+  {
+      this.quantity++;  
+  }
+  minusNin()
+  {
+    if(this.quantity>0)
+    {
+    this.quantity--;
     }
     else
-    {
-      this.formasDePago=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
-      this.formGroup.patchValue({pago:''})
-      this.disabledFP=false
-    }
+    this.quantity
 
-    this.codigosService.getCodigosDeCargo().subscribe(
-      (result:Codigos[])=>{
-        for(let i=0;i<result.length;i++)
-        {
-          if(this.f.cargo_abono.value=='Cargo')
-          {
-            if(result[i].Tipo=='C')
-            {this.codigos.push(result[i])}
-          }
-          else if(this.f.cargo_abono.value=='Abono')
-          {
-            if(result[i].Tipo=='A')
-            {this.codigos.push(result[i])}
-          }
-        }
-      },
-      (err)=>{
-        if (err)
-        {
-
-
-            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
-            modalRef.componentInstance.alertHeader = 'Error'
-            modalRef.componentInstance.mensaje='No hay codigos de cargo disponibles, vuelva a abrir la ventana'
-            
-            modalRef.result.then((result) => {
-              this.closeResult = `Closed with: ${result}`;
-              }, (reason) => {
-                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-              });
-              setTimeout(() => {
-                modalRef.close('Close click');
-              },4000)
-                
-        }
-      },
-
-    );
   }
+
+  // filtroCodigosDeCargo(event:any){
+  //   this.conceptosDisabled=false
+  //   this.codigosCargo=[]
+  //   this.codigosAbono=[]
+
+  //   if(this.f.cargo_abono.value=='Cargo')
+  //   {
+  //     this.formasDePago=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
+  //     this.formGroup.patchValue({pago:'Servicio'})
+  //     this.disabledFP=true
+  //   }
+  //   else
+  //   {
+  //     this.formasDePago=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
+  //     this.formGroup.patchValue({pago:''})
+  //     this.disabledFP=false
+  //   }
+
+  //   this.codigosService.getCodigosDeCargo().subscribe(
+  //     (result:Codigos[])=>{
+  //       for(let i=0;i<result.length;i++)
+  //       {
+  //         if(this.f.cargo_abono.value=='Cargo')
+  //         {
+  //           if(result[i].Tipo=='C')
+  //           {this.codigos.push(result[i])}
+  //         }
+  //         else if(this.f.cargo_abono.value=='Abono')
+  //         {
+  //           if(result[i].Tipo=='A')
+  //           {this.codigos.push(result[i])}
+  //         }
+  //       }
+  //     },
+  //     (err)=>{
+  //       if (err)
+  //       {
+
+
+  //           const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+  //           modalRef.componentInstance.alertHeader = 'Error'
+  //           modalRef.componentInstance.mensaje='No hay codigos de cargo disponibles, vuelva a abrir la ventana'
+            
+  //           modalRef.result.then((result) => {
+  //             this.closeResult = `Closed with: ${result}`;
+  //             }, (reason) => {
+  //                 this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  //             });
+  //             setTimeout(() => {
+  //               modalRef.close('Close click');
+  //             },4000)
+                
+  //       }
+  //     },
+
+  //   );
+  // }
 
   selectedValue(value:Codigos){
     
-
+this.nuevosConceptos=false
     this.codigoDeCargo={
       Descripcion:value.Descripcion,
       Tipo:value.Tipo,
@@ -307,7 +393,6 @@ export class TransaccionesComponentComponent implements OnInit {
 
     this.formGroup.controls['precio'].setValue(this.codigoDeCargo.Precio);
     this.formGroup.controls['cantidad'].setValue(1);
-    this.formGroup.controls['idDeposito'].setValue('');
   }
 
   onChangeQty(qty:number)
@@ -330,39 +415,74 @@ export class TransaccionesComponentComponent implements OnInit {
   }  
 
   deleteRow(edo_cuenta:any){
+
     this.isLoading=true
 
+    const modalRef = this.modalService.open(SuperUserComponent,{size:'sm'})
+    modalRef.result.then((result) => {
+      this.isLoading=false
 
-    this.edoCuentaService.deleteRow(edo_cuenta._id).subscribe(
-      (value)=>{
-        this.isLoading=false
+      this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
 
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
-        modalRef.componentInstance.alertHeader = 'Exito'
-        modalRef.componentInstance.mensaje='Cargo Borrado con Exito'   
-          setTimeout(() => {
-            modalRef.close('Close click');
-          },4000)
+      });
+    modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+      
+          if(receivedEntry)
+          {
+            this.fechaCancelado=new Date()
+            
+                  if(edo_cuenta.Forma_De_Pago=='No Aplica')
+                  {
+                    edo_cuenta.Estatus='Devolucion'
+                  }
+                  else
+                  {
+                    edo_cuenta.Estatus='Cancelado'
+                  }
 
-          this.estadoDeCuenta=[]
-          this.getEdoCuenta();
-      },
-      (error)=>{
-        this.isLoading=false
-        if(error)
-        {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
-          modalRef.componentInstance.alertHeader = 'Error'
-          modalRef.componentInstance.mensaje='No se pudo guardar el pago intente nuevamente'
-        
-            setTimeout(() => {
-              modalRef.close('Close click');
-            },4000)
-              
-          this.isLoading=false
-      }
-    }
-      )
+                  this.edoCuentaService.updateRow(edo_cuenta._id,edo_cuenta.Estatus,this.fechaCancelado,receivedEntry.username).subscribe(
+                    (value)=>{
+                      this.isLoading=false
+
+                      const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                      modalRef.componentInstance.alertHeader = 'Exito'
+                      modalRef.componentInstance.mensaje='Cargo Cancelado con Exito'   
+                        setTimeout(() => {
+                          modalRef.close('Close click');
+                        },4000)
+                        this.resetFiltros();
+
+                        this.estadoDeCuenta=[]
+                        this.getEdoCuenta();
+                    },
+                    (error)=>{
+                      this.isLoading=false
+                      if(error)
+                      {
+                        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                        modalRef.componentInstance.alertHeader = 'Error'
+                        modalRef.componentInstance.mensaje='No se pudo actualizar el estatus el pago intente nuevamente'
+                      
+                          setTimeout(() => {
+                            modalRef.close('Close click');
+                          },4000)
+                          this.resetFiltros();   
+                        this.isLoading=false
+                    }
+                  }
+                    )
+          }else 
+          {
+            const modalRef2= this.modalService.open(AlertsComponent,{size:'md'})
+            modalRef2.componentInstance.alertHeader='Error'
+            modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
+            return
+          }
+      })
+
+
   }
 
   selectedRadioButton(event:any)
@@ -395,48 +515,153 @@ export class TransaccionesComponentComponent implements OnInit {
         this.porcentajeChecked=false;
       }
     }
+    
+  }
+
+  selectedTable(event:any)
+  {
+    if(event.source.id=='todos')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data = this.estadoDeCuenta
+
+        this.todosChecked=true
+        this.activosChecked=false;
+        this.canceladosChecked=false;
+        this.devolucionesChecked=false;
+
+      }
+      else if (event.source._checked==false)
+      {
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+
+      }
+    }
+    else if(event.source.id=='cancelados')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data =this.edoCuentaCancelados
+
+        this.canceladosChecked=true
+        this.activosChecked=false;
+        this.todosChecked=false;
+        this.devolucionesChecked=false;
+
+      }
+      else if (event.source._checked==false)
+      {
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+
+      }
+    }
+    else if(event.source.id=='activos')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data = this.edoCuentaActivos
+
+        this.activosChecked=true
+        this.canceladosChecked=false;
+        this.todosChecked=false;
+        this.devolucionesChecked=false;
+
+      }
+      else if (event.source._checked==false)
+      {
+        
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+
+      }
+    }
+    else if(event.source.id=='devoluciones')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data = this.edoCuentaDevoluciones
+
+        this.activosChecked=false
+        this.canceladosChecked=false;
+        this.todosChecked=false;
+        this.devolucionesChecked=true;
+      }
+      else if (event.source._checked==false)
+      {
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+
+      }
+    }
   }
 
   onSubmit(){
     
-    if(this.formGroup.invalid)
-    {
-      this.submitted=true
-      return;
-    }
 
-    this.isLoading=true
-    
     let pago:edoCuenta;
 
-    if(this.codigoDeCargo.Tipo=='C')
+    if(this.nuevosConceptos)
     {
-       pago = {
+      if(this.nuevosConceptosFormGroup.invalid)
+      {
+        this.submitted=true
+        return;
+      }
+      this.isLoading=true
+
+
+        pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
-        Referencia:this.f.idDeposito.value,
-        Descripcion:this.codigoDeCargo.Descripcion,
-        Forma_de_Pago:this.f.pago.value,
-        Cantidad:this.f.cantidad.value,
-        Cargo:this.f.precio.value,
-        Abono:0
-        
-      }
-    }else if(this.codigoDeCargo.Tipo=='A')
+        Fecha_Cancelado:'',
+        Referencia:'',
+        Descripcion:this.nuevas.nuevoConcepto.value,
+        Forma_de_Pago:'No Aplica',
+        Cantidad:this.nuevas.nuevaCantidad.value,
+        Cargo:this.nuevas.nuevoPrecio.value,
+        Abono:0,
+        Estatus:'Activo'
+        }
+    }else if(!this.nuevosConceptos)
     {
-      pago = {
+      if(this.formGroup.invalid)
+        {
+          this.submitted=true
+          return;
+        }
 
-        Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
-        Referencia:this.f.idDeposito.value,
-        Descripcion:this.codigoDeCargo.Descripcion,
-        Forma_de_Pago:this.f.pago.value,
-        Cantidad:this.f.cantidad.value,
-        Cargo:0,
-        Abono:this.f.precio.value,
+        this.isLoading=true
+
+        pago = {
+
+          Folio:this.customerService.getCurrentHuespedValue.folio,
+          Fecha:new Date(),
+          Fecha_Cancelado:'',
+          Referencia:'',
+          Descripcion:this.codigoDeCargo.Descripcion,
+          Forma_de_Pago:'no Aplica',
+          Cantidad:this.f.cantidad.value,
+          Cargo:this.f.precio.value,
+          Abono:0,
+          Estatus:'Activo'
+
+          
+  
       }
-    }
+  
+    }    
 
     
 this.isLoading=true
@@ -452,7 +677,10 @@ this.isLoading=true
           },4000)
             
 
+        this.nuevosConceptosFormGroup.reset();
         this.formGroup.reset();
+        this.resetFiltros();
+
         this.estadoDeCuenta=[]
         this.getEdoCuenta();
         
@@ -471,7 +699,8 @@ this.isLoading=true
             },4000)
               
           this.isLoading=false
-      
+          this.resetFiltros();
+
         }
       },
       ()=>{//FINALLY
@@ -479,10 +708,81 @@ this.isLoading=true
       )
   }
 
-  aplicaDescuento(){
+  onSubmitAbono(){
+    
+    if(this.abonoFormGroup.invalid)
+    {
+      this.submittedAbono=true
+      return;
+    }
+
+    this.isLoading=true
+    
+    let pago:edoCuenta;
+
+    
+      pago = {
+
+        Folio:this.customerService.getCurrentHuespedValue.folio,
+        Fecha:new Date(),
+        Fecha_Cancelado:'',
+        Referencia:this.abonosf.notaAbono.value,
+        Descripcion:this.abonosf.conceptoManual.value,
+        Forma_de_Pago:this.abonosf.formaDePagoAbono.value,
+        Cantidad:1,
+        Cargo:0,
+        Abono:this.abonosf.cantidadAbono.value,
+        Estatus:'Activo'
+
+      }
     
 
+    
+this.isLoading=true
+    this.edoCuentaService.agregarPago(pago).subscribe(
+      ()=>{
+        this.isLoading=false
+        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
+        
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+            
+          this.resetFiltros();
 
+        this.formGroup.reset();
+        this.estadoDeCuenta=[]
+        this.getEdoCuenta();
+        
+      },
+      (err)=>
+      {
+        this.isLoading=false
+        if(err)
+        {
+          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje=err.message
+        
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
+            this.resetFiltros();
+
+          this.isLoading=false
+      
+        }
+      },
+      ()=>{//FINALLY
+      }
+      )
+  }
+  
+
+  aplicaDescuento(autoriza:string){
+    
     if(this.secondFormGroup.invalid)
     {
       this.secondFormInvalid=true
@@ -501,12 +801,16 @@ this.isLoading=true
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
+        Fecha_Cancelado:'',
         Referencia:'',
-        Descripcion:'Descuento Aplicado',
+        Descripcion:this.second.motivoDesc.value,
         Forma_de_Pago:'Descuento',
         Cantidad:1,
         Cargo:0,
         Abono:parseInt(this.second.qtyPrecio.value),
+        Estatus:'Activo',
+        Autorizo:autoriza
+
       }
 
       // totalConDescuento=totalConDescuento-(this.second.qtyPrecio.value ? null || undefined : 0)
@@ -519,11 +823,14 @@ this.isLoading=true
         Folio:this.customerService.getCurrentHuespedValue.folio,
         Fecha:new Date(),
         Referencia:'',
-        Descripcion:'Descuento Aplicado',
+        Descripcion:this.second.motivoDesc.value + ' ('+this.second.qtyPrecio.value+'%'+')',
         Forma_de_Pago:'Descuento',
         Cantidad:1,
         Cargo:0,
         Abono:((this.totalCalculado * (this.second.qtyPrecio.value) ) / 100),
+        Estatus:'Activo',
+        Autorizo:autoriza
+
       }
 
     }
@@ -533,7 +840,7 @@ this.isLoading=true
       ()=>{
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
-        modalRef.componentInstance.alertHeader = 'Error'
+        modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Descuento Aplicado sobre el total de la cuenta'
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
@@ -547,9 +854,10 @@ this.isLoading=true
 
         this.isLoadingDesc=false
         this.secondFormGroup.reset();
-
+        this.descuentoButton=false
          this.estadoDeCuenta=[]
-         this.getEdoCuenta(); 
+         this.getEdoCuenta();
+          this.resetFiltros();
       },
       (err)=>
       {
@@ -567,14 +875,45 @@ this.isLoading=true
             setTimeout(() => {
               modalRef.close('Close click');
             },4000)
-              
+            this.resetFiltros();
+
           this.isLoadingDesc=false
+          this.descuentoButton=false
         }
       },
       ()=>{//FINALLY
       }
       )
 
+  }
+  autoriza(){
+    this.isLoading=true
+    const modalRef = this.modalService.open(SuperUserComponent,{size:'sm'})
+    modalRef.result.then((result) => {
+      this.isLoading=false
+
+      this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          this.estadoDeCuenta=[]
+          this.getEdoCuenta();
+          this.isLoading=false
+
+          
+      });
+    modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+      this.isLoading=false
+
+          if(receivedEntry)
+          {
+            this.aplicaDescuento(receivedEntry.username);
+          }else 
+          {
+            const modalRef2= this.modalService.open(AlertsComponent,{size:'md'})
+            modalRef2.componentInstance.alertHeader='Error'
+            modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
+          }
+      })
   }
   /*MODALS*/
   ajustes(){
@@ -591,7 +930,21 @@ this.isLoading=true
       });
       
   }
-  
+  abrirDetalle(row:any){
+
+    const modalRef = this.modalService.open(DetalleComponent,{size:'md'})
+    modalRef.componentInstance.row = row
+    modalRef.componentInstance.folio = this.customerService.getCurrentHuespedValue.folio
+    modalRef.componentInstance.fechaCancelado = row.Fecha_Cancelado.split('T')[0]
+
+
+  }
+  resetFiltros(){
+    this.activosChecked=true;
+    this.canceladosChecked=false;
+    this.devolucionesChecked=false;
+    this.todosChecked=false;
+  }
   /*form Helpers*/
   atLeatOneValidator(validator: ValidatorFn, controls:string[] = null) 
    {
@@ -616,6 +969,28 @@ this.isLoading=true
 
   isControlInvalid(controlName: string): boolean {
     const control = this.formGroup.controls[controlName];
+
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  isControlValidNuevo(controlName: string): boolean {
+    const control = this.nuevosConceptosFormGroup.controls[controlName];
+    return control.valid && (control.dirty || control.touched);
+  }
+
+  isControlInvalidNuevo(controlName: string): boolean {
+    const control = this.nuevosConceptosFormGroup.controls[controlName];
+
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  isControlValidAbono(controlName: string): boolean {
+    const control = this.abonoFormGroup.controls[controlName];
+    return control.valid && (control.dirty || control.touched);
+  }
+
+  isControlInvalidAbono(controlName: string): boolean {
+    const control = this.abonoFormGroup.controls[controlName];
 
     return control.invalid && (control.dirty || control.touched);
   }

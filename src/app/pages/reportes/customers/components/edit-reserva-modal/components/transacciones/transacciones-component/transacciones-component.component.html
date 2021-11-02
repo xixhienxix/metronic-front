@@ -3,103 +3,162 @@
       class="h4"
       style="color: aliceblue; text-align: center; padding-top: 5px"
     >
-      Agregar un Movimiento
+      Agregar un Servicio (cargo)
     </label>
-  </div>
+</div>
 <div>
 <br>
 <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
   <div style="text-align: right;" class="row col-md-12">
     <small *ngIf="submitted" style=" color: red;">Captura los Datos Faltantes</small>
   </div>
-  <div class="row col-md-12">
-      <div class="col-sm-6">
+  <ng-container *ngIf="!nuevosConceptos">
+    <div class="row col-md-12">
+      <div class="col-md-12">
         <mat-form-field style=" width: 100%;" appearance="fill">
-            <mat-label>Cargo / Abono</mat-label>
-            <mat-select  formControlName="cargo_abono">
-              <mat-option>Seleccione Tipo de Concepto</mat-option>
-              <th>
-              <mat-option (click)="filtroCodigosDeCargo($event)" value="Cargo">Cargo</mat-option>
-              <mat-option (click)="filtroCodigosDeCargo($event)" value="Abono">Abono</mat-option>
-            </mat-select>
+         <mat-select style="text-align: center; font-weight: bold; color: black;" placeholder=" -- Seleccione Concepto -- " #conceptosAbono formControlName="concepto">
+          <mat-option (click)="nuevoConcepto();conceptosAbono.close()" ><button class="btn btn-primary">Agregar nuevo concepto <i class="fa fa-plus" aria-hidden="true"></i></button> <tr></tr></mat-option>
+          <ng-container *ngFor="let concepto of codigosCargo">
+            <mat-option (click)="selectedValue(concepto)" value={{concepto}}>{{concepto.Descripcion}}</mat-option>
+          </ng-container>
+         </mat-select>
         </mat-form-field>
+        <!-- <mat-form-field style=" width: 100%;" appearance="fill">
+             <mat-label>Concepto / Porducto / Servicio</mat-label> 
+              <mat-select [disabled]="conceptosDisabled" placeholder="Elije una opción.." formControlName="concepto">
+                <ng-container *ngFor="let concepto of codigos">
+                  <mat-option (click)="selectedValue(concepto)" value={{concepto}}>{{concepto.Descripcion}}</mat-option>
+                </ng-container>
+              </mat-select>
+          </mat-form-field> -->
       </div>
-        <div class="col-sm-6">
-            <mat-form-field style=" width: 100%;" appearance="fill">
-                <mat-label>Concepto / Porducto / Servicio</mat-label>
-                <mat-select [disabled]="conceptosDisabled"  formControlName="concepto">
-                  <ng-container *ngFor="let concepto of codigos">
-                    <mat-option (click)="selectedValue(concepto)" value={{concepto}}>{{concepto.Descripcion}}</mat-option>
-                  </ng-container>
-                </mat-select>
-            </mat-form-field>
-        </div>
-    </div>
-<div class="row col-md-12">
-    <div class="col-sm-6">
-        <input
-        type="text"
-        class="form-control form-control-lg form-control-solid"
-        name="precio"
-        placeholder="Precio"
-        autocomplete="off"
-        formControlName="precio"
-        [class.is-invalid]="isControlInvalid('precio')"
-        [class.is-valid]="isControlValid('precio')" 
-        value=""
-      />
-    </div>
-    
-    <div class="col-sm-6">
-            <input
-            #cantidad
-            type="number"
-            class="form-control form-control-lg form-control-solid"
-            name="cantidad"
-            placeholder="Cantidad"
-            autocomplete="off"
-            formControlName="cantidad"
-            [class.is-invalid]="isControlInvalid('cantidad')"
-            [class.is-valid]="isControlValid('cantidad')" 
-            value="1"
-            (change)="onChangeQty(cantidad.value)"
-            />
-       
-    </div>
-</div>
-<br>
-<ng-container *ngIf="!disabledFP">
-  <div  class="row col-md-12">
-    <div class="col-sm-6" >
+  </div>
+  </ng-container>
+  
+
+    <ng-container *ngIf="nuevosConceptos">
+      <form [formGroup]="nuevosConceptosFormGroup">
+
+        <div class="row col-md-12"> 
+          <div class="col-sm-12">
             <input
             type="text"
             class="form-control form-control-lg form-control-solid"
-            name="idDeposit"
-            placeholder="ID de Deposito"
+            name="nuevoConcepto"
+            placeholder="Nombre del Nuevo Servicio"
             autocomplete="off"
-            formControlName="idDeposito"
-            [class.is-invalid]="isControlInvalid('idDeposito')"
-            [class.is-valid]="isControlValid('idDeposito')"                
-            value=''
+            formControlName="nuevoConcepto"
+            [class.is-invalid]="isControlInvalidNuevo('nuevoConcepto')"
+            [class.is-valid]="isControlValidNuevo('nuevoConcepto')" 
+            value=""
           />
-    </div>
+          </div>
+        </div>
+        <div class="row col-md-12">
 
-    <div class="col-sm-6">
-      <div class="col-sm-6">
-        <mat-form-field appearance="fill">
-            <mat-label>Forma de Pago</mat-label>
-            <mat-select 
-            style="font-weight: bold;"
-            formControlName="pago">
-                <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+          <div class="col-sm-6">
+            <br>
+            <input
+            type="number"
+            class="form-control form-control-lg form-control-solid"
+            name="nuevoPrecio"
+            placeholder="Precio $"
+            autocomplete="off"
+            formControlName="nuevoPrecio"
+            [class.is-invalid]="isControlInvalidNuevo('nuevoPrecio')"
+            [class.is-valid]="isControlValidNuevo('nuevoPrecio')" 
+            value=""
+          />
+          </div>
+          <br>
+          <div class="col-md-6">
+            <br>
+            <div class="input-group">
+            <div class="input-group-append">
+              <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusNin()" type="button">
+                <i class="fa fa-minus">
+                </i>
+              </button>
+            </div>
+            <input
+            type="number"
+            style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; border-left: 2px solid #e6e9ed;"
+            class="text-center input-group form-control form-control-lg form-control-solid" 
+            name="nuevaCantidad"
+            placeholder="Cantidad"
+            disabled
+            autocomplete="off"
+            formControlName="nuevaCantidad"
+            [class.is-invalid]="isControlInvalidNuevo('nuevaCantidad')"
+            [class.is-valid]="isControlValidNuevo('nuevaCantidad')" 
+            [value]="quantity"
+          /> 
+          <div class="input-group-append">
+            <button style="background-color: transparent; border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="plusNin()" type="button">
+              <i class="fa fa-plus">
+              </i>
+            </button>
+          </div>
+          </div>
+          </div>
+        </div>
+      </form>
+    </ng-container >
+
+    <br>
+
+    <ng-container *ngIf="!nuevosConceptos">
+      <div class="row col-md-12">
+        <div class="col-sm-6">
+            <input
+            type="text"
+            class="form-control form-control-lg form-control-solid"
+            name="precio"
+            placeholder="Precio"
+            autocomplete="off"
+            formControlName="precio"
+            [class.is-invalid]="isControlInvalid('precio')"
+            [class.is-valid]="isControlValid('precio')" 
+            value=""
+          />
+        </div>
+        
+        <div class="col-sm-6">
+          <div class="input-group">
+            <div class="input-group-append">
+              <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusNin()" type="button">
+                <i class="fa fa-minus">
+                </i>
+              </button>
+            </div>
+                <input
+                #cantidad
+                type="number"
+                style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; border-left: 2px solid #e6e9ed;"
+                class="text-center input-group form-control form-control-lg form-control-solid" 
+                name="cantidad"
+                placeholder="Cantidad"
+                autocomplete="off"
+                formControlName="cantidad"
+                [class.is-invalid]="isControlInvalid('cantidad')"
+                [class.is-valid]="isControlValid('cantidad')" 
+                value="1"
+                [value]="quantity"
+                (change)="onChangeQty(cantidad.value)"
+                />
+                <div class="input-group-append">
+                 <button style="background-color: transparent; border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="plusNin()" type="button">
+                        <i class="fa fa-plus">
+                        </i>
+                  </button>
+                </div>
+          </div>
+           
+        </div>
     </div>
-    </div>
-</div>
-</ng-container>
+    <br>
+  </ng-container>
 <br>
-
 
     <div class="col-lg-12">
         <button
@@ -108,13 +167,13 @@
           type="submit"
           name="estatus"
         >
-          Agregar Pago
+          
+        Agregar Servicio
         </button>
         <br>
       </div>
-      
-
-      <div class="col-lg-12">
+    
+      <!-- <div class="col-lg-12">
         <button           
         [disabled]="isLoading"
         (click)="ajustes()"
@@ -123,13 +182,112 @@
           Ajustes o Devolucion
         </button>
         <br>
-      </div>
+      </div> -->
       <br>
 </form>
   
-  <br />
-
+  <div style="background-color: #319dd7" class="modal-content sub-menu">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    >
+      Realizar Pago (abono)
+    </label>
 </div>
+</div>
+<br>
+<!--Agregar Abono-->
+<div>
+  <form [formGroup]="abonoFormGroup" (ngSubmit)="onSubmitAbono()">
+    <div style="text-align: right;" class="row col-md-12">
+      <small *ngIf="submittedAbono" style=" color: red;">Captura los Datos Faltantes</small>
+    </div>
+    <div class="row col-md-12">
+
+            <div class="col-sm-12">
+              <input
+              type="text"
+              class="form-control form-control-lg form-control-solid"
+              name="conceptoManual"
+              placeholder="Concepto Manual"
+              autocomplete="off"
+              formControlName="conceptoManual"
+              [class.is-invalid]="isControlInvalidAbono('conceptoManual')"
+              [class.is-valid]="isControlValidAbono('conceptoManual')" 
+              value=""
+            />
+            </div>
+      </div>
+      <br>
+  <div class="row col-md-12">
+      <div class="col-sm-6">
+          <input
+          type="text"
+          class="form-control form-control-lg form-control-solid"
+          name="cantidadAbono"
+          placeholder="$ Cantidad a Pagar"
+          autocomplete="off"
+          formControlName="cantidadAbono"
+          [class.is-invalid]="isControlInvalidAbono('cantidadAbono')"
+          [class.is-valid]="isControlValidAbono('cantidadAbono')" 
+          value=""
+        />
+      </div>
+      
+      <div class="col-sm-6">
+              <input
+              #notaAbono
+              type="text"
+              class="form-control form-control-lg form-control-solid"
+              name="notaAbono"
+              placeholder="Nota / Referencia"
+              autocomplete="off"
+              formControlName="notaAbono"
+              [class.is-invalid]="isControlInvalidAbono('notaAbono')"
+              [class.is-valid]="isControlValidAbono('notaAbono')" 
+              />
+         
+      </div>
+  </div>
+  <br>
+    <div  class="row col-md-12">
+    
+  
+      <div class="col-sm-12">
+          <mat-form-field style="width: 100%;" appearance="fill">
+              <mat-label>Forma de Pago</mat-label>
+              <mat-select 
+              style="font-weight: bold;"
+              formControlName="formaDePagoAbono">
+                  <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
+              </mat-select>
+          </mat-form-field>
+      </div>
+  </div>
+  
+  <br>
+  
+  
+      <div class="col-lg-12">
+          <button
+            [disabled]="isLoading"
+            class="btn btn-primary btn-block"
+            type="submit"
+            name="estatus"
+          >
+            Realizar Pago
+          </button>
+          <br>
+        </div>
+        
+        <br>
+  </form>
+    
+    <br />
+  
+  </div>
+
+
 <div style="background-color: #319dd7" class="modal-content sub-menu">
   <label
     class="h4"
@@ -139,7 +297,7 @@
   </label>
 </div>
 <br>
-<form [formGroup]="secondFormGroup" (ngSubmit)="aplicaDescuento()"> 
+<form [formGroup]="secondFormGroup" (ngSubmit)="autoriza()"> 
   <div class="row col-md-12" style="justify-content: center;">
       <div style="margin-top: 5px" class="col-sm-4">
         <mat-radio-button 
@@ -171,17 +329,28 @@
     </div>
   </div>
   <br>
-  <div class="col-lg-12">
-    <button           
-    [disabled]="descuentoButton"
-    class="btn btn-success btn-block" 
-    type="submit">
-      Aplicar o Autorixzar Descuento
-    </button>
-    <br>
-  </div>
-
-  <br>
+  <div class="col-sm-12"  >
+    <input
+    type="text"
+    class="form-control form-control-lg form-control-solid"
+    name="motivoDesc"
+    placeholder="Motivo del Descuento"
+    autocomplete="off"
+    formControlName="motivoDesc"
+    [class.is-invalid]="isSecondControlInvalid('motivoDesc')"
+    [class.is-valid]="isSecondControlValid('motivoDesc')"                
+    value=""
+  />
+</div>
+<br>
+<div class="col-lg-12">
+  <button           
+  [disabled]="descuentoButton"
+  class="btn btn-success btn-block" 
+  type="submit">
+    Aplicar o Autorizar Descuento
+  </button>
+</div>
 </form>
 <br>
 <div style="background-color: #319dd7" class="modal-content sub-menu">
@@ -192,79 +361,150 @@
     MOVIMIENTOS
   </label>
 </div>
+
+<br>
 <div class="row col-md-12" style="justify-content: center;">
-
-
-<table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
   
-   <!-- Blank Column -->
-      <!-- Checkbox Column -->
-      <ng-container matColumnDef="select">
-        <th class="header-align-right" mat-header-cell *matHeaderCellDef>
-          <td class="header-align-right" mat-cell *matCellDef="let row">
-          <button 
-          (click)="deleteRow(row)"
-          class="btn btn-danger">
-              x
-          </button>
+  <div style="margin-top: 5px" class="col-sm-3">
+    <mat-radio-button 
+    (change)="selectedTable($event)"
+    [checked]="todosChecked"
+    id="todos"
+    class="example-margin">Todos</mat-radio-button>
+  </div>
+  <div style="margin-top: 5px" class="col-sm-3">
+    <mat-radio-button 
+    class="example-margin" 
+    [checked]="activosChecked"
+    id="activos"
+    (change)="selectedTable($event)">Activos</mat-radio-button>
+  </div>
+  <div style="margin-top: 5px" class="col-sm-3">
+    <mat-radio-button 
+    class="example-margin" 
+    [checked]="canceladosChecked"
+    id="cancelados"
+    (change)="selectedTable($event)">Cancelados</mat-radio-button>
+  </div>
+  <div style="margin-top: 5px" class="col-sm-3">
+    <mat-radio-button 
+    class="example-margin" 
+    [checked]="devolucionesChecked"
+    id="devoluciones"
+    (change)="selectedTable($event)">Devoluciones</mat-radio-button>
+  </div>
+
+
+<div class="row col-md-12" style="justify-content: center;">
+    <table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
+  
+         <!-- Checkbox Column -->
+         <ng-container matColumnDef="select">
+           <th class="header-align-right" mat-header-cell *matHeaderCellDef>
+             <td class="header-align-right" mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
+             <button [disabled]="row.Descripcion=='Alojamiento'||row.Estatus=='Cancelado'||row.Estatus=='Devolucion'" 
+             (click)="deleteRow(row)"
+             class="btn btn-danger">
+                 x
+             </button>
+           </td>
+           <td mat-footer-cell *matFooterCellDef>  </td>
+   
+         </ng-container>
+   
+     <!-- Fecha Column -->
+     <ng-container matColumnDef="Fecha">
+       <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
+       <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.Fecha.split('T')[0].split('-')[2]+'-'+row.Fecha.split('T')[0].split('-')[1]+'-'+row.Fecha.split('T')[0].split('-')[0]}} </td>
+       <td mat-footer-cell *matFooterCellDef>  </td>
+   
+     </ng-container>
+   
+     <!-- Concepto Column -->
+     <ng-container matColumnDef="Concepto">
+       <th class="concepto-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Concepto </th>
+       <td class="concepto-columna"  mat-cell *matCellDef="let row">{{row.Descripcion}} 
+          <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(C)</ng-container>  
+          <ng-container *ngIf="row.Abono!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(A)</ng-container>  
+          <ng-container *ngIf="row.Estatus=='Cancelado'">(X)</ng-container>  
+          <ng-container *ngIf="row.Estatus=='Devolucion'">(R)</ng-container>  
+          <ng-container *ngIf="row.Forma_de_Pago=='Descuento' && row.Estatus!='Cancelado'">(D)</ng-container>  
+
         </td>
-        <td mat-footer-cell *matFooterCellDef>  </td>
+       <td mat-footer-cell *matFooterCellDef> Total: </td>
+   
+     </ng-container>
+   
 
-      </ng-container>
+          <!-- _id. Column -->
+     <ng-container matColumnDef="_id">
+       <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> _id </th>
+       <td hidden  mat-cell *matCellDef="let row">  {{row._id}}</td>
+       <td hidden  mat-footer-cell *matFooterCellDef> _id </td>
+     </ng-container>
 
-  <!-- Fecha Column -->
-  <ng-container matColumnDef="Fecha">
-    <th   mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
-    <td  mat-cell *matCellDef="let row"> {{row.Fecha.split('T')[0]}} </td>
-    <td mat-footer-cell *matFooterCellDef>  </td>
+     <!-- F.P. Column -->
+     <ng-container matColumnDef="F.P.">
+       <th  hidden mat-header-cell  *matHeaderCellDef mat-sort-header> F.P. </th>
+       <td hidden  mat-cell *matCellDef="let row">  {{row.Forma_de_Pago}}</td>
+       <td hidden  mat-footer-cell *matFooterCellDef> Total </td>
+     </ng-container>
 
-  </ng-container>
+          <!-- Cantidad Column -->
+          <ng-container matColumnDef="Cantidad">
+            <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> Cantidad </th>
+            <td hidden  mat-cell *matCellDef="let row">  {{row.Cantidad}}</td>
+            <td hidden  mat-footer-cell *matFooterCellDef> Total </td>
+          </ng-container>
+   
+     
+     <!-- Valor PAgo Column -->
+     <ng-container hidden matColumnDef="Valor">
+       <th class="valor-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Valor </th>
+       <td class="valor-columna"  mat-cell *matCellDef="let row" [ngStyle]="{'color': row.Cargo==0 ? 'green' : 'black'}" >
+         <ng-container *ngIf="row.Abono==0">
+          $ {{row.Cargo.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}} 
+         </ng-container>  
+         <ng-container *ngIf="row.Cargo==0">
+          $ -{{row.Abono.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}
+         </ng-container> 
+       </td>
+       <td mat-footer-cell *matFooterCellDef> ${{totalCalculado.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}  </td>
+     </ng-container>
+   
+        <!-- Fecha Column -->
+        <ng-container matColumnDef="Fecha_Cancelado">
+          <th hidden  mat-header-cell *matHeaderCellDef mat-sort-header> Fecha_Cancelado </th>
+          <td hidden mat-cell *matCellDef="let row"> {{row.Fecha_Cancelado.split('T')[0]}} </td>
+          <td hidden mat-footer-cell *matFooterCellDef>  </td>
+      
+        </ng-container>
 
-  <!-- Concepto Column -->
-  <ng-container matColumnDef="Concepto">
-    <th  mat-header-cell  *matHeaderCellDef mat-sort-header> Concepto </th>
-    <td  mat-cell *matCellDef="let row">{{row.Descripcion}}  </td>
-    <td mat-footer-cell *matFooterCellDef>  </td>
-
-  </ng-container>
-
-  <!-- F.P. Column -->
-  <ng-container hidden matColumnDef="F.P.">
-    <th  mat-header-cell  *matHeaderCellDef mat-sort-header> F.P. </th>
-    <td  mat-cell *matCellDef="let row">  {{row.Forma_de_Pago}}</td>
-    <td mat-footer-cell *matFooterCellDef> Total </td>
-  </ng-container>
-
-  
-  <!-- Valor PAgo Column -->
-  <ng-container hidden matColumnDef="Valor">
-    <th  mat-header-cell  *matHeaderCellDef mat-sort-header> Valor </th>
-    <td  mat-cell *matCellDef="let row">
-      <ng-container *ngIf="row.Abono==0">
-       $ {{row.Cargo.toLocaleString("es-MX")}}.00
-      </ng-container>  
-      <ng-container *ngIf="row.Cargo==0">
-       $ {{row.Abono.toLocaleString("es-MX")}}.00
-      </ng-container> 
-    </td>
-    <td mat-footer-cell *matFooterCellDef> ${{totalCalculado.toLocaleString("es-MX")}}.00  </td>
-  </ng-container>
-
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-  <!-- <tr mat-footer-row *matFooterRowDef="displayedColumns">
-    <hr>
-    Total :  ${{totalCalculado.toLocaleString("es-MX")}}.00
-  </tr> -->
-
-    
-  
-</table>
+     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+     <tr mat-row     
+     *matRowDef="let row; columns: displayedColumns;"
+     (click)="abrirDetalle(row)"></tr>
+     <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+   </table>
 <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator>
-
-
+<hr>
+<div style="border-top: black; border-left: black; border-right: black; border-bottom: black;" class="row">
+  <div class="col-md-2">
+    <label style="font-weight: bold;">Abono(A)</label>
+  </div>
+  <div class="col-md-2">
+    <label style="font-weight: bold;">Cargos(C)</label>
+  </div>
+  <div class="col-md-3">
+    <label style="font-weight: bold;">Cancelados(X)</label>
+  </div>
+  <div class="col-md-3">
+    <label style="font-weight: bold;">Devoluciones(R)</label>
+  </div>
+  <div class="col-md-2">
+    <label style="font-weight: bold;">Descuentos(D)</label>
+  </div>
+<hr>
 </div>
 
 

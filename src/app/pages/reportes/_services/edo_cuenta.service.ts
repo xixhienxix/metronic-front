@@ -52,8 +52,8 @@ getNotification(){
       )));
     }
 
-    deleteRow(_id:string){
-      return this.http.delete(environment.apiUrl+"/edo_cuenta/pagos/"+_id).pipe(
+    updateRow(_id:string,estatus:string,fechaCancelado:Date,autorizo:string){
+      return this.http.put(environment.apiUrl+"/edo_cuenta/pagos",{_id,estatus,fechaCancelado,autorizo}).pipe(
         map((data=>{
           this.sendNotification(true);
           }
