@@ -208,11 +208,11 @@ export class ReservasComponentComponent implements OnInit {
                               color='#68B29A'
                               if(result[i].Aplicado==false)
                               {
-
+                                let status = 'Expirado'
                                 colorAplicado='#f7347a'//rosa
                                 color='#68B29A'
                                 if(dateObject.getTime()<today.getTime()){
-                                  this.promesaService.updatePromesaEstatus(result[i]._id).subscribe(
+                                  this.promesaService.updatePromesaEstatus(result[i]._id,status).subscribe(
                                     ()=>{
                                       expirado='Expirado'
                                       color='#D47070'//rosa
