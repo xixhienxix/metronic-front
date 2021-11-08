@@ -388,25 +388,25 @@ export class ModificaHuespedComponent implements OnInit {
       this.tarifa=tarifa;
     }
 
-    revisaDatos(){
-      if(this.numCuartoNumber==undefined||this.codigoCuartoString==undefined)
-      {
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-        modalRef.componentInstance.alertHeader='Error'
-        modalRef.componentInstance.mensaje='Debes seleccionar una habitacion antes de guardar los cambios'
-        modalRef.result.then((result) => {
-          this.closeResult = `Closed with: ${result}`;
-          }, (reason) => {
-              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          });
-          setTimeout(() => {
-            modalRef.close('Close click');
-          },4000)
-      }else 
-      {
-        this.actualizarDatos();
-      }
-    }
+    // revisaDatos(){
+    //   if(this.numCuartoNumber==undefined||this.codigoCuartoString==undefined)
+    //   {
+    //     const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+    //     modalRef.componentInstance.alertHeader='Error'
+    //     modalRef.componentInstance.mensaje='Debes seleccionar una habitacion antes de guardar los cambios'
+    //     modalRef.result.then((result) => {
+    //       this.closeResult = `Closed with: ${result}`;
+    //       }, (reason) => {
+    //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    //       });
+    //       setTimeout(() => {
+    //         modalRef.close('Close click');
+    //       },4000)
+    //   }else 
+    //   {
+    //     this.actualizarDatos();
+    //   }
+    // }
     actualizarDatos(){
 
     this.huesped.noches=this.diaDif
@@ -423,26 +423,8 @@ export class ModificaHuespedComponent implements OnInit {
     console.log(this.huesped.noches)
 
       this.customerService.updateHuesped(this.huesped).subscribe(
-        ()=>{},
-        (err)=>{
-          if(err)
-          {
-            const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
-            modalRef.componentInstance.alertHeader = 'Error'
-            modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar al húesped'
-            modalRef.result.then((result) => {
-              this.closeResult = `Closed with: ${result}`;
-              }, (reason) => {
-                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-              });
-              setTimeout(() => {
-                modalRef.close('Close click');
-              },4000)
-            }
-
-        },
-        ()=>{
-          //
+        (value)=>{
+          
           this.customerService.updateHuespedModifica(this.huespedAnterior).subscribe(
             (err)=>{
               if(err)
@@ -476,6 +458,27 @@ export class ModificaHuespedComponent implements OnInit {
             },4000)
 
             this.modal.close(this.huesped)
+        },
+        (err)=>{
+          if(err)
+          {
+            const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar al húesped'
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              });
+              setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
+            }
+
+        },
+        ()=>{
+          //
+
         }
         )
     }
@@ -491,8 +494,10 @@ export class ModificaHuespedComponent implements OnInit {
       {this.fechaInicialDisplay=true}
     }
     toggleCalendarioFinal(){
-     if(this.fechaFinalDisplay==true) {this.fechaFinalDisplay=false}
-     else if(this.fechaFinalDisplay==false){this.fechaFinalDisplay=true}
+     if(this.fechaFinalDisplay==true) 
+     {this.fechaFinalDisplay=false}
+     else if(this.fechaFinalDisplay==false)
+     {this.fechaFinalDisplay=true}
     }
 
     getDismissReason(reason: any): string 
