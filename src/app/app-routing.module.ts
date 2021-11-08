@@ -25,7 +25,15 @@ export const routes: Routes = [
   redirectTo: 'reportes/customers' 
   },
   { path: '**',   
-    redirectTo: 'auth/login' },
+    redirectTo: 'auth/login' 
+  },
+  {
+    path:'clientes',
+    canActivate: [AuthGuard],
+    redirectTo: 'reportes/clientes' 
+    },
+    { path: '**',   
+      redirectTo: 'auth/login' },
 ];
 
 @NgModule({

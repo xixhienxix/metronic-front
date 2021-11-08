@@ -73,6 +73,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import { DetalleComponent } from './customers/components/edit-reserva-modal/components/transacciones/helpers/detalle/detalle.component';
 import { SuperUserComponent } from './customers/helpers/authorization/super.user/super.user.component';
+import { ClientesComponent } from './clientes/clientes.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -115,7 +116,8 @@ registerLocaleData(localeEs);
     AtLeastOne_ValidatorDirective,
     AjustesComponent,
     DetalleComponent,
-    SuperUserComponent
+    SuperUserComponent,
+    ClientesComponent
       ],
   imports: [
     MatSlideToggleModule,

@@ -252,11 +252,6 @@ this.origenService.getOrigenes()
   }
 
 
-  habValue($event)
-  {
-    // this.huesped.habitacion = $event.target.options[$event.target.options.selectedIndex].text;
-    // console.log("this.cuarto",this.cuarto)
-  }
 
   getFolios(): void {
 
