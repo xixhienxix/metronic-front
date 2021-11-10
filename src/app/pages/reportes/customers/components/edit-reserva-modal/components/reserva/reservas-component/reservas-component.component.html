@@ -446,51 +446,72 @@
 
 
 
-
   <ng-template #pregunta let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Realizar Deposito</h4>
+    <div style="background-color: #00506a" class="modal-header">
+      <button
+      style="
+        position: absolute;
+        top: 2%;
+        right: 1%;
+        background-color: #fa6d7c;
+        font-weight: bold;
+        color: white;
+      "
+      class="btn"
+      (click)="modal.dismiss('Cross click')"
+    >
+      X
+    </button>
+    <br />
+      <h4 class="modal-title" style="color: white;">REALIZAR DEPÓSITO</h4>
       <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
 <div class="modal-body">
-    <button type="button" class="btn btn-success col-md-12" (click)="modal.close(1);next.emit();">Agregar Pago Completo a la Cuenta</button>
-<p></p>
-    <ng-container *ngIf="pagoManual">
+    <!-- <button type="button" class="btn btn-successf col-md-12" (click)="modal.close(1);next.emit();">Agregar Pago Completo a la Cuenta</button>
+<p></p> -->
       <form [formGroup]="thirdForm">
         <input 
-        class="form-control col-md-6"
+        class="form-control col-md-12"
         formControlName='pagoManualInput'
+        placeholder="$ Cantidad Recibida"
+        [class.is-valid]="isControlValidThird('pagoManualInput')"
+        [class.is-invalid]="isControlInvalidThird('pagoManualInput')"
         > 
-        <button class="btn btn-info col-md-6" (click)="modal.close(2);next.emit();">Aceptar
-        </button>
-        <br>
+        <!-- <button class="btn btn-info col-md-6" (click)="modal.close(2);next.emit();">Aceptar 
+        </button>-->
+        <div
+          class="invalid-feedback"
+          *ngIf="controlHasErrorThird('required', 'pagoManualInput')"
+        >
+          * Campo Requerido
+        </div> 
+        <div
+        class="invalid-feedback"
+        *ngIf="controlHasErrorThird('pattern', 'pagoManualInput')"
+      >
+        Escriba una cantidad correcta
+      </div> 
       </form>
-    </ng-container>
-    <p></p>
-
-  <!-- <button type="button" class="btn btn-secondary col-md-12" (click)="muestraInput()">Agregar Pago Parcial</button> -->
+      <p></p>
+<div class="row col-md-12">
+  <form [formGroup]="forthForm">
+    <mat-form-field style="width: 100%;" appearance="fill">
+      <mat-label>Forma de Pago</mat-label>
+      <mat-select 
+      style="font-weight: bold;"
+      formControlName="pago"
+      #pago>
+          <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
+      </mat-select>
+  </mat-form-field>
+</form>
+</div>  
   <p></p>
-  <div class="col-sm-12">
-    <form [formGroup]="forthForm">
-      <mat-form-field appearance="fill">
-        <mat-label>Forma de Pago</mat-label>
-        <mat-select 
-        style="font-weight: bold;"
-        formControlName="pago"
-        #pago>
-            <mat-option *ngFor="let pago of formasDePago" value={{pago}}>{{pago}}</mat-option>
-        </mat-select>
-    </mat-form-field>
-    </form>
-    
-</div>
+  <button [disabled]="thirdForm.controls.pagoManualInput.invalid" type="button" class="btn btn-secondary col-md-12"(click)="modal.close();next.emit();">Agregar Anticipo</button>
+  <p></p>
 </div>
 <p></p>
 
-     
-    <div class="modal-footer">
-      <button type="button" class="btn btn-warning col-md-12" (click)="modal.close(3)">Cerrar</button>
-    </div>
   </ng-template>

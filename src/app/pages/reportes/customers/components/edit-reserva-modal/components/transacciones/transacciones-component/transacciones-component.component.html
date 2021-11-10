@@ -75,13 +75,14 @@
             <br>
             <div class="input-group">
             <div class="input-group-append">
-              <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusNin()" type="button">
+              <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusNinNva(nuevaCantidad.value)" type="button">
                 <i class="fa fa-minus">
                 </i>
               </button>
             </div>
             <input
             type="number"
+            #nuevaCantidad
             style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; border-left: 2px solid #e6e9ed;"
             class="text-center input-group form-control form-control-lg form-control-solid" 
             name="nuevaCantidad"
@@ -91,10 +92,10 @@
             formControlName="nuevaCantidad"
             [class.is-invalid]="isControlInvalidNuevo('nuevaCantidad')"
             [class.is-valid]="isControlValidNuevo('nuevaCantidad')" 
-            [value]="quantity"
+            [value]="quantityNva"
           /> 
           <div class="input-group-append">
-            <button style="background-color: transparent; border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="plusNin()" type="button">
+            <button style="background-color: transparent; border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="plusNinNva(nuevaCantidad.value);" type="button">
               <i class="fa fa-plus">
               </i>
             </button>
@@ -126,7 +127,7 @@
         <div class="col-sm-6">
           <div class="input-group">
             <div class="input-group-append">
-              <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusNin()" type="button">
+              <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusNin(cantidad.value)" type="button">
                 <i class="fa fa-minus">
                 </i>
               </button>
@@ -147,7 +148,7 @@
                 (change)="onChangeQty(cantidad.value)"
                 />
                 <div class="input-group-append">
-                 <button style="background-color: transparent; border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="plusNin()" type="button">
+                 <button style="background-color: transparent; border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="plusNin(cantidad.value)" type="button">
                         <i class="fa fa-plus">
                         </i>
                   </button>
@@ -365,36 +366,60 @@
 <br>
 <div class="row col-md-12" style="justify-content: center;">
   
-  <div style="margin-top: 5px" class="col-sm-3">
+  <div style="margin-top: 5px" class="col-sm-4">
     <mat-radio-button 
     (change)="selectedTable($event)"
     [checked]="todosChecked"
     id="todos"
     class="example-margin">Todos</mat-radio-button>
   </div>
-  <div style="margin-top: 5px" class="col-sm-3">
+  <!-- <div style="margin-top: 5px" class="col-sm-3">
     <mat-radio-button 
     class="example-margin" 
     [checked]="activosChecked"
     id="activos"
     (change)="selectedTable($event)">Activos</mat-radio-button>
+  </div> -->
+  <div style="margin-top: 5px" class="col-sm-4">
+    <mat-radio-button 
+    class="example-margin" 
+    [checked]="abonosChecked"
+    id="abonosRadio"
+    (change)="selectedTable($event)">Abonos</mat-radio-button>
   </div>
-  <div style="margin-top: 5px" class="col-sm-3">
+  <div style="margin-top: 5px" class="col-sm-4">
+    <mat-radio-button 
+    class="example-margin" 
+    [checked]="cargosChecked"
+    id="cargosRadio"
+    (change)="selectedTable($event)">Cargos</mat-radio-button>
+  </div>
+
+</div>
+<div class="row col-md-12" style="justify-content: center;">
+
+  <div style="margin-top: 5px" class="col-sm-4">
     <mat-radio-button 
     class="example-margin" 
     [checked]="canceladosChecked"
     id="cancelados"
     (change)="selectedTable($event)">Cancelados</mat-radio-button>
   </div>
-  <div style="margin-top: 5px" class="col-sm-3">
+  <div style="margin-top: 5px" class="col-sm-4">
     <mat-radio-button 
     class="example-margin" 
     [checked]="devolucionesChecked"
     id="devoluciones"
     (change)="selectedTable($event)">Devoluciones</mat-radio-button>
   </div>
-
-
+  <div style="margin-top: 5px" class="col-sm-4">
+    <mat-radio-button 
+    (change)="selectedTable($event)"
+    [checked]="descuentosChecked"
+    id="descuentosRadio"
+    class="example-margin">Descuentos</mat-radio-button>
+  </div>
+</div>
 <div class="row col-md-12" style="justify-content: center;">
     <table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
   
@@ -423,14 +448,25 @@
      <!-- Concepto Column -->
      <ng-container matColumnDef="Concepto">
        <th class="concepto-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Concepto </th>
-       <td class="concepto-columna"  mat-cell *matCellDef="let row">{{row.Descripcion}} 
-          <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(C)</ng-container>  
-          <ng-container *ngIf="row.Abono!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(A)</ng-container>  
-          <ng-container *ngIf="row.Estatus=='Cancelado'">(X)</ng-container>  
-          <ng-container *ngIf="row.Estatus=='Devolucion'">(R)</ng-container>  
-          <ng-container *ngIf="row.Forma_de_Pago=='Descuento' && row.Estatus!='Cancelado'">(D)</ng-container>  
-
+       <td class="concepto-columna"  mat-cell *matCellDef="let row">
+         <ng-container *ngIf="row.Referencia!='Anticipo'">
+          <ng-container *ngIf="row.Forma_de_Pago!='Descuento'">
+            {{row.Descripcion}} 
+           </ng-container>
+            <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(C)</ng-container>  
+            <ng-container *ngIf="row.Abono!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(A)</ng-container>  
+            <ng-container *ngIf="row.Estatus=='Cancelado'">(X)</ng-container>  
+            <ng-container *ngIf="row.Estatus=='Devolucion'">(R)</ng-container>  
+            <ng-container *ngIf="row.Forma_de_Pago=='Descuento' && row.Estatus!='Cancelado'">Descuento ({{row.Descripcion.split('(')[1]}} (D)</ng-container>  
+         </ng-container>
+         <ng-container *ngIf="row.Referencia=='Anticipo' && row.Estatus!='Cancelado'">
+          Anticipo (A)
+         </ng-container>
+         <ng-container *ngIf="row.Referencia=='Anticipo' && row.Estatus=='Cancelado'">
+          Anticipo (X)
+         </ng-container>
         </td>
+      
        <td mat-footer-cell *matFooterCellDef> Total: </td>
    
      </ng-container>
@@ -486,8 +522,8 @@
      (click)="abrirDetalle(row)"></tr>
      <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
    </table>
-<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator>
-<hr>
+<!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator> -->
+<!-- <hr>
 <div style="border-top: black; border-left: black; border-right: black; border-bottom: black;" class="row">
   <div class="col-md-2">
     <label style="font-weight: bold;">Abono(A)</label>
@@ -505,7 +541,7 @@
     <label style="font-weight: bold;">Descuentos(D)</label>
   </div>
 <hr>
-</div>
+</div> -->
 
 
 

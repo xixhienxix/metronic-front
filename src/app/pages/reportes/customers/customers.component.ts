@@ -430,7 +430,13 @@ this.origenService.getOrigenes()
             this.customerService.fetch(),
             () => { }
           );
+          modalRef.result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
         });
+        
         this.subscriptions.push(sb);
     }
   }

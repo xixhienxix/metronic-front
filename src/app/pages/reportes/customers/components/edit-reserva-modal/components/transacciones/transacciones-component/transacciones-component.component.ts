@@ -75,6 +75,9 @@ export class TransaccionesComponentComponent implements OnInit {
   edoCuentaActivos:edoCuenta[]=[]
   edoCuentaCancelados:edoCuenta[]=[]
   edoCuentaDevoluciones:edoCuenta[]=[]
+  edoCuentaCargos:edoCuenta[]=[]
+  edoCuentaAbonos:edoCuenta[]=[]
+  edoCuentaDescuentos:edoCuenta[]=[]
 
   codigoDeCargo:Codigos={
     Descripcion:'',
@@ -97,11 +100,14 @@ export class TransaccionesComponentComponent implements OnInit {
   conceptosDisabled:boolean=true;
   closeResult: string;
   quantity:number=1;
-  quantityNin:number=0;
+  quantityNva:number=1;
   todosChecked:boolean=false;
   activosChecked:boolean=true;
   canceladosChecked:boolean=false;
   devolucionesChecked:boolean=false;
+  abonosChecked:boolean=false;
+  cargosChecked:boolean=false;
+  descuentosChecked:boolean=false;
   fechaCancelado:Date;
 
   /**Forms */
@@ -196,7 +202,11 @@ export class TransaccionesComponentComponent implements OnInit {
         this.estadoDeCuenta=[]
         this.edoCuentaActivos=[]
         this.edoCuentaCancelados=[]
-        this.edoCuentaDevoluciones=[]
+        this.edoCuentaDevoluciones=[] 
+        this.edoCuentaAbonos=[]
+        this.edoCuentaCargos=[]
+        this.edoCuentaDescuentos=[]
+
 
         for(let i=0;i<result.length;i++){
 
@@ -206,12 +216,18 @@ export class TransaccionesComponentComponent implements OnInit {
           { this.edoCuentaCancelados.push(result[i]) }
           if(result[i].Estatus=='Devolucion')
           { this.edoCuentaDevoluciones.push(result[i]) }
+          if(result[i].Cargo!=0)
+          { this.edoCuentaCargos.push(result[i]) }
+          if(result[i].Abono!=0)
+          { this.edoCuentaAbonos.push(result[i]) }
+          if(result[i].Forma_de_Pago=='Descuento')
+          { this.edoCuentaDescuentos.push(result[i]) }
           this.estadoDeCuenta.push(result[i]) 
 
         }
 
           this.dataSource.data = this.edoCuentaActivos
-          this.dataSource.paginator = this.paginator;
+          // this.dataSource.paginator = this.paginator;
 
           let totalCargos=0;
           let totalAbonos=0;
@@ -309,78 +325,53 @@ export class TransaccionesComponentComponent implements OnInit {
     }
   }
 
-  plusNin()
+  plusNin(qty:number)
   {
-      this.quantity++;  
+      this.quantity++;
+      this.onChangeQty(this.quantity);
   }
-  minusNin()
+  minusNin(qty:number)
   {
     if(this.quantity>0)
     {
     this.quantity--;
     }
+    else if(this.quantity=0)
+    {
+      this.quantity=1;
+    }
     else
-    this.quantity
+    {
+      this.quantity
+    }
+  
+    this.onChangeQty(this.quantity);
 
   }
 
-  // filtroCodigosDeCargo(event:any){
-  //   this.conceptosDisabled=false
-  //   this.codigosCargo=[]
-  //   this.codigosAbono=[]
+  plusNinNva(qty:number)
+  {
+      this.quantityNva++;
+      this.onChangeQtyNva(this.quantityNva)
+  }
+  minusNinNva(qty:number)
+  {
+    if(this.quantityNva>0)
+    {
+    this.quantityNva--;
+    }
+    else if(this.quantityNva=0)
+    {
+      this.quantityNva=1;
+    }
+    else 
+    {
+      this.quantityNva
+    }
+  
+    this.onChangeQtyNva(this.quantityNva)
+  }
 
-  //   if(this.f.cargo_abono.value=='Cargo')
-  //   {
-  //     this.formasDePago=['Servicio','Efectivo','Tarjeta de Credito','Tarjeta de Debito']
-  //     this.formGroup.patchValue({pago:'Servicio'})
-  //     this.disabledFP=true
-  //   }
-  //   else
-  //   {
-  //     this.formasDePago=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
-  //     this.formGroup.patchValue({pago:''})
-  //     this.disabledFP=false
-  //   }
-
-  //   this.codigosService.getCodigosDeCargo().subscribe(
-  //     (result:Codigos[])=>{
-  //       for(let i=0;i<result.length;i++)
-  //       {
-  //         if(this.f.cargo_abono.value=='Cargo')
-  //         {
-  //           if(result[i].Tipo=='C')
-  //           {this.codigos.push(result[i])}
-  //         }
-  //         else if(this.f.cargo_abono.value=='Abono')
-  //         {
-  //           if(result[i].Tipo=='A')
-  //           {this.codigos.push(result[i])}
-  //         }
-  //       }
-  //     },
-  //     (err)=>{
-  //       if (err)
-  //       {
-
-
-  //           const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
-  //           modalRef.componentInstance.alertHeader = 'Error'
-  //           modalRef.componentInstance.mensaje='No hay codigos de cargo disponibles, vuelva a abrir la ventana'
-            
-  //           modalRef.result.then((result) => {
-  //             this.closeResult = `Closed with: ${result}`;
-  //             }, (reason) => {
-  //                 this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-  //             });
-  //             setTimeout(() => {
-  //               modalRef.close('Close click');
-  //             },4000)
-                
-  //       }
-  //     },
-
-  //   );
-  // }
 
   selectedValue(value:Codigos){
     
@@ -400,19 +391,30 @@ this.nuevosConceptos=false
 
     if(qty<=0)
     {
-
-
       this.formGroup.controls['cantidad'].setValue(1);
       this.formGroup.controls['precio'].setValue(this.codigoDeCargo.Precio)
     
     }else
     {
-     
-        this.formGroup.controls['precio'].setValue((this.codigoDeCargo.Precio)*qty);
+      this.formGroup.controls['precio'].setValue((this.codigoDeCargo.Precio)*qty);
     }
         
-
   }  
+
+  onChangeQtyNva(qty:number)
+  {
+
+    if(qty<=0)
+    {
+      this.formGroup.controls['nuevaCantidad'].setValue(1);
+      this.formGroup.controls['nuevoPrecio'].setValue(this.codigoDeCargo.Precio)
+    
+    }else
+    {
+      this.formGroup.controls['nuevoPrecio'].setValue((this.codigoDeCargo.Precio)*qty);
+    }
+        
+  } 
 
   deleteRow(edo_cuenta:any){
 
@@ -530,6 +532,9 @@ this.nuevosConceptos=false
         this.activosChecked=false;
         this.canceladosChecked=false;
         this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
 
       }
       else if (event.source._checked==false)
@@ -538,7 +543,9 @@ this.nuevosConceptos=false
         this.activosChecked=false
         this.todosChecked=false
         this.devolucionesChecked=false;
-
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
       }
     }
     else if(event.source.id=='cancelados')
@@ -551,7 +558,9 @@ this.nuevosConceptos=false
         this.activosChecked=false;
         this.todosChecked=false;
         this.devolucionesChecked=false;
-
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
       }
       else if (event.source._checked==false)
       {
@@ -559,7 +568,9 @@ this.nuevosConceptos=false
         this.activosChecked=false
         this.todosChecked=false
         this.devolucionesChecked=false;
-
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
       }
     }
     else if(event.source.id=='activos')
@@ -572,7 +583,9 @@ this.nuevosConceptos=false
         this.canceladosChecked=false;
         this.todosChecked=false;
         this.devolucionesChecked=false;
-
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
       }
       else if (event.source._checked==false)
       {
@@ -581,7 +594,9 @@ this.nuevosConceptos=false
         this.activosChecked=false
         this.todosChecked=false
         this.devolucionesChecked=false;
-
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
       }
     }
     else if(event.source.id=='devoluciones')
@@ -594,6 +609,9 @@ this.nuevosConceptos=false
         this.canceladosChecked=false;
         this.todosChecked=false;
         this.devolucionesChecked=true;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
       }
       else if (event.source._checked==false)
       {
@@ -601,6 +619,87 @@ this.nuevosConceptos=false
         this.activosChecked=false
         this.todosChecked=false
         this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
+
+      }
+    }
+    else if(event.source.id=='descuentosRadio')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data = this.edoCuentaDescuentos
+
+        this.activosChecked=false
+        this.canceladosChecked=false;
+        this.todosChecked=false;
+        this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=true;
+      }
+      else if (event.source._checked==false)
+      {
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
+
+      }
+    }
+    else if(event.source.id=='abonosRadio')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data = this.edoCuentaAbonos
+
+        this.activosChecked=false
+        this.canceladosChecked=false;
+        this.todosChecked=false;
+        this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=true;
+        this.descuentosChecked=false;
+      }
+      else if (event.source._checked==false)
+      {
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
+
+      }
+    }
+    else if(event.source.id=='cargosRadio')
+    {
+      if(event.source._checked==true)
+      {
+        this.dataSource.data = this.edoCuentaCargos
+
+        this.activosChecked=false
+        this.canceladosChecked=false;
+        this.todosChecked=false;
+        this.devolucionesChecked=false;
+        this.cargosChecked=true;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
+      }
+      else if (event.source._checked==false)
+      {
+        this.canceladosChecked=false
+        this.activosChecked=false
+        this.todosChecked=false
+        this.devolucionesChecked=false;
+        this.cargosChecked=false;
+        this.abonosChecked=false;
+        this.descuentosChecked=false;
 
       }
     }
@@ -629,8 +728,8 @@ this.nuevosConceptos=false
         Referencia:'',
         Descripcion:this.nuevas.nuevoConcepto.value,
         Forma_de_Pago:'No Aplica',
-        Cantidad:this.nuevas.nuevaCantidad.value,
-        Cargo:this.nuevas.nuevoPrecio.value,
+        Cantidad:this.quantityNva,
+        Cargo:this.nuevas.nuevoPrecio.value*this.quantityNva,
         Abono:0,
         Estatus:'Activo'
         }
@@ -652,8 +751,8 @@ this.nuevosConceptos=false
           Referencia:'',
           Descripcion:this.codigoDeCargo.Descripcion,
           Forma_de_Pago:'no Aplica',
-          Cantidad:this.f.cantidad.value,
-          Cargo:this.f.precio.value,
+          Cantidad:this.quantity,
+          Cargo:this.f.precio.value*this.quantity,
           Abono:0,
           Estatus:'Activo'
 
