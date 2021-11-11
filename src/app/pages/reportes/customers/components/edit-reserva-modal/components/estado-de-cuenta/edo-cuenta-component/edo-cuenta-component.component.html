@@ -382,7 +382,7 @@
     </div>
 </div>
 <br>
-<div style="background-color: #44d731de" class="modal-content sub-menu">
+<!-- <div style="background-color: #44d731de" class="modal-content sub-menu">
     <div class="container">
         <div class="row">
             <div style="text-align: left;" class="col-sm-8">
@@ -403,8 +403,7 @@
             </div>
         </div>
     </div>
-</div>
-<br>
+</div> -->
 <div style="background-color: #da8f27" class="modal-content sub-menu">
     <div class="container">
         <div class="row">
@@ -413,7 +412,7 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-                Pagos Realizados
+                Pagos y Descuentos
               </label>
             </div>
               <div style="text-align: right;" class="col-sm-4">
@@ -421,14 +420,14 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-              $ {{totalAbonos.toLocaleString('es-MX')}}
+              $ -{{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString('es-MX')}}
               </label>
             </div>
         </div>
     </div>
 </div>
 <br>
-<div style="background-color:#fa6d7c" class="modal-content sub-menu">
+<div style="background-color:#e43748" class="modal-content sub-menu">
     <div class="container">
         <div class="row">
             <div style="text-align: left;" class="col-sm-8">
@@ -444,7 +443,7 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-              $ {{(totalCargos-totalAbonos).toLocaleString('es-MX')}}
+              $ {{(customerService.getCurrentHuespedValue.pendiente).toLocaleString('es-MX')}}
               </label>
             </div>
         </div>

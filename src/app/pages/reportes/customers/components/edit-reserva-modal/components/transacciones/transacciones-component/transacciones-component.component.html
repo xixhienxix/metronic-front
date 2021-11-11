@@ -305,14 +305,14 @@
         (change)="selectedRadioButton($event)"
         [checked]="porcentajeChecked"
         id="porcentaje"
-        class="example-margin">POERCENTAJE (%)</mat-radio-button>
+        class="example-margin">PORCENTAJE (%)</mat-radio-button>
       </div>
       <div style="margin-top: 5px" class="col-sm-4">
         <mat-radio-button 
         class="example-margin" 
         [checked]="precioFijoChecked"
         id="precioFijo"
-        (change)="selectedRadioButton($event)">PRECIO FIJO ($)</mat-radio-button>
+        (change)="selectedRadioButton($event)">VALOR FIJO ($)</mat-radio-button>
       </div>
       <div class="col-sm-4"  >
         <input
@@ -394,21 +394,6 @@
 
 </div>
 <div class="row col-md-12" style="justify-content: center;">
-
-  <div style="margin-top: 5px" class="col-sm-6">
-    <mat-radio-button 
-    class="example-margin" 
-    [checked]="canceladosChecked"
-    id="cancelados"
-    (change)="selectedTable($event)">Cancelaciones y Devoluciones</mat-radio-button>
-  </div>
-  <!-- <div style="margin-top: 5px" class="col-sm-4">
-    <mat-radio-button 
-    class="example-margin" 
-    [checked]="devolucionesChecked"
-    id="devoluciones"
-    (change)="selectedTable($event)">Devoluciones</mat-radio-button>
-  </div> -->
   <div style="margin-top: 5px" class="col-sm-6">
     <mat-radio-button 
     (change)="selectedTable($event)"
@@ -417,6 +402,14 @@
     class="example-margin">Descuentos</mat-radio-button>
   </div>
 </div>
+  <div style="margin-top: 5px" class="col-sm-6">
+    <mat-radio-button 
+    class="example-margin" 
+    [checked]="canceladosChecked"
+    id="cancelados"
+    (change)="selectedTable($event)">Cancelaciones y Devoluciones</mat-radio-button>
+  </div>
+
 <div class="row col-md-12" style="justify-content: center;">
     <table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
   
@@ -448,7 +441,7 @@
        <td class="concepto-columna"  mat-cell *matCellDef="let row">
          <ng-container *ngIf="row.Referencia!='Anticipo'">
           <ng-container *ngIf="row.Forma_de_Pago!='Descuento'"> {{row.Descripcion}} </ng-container>
-          <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo' && row.Cantidad >1">($ {{row.Cargo.toLocaleString()}} x {{row.Cantidad}}) (C)</ng-container>  
+          <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo' && row.Cantidad >1 && !row.Descripcion.includes('Alojamiento')" >($ {{(row.Cargo / row.Cantidad).toLocaleString()}} x {{row.Cantidad}}) (C)</ng-container>  
           <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo' && row.Cantidad ==1">(C)</ng-container>  
           <ng-container *ngIf="row.Abono!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(A)</ng-container>  
             <ng-container *ngIf="row.Estatus=='Cancelado' && row.Forma_De_Pago!='Descuento'">{{row.Descripcion}} (X)</ng-container>  

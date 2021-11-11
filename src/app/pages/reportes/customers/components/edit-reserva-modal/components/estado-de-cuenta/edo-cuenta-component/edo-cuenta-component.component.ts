@@ -68,7 +68,8 @@ export class EdoCuentaComponentComponent implements OnInit {
         this.totalCargos=0;
         this.totalDescuentos=0;
         this.totalAbonos=0;
-
+        this.subTotalServiciosExtra=0;
+        this.iva=0;
         this.estadoDeCuenta=[]
         this.edoCuentaActivos=[]
         this.edoCuentaCancelados=[]
