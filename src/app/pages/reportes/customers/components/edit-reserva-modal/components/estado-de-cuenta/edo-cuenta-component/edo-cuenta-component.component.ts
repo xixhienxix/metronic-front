@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalDismissReasons, NgbActiveModal, NgbDatepickerI18n, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { edoCuenta } from 'src/app/pages/reportes/_models/edoCuenta.model';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
@@ -11,7 +12,8 @@ import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/ale
   styleUrls: ['./edo-cuenta-component.component.scss']
 })
 export class EdoCuentaComponentComponent implements OnInit {
-
+  /**Subscription */
+  subscription:Subscription
   /**Models */
   alojamientoPorNoche:any[]=[]
   estadoDeCuenta:edoCuenta[]=[]
@@ -40,20 +42,33 @@ export class EdoCuentaComponentComponent implements OnInit {
     public estadoDeCuentaService:Edo_Cuenta_Service,
     public modalService:NgbModal,
     public i18n: NgbDatepickerI18n,
-
-  ) { }
+    
+  ) {
+    this.subscription=this.estadoDeCuentaService.getNotification().subscribe(data=>{
+      if(data)
+      {
+        this.getEdoCuenta();
+      }
+    });
+   }
 
   ngOnInit(): void {
     this.customerService.getCurrentHuespedValue.habitacion
     this.estadoDeCuentaService.currentCuentaValue
     this.getEdoCuenta()
+
   }
 
 
   getEdoCuenta(){
+
+
     this.estadoDeCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result:edoCuenta[])=>{
-        
+        this.totalCargos=0;
+        this.totalDescuentos=0;
+        this.totalAbonos=0;
+
         this.estadoDeCuenta=[]
         this.edoCuentaActivos=[]
         this.edoCuentaCancelados=[]
@@ -66,6 +81,21 @@ export class EdoCuentaComponentComponent implements OnInit {
         this.edoCuentaAbonosLista=[]
 
         for(let i=0;i<result.length;i++){
+
+          //Totales
+          if(result[i].Cargo!=0 && result[i].Estatus=='Activo')
+          { 
+            this.totalCargos+=result[i].Cargo
+          } 
+          if(result[i].Forma_de_Pago=='Descuento' && result[i].Estatus=='Activo')
+          { 
+            this.totalDescuentos+=result[i].Abono
+          }
+          if(result[i].Abono!=0 && result[i].Estatus=='Activo' && result[i].Forma_de_Pago!='Descuento')
+          { 
+            this.totalAbonos+=result[i].Abono 
+          }
+          //
 
           if(result[i].Estatus=='Activo')
           { 
@@ -171,7 +201,9 @@ export class EdoCuentaComponentComponent implements OnInit {
               }
 
               this.edoCuentaDescuentosLista.push(edoCuentaDescuentos)
-              this.totalDescuentos+=result[i].Abono
+
+
+              
             }
 
             if(result[i].Abono!=0 && result[i].Forma_de_Pago!='Descuento')
@@ -198,12 +230,12 @@ export class EdoCuentaComponentComponent implements OnInit {
               }
 
               this.edoCuentaAbonosLista.push(edoCuentaAbonos)
-              this.totalAbonos+=result[i].Abono
+              // this.totalAbonos+=result[i].Abono
 
             }
 
             this.edoCuentaActivos.push(result[i]) 
-            this.totalCargos+=result[i].Cargo
+   
           }
 
 

@@ -97,6 +97,12 @@ export class TransaccionesComponentComponent implements OnInit {
   disabledFP:boolean=true;
   descuentoButton=true;
   totalCalculado:number=0;
+  totalVigente:number=0;
+  totalActivos:number=0;
+  totalDescuentos:number=0;
+  totalCargos:number=0;
+  totalAbonos:number=0;
+  totalCancelados:number=0;
   conceptosDisabled:boolean=true;
   closeResult: string;
   quantity:number=1;
@@ -206,27 +212,49 @@ export class TransaccionesComponentComponent implements OnInit {
         this.edoCuentaAbonos=[]
         this.edoCuentaCargos=[]
         this.edoCuentaDescuentos=[]
-
+        this.totalAbonos=0;
+        this.totalActivos=0;
+        this.totalCargos=0;
+        this.totalDescuentos=0;
+        this.totalCancelados=0;
 
         for(let i=0;i<result.length;i++){
 
           if(result[i].Estatus=='Activo')
-          { this.edoCuentaActivos.push(result[i]) }
+          { 
+            this.edoCuentaActivos.push(result[i]) 
+            this.totalActivos+=(result[i].Cargo-result[i].Abono)
+          }
           if(result[i].Estatus=='Cancelado')
-          { this.edoCuentaCancelados.push(result[i]) }
+          { 
+            this.edoCuentaCancelados.push(result[i]) 
+            this.totalCancelados+=(result[i].Cargo-result[i].Abono)
+          }
           if(result[i].Estatus=='Devolucion')
-          { this.edoCuentaDevoluciones.push(result[i]) }
-          if(result[i].Cargo!=0)
-          { this.edoCuentaCargos.push(result[i]) }
-          if(result[i].Abono!=0)
-          { this.edoCuentaAbonos.push(result[i]) }
-          if(result[i].Forma_de_Pago=='Descuento')
-          { this.edoCuentaDescuentos.push(result[i]) }
+          { 
+            this.edoCuentaDevoluciones.push(result[i]) 
+          }
+          if(result[i].Cargo!=0 && result[i].Estatus=='Activo')
+          { 
+            this.edoCuentaCargos.push(result[i]) 
+            this.totalCargos+=result[i].Cargo
+          }
+          if(result[i].Abono!=0 && result[i].Estatus=='Activo' && result[i].Forma_de_Pago!='Descuento')
+          { 
+            this.edoCuentaAbonos.push(result[i])
+            this.totalAbonos+=result[i].Abono 
+          }
+          if(result[i].Forma_de_Pago=='Descuento' && result[i].Estatus=='Activo')
+          { 
+            this.edoCuentaDescuentos.push(result[i]) 
+            this.totalDescuentos+=result[i].Abono
+          }
           this.estadoDeCuenta.push(result[i]) 
 
         }
 
           this.dataSource.data = this.edoCuentaActivos
+          this.edoCuentaService.currentCuentaValue = this.edoCuentaActivos
           // this.dataSource.paginator = this.paginator;
 
           let totalCargos=0;
@@ -241,7 +269,7 @@ export class TransaccionesComponentComponent implements OnInit {
           }
 
           this.totalCalculado=totalCargos-totalAbonos
-
+          this.totalVigente=this.totalCalculado
           this.huesped = this.customerService.getCurrentHuespedValue
           this.huesped.pendiente = this.totalCalculado
           this.huesped.porPagar = totalCargos
@@ -450,7 +478,7 @@ this.nuevosConceptos=false
 
                       const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
                       modalRef.componentInstance.alertHeader = 'Exito'
-                      modalRef.componentInstance.mensaje='Cargo Cancelado con Exito'   
+                      modalRef.componentInstance.mensaje='Movimiento Cancelado con Exito'   
                         setTimeout(() => {
                           modalRef.close('Close click');
                         },4000)
@@ -465,7 +493,7 @@ this.nuevosConceptos=false
                       {
                         const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
                         modalRef.componentInstance.alertHeader = 'Error'
-                        modalRef.componentInstance.mensaje='No se pudo actualizar el estatus el pago intente nuevamente'
+                        modalRef.componentInstance.mensaje='No se pudo actualizar el estatus del Movimiento, Intente de nuevo mas tarde'
                       
                           setTimeout(() => {
                             modalRef.close('Close click');
@@ -526,7 +554,9 @@ this.nuevosConceptos=false
     {
       if(event.source._checked==true)
       {
+
         this.dataSource.data = this.estadoDeCuenta
+        this.totalCalculado=this.totalVigente
 
         this.todosChecked=true
         this.activosChecked=false;
@@ -553,6 +583,7 @@ this.nuevosConceptos=false
       if(event.source._checked==true)
       {
         this.dataSource.data =this.edoCuentaCancelados
+        this.totalCalculado=this.totalCancelados
 
         this.canceladosChecked=true
         this.activosChecked=false;
@@ -578,6 +609,7 @@ this.nuevosConceptos=false
       if(event.source._checked==true)
       {
         this.dataSource.data = this.edoCuentaActivos
+        this.totalCalculado=this.totalActivos
 
         this.activosChecked=true
         this.canceladosChecked=false;
@@ -605,6 +637,7 @@ this.nuevosConceptos=false
       {
         this.dataSource.data = this.edoCuentaDevoluciones
 
+
         this.activosChecked=false
         this.canceladosChecked=false;
         this.todosChecked=false;
@@ -630,6 +663,7 @@ this.nuevosConceptos=false
       if(event.source._checked==true)
       {
         this.dataSource.data = this.edoCuentaDescuentos
+        this.totalCalculado=this.totalDescuentos
 
         this.activosChecked=false
         this.canceladosChecked=false;
@@ -656,6 +690,7 @@ this.nuevosConceptos=false
       if(event.source._checked==true)
       {
         this.dataSource.data = this.edoCuentaAbonos
+        this.totalCalculado=this.totalAbonos
 
         this.activosChecked=false
         this.canceladosChecked=false;
@@ -682,6 +717,7 @@ this.nuevosConceptos=false
       if(event.source._checked==true)
       {
         this.dataSource.data = this.edoCuentaCargos
+        this.totalCalculado=this.totalCargos
 
         this.activosChecked=false
         this.canceladosChecked=false;

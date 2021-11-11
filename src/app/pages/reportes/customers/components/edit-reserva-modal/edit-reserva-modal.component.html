@@ -70,41 +70,42 @@
   <div class="row" style="text-align: center; padding-left: 15px">
     &nbsp;&nbsp;&nbsp;
     <div
-      style="background-color: #e43748; color: white"
-      class="col px-3 py-3 rounded-sm mr-7 mb-7"
-    >
-      <div>
-        <label style="color: white"> Pendiente: </label>
-      </div>
-
-      <label style="color: white;font-size: large;">
-        $ {{ (customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX") }}.00
-      </label>
+    style="background-color: #0083b2; color: white"
+    class="col px-3 py-3 rounded-sm mr-7 mb-7"
+  >
+    <div>
+      <label style="color: white"> Su Cuenta: </label>
     </div>
+
+    <label  style="color: white; font-size: large;">
+      $ {{ (customerService.getCurrentHuespedValue.porPagar).toLocaleString("es-MX") }}.00
+    </label>
+  </div>
+    
 
     <div
       style="background-color: #da8f27; color: white"
       class="col px-3 py-3 rounded-sm mr-7 mb-7"
     >
       <div>
-        <label style="color: white"> Pagado y Abonado: </label>
+        <label style="color: white"> Pagos y Descuentos: </label>
       </div>
 
       <label style="color: white;font-size: large;"> $ {{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX")}}.00 </label>
     </div>
 
     <div
-      style="background-color: #0083b2; color: white"
-      class="col px-3 py-3 rounded-sm mr-7 mb-7"
-    >
-      <div>
-        <label style="color: white"> Su Cuenta: </label>
-      </div>
-
-      <label  style="color: white; font-size: large;">
-        $ {{ (customerService.getCurrentHuespedValue.porPagar).toLocaleString("es-MX") }}.00
-      </label>
+    style="background-color: #e43748; color: white"
+    class="col px-3 py-3 rounded-sm mr-7 mb-7"
+  >
+    <div>
+      <label style="color: white"> Pendiente: </label>
     </div>
+
+    <label style="color: white;font-size: large;">
+      $ {{ (customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX") }}.00
+    </label>
+  </div>
   </div>
 </div>
 
@@ -289,8 +290,7 @@
       (click)="confirmaReserva(2,customerService.getCurrentHuespedValue.folio);closeModal()"
       class="btn btn-success btn-block"
       type="submit"
-      value="7"
-    >
+      value="7">
       Reactivar Reservación
     </button>
     <br>
@@ -321,9 +321,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <!-- <div class="modal-body">
-    <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
-  </div> -->
+
   <div class="modal-footer">
     <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
   </div>

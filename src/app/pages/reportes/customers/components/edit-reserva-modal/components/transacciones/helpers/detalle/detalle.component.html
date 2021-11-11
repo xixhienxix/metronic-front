@@ -61,10 +61,10 @@
 
       <div class="col-md-6">
         <br />
-        <label class="control-label">ID de Pago:</label>
+        <label class="control-label">ID de Movimiento Interno:</label>
         <br />
         &nbsp;
-        <label>{{row._id.substring(0,5)}}</label>
+        <label>{{row._id}}</label>
       </div>
     </div>
 
@@ -74,8 +74,11 @@
         <label class="control-label">Concepto:</label>
         <br />
         &nbsp;
-        <ng-container *ngIf="row.Forma_de_Pago=='Descuento'">
-          <label> Descuento ({{row.Descripcion.split('(')[1]}}</label>
+        <ng-container *ngIf="row.Forma_de_Pago=='Descuento' && row.Descripcion.indexOf('%') > -1">
+          <label>Descuento ({{row.Descripcion.split("(")[1]}} (D)</label>
+        </ng-container>
+        <ng-container *ngIf="row.Forma_de_Pago=='Descuento' && row.Descripcion.indexOf('%') == -1">
+          <label> Descuento (D)</label>
         </ng-container>
         <ng-container *ngIf="row.Referencia=='Anticipo' && row.Estatus!='Cancelado'">
           Anticipo (A)
@@ -83,7 +86,7 @@
          <ng-container *ngIf="row.Referencia=='Anticipo' && row.Estatus=='Cancelado'">
           Anticipo (X)
          </ng-container>
-        <label *ngIf="row.Forma_de_Pago!='Descuento' || row.Referencia!='Anticipo'"> {{row.Descripcion}}</label>
+        <label *ngIf="row.Forma_de_Pago != 'Descuento' && row.Referencia != 'Anticipo' "> {{row.Descripcion}}</label>
       </div>
       <div class="col-md-6">
         <br />
@@ -117,7 +120,7 @@
       <div class="col-md-6">
         <label class="control-label">
           <br />
-          ID de Transación externa:
+          ID de Movimiento Externo:
         </label>
         <br />
         &nbsp;
@@ -158,9 +161,7 @@
           >
           <br />
           &nbsp;
-          <ng-container *ngIf="row.Forma_de_Pago=='Descuento'">
-            <label>{{row.Descripcion.split('(')[0]}}</label>
-          </ng-container>
+
           <label>{{row.Descripcion}}</label>
         </div>
        

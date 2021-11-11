@@ -267,7 +267,7 @@ export class ReservasComponentComponent implements OnInit {
                               }
                             }
                             this.dataSource = new MatTableDataSource(this.promesasPagoList);   
-                            this.dataSource.paginator = this.paginator ;
+                            // this.dataSource.paginator = this.paginator ;
                             this.dataSource.sort = this.sort;
                           },
                           (err)=>{
