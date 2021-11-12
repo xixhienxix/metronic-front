@@ -54,7 +54,7 @@ const EMPTY_CUSTOMER: Huesped = {
   tarifa:500,
   porPagar: 500,
   pendiente:500,
-  origen: 'Online',
+  origen: '',
   habitacion: '',
   telefono:"",
   email:"",
@@ -158,7 +158,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   preAsig = new Set<preAsigModel>();
   searchValue:string='';
   dropDownHabValueIndex:any
-
+  origenReserva='Online'
 
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
@@ -394,7 +394,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {
 
       const formData = this.formGroup.value;
-
+    this.huesped.origen=this.origenReserva;
     this.huesped.llegada = this.fromDate.toString();
     this.huesped.salida = this.toDate.toString();
     this.huesped.nombre = formData.nombre;
@@ -946,10 +946,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {
       this.huesped.folio=this.folios[2].Folio
       this.estatusID=value
+      this.origenReserva='Walk-In'
     }
     else
-    this.huesped.folio=this.folios[0].Folio
+    {this.huesped.folio=this.folios[0].Folio
     this.estatusID=value
+    this.origenReserva='Recepción'}
+
 
 }
 
