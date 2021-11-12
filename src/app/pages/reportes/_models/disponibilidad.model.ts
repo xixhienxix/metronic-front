@@ -8,5 +8,5 @@ export interface Disponibilidad extends BaseModel
   Dia:number,
   Mes:number,
   Ano:number
-
+  Estatus_Ama_De_Llaves:string
 }

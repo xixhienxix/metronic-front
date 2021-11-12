@@ -392,6 +392,105 @@ class="form form-label-right"
   <label
     class="h4"
     style="color: aliceblue; text-align: center; padding-top: 5px"
+  >  Otros Detalles </label>
+</div>
+
+<form [formGroup]="facturacionFormGroup">
+  <br>
+  <div class="row container">
+    <div class="col-lg-12">
+      <label class="form-label">Nombre / Razon Social</label>
+      <input
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="razonsocial"
+        autocomplete="off"
+        [class.is-invalid]="isControlInvalidFactura('razonsocial')"
+        [class.is-valid]="isControlValidFactura('razonsocial')"
+        formControlName="razonsocial"
+      />
+      <div
+        class="invalid-feedback"
+        *ngIf="controlHasErrorFactura('required', 'razonsocial')"
+      >
+        Campo Requerido*
+      </div>
+    </div>
+    <br>
+    <div class="col-lg-12">
+      <label class="form-label">RFC</label>
+      <input
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="rfc"
+        autocomplete="off"
+        [class.is-invalid]="isControlInvalidFactura('rfc')"
+        [class.is-valid]="isControlValidFactura('rfc')"
+        formControlName="rfc"
+      />
+      <div
+        class="invalid-feedback"
+        *ngIf="controlHasErrorFactura('required', 'rfc')"
+      >
+        Campo Requerido*
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row container">
+    <div class="col-lg-6">
+      <label class="form-label">EMAIL</label>
+      <input
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="email"
+        autocomplete="off"
+        [class.is-invalid]="isControlInvalidFactura('email')"
+        [class.is-valid]="isControlValidFactura('email')"
+        formControlName="email"
+      />
+      <div
+        class="invalid-feedback"
+        *ngIf="controlHasErrorFactura('required', 'email')"
+      >
+        Campo Requerido*
+      </div>
+    </div>
+  <div class="col-lg-6">
+    <label class="form-label">USO DE CFDI</label>
+    <mat-form-field appearance="fill">
+      <mat-label></mat-label>
+      <mat-select formControlName="cfdi" >
+        <mat-option *ngFor="let cfdi of cfdiList" [value]="cfdi">{{cfdi}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <div
+      class="invalid-feedback"
+      *ngIf="controlHasErrorFactura('required', 'cfdi')"
+    >
+      Campo Requerido*
+    </div>
+  </div>
+  </div>
+ 
+  <div class="col-md-12">
+    <button 
+    disabled
+    class="btn btn-primary btn-block">
+      Actualizar Datos de Facturación
+    </button>
+  </div>
+</form>
+
+<br>
+
+
+
+<div style="background-color: #319dd7" class="modal-content">
+
+  <label
+    class="h4"
+    style="color: aliceblue; text-align: center; padding-top: 5px"
   > Notas Internas del cliente </label>
 </div>
 <br>

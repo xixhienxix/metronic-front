@@ -47,12 +47,19 @@ export class HuespedComponentComponent implements OnInit {
   today = this.calendar.getToday();
 
   formGroup: FormGroup;
+  facturacionFormGroup: FormGroup;
 
   /*Models*/
   huesped:Huesped
   details:Huesped_Detail
   detailsList:Huesped_Detail=EMPTY_DETAILS
   id_Socio:number;
+  cfdiList: string[] = ['Adquisición de mercancías', 'Devoluciones, descuentos o bonificaciones', 'Gastos en general', 
+  'Construcciones', 'Mobiliario y equipo de oficina por inversiones', 'Equipo de transporte',
+'Dados, troqueles, moldes, matrices y herramental','Comunicaciones telefónicas','Comunicaciones satelitales','Otra maquinaria y equipo',
+'Honorarios médicos, dentales y gastos hospitalarios.','Gastos médicos por incapacidad o discapacidad','Gastos funerales.','Donativos',
+'Intereses reales efectivamente pagados por créditos hipotecarios (casa habitación).','Aportaciones voluntarias al SAR.','Primas por seguros de gastos médicos.',
+'Gastos de transportación escolar obligatoria.','Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones.','Pagos por servicios educativos (colegiaturas)','Por definir'];
 
   /*Diseño Dinamico*/
   modifica:boolean = true;
@@ -137,6 +144,13 @@ export class HuespedComponentComponent implements OnInit {
       lenguaje: ['', Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
       notas:[''],
     });
+
+    this.facturacionFormGroup= this.fb.group({
+      razonsocial : ['',Validators.required],
+      rfc:['',Validators.required],
+      cfdi:['',Validators.required],
+      email:['',Validators.required]
+    })
   }
 
   get f() {
@@ -291,6 +305,22 @@ export class HuespedComponentComponent implements OnInit {
 
   controlHasError(validation, controlName): boolean {
     const control = this.formGroup.controls[controlName];
+    return control.hasError(validation) && (control.dirty || control.touched);
+  }
+
+  //FORMFACTURA
+  isControlValidFactura(controlName: string): boolean {
+    const control = this.facturacionFormGroup.controls[controlName];
+    return control.valid && (control.dirty || control.touched);
+  }
+
+  isControlInvalidFactura(controlName: string): boolean {
+    const control = this.facturacionFormGroup.controls[controlName];
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  controlHasErrorFactura(validation, controlName): boolean {
+    const control = this.facturacionFormGroup.controls[controlName];
     return control.hasError(validation) && (control.dirty || control.touched);
   }
 
