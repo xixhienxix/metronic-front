@@ -180,8 +180,8 @@ export class EditReservaModalComponent implements OnInit {
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
       this.getEstatus();
-    
     }
+
 
 
     // async getPrice(currency: string): Promise<number> {

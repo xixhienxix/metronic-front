@@ -161,6 +161,19 @@ export class TransaccionesComponentComponent implements OnInit {
 
     
   }
+  actualizaHuesped(huesped:Huesped)
+  {
+    this.customerService.updateHuesped(huesped).subscribe(
+      (Value)=>{
+        console.log("Huesped Actualizado con Exito")
+
+        this.customerService.fetch();
+      },
+      (error)=>{
+        console.log("Error al Actualizar Huesped")
+      }
+      )
+  }    
 
   
   loadForm(){
@@ -275,6 +288,7 @@ export class TransaccionesComponentComponent implements OnInit {
           this.huesped.porPagar = totalCargos
 
           this.customerService.setCurrentHuespedValue=this.huesped
+          this.actualizaHuesped(this.huesped);
       },
       (err)=>
       {
@@ -743,6 +757,7 @@ this.nuevosConceptos=false
 
   onSubmit(){
     
+    
 
     let pago:edoCuenta;
 
@@ -765,7 +780,7 @@ this.nuevosConceptos=false
         Descripcion:this.nuevas.nuevoConcepto.value,
         Forma_de_Pago:'No Aplica',
         Cantidad:this.quantityNva,
-        Cargo:this.nuevas.nuevoPrecio.value*this.quantityNva,
+        Cargo:this.nuevas.nuevoPrecio.value,
         Abono:0,
         Estatus:'Activo'
         }
@@ -788,14 +803,14 @@ this.nuevosConceptos=false
           Descripcion:this.codigoDeCargo.Descripcion,
           Forma_de_Pago:'no Aplica',
           Cantidad:this.quantity,
-          Cargo:this.f.precio.value*this.quantity,
+          Cargo:this.f.precio.value,
           Abono:0,
           Estatus:'Activo'
 
           
   
       }
-  
+      this.quantity=1;
     }    
 
     
