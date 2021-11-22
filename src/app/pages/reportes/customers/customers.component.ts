@@ -165,6 +165,7 @@ export class CustomersComponent
     this.getTipoCuarto();
     this.filterForm();
     this.searchForm();
+    // this.getEstatusAmaDeLlaves();
     this.customerService.fetch();
     this.grouping = this.customerService.grouping;
     this.paginator = this.customerService.paginator;

@@ -24,6 +24,11 @@ export const routes: Routes = [
   canActivate: [AuthGuard],
   redirectTo: 'reportes/customers' 
   },
+  {
+    path:'parametros',
+    canActivate: [AuthGuard],
+    redirectTo: 'parametros' 
+  },
   { path: '**',   
     redirectTo: 'auth/login' 
   },

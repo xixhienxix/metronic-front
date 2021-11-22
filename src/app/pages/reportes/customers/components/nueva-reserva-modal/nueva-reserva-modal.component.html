@@ -577,33 +577,3 @@
     <!-- <button class="btn btn-primary" (click)="open(content)">Launch demo modal</button> -->
   </div>
 </div>
-
-  <ng-template #error let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Error</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-    </div>
-  </ng-template>
-
-  <ng-template #exito let-modal>
-    <div class="modal-header">
-      <h4 class="modal-title">Húesped Guardado con exito</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <!-- <div class="modal-body">
-      <p>Ocurrio un Error al guardar al Húesped porfavor intentelo mas tarde&hellip;</p>
-    </div> -->
-    <div class="modal-footer">
-      <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-    </div>
-  </ng-template>
