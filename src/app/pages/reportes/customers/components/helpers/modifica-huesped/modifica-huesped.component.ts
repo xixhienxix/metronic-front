@@ -84,7 +84,7 @@ export class ModificaHuespedComponent implements OnInit {
     public modal: NgbActiveModal,
     public estatusService:EstatusService,
     private modalService: NgbModal,
-    private customerService: HuespedService,
+    public customerService: HuespedService,
     public i18n: NgbDatepickerI18n,
     public disponibilidadService: DisponibilidadService,
     public habitacionService:HabitacionesService,
@@ -424,7 +424,8 @@ export class ModificaHuespedComponent implements OnInit {
 
       this.customerService.updateHuesped(this.huesped).subscribe(
         (value)=>{
-          
+          this.customerService.setCurrentHuespedValue=this.huesped
+
           this.customerService.updateHuespedModifica(this.huespedAnterior).subscribe(
             (err)=>{
               if(err)

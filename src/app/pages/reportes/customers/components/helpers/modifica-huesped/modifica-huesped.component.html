@@ -14,10 +14,10 @@
     X
   </button>
   <br />
-<ng-container *ngIf="huesped.estatus=='Huesped en Casa'">
+<ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='Huesped en Casa'">
   <h2  style="font: bold; color: white; text-align: center;">Modifica Húesped</h2>
 </ng-container>
-<ng-container *ngIf="huesped.estatus!='Huesped en Casa'">
+<ng-container *ngIf="customerService.getCurrentHuespedValue.estatus!='Huesped en Casa'">
   <h2  style="font: bold; color: white; text-align: center;">Modifica Reserva</h2>
 </ng-container>
 </div>
@@ -30,20 +30,20 @@
       id="example-modal-sizes-title-lg"
     >
       <div class="row">
-        <h2 style="font-size: 1.5em; text-align: center;">{{ huesped.nombre }}</h2>
+        <h2 style="font-size: 1.5em; text-align: center;">{{ customerService.getCurrentHuespedValue.nombre }}</h2>
       </div>
       <div class="row">
         <small style=" font-size: 1em"
           >ID RVA : &nbsp;
           <small style="font-size: 1em; font-weight: bold; color: #319dd7">{{
-            huesped.folio
+            customerService.getCurrentHuespedValue.folio
           }}</small>
         </small>
         &nbsp; &nbsp; &nbsp; &nbsp;
         <small style="color: white; font-size: 1em"
           >Hab.: &nbsp;
           <small style="font-weight: bold; font-size: 1em; color: #319dd7"
-            >{{ huesped.numeroCuarto }} - {{ huesped.habitacion.replace("_"," ") }}</small
+            >{{ customerService.getCurrentHuespedValue.numeroCuarto }} - {{ customerService.getCurrentHuespedValue.habitacion.replace("_"," ") }}</small
           >
         </small>
       </div>
@@ -71,7 +71,7 @@
           <label class="control-label">Periodo:</label>
           <br />
           &nbsp;
-          <label>{{ fullFechaLlegada }} - {{ fullFechaSalida }} </label>
+          <label>{{ customerService.getCurrentHuespedValue.llegada }} - {{ customerService.getCurrentHuespedValue.salida }} </label>
         </div>
 
       </div>
@@ -82,14 +82,14 @@
           <label class="control-label">Adultos / Personas:</label>
           <br />
           &nbsp;
-          <label>{{ huesped.adultos }} </label>
+          <label>{{ customerService.getCurrentHuespedValue.adultos }} </label>
         </div>
         <div class="col-md-6">
           <br />
           <label class="control-label">Niños:</label>
           <br />
           &nbsp;
-          <label>{{ huesped.ninos }} </label>
+          <label>{{ customerService.getCurrentHuespedValue.ninos }} </label>
         </div>
       </div>
 
@@ -99,14 +99,14 @@
           <label class="control-label">Habitacion / Cama:</label>
           <br />
           &nbsp;
-          <label>{{ huesped.habitacion.replace("_"," ") }}</label>
+          <label>{{ customerService.getCurrentHuespedValue.habitacion.replace("_"," ") }}</label>
         </div>
         <div class="col-md-6">
           <br />
           <label class="control-label">No.Habitacion:</label>
           <br />
           &nbsp;
-          <label>{{ huesped.numeroCuarto }}</label>
+          <label>{{ customerService.getCurrentHuespedValue.numeroCuarto }}</label>
         </div>
       </div>
 
@@ -123,7 +123,7 @@
           <label class="control-label">Tarifa: </label>
           <br />
           &nbsp;
-          <label>$ {{ huesped.tarifa.toLocaleString('es-MX') }} .00</label>
+          <label>$ {{ customerService.getCurrentHuespedValue.tarifa.toLocaleString('es-MX') }} .00</label>
         </div>
       </div>
 

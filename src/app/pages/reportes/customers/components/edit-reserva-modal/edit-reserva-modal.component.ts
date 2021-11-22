@@ -595,8 +595,10 @@ export class EditReservaModalComponent implements OnInit {
         this.huesped=receivedEntry;
         this.customerService.fetch()
         })
+        
         //Recibir Data del Modal usando modal.close(data)
-        modalRef.result.then((result) => {
+
+       modalRef.result.then((result) => {
           if (result) {
           this.huesped=result
             this.formatFechas();
@@ -609,6 +611,23 @@ export class EditReservaModalComponent implements OnInit {
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         });
+
+
+
+
+      //   modalRef.result.then((result) => {
+      //     if (result) {
+      //     this.huesped=result
+      //       this.formatFechas();
+      //     console.log("modal.close():", result);
+      //     }
+      //     });
+
+      // modalRef.result.then((result) => {
+      //   this.closeResult = `Closed with: ${result}`;
+      //   }, (reason) => {
+      //       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      //   });
     }
 
     openEnviarConfirmacion(){
