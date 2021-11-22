@@ -16,6 +16,13 @@ export const DynamicAsideMenuConfig = {
       page: '/builder',
       svg: './assets/media/svg/icons/Home/Library.svg'
     },
+    {
+      title: 'Parametros',
+      root: true,
+      icon: 'flaticon2-expand',
+      page: '/parametros',
+      svg: './assets/media/svg/icons/Home/Library.svg'
+    },
 
 
     { section: 'Components' },

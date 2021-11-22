@@ -27,6 +27,11 @@ const routes: Routes = [
       loadChildren: () =>
         import('./builder/builder.module').then((m) => m.BuilderModule),
     },
+    {
+      path: 'parametros',
+      loadChildren: () =>
+        import('./parametros/parametros.module').then((m) => m.ParametrosModule),
+    },
       
 //    {
 //        path: 'ecommerce',

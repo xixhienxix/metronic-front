@@ -27,6 +27,7 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import {HistoricoService} from '../../../_services/historico.service'
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {preAsigModel} from '../../../_models/_models_helpers/preAsig'
+import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
 
 let date: Date = new Date();
 declare global {
@@ -54,7 +55,7 @@ const EMPTY_CUSTOMER: Huesped = {
   tarifa:500,
   porPagar: 500,
   pendiente:500,
-  origen: 'Online',
+  origen: '',
   habitacion: '',
   telefono:"",
   email:"",
@@ -118,8 +119,6 @@ const EMPTY_CUSTOMER: Huesped = {
 
 export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 {
-  @ViewChild('error') errorModal: null;
-  @ViewChild('exito') exitoModal: null;
   @ViewChild('tipodeCuartoDropDown') tipodeCuartoDropDown: null;
 
   @Input()
@@ -158,7 +157,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   preAsig = new Set<preAsigModel>();
   searchValue:string='';
   dropDownHabValueIndex:any
-
+  origenReserva='Online'
 
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
@@ -393,8 +392,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     for(let habitaciones of this.preAsig)
     {
 
-      const formData = this.formGroup.value;
-
+    const formData = this.formGroup.value;
+    this.huesped.origen=this.origenReserva;
     this.huesped.llegada = this.fromDate.toString();
     this.huesped.salida = this.toDate.toString();
     this.huesped.nombre = formData.nombre;
@@ -436,10 +435,30 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
-      ()=>{},
+      ()=>{
+        if(this.banderaExito)
+        {
+          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          modalRef.componentInstance.alertHeader = 'Exito'
+          modalRef.componentInstance.mensaje='Húesped Generado con éxito'          
+          modalRef.result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
+            setTimeout(() => {
+              modalRef.close('Close click');
+            },4000)
+            this.banderaExito=false;
+
+            
+        }
+      },
       (err)=>{
         if(err){
-          const modalRef = this.modalService.open(this.errorModal,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje='No se pudo guardar el húesped intente de nuevo mas tarde'
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
@@ -451,22 +470,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
               }
       },
       ()=>{
-
-        if(this.banderaExito)
-        {
-          const modalRef = this.modalService.open(this.exitoModal,{size:'sm'})
-          modalRef.result.then((result) => {
-            this.closeResult = `Closed with: ${result}`;
-            }, (reason) => {
-                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-            });
-            setTimeout(() => {
-              modalRef.close('Close click');
-            },4000)
-            this.banderaExito=false;
-        }
-
-
       });
 
       this.huesped.folio=this.huesped.folio+1
@@ -946,10 +949,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {
       this.huesped.folio=this.folios[2].Folio
       this.estatusID=value
+      this.origenReserva='Walk-In'
     }
     else
-    this.huesped.folio=this.folios[0].Folio
+    {this.huesped.folio=this.folios[0].Folio
     this.estatusID=value
+    this.origenReserva='Recepción'}
+
 
 }
 

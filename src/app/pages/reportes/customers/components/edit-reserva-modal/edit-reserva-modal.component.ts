@@ -24,6 +24,8 @@ import { EmailService } from '../../../_services/email.service';
 import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
 import { Edo_Cuenta_Service } from '../../../_services/edo_cuenta.service';
 import { HistoricoService } from '../../../_services/historico.service';
+import { AmaLlavesService } from '../../../_services/ama-llaves.service';
+import { Ama_De_Llaves } from '../../../_models/ama-llaves';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -133,6 +135,8 @@ export class EditReservaModalComponent implements OnInit {
     foliador:Foliador;
     folioLetra:string;
     public folios:Foliador[]=[];
+    amaDeLlavesList:Ama_De_Llaves[]=[];
+    amaDeLlaves:Ama_De_Llaves;
     public folioactualizado:any;
 
     mensaje_exito:string
@@ -158,7 +162,7 @@ export class EditReservaModalComponent implements OnInit {
     constructor(
       //Date Imports
       private modalService: NgbModal,
-      //
+      public amaDeLlavesService:AmaLlavesService,
       public foliosService : FoliosService,
       public adicionalService : AdicionalService,
       private customersService: HuespedService,
@@ -180,6 +184,8 @@ export class EditReservaModalComponent implements OnInit {
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
       this.getEstatus();
+      this.getAmaDeLlaves();
+      this.getAmaDeLlavesByID();
     }
 
 
@@ -188,6 +194,35 @@ export class EditReservaModalComponent implements OnInit {
     //   const response = await this.http.get(this.currentPriceUrl).toPromise();
     //   return response.json().bpi[currency].rate;
     // }
+    getAmaDeLlaves(){
+
+      this.amaDeLlavesService.getAmaDeLlaves().subscribe(
+        (value)=>{
+          for(let i=0;i<value.length;i++)
+          {
+            this.amaDeLlavesList.push(value[i])
+          }
+        },
+        (error)=>{
+          console.log(error)
+        },
+        ()=>{}
+        )
+    }
+
+    getAmaDeLlavesByID(){
+      this.amaDeLlavesService.getAmaDeLlavesByID('La_Vid',1).subscribe(
+        (value)=>{
+
+            this.amaDeLlaves=value
+          
+        },
+        (error)=>{
+          console.log(error)
+        },
+        ()=>{}
+        )
+    }
 
     formatFechas()
     {
@@ -301,6 +336,19 @@ export class EditReservaModalComponent implements OnInit {
       if(estatus==this.estatusArray[i].estatus)
       {
         color = this.estatusArray[i].color
+      }
+    }
+    return color;
+  }
+
+  backgroundColorAmadeLlaves(estatus:string){
+    let color;
+
+    for (let i=0;i<this.amaDeLlavesList.length;i++)
+    {
+      if(estatus==this.amaDeLlavesList[i].Descripcion)
+      {
+        color = this.amaDeLlavesList[i].Color
       }
     }
     return color;
