@@ -28,17 +28,12 @@ import {HistoricoService} from '../../../_services/historico.service'
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {preAsigModel} from '../../../_models/_models_helpers/preAsig'
 import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import {DateTime} from 'luxon'
 
-let date: Date = new Date();
-declare global {
-  interface Date {
-      getDays (start?: number) : [Date, Date]
-  }
-}
+// const todayDate = new Date();
 
-const todayDate = new Date();
 // const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
-const todayString=todayDate.getDate().toString().padStart(2, '0')+"/"+(todayDate.getMonth()+1).toString().padStart(2, '0')+"/"+todayDate.getFullYear().toString().padStart(4, '0')+"-"+todayDate.getHours().toString().padStart(2, '0')+":"+todayDate.getMinutes().toString().padStart(2, '0')+":"+todayDate.getSeconds().toString().padStart(2, '0')
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -47,8 +42,6 @@ const EMPTY_CUSTOMER: Huesped = {
   ninos:0,
   nombre: '',
   estatus: '',
-  // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
-  // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
   llegada:'',
   salida:'',
   noches: 1,
@@ -71,7 +64,7 @@ const EMPTY_CUSTOMER: Huesped = {
   codigoPostal:'',
   lenguaje:'Español',
   numeroCuarto: 0,
-  creada:todayString,
+  creada:'',
   tipoHuesped:"Regular"
 };
 
@@ -125,13 +118,18 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 //DATETIMEPICKER RANGE
   hoveredDate: NgbDate | null = null;
+  todayDate:DateTime
+  todayString:string
 
-  fromDate: NgbDate | null;
-  today: NgbDate | null;
-  fromDate1: string;
+
+  fromDate: DateTime;
+  toDate: DateTime;
+
+  today: DateTime;
+
   ToDoListForm:any;
   diaDif:number;
-  toDate: NgbDate | null;
+
   closeResult: string;
   minDate:NgbDateStruct;
 
@@ -178,7 +176,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
   estatusID:number;
-  todayString:string;
+  // todayString:string;
   personasXCuarto:any[]=[]
 
   constructor(
@@ -196,19 +194,26 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     public estatusService: EstatusService,
     public postService : ReportesComponent,
     private http: HttpClient,
-    public i18n: NgbDatepickerI18n
+    public i18n: NgbDatepickerI18n,
+    public parametrosService:ParametrosServiceService,
     ) {
-      this.today = calendar.getToday();
+      this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+      this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
+
+      // this.today = calendar.getToday();
       // this.minDate = {year: this.today.year, month: this.today.month, day: this.today.day};
-      this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
-      this.fromDate = calendar.getToday();
-      this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      // this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
+      this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+      this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+      this.toDate = this.toDate.plus({ days: 1 });
+
       this.minDate=calendar.getToday();
     }
 
 
 
   ngOnInit(): void {
+    this.getParametros();
     this.isLoading$ = this.customersService.isLoading$;
     this.historicoService.fetch();
     this.loadCustomer();
@@ -216,9 +221,20 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.getDispo();
     this.getFolios();
     this.getEstatus();
-    console.log(todayString)
+    console.log("print del todayString inicial"+this.todayString)
   }
 
+  getParametros(){
+    this.parametrosService.getParametros().subscribe(
+      (value)=>{
+        
+      },
+      (error)=>{
+        const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertsHeader='Error'
+        modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
+      })
+  }
 
   loadCustomer() {
 
@@ -384,29 +400,25 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   private prepareHuesped() {
 
-    const todayDate = new Date();
-    const todayString=todayDate.getDate().toString().padStart(2, '0')+"/"+(todayDate.getMonth()+1).toString().padStart(2, '0')+"/"+todayDate.getFullYear().toString().padStart(4, '0')+"-"+todayDate.getHours().toString().padStart(2, '0')+":"+todayDate.getMinutes().toString().padStart(2, '0')+":"+todayDate.getSeconds().toString().padStart(2, '0')
-    let fromDate : Date
-    let toDate : Date
-
     for(let habitaciones of this.preAsig)
     {
 
+      let diaFromDate = this.fromDate.day.toString().padStart(2, '0');
+      let mesFromDate = this.fromDate.month.toString().padStart(2, '0');
+      let anoFromDate = this.fromDate.year      
+      
+      let diaToDate = this.toDate.day.toString().padStart(2, '0');
+      let mesToDate = this.toDate.month.toString().padStart(2, '0');
+      let anoToDate = this.toDate.year
+
     const formData = this.formGroup.value;
     this.huesped.origen=this.origenReserva;
-    this.huesped.llegada = this.fromDate.toString();
-    this.huesped.salida = this.toDate.toString();
+    this.huesped.llegada = diaFromDate +"/"+ mesFromDate +"/"+ anoFromDate
+    this.huesped.salida = diaToDate +"/"+ mesToDate +"/"+ anoToDate
     this.huesped.nombre = formData.nombre;
 
-    fromDate=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
-    toDate=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
-    
-    var Difference_In_Time=toDate.getTime()-fromDate.getTime()
-    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
 
-        this.huesped.llegada=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
-        this.huesped.salida=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
-        this.huesped.noches=Math.trunc((Difference_In_Days>=1) ? Difference_In_Days : (Difference_In_Days-1))
+        this.huesped.noches=Math.trunc((this.diaDif>=1) ? this.diaDif : (this.diaDif-1))
         this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
         this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
         this.huesped.habitacion=habitaciones.codigo
@@ -415,7 +427,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         this.huesped.motivo=formData.motivo
         this.huesped.id=this.huesped.folio
         this.huesped.numeroCuarto=habitaciones.habitacion
-        this.huesped.creada=todayString
+        this.huesped.creada=this.todayString.split('-')[0]
         this.huesped.tipoHuesped="Regular"
 
   //HISTORICO--------------------------------------------------------
@@ -515,7 +527,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.huesped.codigoPostal=''
     this.huesped.lenguaje='Español'
     this.huesped.numeroCuarto=0,
-    this.huesped.creada=todayString,
+    this.huesped.creada=this.todayString.split('-')[0]
     this.huesped.tipoHuesped="Regular"  
   }
 
@@ -617,17 +629,20 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.mySet.clear();
     this.sinDisponibilidad=[]
 
+    let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
+    this.diaDif = diaDif.days
+
     if(this.bandera)
     {
       //DIAS DE DIFERENCIA
-    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    this.diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
-    //
+    // var diaDif=this.toDate.startOf("day")-this.fromDate.startOf("day")
 
-    for (let i=0; i<(this.diaDif+1); i++) {
+    let dispoFromDate = this.fromDate
+    let dispoToDate = this.toDate
 
-      this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
+    for (let i=0; i<(diaDif.days+1); i++) {
+
+      this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month,dispoFromDate.year)
       .pipe(map(
         (responseData)=>{
           const postArray = []
@@ -667,15 +682,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
           }
 
         })
-      fromDate.setDate(fromDate.getDate() + 1);
+      dispoFromDate.plus({ days: 1 })
     };
 
     }else
     {
-      //DIAS DE DIFERENCIA
-    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    this.diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+     
+      let dispoFromDate = this.fromDate
+      let dispoToDate = this.toDate
     //
 
     this.habitacionService.getHabitacionesbyTipo(this.cuarto)
@@ -694,9 +708,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       })
 
 
-    for (let i=0; i<(this.diaDif+1); i++) {
+    for (let i=0; i<(diaDif.days+1); i++) {
 
-    this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
+    this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -735,7 +749,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         }
 
       })
-      fromDate.setDate(fromDate.getDate() + 1);
+      dispoFromDate.plus({ days: 1 })
     };
 
     }
@@ -971,13 +985,23 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 
   onDateSelection(date: NgbDate) {
+
+    let fromDateNGB = {
+      "year": this.fromDate.year,
+      "month": this.fromDate.month,
+      "day": this.fromDate.day
+    }
+
     if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date && date.after(this.fromDate)) {
-      this.toDate = date;
+      // this.fromDate = date;
+      this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+    } else if (this.fromDate && !this.toDate && date && date.after(fromDateNGB)) {
+      this.toDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
     } else {
       this.toDate = null;
-      this.fromDate = date;
+      // this.fromDate = date;
+      this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+
     }
     if(this.disponibilidad.length!=0)
     {
@@ -1021,12 +1045,16 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   {
     
     let rangodeFechas
-    let toDate =   new Date(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
-    let fromDate = new Date(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
-    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
 
-    if(!isNaN(diaDif)){
-    this.huesped.noches=diaDif
+    let toDate =   new DateTime(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
+    let fromDate = new DateTime(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
+
+    const diaDif = fromDate.diff(toDate, ["years", "months", "days", "hours"])
+
+    // let diaDif = Math.floor((DateTime(toDate.year, toDate.month, toDate.day) - DateTime(fromDate.year, fromDate.month, fromDate.day) ) );
+
+    if(!isNaN(diaDif.days)){
+    this.huesped.noches=diaDif.days
     }else
     this.huesped.noches=1
 

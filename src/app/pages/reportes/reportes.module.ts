@@ -74,6 +74,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import { DetalleComponent } from './customers/components/edit-reserva-modal/components/transacciones/helpers/detalle/detalle.component';
 import { SuperUserComponent } from './customers/helpers/authorization/super.user/super.user.component';
 import { ClientesComponent } from './clientes/clientes.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -112,7 +113,6 @@ registerLocaleData(localeEs);
     ReservasComponentComponent,
     HuespedComponentComponent,
     EdoCuentaComponentComponent,
-    LoadingSpinnerComponent,
     AtLeastOne_ValidatorDirective,
     AjustesComponent,
     DetalleComponent,
@@ -156,8 +156,8 @@ registerLocaleData(localeEs);
     MatInputModule,
     MatRadioModule,
     MatTableModule,
-    MatPaginatorModule
-    
+    MatPaginatorModule,
+    SharedModule,
 
        // RouterModule.forChild([
     //   {
@@ -166,6 +166,7 @@ registerLocaleData(localeEs);
     //   },
     // ]),
   ],
+
   entryComponents: [
     DeleteHuespedModalComponent,
     DeleteHuespedesModalComponent,

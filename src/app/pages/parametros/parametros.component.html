@@ -23,427 +23,129 @@
           <!-- begin::Header -->
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Desktop Fixed Header:</label
+                >Zona Horaria:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">
-                  Enable fixed header for desktop mode
-                </div>
+                <mat-form-field appearance="fill">
+                  <mat-label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}</mat-label>
+                  <mat-select (selectionChange)='onSelectTimeZone($event.value)'  formControlName="timeZone" required>
+                    <mat-option *ngFor="let timezone of zonaHoraria" [value]="timezone.UTC+' '+timezone.Nombre">
+                      (UTC {{timezone.UTC}}) {{timezone.Nombre}} 
+                    </mat-option>
+                  </mat-select>
+                  <!-- <mat-error *ngIf="animalControl.hasError('required')">Please choose an animal</mat-error>
+                  <mat-hint>{{animalControl.value?.sound}}</mat-hint> -->
+                </mat-form-field>
               </div>
             </div>
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Mobile Fixed Header:</label
+                >Divisa:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">
-                  Enable fixed header for mobile mode
-                </div>
+                <mat-form-field appearance="fill">
+                  <mat-label>{{parametrosService.getCurrentParametrosValue.divisa}}</mat-label>
+                  <mat-select formControlName="divisa" required>
+                    <mat-option *ngFor="let divisa of divisas" [value]="divisa.Nombre">
+                      {{divisa.Nombre}} - {{divisa.Localidad}} - {{divisa.Simbolo}} 
+                    </mat-option>
+                  </mat-select>
+                  <!-- <mat-error *ngIf="animalControl.hasError('required')">Please choose an animal</mat-error>
+                  <mat-hint>{{animalControl.value?.sound}}</mat-hint> -->
+                </mat-form-field>
               </div>
             </div>
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Header Width:</label
+                >IVA %:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                >
-                  <option value="fluid">Fluid</option>
-                  <option value="fixed">Fixed</option>
-                </select>
-                <div class="form-text text-muted">Select header width type.</div>
+                <input class="form-control" type="number" formControlName='iva' value=""> 
+                <div class="form-text text-muted">Seleccione % de impuesto a aplicar.</div>
               </div>
             </div>
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Display Header Menu:</label
+                >ISH %:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Display header menu</div>
+                <input class="form-control" type="number" formControlName='ish' value=""> 
+                <div class="form-text text-muted">Seleccione % de impuesto a aplicar.</div>
               </div>
             </div>
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Static Header Menu:</label
+                >Hora de Salida:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Static header menu</div>
+                <mat-form-field appearance="fill">
+                  <mat-label>--Selecciona Hora--</mat-label>
+                  <mat-select  formControlName="checkOut" required>
+                    <mat-option *ngFor="let checkOut of checkOutList" [value]="checkOut">
+                      {{checkOut}} 
+                    </mat-option>
+                  </mat-select>
+                  <!-- <mat-error *ngIf="animalControl.hasError('required')">Please choose an animal</mat-error>
+                  <mat-hint>{{animalControl.value?.sound}}</mat-hint> -->
+                </mat-form-field>
+                <div class="form-text text-muted">Seleccione la Hora en la que desea que el sistema marque de manera automatica los Check-Out.</div>
               </div>
             </div>
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Header Menu Layout:</label
+                >Hora de No-Show:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                >
-                  <option value="default">Default</option>
-                  <option value="tab">Tab</option>
-                </select>
-                <div class="form-text text-muted">Select header width type.</div>
+                <mat-form-field appearance="fill">
+                  <mat-label>--Selecciona Hora--</mat-label>
+                  <mat-select  formControlName="noShow" required>
+                    <mat-option *ngFor="let noShow of checkOutList" [value]="noShow">
+                      {{noShow}} 
+                    </mat-option>
+                  </mat-select>
+                  <!-- <mat-error *ngIf="animalControl.hasError('required')">Please choose an animal</mat-error>
+                  <mat-hint>{{animalControl.value?.sound}}</mat-hint> -->
+                </mat-form-field>
+                <div class="form-text text-muted">Seleccione la Hora en la que desea que el sistema marque de manera automatica un No-Show.</div>
               </div>
             </div>
             <div class="form-group row">
               <label class="col-lg-3 col-form-label text-lg-right"
-                >Header Menu Arrows:</label
+                >Hora de Auditoria:</label
               >
               <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">
-                  Enable header menu root link arrows
-                </div>
+                <mat-form-field appearance="fill">
+                  <mat-label>--Selecciona Hora--</mat-label>
+                  <mat-select formControlName="auditoria" required>
+                    <mat-option *ngFor="let auditoria of checkOutList" [value]="auditoria">
+                      {{auditoria}} 
+                    </mat-option>
+                  </mat-select>
+                  <!-- <mat-error *ngIf="animalControl.hasError('required')">Please choose an animal</mat-error>
+                  <mat-hint>{{animalControl.value?.sound}}</mat-hint> -->
+                </mat-form-field>
+                <div class="form-text text-muted">Seleccione la Hora en la que desea que el sistema realize la auditoria de cuartos.</div>
               </div>
             </div>
+          
           </div>
           <!-- end::Header -->
-  
-          <!-- begin::Subheader -->
-          <div class="tab-pane" >
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Display Subheader:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Display subheader</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Fixed Subheader:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">
-                  Enable fixed(sticky) subheader. Requires
-                  <code>Solid</code> subheader style.
-                </div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right">Width:</label>
-              <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                  name="builder[subheader][width]"
-                >
-                  <option value="fluid">Fluid</option>
-                  <option value="fixed">Fixed</option>
-                </select>
-                <div class="form-text text-muted">Select layout width type.</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Subheader Style:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                >
-                  <option value="transparent">Transparent</option>
-                  <option value="solid">Solid</option>
-                </select>
-                <div class="form-text text-muted">Select subheader style</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Subheader Layout:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                >
-                  <option value="v1">Subheader 1</option>
-                  <option value="v2">Subheader 2</option>
-                  <option value="v3">Subheader 3</option>
-                  <option value="v4">Subheader 4</option>
-                  <option value="v5">Subheader 5</option>
-                  <option value="v6">Subheader 6</option>
-                </select>
-                <div class="form-text text-muted">Select subheader layout</div>
-              </div>
-            </div>
-          </div>
-          <!-- end::Subheader -->
-  
-          <!-- begin::Content -->
-          <div class="tab-pane" >
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right">Width:</label>
-              <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                >
-                  <option value="fluid">Fluid</option>
-                  <option value="fixed">Fixed</option>
-                </select>
-                <div class="form-text text-muted">Select layout width type.</div>
-              </div>
-            </div>
-          </div>
-          <!-- end::Content -->
-  
-          <!-- begin::Aside -->
-          <div class="tab-pane" >
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Display:</label
-              >
-              <div class="col-lg-9 col-xl-6">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Display aside</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Static aside menu:</label
-              >
-              <div class="col-lg-9 col-xl-6">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Static aside menu</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right">Fixed:</label>
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Set fixed aside layout</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Minimize:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Allow aside minimizing</div>
-              </div>
-            </div>
-  
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Default Minimize:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">
-                  Set aside minimized by default
-                </div>
-              </div>
-            </div>
-  
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right">Scroll:</label>
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Enable aside scroll</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Submenu toggle dropdown:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">
-                  Select Submenu Toggle mode (works only when
-                  <code>Scroll</code> is disabled. *By default - mode is
-                  'accordion').
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- end::Aside -->
-  
-          <!-- begin::Footer -->
-          <div class="tab-pane" >
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right"
-                >Fixed Desktop Footer:</label
-              >
-              <div class="col-lg-9 col-xl-4">
-                <span class="switch switch-icon">
-                  <label>
-                    <input
-                      type="checkbox"
-                      value="true"
-                    />
-                    <span></span>
-                  </label>
-                </span>
-                <div class="form-text text-muted">Set fixed desktop footer</div>
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-lg-3 col-form-label text-lg-right">Width:</label>
-              <div class="col-lg-9 col-xl-4">
-                <select
-                  class="form-control form-control-solid"
-                  name="builder[footer][width]"
-                >
-                  <option value="fluid">Fluid</option>
-                  <option value="fixed">Fixed</option>
-                </select>
-                <div class="form-text text-muted">Select layout width type.</div>
-              </div>
-            </div>
-          <!-- end::Footer -->
-        </div>
       </div>
       <!--end::Body-->
-      <!--begin::Footer-->
-      <div class="card-body">
-        <div class="row">
-          <div class="col-lg-4"></div>
-          <div class="col-lg-8">
-            <button type="submit" name="builder_submit" class="btn btn-primary">
-              Preview
-            </button>
-            &nbsp;
-            <button
-              type="submit"
-              name="builder_reset"
-              class="btn btn-secondary"
-            >
-              Reset
-            </button>
-          </div>
-        </div>
-      </div>
-      <!--end::Footer-->
+        <button type="submit" class="btn btn-info col-md-6" >Guardar Cambios 
+        </button>
     </form>
     <!--end::Form-->
   </div>
   <!--end::Card-->
   
-  <div class="card card-custom gutter-b">
+  <!-- <div class="card card-custom gutter-b">
     <div class="card-header">
       <div class="card-title">
         <h3 class="card-label">Generated Config</h3>
       </div>
     </div>
     <div class="card-body">
-      <!--begin::Example-->
       <div class="example mb-10">
         <p>
           Use for layout config in
@@ -461,7 +163,9 @@
           </div>
         </div>
       </div>
-      <!--end::Example-->
     </div>
-  </div>
+  </div> -->
   
+  <ng-container *ngIf="isLoading">
+    <app-loader-spinner></app-loader-spinner>
+  </ng-container>

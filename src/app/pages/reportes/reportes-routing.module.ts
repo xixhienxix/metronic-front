@@ -36,6 +36,7 @@ const routes: Routes = [
         path: 'product/edit/:id',
         component: ProductEditComponent
       },
+
       { path: '', redirectTo: 'customers', pathMatch: 'full' },
       { path: '**', redirectTo: 'customers', pathMatch: 'full' },
     ],

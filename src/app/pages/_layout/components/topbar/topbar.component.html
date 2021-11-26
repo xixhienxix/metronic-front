@@ -1,5 +1,20 @@
 <!--begin::Topbar-->
+<div class="topbar-item">
+  <div class="form-control" >
+    <!-- <label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}
+    </label> -->
+    <label>{{fecha}}</label>
+  </div>
+</div>
+<div class="topbar-item">
+  <div class="form-control" >
+    <label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}
+    </label>
+  
+  </div>
+</div>
 <ng-container *ngIf="extraSearchDisplay">
+
   <ng-container *ngIf="extrasSearchLayout === 'offcanvas'">
     <!--begin::Search-->
     <div class="topbar-item">

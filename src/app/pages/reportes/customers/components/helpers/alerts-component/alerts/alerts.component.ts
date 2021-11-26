@@ -12,7 +12,7 @@ export class AlertsComponent implements OnInit {
 
 
   
-  constructor(      public modal: NgbActiveModal,
+  constructor(public modal: NgbActiveModal,
     ) { }
 
   ngOnInit(): void {

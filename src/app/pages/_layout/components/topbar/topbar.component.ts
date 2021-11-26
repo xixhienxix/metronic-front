@@ -12,6 +12,8 @@ import KTLayoutQuickUser from '../../../../../assets/js/layout/extended/quick-us
 import KTLayoutHeaderTopbar from '../../../../../assets/js/layout/base/header-topbar';
 import { KTUtil } from '../../../../../assets/js/components/util';
 import { AuthModel } from 'src/app/modules/auth/_services/auth.service';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import {DateTime} from 'luxon'
 
 @Component({
   selector: 'app-topbar',
@@ -20,6 +22,8 @@ import { AuthModel } from 'src/app/modules/auth/_services/auth.service';
 })
 export class TopbarComponent implements OnInit, AfterViewInit {
   user$: Observable<AuthModel>;
+  fecha:Date
+  luxon:string
   // tobbar extras
   extraSearchDisplay: boolean;
   extrasSearchLayout: 'offcanvas' | 'dropdown';
@@ -34,8 +38,16 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   extrasUserDisplay: boolean;
   extrasUserLayout: 'offcanvas' | 'dropdown';
 
-  constructor(private layout: LayoutService, private auth: AuthService) {
+  constructor(private layout: LayoutService, private auth: AuthService, public parametrosService:ParametrosServiceService) {
     this.user$ = this.auth.currentUserSubject.asObservable();
+    this.parametrosService.getParametros().subscribe(
+      (value)=>{
+        this.fecha = new Date();
+       this.fecha = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+       console.log(this.fecha)
+     
+      });
+    
   }
 
   ngOnInit(): void {
