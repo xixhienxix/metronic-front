@@ -19,7 +19,9 @@ import { Bloqueo } from '../../../_models/bloqueo.model';
 import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
-
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import {DateTime} from 'luxon'
 
 let date: Date = new Date();
 declare global {
@@ -90,10 +92,11 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
   //Date Variables
 
-  fromDate: NgbDate | null;
-  today: NgbDate | null;
-  toDate: NgbDate | null;
-
+  fromDate: DateTime
+  today: DateTime
+  toDate: DateTime
+  comparadorInicial:Date
+  comparadorFinal:Date
 
 
 
@@ -146,8 +149,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   statusBloqueo:string
   fechaInicialBloqueo:string
   fechaFinalBloqueo:string
-  comparadorInicial:Date
-  comparadorFinal:Date
   display:boolean=true
   isSubmitted:boolean
 
@@ -167,22 +168,31 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     public disponibilidadService:DisponibilidadService,
     public postService : ReportesComponent,
     private http: HttpClient,
-    public i18n: NgbDatepickerI18n
+    public i18n: NgbDatepickerI18n,
+    public parametrosService : ParametrosServiceService
     )
     {
-      this.today= calendar.getToday();
-      this.fromDate = calendar.getToday();
-      this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+      this.today = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
+      // this.today= calendar.getToday();
+      this.fromDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
+      this.toDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}).plus({ days: 1 })
+
       this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
       this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
-      this.comparadorInicial=new Date(this.fromDate.year,this.fromDate.month-1,this.fromDate.day)
-      this.comparadorFinal=new Date(this.toDate.year,this.toDate.month-1,this.toDate.day)
+      this.comparadorInicial=new Date(DateTime.local(this.fromDate.year,this.fromDate.month,this.fromDate.day))
+      this.comparadorFinal=new Date(DateTime.local(this.toDate.year,this.toDate.month,this.toDate.day))
+
+
+      console.log('fechaInicialBloqueo : '+this.fechaInicialBloqueo)
+      console.log('fechaFinalBloqueo : '+this.fechaFinalBloqueo)
+      console.log('comparadorInicial : '+this.comparadorInicial)
+      console.log('comparadorFinal : '+this.comparadorFinal)
     }
 
 
 
   ngOnInit(): void {
-
+    this.getParametros();
     this.loadForm();
     this.getCodigosCuarto();
     this.getHabitaciones();
@@ -216,6 +226,17 @@ onFormSubmit(value: string) {
 }
 
 
+getParametros(){
+  this.parametrosService.getParametros().subscribe(
+    (value)=>{
+      
+    },
+    (error)=>{
+      const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+      modalRef.componentInstance.alertsHeader='Error'
+      modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
+    })
+}
 
   getHabitaciones()
   {
