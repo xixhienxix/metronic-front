@@ -172,10 +172,10 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     public parametrosService : ParametrosServiceService
     )
     {
-      this.today = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
+      this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
       // this.today= calendar.getToday();
-      this.fromDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
-      this.toDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}).plus({ days: 1 })
+      this.fromDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+      this.toDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona).plus({ days: 1 })
 
       this.fechaInicialBloqueo=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
       this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
