@@ -64,7 +64,7 @@ export class ForgotPasswordComponent implements OnInit {
       (value)=>{
         this.isLoading=false
 
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Email Enviado'
         modalRef.componentInstance.mensaje = 'Contraseña enviada al correo '+this.f.email.value
 
@@ -73,7 +73,7 @@ export class ForgotPasswordComponent implements OnInit {
         this.isLoading=false
 
         if(error){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje = 'Error al enviar contraseña al correo '+this.f.email.value
         }

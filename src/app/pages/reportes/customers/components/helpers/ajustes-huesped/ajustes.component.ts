@@ -89,7 +89,7 @@ export class AjustesComponent implements OnInit {
       //   (err)=>{
       //     if (err)
       //     {
-      //       const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+      //       const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
       //       modalRef.componentInstance.mensaje='No se Pudo Cargar la Tabla'
       //       modalRef.componentInstance.alertHeader='Error'
       //       modalRef.result.then((result) => {
@@ -138,7 +138,7 @@ export class AjustesComponent implements OnInit {
       (err)=>{
         if (err)
         {
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.mensaje='No se Pudo Cargar la Tabla'
           modalRef.componentInstance.alertHeader='Error'
           modalRef.result.then((result) => {
@@ -242,7 +242,7 @@ onSubmit()
     this.edoCuentaService.agregarPago(pago).subscribe(
       (result)=>{
         
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader='Exito'
         modalRef.componentInstance.mensaje=this.f.tipo.value +' guardado con exito!'        
         modalRef.result.then((result) => {
@@ -268,7 +268,7 @@ onSubmit()
       {
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader='Error'
           modalRef.componentInstance.mensaje='No se pudo Guardar el Pago Intente Nuevamente'
           modalRef.result.then((result) => {

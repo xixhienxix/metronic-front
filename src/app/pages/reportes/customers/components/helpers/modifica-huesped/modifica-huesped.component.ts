@@ -391,7 +391,7 @@ export class ModificaHuespedComponent implements OnInit {
     // revisaDatos(){
     //   if(this.numCuartoNumber==undefined||this.codigoCuartoString==undefined)
     //   {
-    //     const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+    //     const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
     //     modalRef.componentInstance.alertHeader='Error'
     //     modalRef.componentInstance.mensaje='Debes seleccionar una habitacion antes de guardar los cambios'
     //     modalRef.result.then((result) => {
@@ -430,13 +430,13 @@ export class ModificaHuespedComponent implements OnInit {
             (err)=>{
               if(err)
               {
-                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                 modalRef.componentInstance.alertHeader = 'Error'
                 modalRef.componentInstance.mensaje='No se pudo liberar la Disponibilidad'
               }
             },
             (value)=>{
-              const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+              const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader = 'Exito'
               modalRef.componentInstance.mensaje='Disponibilidad liberada con exito'
             }
@@ -446,7 +446,7 @@ export class ModificaHuespedComponent implements OnInit {
           this.passEntry.emit(this.huesped);
           this.customerService.setCurrentHuespedValue=this.huesped
 
-          const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Exito'
           modalRef.componentInstance.mensaje='Datos del Húesped Actualizados con Exito'
           modalRef.result.then((result) => {
@@ -463,7 +463,7 @@ export class ModificaHuespedComponent implements OnInit {
         (err)=>{
           if(err)
           {
-            const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+            const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar al húesped'
             modalRef.result.then((result) => {

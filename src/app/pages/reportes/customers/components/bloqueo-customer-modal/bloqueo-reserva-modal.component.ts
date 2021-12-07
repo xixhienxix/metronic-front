@@ -232,7 +232,7 @@ getParametros(){
       
     },
     (error)=>{
-      const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+      const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
       modalRef.componentInstance.alertsHeader='Error'
       modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
     })
@@ -710,7 +710,7 @@ fechaSeleccionadaFinal(event:NgbDate){
 //MODAL
 openMini(exito) {
 
-  const modalRef = this.modalService.open(exito,{ size: 'sm' });
+  const modalRef = this.modalService.open(exito,{ size: 'sm', backdrop:'static' });
   modalRef.result.then((result) => {
   this.closeResult = `Closed with: ${result}`;
   }, (reason) => {
@@ -724,7 +724,7 @@ openMini(exito) {
 
 openFechaIncorrecta(fechaIncorrecta) {
 
- const modalRef = this.modalService.open(fechaIncorrecta,{ size: 'sm' });
+ const modalRef = this.modalService.open(fechaIncorrecta,{ size: 'sm', backdrop:'static' });
 
  modalRef.result.then((result) => {
   this.closeResult = `Closed with: ${result}`;
@@ -741,7 +741,7 @@ openFechaIncorrecta(fechaIncorrecta) {
 
 openDelete(borrar,id,desde,hasta,habitacion,numero) {
 
-  const modalRef = this.modalService.open(borrar,{ size: 'sm' });
+  const modalRef = this.modalService.open(borrar,{ size: 'sm', backdrop:'static' });
   this.idDelete = id
   this.desdeDelete = desde
   this.hastaDelete = hasta

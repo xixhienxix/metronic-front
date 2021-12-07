@@ -230,7 +230,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         
       },
       (error)=>{
-        const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader='Error'
         modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
       })
@@ -450,7 +450,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       ()=>{
         if(this.banderaExito)
         {
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Húesped Generado con éxito'          
           modalRef.result.then((result) => {
@@ -468,7 +468,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       },
       (err)=>{
         if(err){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje='No se pudo guardar el húesped intente de nuevo mas tarde'
           modalRef.result.then((result) => {

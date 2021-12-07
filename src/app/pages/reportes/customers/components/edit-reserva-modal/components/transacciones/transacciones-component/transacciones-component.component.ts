@@ -295,7 +295,7 @@ export class TransaccionesComponentComponent implements OnInit {
         if (err)
         {
 
-            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje=err.message
 
@@ -339,7 +339,7 @@ export class TransaccionesComponentComponent implements OnInit {
 
 
 
-            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje=err.message
             modalRef.result.then((result) => {
@@ -462,7 +462,7 @@ this.nuevosConceptos=false
 
     this.isLoading=true
 
-    const modalRef = this.modalService.open(SuperUserComponent,{size:'sm'})
+    const modalRef = this.modalService.open(SuperUserComponent,{ size: 'sm', backdrop:'static' })
     modalRef.result.then((result) => {
       this.isLoading=false
 
@@ -490,7 +490,7 @@ this.nuevosConceptos=false
                     (value)=>{
                       this.isLoading=false
 
-                      const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                      const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
                       modalRef.componentInstance.alertHeader = 'Exito'
                       modalRef.componentInstance.mensaje='Movimiento Cancelado con Exito'   
                         setTimeout(() => {
@@ -505,7 +505,7 @@ this.nuevosConceptos=false
                       this.isLoading=false
                       if(error)
                       {
-                        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
                         modalRef.componentInstance.alertHeader = 'Error'
                         modalRef.componentInstance.mensaje='No se pudo actualizar el estatus del Movimiento, Intente de nuevo mas tarde'
                       
@@ -519,7 +519,7 @@ this.nuevosConceptos=false
                     )
           }else 
           {
-            const modalRef2= this.modalService.open(AlertsComponent,{size:'md'})
+            const modalRef2= this.modalService.open(AlertsComponent,{ size: 'md', backdrop:'static' })
             modalRef2.componentInstance.alertHeader='Error'
             modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
             return
@@ -818,7 +818,7 @@ this.isLoading=true
     this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
         
@@ -840,7 +840,7 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
         
@@ -892,7 +892,7 @@ this.isLoading=true
     this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
         
@@ -912,7 +912,7 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
         
@@ -989,7 +989,7 @@ this.isLoading=true
     this.edoCuentaService.agregarPago(descuento).subscribe(
       ()=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Descuento Aplicado sobre el total de la cuenta'
         modalRef.result.then((result) => {
@@ -1014,7 +1014,7 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
           modalRef.result.then((result) => {
@@ -1038,7 +1038,7 @@ this.isLoading=true
   }
   autoriza(){
     this.isLoading=true
-    const modalRef = this.modalService.open(SuperUserComponent,{size:'sm'})
+    const modalRef = this.modalService.open(SuperUserComponent,{ size: 'sm', backdrop:'static' })
     modalRef.result.then((result) => {
       this.isLoading=false
 
@@ -1059,7 +1059,7 @@ this.isLoading=true
             this.aplicaDescuento(receivedEntry.username);
           }else 
           {
-            const modalRef2= this.modalService.open(AlertsComponent,{size:'md'})
+            const modalRef2= this.modalService.open(AlertsComponent,{ size: 'md', backdrop:'static' })
             modalRef2.componentInstance.alertHeader='Error'
             modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
           }
@@ -1067,7 +1067,7 @@ this.isLoading=true
   }
   /*MODALS*/
   ajustes(){
-    const modalRef = this.modalService.open(AjustesComponent,{size:'lg'})
+    const modalRef = this.modalService.open(AjustesComponent,{ size: 'lg', backdrop:'static' })
     modalRef.componentInstance.huesped = this.customerService.getCurrentHuespedValue
     modalRef.componentInstance.estadoDeCuenta=this.estadoDeCuenta
     modalRef.result.then((result) => {
@@ -1082,7 +1082,7 @@ this.isLoading=true
   }
   abrirDetalle(row:any){
 
-    const modalRef = this.modalService.open(DetalleComponent,{size:'md'})
+    const modalRef = this.modalService.open(DetalleComponent,{ size: 'md', backdrop:'static' })
     modalRef.componentInstance.row = row
     modalRef.componentInstance.folio = this.customerService.getCurrentHuespedValue.folio
     modalRef.componentInstance.fechaCancelado = row.Fecha_Cancelado.split('T')[0]

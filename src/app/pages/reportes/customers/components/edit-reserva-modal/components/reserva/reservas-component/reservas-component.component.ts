@@ -15,9 +15,9 @@ import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.ser
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 import { PromesaService } from 'src/app/pages/reportes/_services/promesa.service';
 import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import {DateTime} from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
-const todayDate = new Date();
-const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
 
 
 const EMPTY_CUSTOMER: Huesped = {
@@ -51,7 +51,7 @@ const EMPTY_CUSTOMER: Huesped = {
   codigoPostal:'',
   lenguaje:'Español',
   numeroCuarto:0,
-  creada:todayString,
+  creada:'',
   tipoHuesped:"Regular"
 };
 @Component({
@@ -80,8 +80,8 @@ export class ReservasComponentComponent implements OnInit {
   /*Date Variables*/
   fullFechaSalida:string
   fullFechaLlegada:string
-  fromDate: NgbDate | null;
-  toDate: NgbDate | null;
+  fromDate: DateTime | null;
+  toDate: DateTime | null;
   comparadorInicial:Date
   comparadorFinal:Date
   fechaFinalBloqueo:string=''
@@ -89,6 +89,7 @@ export class ReservasComponentComponent implements OnInit {
   noches:number;
   closeResult:string;
   minDate:NgbDateStruct;
+  today:DateTime
 
   /*Models*/
   huesped: Huesped = EMPTY_CUSTOMER;
@@ -113,7 +114,6 @@ export class ReservasComponentComponent implements OnInit {
   promesasDisplay:boolean=false;
   expired:boolean=false;
   isLoading:boolean=false;
-  today: NgbDate | null;
   todayString:string;
   pagoManual:boolean=false;
   formadePago:string='Efectivo';
@@ -127,16 +127,18 @@ export class ReservasComponentComponent implements OnInit {
     public modalService: NgbModal,
     public promesaService : PromesaService,
     public edoCuentaService:Edo_Cuenta_Service,
+    public parametrosService:ParametrosServiceService
   ) {  
-    this.today=calendar.getToday();
+    this.today = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
+
     this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
-    this.fromDate = calendar.getToday();
+
+    this.fromDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
     // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
-    this.toDate=calendar.getToday();
-    this.minDate=calendar.getToday();
+    this.toDate=this.today.plus({days:1})
+    this.minDate=DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
 
      this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
-     console.log(this.fechaFinalBloqueo)
   }
 
   ngOnInit(): void {
@@ -146,7 +148,7 @@ export class ReservasComponentComponent implements OnInit {
       this.huesped=value
 
       this.getPromesa();
-      this.formatFechas();
+      // this.formatFechas();
       this.loadForm();
     })
 
@@ -162,7 +164,7 @@ export class ReservasComponentComponent implements OnInit {
       this.promesaService.borrarPromesa(_id).subscribe(
         (result)=>{
           this.isLoading=false
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.mensaje='Promesa Borrada con Exito'
           modalRef.componentInstance.alertHeader='Exito'
             setTimeout(() => {
@@ -178,7 +180,7 @@ export class ReservasComponentComponent implements OnInit {
 
                 if (error)
                             {
-                              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+                              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                               modalRef.componentInstance.mensaje='No se Pudo Cargar la Tabla'
                               modalRef.componentInstance.alertHeader='Error'
                                 setTimeout(() => {
@@ -193,7 +195,7 @@ export class ReservasComponentComponent implements OnInit {
     {
     this.promesaService.getPromesas(this.huesped.folio).subscribe(
                           (result)=>{
-                            let today = new Date()
+                            let today = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
 
                             for(let i =0;i<result.length;i++){
                               
@@ -206,7 +208,7 @@ export class ReservasComponentComponent implements OnInit {
                               // const ano = parseInt(fecha.toString().split('/')[2])
                               // const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
                               
-
+                              let todayMillis = today.toMillis()
                               // let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
 
                               var dateParts50 = result[i].Fecha.toString().split("T")[0];
@@ -220,7 +222,7 @@ export class ReservasComponentComponent implements OnInit {
 
                                 colorAplicado='#f7347a'//rosa
                                 color='#68B29A'
-                                if(dateObject.getTime()<today.getTime())
+                                if(dateObject.getTime()<todayMillis)
                                 {
                                   let status = 'Expirado'
                                   expirado='Expirado'
@@ -228,7 +230,7 @@ export class ReservasComponentComponent implements OnInit {
                                   this.promesaService.updatePromesaEstatus(result[i]._id,status).subscribe()
                                 }
 
-                                if(dateObject.getTime()>today.getTime())
+                                if(dateObject.getTime()>todayMillis)
                                 {
                                   expirado='Vigente'
                                   color='#68B29A'//verde
@@ -273,7 +275,7 @@ export class ReservasComponentComponent implements OnInit {
                           (err)=>{
                             if (err)
                             {
-                              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+                              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                               modalRef.componentInstance.mensaje='No se Pudo Cargar la Tabla'
                               modalRef.componentInstance.alertHeader='Error'
                               modalRef.result.then((result) => {
@@ -290,24 +292,26 @@ export class ReservasComponentComponent implements OnInit {
     }
     
     
-   formatFechas()
-    {
-      const diaLlegada = parseInt(this.huesped.llegada.split("/")[0])
-      const mesLlegada = parseInt(this.huesped.llegada.split("/")[1])
-      const anoLlegada = parseInt(this.huesped.llegada.split("/")[2])
-      const fechaLlegada = new Date(anoLlegada,mesLlegada,diaLlegada)
-      this.fullFechaLlegada = fechaLlegada.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaLlegada.getUTCMonth()) + "/" + fechaLlegada.getFullYear().toString()
+  //  formatFechas()
+  //   {
+  //     const diaLlegada = parseInt(this.huesped.llegada.split("/")[0])
+  //     const mesLlegada = parseInt(this.huesped.llegada.split("/")[1])
+  //     const anoLlegada = parseInt(this.huesped.llegada.split("/")[2])
+  //     const fechaLlegada = new Date(anoLlegada,mesLlegada,diaLlegada)
+  //     this.fullFechaLlegada = fechaLlegada.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaLlegada.getUTCMonth()) + "/" + fechaLlegada.getFullYear().toString()
 
-      const diaSalida = parseInt(this.huesped.salida.split("/")[0])
-      const mesSalida = parseInt(this.huesped.salida.split("/")[1])
-      const anoSalida = parseInt(this.huesped.salida.split("/")[2])
-      const fechaSalida = new Date(anoSalida,mesSalida,diaSalida)
-      this.fullFechaSalida = fechaSalida.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaSalida.getUTCMonth()) + "/" + fechaSalida.getFullYear().toString()
-    }
+  //     const diaSalida = parseInt(this.huesped.salida.split("/")[0])
+  //     const mesSalida = parseInt(this.huesped.salida.split("/")[1])
+  //     const anoSalida = parseInt(this.huesped.salida.split("/")[2])
+  //     const fechaSalida = new Date(anoSalida,mesSalida,diaSalida)
+  //     this.fullFechaSalida = fechaSalida.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaSalida.getUTCMonth()) + "/" + fechaSalida.getFullYear().toString()
+  //   }
 
   loadForm() {
 
-    this.noches=-parseInt((this.huesped.llegada.toString()).split("/")[0])+parseInt((this.huesped.salida.toString()).split("/")[0])
+    this.noches= this.toDate.diff(this.fromDate, ["days"])
+
+    // this.noches=-parseInt((this.huesped.llegada.toString()).split("/")[0])+parseInt((this.huesped.salida.toString()).split("/")[0])
 
     this.formGroupPromesa = this.fb.group({
       promesaPago:['',Validators.required],
@@ -352,7 +356,7 @@ export class ReservasComponentComponent implements OnInit {
 
       (value)=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader='Exito'
         modalRef.componentInstance.mensaje = 'Datos del huesped Actualizados'
        
@@ -365,7 +369,7 @@ export class ReservasComponentComponent implements OnInit {
         this.isLoading=false
 
         if(error){
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader='Error'
         modalRef.componentInstance.mensaje = 'Error al Guardar Promesa de Pago'
 
@@ -382,7 +386,7 @@ export class ReservasComponentComponent implements OnInit {
 
   guardarPromesa(){
     if(this.formGroupPromesa.invalid){  
-      const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+      const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
       modalRef.componentInstance.alertHeader = 'Error'
       modalRef.componentInstance.mensaje='Seleccione una Fecha' 
       
@@ -396,7 +400,7 @@ let estatus='Vigente'
       (value)=>{
         this.isLoading=false
 
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader='Exito'
         modalRef.componentInstance.mensaje = 'Promesa de Pago Generada con Exito'
         modalRef.result.then((result) => {
@@ -416,7 +420,7 @@ let estatus='Vigente'
         this.isLoading=false
 
         if(err){
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader='Error'
         modalRef.componentInstance.mensaje = 'Error al Guardar Promesa de Pago'
         modalRef.result.then((result) => {
@@ -458,7 +462,7 @@ let estatus='Vigente'
   fechaSeleccionadaFinal(event){
     this.fromDate = event
 
-    this.comparadorInicial = new Date(event.year,event.month-1,event.day)
+    this.comparadorInicial = DateTime.fromString(event.year,event.month-1,event.day)
   
     this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
   
@@ -493,7 +497,7 @@ let estatus='Vigente'
   preguntasPrevias(row:any){
 
       if(row.Aplicado==false){
-        const modalRef = this.modalService.open(this.preguntaPrevia,{size:'sm'})
+        const modalRef = this.modalService.open(this.preguntaPrevia,{ size: 'sm', backdrop:'static' })
         modalRef.result.then( (value) =>
         {
 
@@ -513,7 +517,7 @@ let estatus='Vigente'
       );
       }else if (row.Aplicado==true)
       {
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader='Error'
         modalRef.componentInstance.mensaje='Este pago ya fue aplicado'
         setTimeout(() => {
@@ -555,7 +559,7 @@ let estatus='Vigente'
       (value)=>{
         this.isLoading=false
         
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader ='Exito'
         modalRef.componentInstance.mensaje ='Movimiento agregado al Estado de cuenta del cliente'
           setTimeout(() => {
@@ -584,7 +588,7 @@ let estatus='Vigente'
               if(error)
               {
       
-                const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
                 modalRef.componentInstance.alertHeader ='Error'
                 modalRef.componentInstance.mensaje ='No se pudo actualizar el estatus de la Promesa'
   
@@ -601,7 +605,7 @@ let estatus='Vigente'
         if(err)
         {
 
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader ='Error'
         modalRef.componentInstance.mensaje ='No se pudo Guardar el Pago Intente Nuevamente'
 

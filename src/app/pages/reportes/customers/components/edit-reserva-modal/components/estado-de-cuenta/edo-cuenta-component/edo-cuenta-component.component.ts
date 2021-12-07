@@ -100,7 +100,6 @@ export class EdoCuentaComponentComponent implements OnInit {
 
           if(result[i].Estatus=='Activo')
           { 
-            let fechaIncial : Date 
             let edoCuentaAlojamientoTemp
 
             let fromDate
@@ -272,7 +271,7 @@ export class EdoCuentaComponentComponent implements OnInit {
         if (err)
         {
 
-            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje=err.message
 

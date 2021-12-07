@@ -8,6 +8,8 @@ import { Huesped_Detail } from 'src/app/pages/reportes/_models/huesped.details.m
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Huesped_Detail_Service } from 'src/app/pages/reportes/_services/huesped.detail.service';
 import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import {DateTime} from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 const EMPTY_DETAILS ={
   ID_Socio:null,
@@ -40,11 +42,10 @@ export class HuespedComponentComponent implements OnInit {
   checkedListaNegra:boolean=false;
 
   /**DATES */
-  fromDate: NgbDate | null;
-  toDate: NgbDate | null;
+  fromDate: DateTime | null;
+  toDate: DateTime | null;
   fechaFinalBloqueo:string
   model: NgbDateStruct;
-  today = this.calendar.getToday();
 
   formGroup: FormGroup;
   facturacionFormGroup: FormGroup;
@@ -75,11 +76,14 @@ export class HuespedComponentComponent implements OnInit {
     public modal: NgbActiveModal,
     public fb : FormBuilder,
     public modalService : NgbModal,
-    private detallesService : Huesped_Detail_Service
+    private detallesService : Huesped_Detail_Service,
+    public parametrosService : ParametrosServiceService
   ) 
   {  
-    this.fromDate = calendar.getToday();
-    this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
+    this.fromDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}) ;
+    this.toDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}).plus({ days: 1 }) 
+    console.log(this.fromDate)
+    console.log(this.toDate)
     this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
   }
 
@@ -218,7 +222,7 @@ export class HuespedComponentComponent implements OnInit {
         this.detallesService.updateDetails(this.detailsList).subscribe(
           (response)=>{
             this.isLoading=false
-            const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='Exito'
               modalRef.componentInstance.mensaje = 'Datos del Huesped Actualizados con exito'
           },
@@ -227,7 +231,7 @@ export class HuespedComponentComponent implements OnInit {
             {
               this.isLoading=false
 
-              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='Error'
               modalRef.componentInstance.mensaje = 'No se pudieron actualizar los datos del detalle del huesped'
             }
@@ -238,7 +242,7 @@ export class HuespedComponentComponent implements OnInit {
         {
           this.isLoading=false
 
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Error'
           modalRef.componentInstance.mensaje = 'No se pudieron actualizar los datos del Huesped'
         }
@@ -264,7 +268,7 @@ export class HuespedComponentComponent implements OnInit {
       },
       (err)=>{
         if(err){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Error'
           modalRef.componentInstance.mensaje ='No se pudieron recuperar los datos del numero de Socio'
         }

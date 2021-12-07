@@ -71,7 +71,7 @@ export class ParametrosComponent implements OnInit {
         this.formGroup.controls['auditoria'].setValue(this.parametrosService.getCurrentParametrosValue.auditoria);
       },
       (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader='Error'
         modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
       })
@@ -87,7 +87,7 @@ export class ParametrosComponent implements OnInit {
         {this.zonaHoraria.push(DEFAULT_TIMEZONE)}
       },
       (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader = 'Error'
         modalRef.componentInstance.mensaje='No se pudo cargar la lista de zonas horarias intente actualizando la pagina'
       },
@@ -104,7 +104,7 @@ export class ParametrosComponent implements OnInit {
         {this.divisas.push(DEFAULT_DIVISA)}
       },
       (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader = 'Error'
         modalRef.componentInstance.mensaje='No se pudo cargar la lista de zonas horarias intente actualizando la pagina'
       },
@@ -171,7 +171,7 @@ export class ParametrosComponent implements OnInit {
       (value)=>{
         this.isLoading=false
 
-       const modalRef = this.modal.open(AlertsComponent,{size:'sm'})
+       const modalRef = this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
        modalRef.componentInstance.alertHeader='Exito'
        modalRef.componentInstance.mensaje='Parametros Actualizados con exito'
         this.getParametros()
@@ -179,7 +179,7 @@ export class ParametrosComponent implements OnInit {
       (error)=>{
         this.isLoading=false
 
-        const modalRef = this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef = this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader='Error'
         modalRef.componentInstance.mensaje='Hubo un error al guardar los parametros intente de nuevo mas tarde'
       },

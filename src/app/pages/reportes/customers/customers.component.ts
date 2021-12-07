@@ -387,7 +387,7 @@ this.origenService.getOrigenes()
   }
 
   bloqueo() {
-      const modalRef = this.modalService.open(BloqueoReservaModalComponent, { size: 'md' });
+      const modalRef = this.modalService.open(BloqueoReservaModalComponent, { size: 'md',backdrop: 'static' });
       modalRef.result.then( () =>
       this.customerService.fetch(),
       () => { }
@@ -401,7 +401,7 @@ this.origenService.getOrigenes()
 
     if(id==undefined)
     {
-      const modalRef = this.modalService.open(NuevaReservaModalComponent, { size: 'md' });
+      const modalRef = this.modalService.open(NuevaReservaModalComponent, { size: 'md',backdrop: 'static' });
       modalRef.componentInstance.folios = this.folios
       modalRef.componentInstance.id = id;
 
@@ -429,20 +429,21 @@ this.origenService.getOrigenes()
           this.huesped = huesped1;
           this.customerService.setCurrentHuespedValue=huesped1
           
-          const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md', });
+          const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md',backdrop: 'static' });
           modalRef.componentInstance.folio = id;
           modalRef.componentInstance.id = id;
-          modalRef.result.then(() =>
-            this.customerService.fetch(),
-            () => { }
-          );
+
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
-            }, (reason) => {
-                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-            });
+          }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+
+        
         });
         
+        this.customerService.fetch(),
+ 
         this.subscriptions.push(sb);
     }
   }
@@ -568,7 +569,7 @@ this.origenService.getOrigenes()
   //   .subscribe(
   //    ()=>
   //    {
-  //     this.modalService.open(this.exito,{size:'sm'}).result.then((result) => {
+  //     this.modalService.open(this.exito,{ size: 'sm', backdrop:'static' }).result.then((result) => {
   //       this.closeResult = `Closed with: ${result}`;
   //       }, (reason) => {
   //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -578,7 +579,7 @@ this.origenService.getOrigenes()
   //    (err)=>
   //    {
   //      console.log(err.message)
-  //     this.modalService.open(this.error,{size:'sm'}).result.then((result) => {
+  //     this.modalService.open(this.error,{ size: 'sm', backdrop:'static' }).result.then((result) => {
   //       this.closeResult = `Closed with: ${result}`;
   //       }, (reason) => {
   //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

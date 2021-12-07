@@ -12,6 +12,7 @@ import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 export class ConfirmationModalComponent implements OnInit {
 
   @Input() huesped;
+  @Input() estatus;
   closeResult: string;
   @ViewChild('exito') exito= null;
   @ViewChild('error') error= null;
@@ -32,12 +33,12 @@ export class ConfirmationModalComponent implements OnInit {
 
   cambiaEstatus(huesped:Huesped)
   {
-    
+    this.huesped.estatus=this.estatus
     this.customerService.updateHuesped(huesped)
     .subscribe(
      ()=>
      {
-      const modalRef = this.modalService.open(this.exito,{size:'sm'});
+      const modalRef = this.modalService.open(this.exito,{ size: 'sm', backdrop:'static' });
       
       modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -53,7 +54,7 @@ export class ConfirmationModalComponent implements OnInit {
      (err)=>
      {
        console.log(err.message)
-      const modalRef = this.modalService.open(this.error,{size:'sm'})
+      const modalRef = this.modalService.open(this.error,{ size: 'sm', backdrop:'static' })
       modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
         }, (reason) => {

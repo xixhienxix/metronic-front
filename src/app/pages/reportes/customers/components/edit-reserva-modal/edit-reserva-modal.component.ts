@@ -26,10 +26,25 @@ import { Edo_Cuenta_Service } from '../../../_services/edo_cuenta.service';
 import { HistoricoService } from '../../../_services/historico.service';
 import { AmaLlavesService } from '../../../_services/ama-llaves.service';
 import { Ama_De_Llaves } from '../../../_models/ama-llaves';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import {DateTime} from 'luxon'
+import { DisponibilidadService } from '../../../_services/disponibilidad.service';
+import { Disponibilidad } from '../../../_models/disponibilidad.model';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
 
+const DISPONIBILIDAD_DEFAULT:Disponibilidad ={
+id:1,
+Cuarto:'',
+Habitacion:100,
+Estatus:1,
+Dia:1,
+Mes:1,
+Ano:2021,
+Estatus_Ama_De_Llaves:'Limpia'
+
+}
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
@@ -116,7 +131,8 @@ export class EditReservaModalComponent implements OnInit {
 
   @Input()
         
-
+  //form
+  formGroup:FormGroup
 
     //DATETIMEPICKER RANGE
     fullFechaSalida:string
@@ -142,6 +158,9 @@ export class EditReservaModalComponent implements OnInit {
     mensaje_exito:string
 
     estatusArray:Estatus[]=[];
+
+    disponibilidadEstatus:Disponibilidad=DISPONIBILIDAD_DEFAULT
+
     checked: boolean = true;
     changeStyleVisible:string = ''
     setLabel:string="label label-lg label-light-primary label-inline"
@@ -162,6 +181,7 @@ export class EditReservaModalComponent implements OnInit {
     constructor(
       //Date Imports
       private modalService: NgbModal,
+      public fb:FormBuilder,
       public amaDeLlavesService:AmaLlavesService,
       public foliosService : FoliosService,
       public adicionalService : AdicionalService,
@@ -174,7 +194,9 @@ export class EditReservaModalComponent implements OnInit {
       private http: HttpClient,
       private emailService:EmailService,
       private estadoDeCuentaService:Edo_Cuenta_Service,
-      private historicoService : HistoricoService
+      private historicoService : HistoricoService,
+      public parametrosService:ParametrosServiceService,
+      public disponibilidadService:DisponibilidadService
       ) {
       }
 
@@ -186,9 +208,16 @@ export class EditReservaModalComponent implements OnInit {
       this.getEstatus();
       this.getAmaDeLlaves();
       this.getAmaDeLlavesByID();
+
+      this.formGroup = this.fb.group({
+        estatus : [this.customersService.getCurrentHuespedValue.estatus],
+        ama:[this.disponibilidadEstatus.Estatus_Ama_De_Llaves]
+      }) 
     }
 
-
+    get getFormGroupValues (){
+     return this.formGroup.controls
+    }
 
     // async getPrice(currency: string): Promise<number> {
     //   const response = await this.http.get(this.currentPriceUrl).toPromise();
@@ -211,11 +240,16 @@ export class EditReservaModalComponent implements OnInit {
     }
 
     getAmaDeLlavesByID(){
-      this.amaDeLlavesService.getAmaDeLlavesByID('La_Vid',1).subscribe(
-        (value)=>{
 
-            this.amaDeLlaves=value
-          
+      let habitacion=this.customerService.getCurrentHuespedValue.habitacion
+      let numeroCuarto=this.customerService.getCurrentHuespedValue.numeroCuarto
+      let diaDeHoy=DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
+       
+
+
+      this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
+        (value)=>{
+            this.disponibilidadEstatus=value[0]
         },
         (error)=>{
           console.log(error)
@@ -343,7 +377,6 @@ export class EditReservaModalComponent implements OnInit {
 
   backgroundColorAmadeLlaves(estatus:string){
     let color;
-
     for (let i=0;i<this.amaDeLlavesList.length;i++)
     {
       if(estatus==this.amaDeLlavesList[i].Descripcion)
@@ -354,7 +387,7 @@ export class EditReservaModalComponent implements OnInit {
     return color;
   }
 
-  openDialog(huesped:Huesped) {
+  openDialog(huesped:Huesped,estatus:string) {
     const modalRef = this.modalService.open(ConfirmationModalComponent,
       {
         scrollable: true,
@@ -375,11 +408,53 @@ export class EditReservaModalComponent implements OnInit {
   
   
     modalRef.componentInstance.huesped = huesped;
+    modalRef.componentInstance.estatus = estatus;
+
     modalRef.result.then((result) => {
+      if(result=='Cancel')
+      {
+        this.formGroup.patchValue(
+          {'estatus':this.customerService.getCurrentHuespedValue.estatus}
+        );
+
+        this.formGroup.controls['estatus'].setValue(this.customerService.getCurrentHuespedValue.estatus);
+      }
       console.log(result);
     }, (reason) => {
     });
     }
+
+    onChangeAma(estatus:string)
+    {
+      this.disponibilidadEstatus.Estatus_Ama_De_Llaves=estatus
+
+      this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
+        (value)=>{
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+          modalRef.componentInstance.alertHeader = 'Exito'
+          modalRef.componentInstance.mensaje='Estatus de habitacion Actualizado'
+        
+          modalRef.result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+
+            });
+            this.getAmaDeLlavesByID();
+       },
+        (error)=>{
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='No se pudo Actualizar el Estatus de Ama de Llaves'
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  
+              });
+            
+        })
+    } 
   
 
     onSelectHuesped(event : string)
@@ -418,7 +493,7 @@ export class EditReservaModalComponent implements OnInit {
           }
           if(totalAbonos<totalCargos)
           {
-            const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje='El huesped tiene saldo a Favor, aplique una devolucion antes de darle Check-Out'
 
@@ -444,7 +519,7 @@ export class EditReservaModalComponent implements OnInit {
               if(estatus==11){this.mensaje_exito="No-Show, para reactivar la reservacion haga click en el boton en la parte inferior"}
               if(estatus==12){this.mensaje_exito="Reservacion Cancelada con exito"}
               
-              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='EXITO'
               modalRef.componentInstance.mensaje=this.mensaje_exito
               modalRef.result.then((result) => {
@@ -466,7 +541,7 @@ export class EditReservaModalComponent implements OnInit {
 
                 this.isLoading=false
 
-                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                 modalRef.componentInstance.alertHeader='ERROR'
                 modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar el estatus, vuelve a intentarlo'
                 modalRef.result.then((result) => {
@@ -498,7 +573,7 @@ export class EditReservaModalComponent implements OnInit {
             ()=>
             {
               this.isLoading=false
-              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='EXITO'
               modalRef.componentInstance.mensaje = 'Chek-Out Realizado con Exito '
               
@@ -517,7 +592,7 @@ export class EditReservaModalComponent implements OnInit {
               if(err)
               {
 
-                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                 modalRef.componentInstance.alertHeader='ERROR'
                 modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento del Check-out intente de nuevo mas tarde'
                
@@ -535,7 +610,7 @@ export class EditReservaModalComponent implements OnInit {
       {
         this.isLoading=false
 
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader='ERROR'
         modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en el húesped '
         modalRef.result.then((result) => {
@@ -568,7 +643,7 @@ export class EditReservaModalComponent implements OnInit {
             },
             (error)=>{
               if(error){
-                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+                const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                 modalRef.componentInstance.alertHeader='ERROR'
                 modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento de Guardar al huesped en el historico'
                 setTimeout(() => {
@@ -586,7 +661,7 @@ export class EditReservaModalComponent implements OnInit {
     }
 
     openModifica(){
-      const modalRef = this.modalService.open(ModificaHuespedComponent,{size:'md'})
+      const modalRef = this.modalService.open(ModificaHuespedComponent,{ size: 'md', backdrop:'static' })
       modalRef.componentInstance.huesped = this.huesped;
 
       modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
@@ -631,7 +706,7 @@ export class EditReservaModalComponent implements OnInit {
     }
 
     openEnviarConfirmacion(){
-      const modalRef=this.modalService.open(this.emailModal,{size:'md'})
+      const modalRef=this.modalService.open(this.emailModal,{ size: 'md', backdrop:'static' })
       modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
         }, (reason) => {
@@ -648,7 +723,7 @@ export class EditReservaModalComponent implements OnInit {
           this.isLoading=false
 
           console.log(result)
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'EXITO'
           modalRef.componentInstance.mensaje = 'Email Enviado Con Exito'
           this.enviandoEmail=false
@@ -657,7 +732,7 @@ export class EditReservaModalComponent implements OnInit {
           this.isLoading=false
 
           if(err){
-            const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef.componentInstance.alertHeader = 'ERROR'
             modalRef.componentInstance.mensaje = err.message
             this.enviandoEmail=false

@@ -51,7 +51,7 @@ export class SuperUserComponent implements OnInit {
 
         if (error)
         {
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Error'
           modalRef.componentInstance.mensaje='Ocurrio un Error intente de nuevo mas tarde'
         }

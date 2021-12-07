@@ -8,7 +8,7 @@ import { Ama_De_Llaves } from '../_models/ama-llaves';
 const EMPTY_ESTAUTS = {
   _id:'',
   Descripcion:'SUCIA',
-  Color:'' 
+  Color:'',
 }
 
 @Injectable({
