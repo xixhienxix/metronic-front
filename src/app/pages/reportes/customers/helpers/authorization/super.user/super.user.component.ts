@@ -36,14 +36,10 @@ export class SuperUserComponent implements OnInit {
     this.authService.autoriza(this.getAutorizaForm.usuario.value,this.getAutorizaForm.password.value).subscribe(
       (value:any)=>{
         this.isLoading=false
-        if(value){
+        
           this.passBack(value)
           this.modal.close()
-        }else
-        {
-          this.passBack('')
-          this.modal.close()
-        }
+        
       },
       (error)=>
       {

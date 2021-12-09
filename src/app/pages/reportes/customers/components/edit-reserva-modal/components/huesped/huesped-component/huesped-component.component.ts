@@ -46,7 +46,9 @@ export class HuespedComponentComponent implements OnInit {
   toDate: DateTime | null;
   fechaFinalBloqueo:string
   model: NgbDateStruct;
-
+  today:DateTime|null;
+  todayString:string;
+  
   formGroup: FormGroup;
   facturacionFormGroup: FormGroup;
 
@@ -80,8 +82,10 @@ export class HuespedComponentComponent implements OnInit {
     public parametrosService : ParametrosServiceService
   ) 
   {  
-    this.fromDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}) ;
-    this.toDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}).plus({ days: 1 }) 
+    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+
+    this.fromDate = DateTime.now().setZone({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
+    this.toDate = DateTime.now().setZone({ zone: this.parametrosService.getCurrentParametrosValue.zona}) .plus({ days: 1 }) 
     console.log(this.fromDate)
     console.log(this.toDate)
     this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
@@ -161,6 +165,9 @@ export class HuespedComponentComponent implements OnInit {
     return this.formGroup.controls
   }
 
+  formatDate(fecha:any){
+  this.todayString= fecha.day+" de "+this.i18n.getMonthFullName(fecha.month)+" del "+fecha.year
+  }
 
   save() {
     this.getNumeroSocio();

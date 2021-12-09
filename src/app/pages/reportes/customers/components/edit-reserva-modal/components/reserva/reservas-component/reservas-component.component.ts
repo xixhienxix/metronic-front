@@ -82,8 +82,8 @@ export class ReservasComponentComponent implements OnInit {
   fullFechaLlegada:string
   fromDate: DateTime | null;
   toDate: DateTime | null;
-  comparadorInicial:Date
-  comparadorFinal:Date
+  comparadorInicial:DateTime
+  comparadorFinal:DateTime
   fechaFinalBloqueo:string=''
   fechaInicialBloqueo:string
   noches:number;
@@ -129,16 +129,17 @@ export class ReservasComponentComponent implements OnInit {
     public edoCuentaService:Edo_Cuenta_Service,
     public parametrosService:ParametrosServiceService
   ) {  
-    this.today = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
+    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
 
     this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
 
-    this.fromDate = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
+    this.fromDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
     // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
     this.toDate=this.today.plus({days:1})
-    this.minDate=DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
+    this.minDate=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
 
      this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
+
   }
 
   ngOnInit(): void {
@@ -146,6 +147,10 @@ export class ReservasComponentComponent implements OnInit {
     this.getAdicionales();
     this.customerService.huespedUpdate$.subscribe((value)=>{
       this.huesped=value
+      this.huesped.llegada.split('-')[0]
+      
+      this.fullFechaLlegada = this.huesped.llegada.split('/')[0]+" de "+this.i18n.getMonthFullName(+this.huesped.llegada.split('/')[1])+" del "+this.huesped.llegada.split('/')[2] 
+      this.fullFechaSalida=this.huesped.salida.split('/')[0]+" de "+this.i18n.getMonthFullName(+this.huesped.salida.split('/')[1])+" del "+this.huesped.salida.split('/')[2] 
 
       this.getPromesa();
       // this.formatFechas();
@@ -158,7 +163,6 @@ export class ReservasComponentComponent implements OnInit {
 
   // }
 
-  
     eliminarPromesa(_id:any){
       this.isLoading=true
       this.promesaService.borrarPromesa(_id).subscribe(
@@ -195,26 +199,20 @@ export class ReservasComponentComponent implements OnInit {
     {
     this.promesaService.getPromesas(this.huesped.folio).subscribe(
                           (result)=>{
-                            let today = DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona})
+                            let today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
 
                             for(let i =0;i<result.length;i++){
                               
                               let color =''
                               let colorAplicado='' //amarillo
-                              let fecha = result[i].Fecha.toString()
                               let expirado 
-                              // const dia = parseInt(fecha.toString().split('/')[0])
-                              // const mes = parseInt(fecha.toString().split('/')[1])
-                              // const ano = parseInt(fecha.toString().split('/')[2])
-                              // const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
+                           
                               
                               let todayMillis = today.toMillis()
-                              // let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
 
                               var dateParts50 = result[i].Fecha.toString().split("T")[0];
-                              var dateParts = dateParts50.toString().split("-");
-                              var dateObject = new Date(result[i].Fecha); 
-                              // var dateObject = new Date(parseInt(dateParts[0]), (parseInt(dateParts[2]) - 1), parseInt(dateParts[1])); 
+                              var dateObject = new DateTime.fromISO(dateParts50); 
+
                               console.log(dateObject)
 
                               if(result[i].Aplicado==false)
@@ -222,7 +220,7 @@ export class ReservasComponentComponent implements OnInit {
 
                                 colorAplicado='#f7347a'//rosa
                                 color='#68B29A'
-                                if(dateObject.getTime()<todayMillis)
+                                if(dateObject.ts<todayMillis)
                                 {
                                   let status = 'Expirado'
                                   expirado='Expirado'
@@ -230,7 +228,7 @@ export class ReservasComponentComponent implements OnInit {
                                   this.promesaService.updatePromesaEstatus(result[i]._id,status).subscribe()
                                 }
 
-                                if(dateObject.getTime()>todayMillis)
+                                if(dateObject.ts>todayMillis)
                                 {
                                   expirado='Vigente'
                                   color='#68B29A'//verde
@@ -292,20 +290,10 @@ export class ReservasComponentComponent implements OnInit {
     }
     
     
-  //  formatFechas()
-  //   {
-  //     const diaLlegada = parseInt(this.huesped.llegada.split("/")[0])
-  //     const mesLlegada = parseInt(this.huesped.llegada.split("/")[1])
-  //     const anoLlegada = parseInt(this.huesped.llegada.split("/")[2])
-  //     const fechaLlegada = new Date(anoLlegada,mesLlegada,diaLlegada)
-  //     this.fullFechaLlegada = fechaLlegada.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaLlegada.getUTCMonth()) + "/" + fechaLlegada.getFullYear().toString()
+    formatDate(fecha:any){
+      this.todayString= fecha.day+" de "+this.i18n.getMonthFullName(fecha.month)+" del "+fecha.year
+      }
 
-  //     const diaSalida = parseInt(this.huesped.salida.split("/")[0])
-  //     const mesSalida = parseInt(this.huesped.salida.split("/")[1])
-  //     const anoSalida = parseInt(this.huesped.salida.split("/")[2])
-  //     const fechaSalida = new Date(anoSalida,mesSalida,diaSalida)
-  //     this.fullFechaSalida = fechaSalida.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaSalida.getUTCMonth()) + "/" + fechaSalida.getFullYear().toString()
-  //   }
 
   loadForm() {
 
@@ -458,23 +446,6 @@ let estatus='Vigente'
   }
 
 
-
-  fechaSeleccionadaFinal(event){
-    this.fromDate = event
-
-    this.comparadorInicial = DateTime.fromString(event.year,event.month-1,event.day)
-  
-    this.fechaFinalBloqueo= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
-  
-    if(this.comparadorInicial>this.comparadorFinal)
-    {
-    }
-    else if(this.comparadorInicial<this.comparadorFinal)
-    {
-      
-    }
-  }
-
   setEstatus(value): void {
 
     for (let i=0;i<this.estatusArray.length;i++)
@@ -537,13 +508,13 @@ let estatus='Vigente'
     const dia = parseInt(row.Fecha.toString().split('/')[1])
     const mes = parseInt(row.Fecha.toString().split('/')[2])
     const ano = parseInt(row.Fecha.toString().split('/')[0])
-    const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
-    let fullFecha = fechaPromesa.getUTCDate().toString() + " de " + this.i18n.getMonthFullName(fechaPromesa.getUTCMonth()) + " del " + fechaPromesa.getFullYear().toString()
+    // const fechaPromesa = new Date(this.today.year,this.today.month,this.today.day)
+    let fullFecha = this.today.day + " de " + this.i18n.getMonthFullName(this.today.month) + " del " + this.today.year.toString()
 
     pago = {
 
       Folio:this.customerService.getCurrentHuespedValue.folio,
-      Fecha:new Date(),
+      Fecha:this.today,
       Referencia:'Anticipo',
       Descripcion:'Promesa de Pago: ' + fullFecha,
       Forma_de_Pago: row.Forma_De_Pago,

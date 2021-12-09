@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   OnDestroy,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { TranslationService } from './modules/i18n/translation.service';
 // language list
@@ -16,6 +17,11 @@ import { SplashScreenService } from './_metronic/partials/layout/splash-screen/s
 import { Router, NavigationEnd, NavigationError } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TableExtendedService } from './_metronic/shared/crud-table';
+import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
+import { Keepalive } from '@ng-idle/keepalive';
+import { AlertsComponent } from './pages/reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'body[root]',
@@ -26,12 +32,16 @@ import { TableExtendedService } from './_metronic/shared/crud-table';
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
+
   constructor(
+
     private translationService: TranslationService,
     private splashScreenService: SplashScreenService,
     private router: Router,
-    private tableService: TableExtendedService
+    private tableService: TableExtendedService,
   ) {
+
+
     // register translations
     this.translationService.loadTranslations(
       enLang,
@@ -42,6 +52,8 @@ export class AppComponent implements OnInit, OnDestroy {
       frLang
     );
   }
+
+
 
   ngOnInit() {
     const routerSubscription = this.router.events.subscribe((event) => {
@@ -60,8 +72,14 @@ export class AppComponent implements OnInit, OnDestroy {
         }, 500);
       }
     });
+
+     
+
+
     this.unsubscribe.push(routerSubscription);
   }
+  
+
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());

@@ -11,6 +11,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthService } from './modules/auth/_services/auth.service';
 import { environment } from 'src/environments/environment';
+import { NgIdleKeepaliveModule } from '@ng-idle/keepalive'; // this includes the core NgIdleModule but includes keepalive providers for easy wireup
+import { MomentModule } from 'angular2-moment'; // optional, provides moment-style pipes for date formatting
+
 // Highlight JS
 import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { SplashScreenModule } from './_metronic/partials/layout/splash-screen/splash-screen.module';
@@ -52,6 +55,8 @@ registerLocaleData(localeEs, 'es');
     HttpClientModule,
     HighlightModule,
     ClipboardModule,
+    NgIdleKeepaliveModule.forRoot(),
+    MomentModule,
     // MatTabsModule,
     // MatCheckboxModule,
     // MatExpansionModule,

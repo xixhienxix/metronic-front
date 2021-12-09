@@ -1,11 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject, of, Subscription, Subject, throwError } from 'rxjs';
-import { map, catchError, switchMap, finalize } from 'rxjs/operators';
+import { map, catchError, switchMap, finalize,timeout } from 'rxjs/operators';
 import { UserModel } from '../_models/user.model';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
-
 export interface AuthModel {
   _id:string,
   username:string,
@@ -147,7 +146,7 @@ export class AuthService implements OnDestroy {
    }
 
    autoriza(usuario:string,password:string){
-    return this.http.post(environment.apiUrl+'/auth/autoriza',{usuario,password})
+    return this.http.post(environment.apiUrl+'/auth/autoriza',{usuario,password}).pipe(timeout(5000))
    }
 
   ngOnDestroy(){

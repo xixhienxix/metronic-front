@@ -18,6 +18,8 @@ import { map, startWith } from 'rxjs/operators';
 import { DetalleComponent } from '../helpers/detalle/detalle.component';
 import { SuperUserComponent } from 'src/app/pages/reportes/customers/helpers/authorization/super.user/super.user.component';
 import { MatPaginator } from '@angular/material/paginator';
+import {DateTime} from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -114,7 +116,7 @@ export class TransaccionesComponentComponent implements OnInit {
   abonosChecked:boolean=false;
   cargosChecked:boolean=false;
   descuentosChecked:boolean=false;
-  fechaCancelado:Date;
+  fechaCancelado:DateTime;
 
   /**Forms */
   nuevosConceptosFormGroup:FormGroup;
@@ -142,7 +144,8 @@ export class TransaccionesComponentComponent implements OnInit {
     private edoCuentaService:Edo_Cuenta_Service,
     private codigosService:CodigosDeCargoService,
     private modalService: NgbModal,
-    private customerService:HuespedService
+    private customerService:HuespedService,
+    public parametrosService:ParametrosServiceService
 
     ) {
       this.subscription=this.edoCuentaService.getNotification().subscribe(data=>{
@@ -472,10 +475,10 @@ this.nuevosConceptos=false
 
       });
     modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
-      
-          if(receivedEntry)
+
+          if(receivedEntry.id==3)
           {
-            this.fechaCancelado=new Date()
+            this.fechaCancelado=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
             
                   if(edo_cuenta.Forma_De_Pago=='No Aplica')
                   {
@@ -517,12 +520,12 @@ this.nuevosConceptos=false
                     }
                   }
                     )
-          }else 
+          }
+          else 
           {
-            const modalRef2= this.modalService.open(AlertsComponent,{ size: 'md', backdrop:'static' })
+            const modalRef2= this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef2.componentInstance.alertHeader='Error'
-            modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
-            return
+            modalRef2.componentInstance.mensaje=receivedEntry.message
           }
       })
 
@@ -757,8 +760,7 @@ this.nuevosConceptos=false
 
   onSubmit(){
     
-    
-
+  
     let pago:edoCuenta;
 
     if(this.nuevosConceptos)
@@ -774,7 +776,7 @@ this.nuevosConceptos=false
         pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:'',
         Descripcion:this.nuevas.nuevoConcepto.value,
@@ -797,7 +799,7 @@ this.nuevosConceptos=false
         pago = {
 
           Folio:this.customerService.getCurrentHuespedValue.folio,
-          Fecha:new Date(),
+          Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
           Fecha_Cancelado:'',
           Referencia:'',
           Descripcion:this.codigoDeCargo.Descripcion,
@@ -874,7 +876,7 @@ this.isLoading=true
       pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:this.abonosf.notaAbono.value,
         Descripcion:this.abonosf.conceptoManual.value,
@@ -950,7 +952,7 @@ this.isLoading=true
       descuento = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:'',
         Descripcion:this.second.motivoDesc.value,
@@ -971,7 +973,7 @@ this.isLoading=true
       descuento = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Referencia:'',
         Descripcion:this.second.motivoDesc.value + ' ('+this.second.qtyPrecio.value+'%'+')',
         Forma_de_Pago:'Descuento',
@@ -1054,7 +1056,7 @@ this.isLoading=true
     modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
       this.isLoading=false
 
-          if(receivedEntry)
+          if(receivedEntry!='Usuario No Autorizado')
           {
             this.aplicaDescuento(receivedEntry.username);
           }else 

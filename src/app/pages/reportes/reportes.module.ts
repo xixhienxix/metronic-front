@@ -187,6 +187,7 @@ registerLocaleData(localeEs);
     EditSpecModalComponent,
     DialogComponent,
     BloqueoReservaModalComponent,
+    
 
 
   ],

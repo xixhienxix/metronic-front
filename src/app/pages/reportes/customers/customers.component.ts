@@ -48,6 +48,7 @@ import { Origen } from '../_models/origen.model';
 import { BloqueoReservaModalComponent } from './components/bloqueo-customer-modal/bloqueo-reserva-modal.component';
 import { ConfirmationModalComponent } from './components/helpers/confirmation-modal/confirmation-modal/confirmation-modal.component';
 import { OrigenService } from '../_services/origen.service';
+import { IddleService } from '../_services/iddle.service';
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -148,7 +149,7 @@ export class CustomersComponent
     public origenService : OrigenService,
     public disponibilidadSercice : DisponibilidadService,
     public estatusService : EstatusService,
-
+    private iddleService:IddleService
 
   ) {
 
@@ -157,6 +158,7 @@ export class CustomersComponent
 
   // angular lifecircle hooks
   ngOnInit(): void {
+    this.iddleService.initiateIddle();
     this.postService.getPost();
     this.getFolios();
     this.getCuartos();
