@@ -6,7 +6,16 @@
   </div>
   <div class="modal-body">
     <p>{{mensaje}}</p>
+
+    <ng-container *ngIf="isProgress">
+      <p>{{countdown}}</p>
+      <!-- <mat-progress-bar value="40"></mat-progress-bar> -->
+    </ng-container>
+
   </div>
-  <div class="modal-footer">
+
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Aceptar')">Aceptar</button>
     <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
   </div>

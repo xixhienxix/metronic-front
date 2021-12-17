@@ -33,6 +33,8 @@ import { DialogComponent } from './pages/reportes/customers/components/nueva-res
 //Locale i18n
 import localeEs from '@angular/common/locales/es-MX';
 import { registerLocaleData } from '@angular/common';
+import { SharedModule } from './shared/shared.module';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 
 function appInitializer(authService: AuthService) {
@@ -57,6 +59,8 @@ registerLocaleData(localeEs, 'es');
     ClipboardModule,
     NgIdleKeepaliveModule.forRoot(),
     MomentModule,
+    SharedModule,
+    MatProgressBarModule,
     // MatTabsModule,
     // MatCheckboxModule,
     // MatExpansionModule,

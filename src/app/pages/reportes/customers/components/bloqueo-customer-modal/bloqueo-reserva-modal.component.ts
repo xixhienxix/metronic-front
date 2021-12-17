@@ -20,7 +20,7 @@ import {FormControl} from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
-import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import {DateTime} from 'luxon'
 
 let date: Date = new Date();

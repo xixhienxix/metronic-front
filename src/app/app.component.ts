@@ -19,8 +19,9 @@ import { Subscription } from 'rxjs';
 import { TableExtendedService } from './_metronic/shared/crud-table';
 import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
 import { Keepalive } from '@ng-idle/keepalive';
-import { AlertsComponent } from './pages/reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from './main/alerts/alerts.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DivisasService } from './pages/parametros/_services/divisas.service';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -39,6 +40,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private splashScreenService: SplashScreenService,
     private router: Router,
     private tableService: TableExtendedService,
+    private divisasService:DivisasService,
+    private modalService:NgbModal
   ) {
 
 
@@ -56,13 +59,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    this.divisasService.getcurrentDivisa
     const routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         // clear filtration paginations and others
         this.tableService.setDefaults();
         // hide splash screen
         this.splashScreenService.hide();
-
+        //dismiss all modals
+        this.modalService.dismissAll();
         // scroll to top on every route change
         window.scrollTo(0, 0);
 

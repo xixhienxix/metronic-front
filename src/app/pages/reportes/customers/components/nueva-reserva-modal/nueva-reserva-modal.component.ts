@@ -27,9 +27,10 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import {HistoricoService} from '../../../_services/historico.service'
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {preAsigModel} from '../../../_models/_models_helpers/preAsig'
-import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import {DateTime} from 'luxon'
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
 // const todayDate = new Date();
 
@@ -196,6 +197,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     private http: HttpClient,
     public i18n: NgbDatepickerI18n,
     public parametrosService:ParametrosServiceService,
+    public divisasService:DivisasService
     ) {
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
@@ -985,6 +987,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 
   onDateSelection(date: NgbDate) {
+
+    this.preAsig.clear();
 
     let fromDateNGB = {
       "year": this.fromDate.year,

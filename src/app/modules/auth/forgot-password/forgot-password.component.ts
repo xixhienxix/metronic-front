@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { first } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsComponent } from 'src/app/pages/reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 enum ErrorStates {
   NotSubmitted,
   HasError,

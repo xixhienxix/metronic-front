@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsComponent } from '../reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../main/alerts/alerts.component';
 import { Divisas } from './_models/divisas';
 import { Parametros } from './_models/parametros';
 import { TimeZones } from './_models/timezone';

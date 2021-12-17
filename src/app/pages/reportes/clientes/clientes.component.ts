@@ -30,6 +30,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { Subscription } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { Historico } from '../_models/historico.model';
+import { DivisasService } from '../../parametros/_services/divisas.service';
 
 
 @Component({
@@ -69,7 +70,8 @@ export class ClientesComponent implements OnInit {
   constructor(
     public clientesServices : ClientesService,
     public modalService:NgbModal,
-    public fb : FormBuilder
+    public fb : FormBuilder,
+    public divisasService : DivisasService
     ) 
     {  
       

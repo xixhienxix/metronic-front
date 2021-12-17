@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/app/modules/auth';
-import { AlertsComponent } from '../../../components/helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../main/alerts/alerts.component';
 
 @Component({
   selector: 'app-super.user',

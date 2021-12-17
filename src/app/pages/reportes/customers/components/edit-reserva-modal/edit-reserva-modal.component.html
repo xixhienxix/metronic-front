@@ -91,7 +91,7 @@
     </div>
 
     <label  style="color: white; font-size: large;">
-      $ {{ (customerService.getCurrentHuespedValue.porPagar).toLocaleString("es-MX") }}.00
+      {{this.divisasService.getcurrentDivisa.Simbolo}} {{ (customerService.getCurrentHuespedValue.porPagar).toLocaleString("es-MX") }}.00
     </label>
   </div>
     
@@ -104,7 +104,7 @@
         <label style="color: white"> Pagos y Descuentos: </label>
       </div>
 
-      <label style="color: white;font-size: large;"> $ {{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX")}}.00 </label>
+      <label style="color: white;font-size: large;"> {{this.divisasService.getcurrentDivisa.Simbolo}} {{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX")}}.00 </label>
     </div>
 
     <div
@@ -116,7 +116,7 @@
     </div>
 
     <label style="color: white;font-size: large;">
-      $ {{ (customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX") }}.00
+      {{this.divisasService.getcurrentDivisa.Simbolo}} {{ (customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX") }}.00
     </label>
   </div>
   </div>

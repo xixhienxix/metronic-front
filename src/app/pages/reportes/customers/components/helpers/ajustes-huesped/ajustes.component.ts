@@ -3,13 +3,14 @@ import { ModalDismissReasons, NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-
 import { edoCuenta } from 'src/app/pages/reportes/_models/edoCuenta.model';
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 import { EditReservaModalComponent } from '../../edit-reserva-modal/edit-reserva-modal.component';
-import { AlertsComponent } from '../alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../main/alerts/alerts.component';
 import {MatTableDataSource} from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
 export interface Transacciones {
   Fecha: Date;
@@ -67,6 +68,7 @@ export class AjustesComponent implements OnInit {
     private modalService : NgbModal,
     private fb : FormBuilder,
     private modal : NgbActiveModal,
+    public divisasService:DivisasService
     ) { 
 
       // this.edoCuentaService.edoCuentaSubject.subscribe(

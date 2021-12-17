@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { HttpClient } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { catchError, map, tap } from 'rxjs/operators';
+import { Huesped } from '../_models/customer.model';
 
 
 
@@ -38,9 +39,9 @@ export class EstatusService  {
 
   }
 
-  actualizaEstatus(estatus,folio){
+  actualizaEstatus(estatus,folio,huesped:Huesped){
 
-    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio})
+    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio,huesped:huesped})
 
   }
 

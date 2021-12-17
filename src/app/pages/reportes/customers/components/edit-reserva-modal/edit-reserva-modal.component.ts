@@ -21,7 +21,7 @@ import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { ModificaHuespedComponent } from '../helpers/modifica-huesped/modifica-huesped.component';
 import { TransaccionesComponentComponent } from './components/transacciones/transacciones-component/transacciones-component.component';
 import { EmailService } from '../../../_services/email.service';
-import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import { Edo_Cuenta_Service } from '../../../_services/edo_cuenta.service';
 import { HistoricoService } from '../../../_services/historico.service';
 import { AmaLlavesService } from '../../../_services/ama-llaves.service';
@@ -30,6 +30,8 @@ import { ParametrosServiceService } from 'src/app/pages/parametros/_services/par
 import {DateTime} from 'luxon'
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 import { Disponibilidad } from '../../../_models/disponibilidad.model';
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
+import { edoCuenta } from '../../../_models/edoCuenta.model';
 
 const todayDate = new Date();
 const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
@@ -140,6 +142,7 @@ export class EditReservaModalComponent implements OnInit {
     hoveredDate: NgbDate | null = null;
     llegaHoy:Boolean;
     toDate: NgbDate | null;
+    todayDate: DateTime | null;
 
     closeResult: string;
 
@@ -196,13 +199,17 @@ export class EditReservaModalComponent implements OnInit {
       private estadoDeCuentaService:Edo_Cuenta_Service,
       private historicoService : HistoricoService,
       public parametrosService:ParametrosServiceService,
-      public disponibilidadService:DisponibilidadService
+      public disponibilidadService:DisponibilidadService,
+      public divisasService : DivisasService
       ) {
+        this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+
       }
 
 
 
     ngOnInit(): void {
+      this.divisasService.getcurrentDivisa
       this.isLoading$ = this.customersService.isLoading$;
       this.loadCustomer();
       this.getEstatus();
@@ -506,7 +513,7 @@ export class EditReservaModalComponent implements OnInit {
       }
 
 
-          this.estatusService.actualizaEstatus(estatus,folio)
+          this.estatusService.actualizaEstatus(estatus,folio,this.huesped)
           .subscribe(
             ()=>
             {
@@ -566,62 +573,188 @@ export class EditReservaModalComponent implements OnInit {
     {
       this.isLoading=true
 
-      if (this.huesped.pendiente==0)
+      let diaSalida = this.huesped.salida.split('/')[0]
+      let mesSalida = this.huesped.salida.split('/')[1]
+      let anoSalida = this.huesped.salida.split('/')[2]
+
+      let fechaSalida = DateTime.fromObject({year:anoSalida,month:mesSalida,day:diaSalida})
+      console.log(this.todayDate)
+      console.log(fechaSalida)
+      if(fechaSalida.startOf("day") > this.todayDate.startOf("day"))
       {
-        this.estatusService.actualizaEstatus(estatus,folio)
-          .subscribe(
-            ()=>
-            {
-              this.isLoading=false
-              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-              modalRef.componentInstance.alertHeader='EXITO'
-              modalRef.componentInstance.mensaje = 'Chek-Out Realizado con Exito '
-              
-                setTimeout(() => {
-                  modalRef.close('Close click');
-                },4000)
-
-                this.postHistorico(this.huesped.folio);
-
-            this.customerService.fetch();
-
-            },
-            (err)=>{
-              this.isLoading=false
-
-              if(err)
-              {
-
-                const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-                modalRef.componentInstance.alertHeader='ERROR'
-                modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento del Check-out intente de nuevo mas tarde'
-               
-                  setTimeout(() => {
-                    modalRef.close('Close click');
-                  },4000)
-                    }
-                    this.isLoading=false
-            },
-            ()=>{
-
-          });
-
-      }else
-      {
-        this.isLoading=false
-
-        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-        modalRef.componentInstance.alertHeader='ERROR'
-        modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en el húesped '
+        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertHeader='Advertencia'
+        modalRef.componentInstance.mensaje = 'La fecha de salida del huesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
+       
         modalRef.result.then((result) => {
+          console.log(result)
+          if(result=='Aceptar')
+          {
+            const alojamiento:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(alojamiento => alojamiento.Descripcion == 'Alojamiento');
+            const abonos:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(abonos=> abonos.Abono>0)
+
+            const totalAbonos = abonos.reduce((previus,current)=>previus+current.Abono,0)
+
+            const diff = this.todayDate.diff(fechaSalida, ["days"])
+
+            const tarifaDiff = alojamiento[0].Cargo-(this.huesped.tarifa*diff)
+
+
+            if(alojamiento[0].Cargo-totalAbonos==0)
+            {   
+              this.huesped.pendiente==0
+              this.huesped.porPagar==0
+              this.huesped.noches==diff
+              
+              for(let i=1;i<=diff;i++){
+              
+                const fecha = this.todayDate.plus({days:i})
+  
+                let dispo:Disponibilidad = {
+                  Cuarto:this.huesped.habitacion,
+                  Habitacion:this.huesped.numeroCuarto,
+                  Estatus:1,
+                  Dia:fecha.dia,
+                  Mes:fecha.month,
+                  Ano:fecha.year,
+                  Estatus_Ama_De_Llaves:'Limpia',
+                }
+                this.disponibilidadService.actualizaDisponibilidad(dispo).subscribe(
+                  (value)=>{
+                    this.estatusService.actualizaEstatus(4,folio,this.huesped).subscribe(
+                      ()=>
+                      {
+                        this.isLoading=false
+                        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+                        modalRef.componentInstance.alertHeader='EXITO'
+                        modalRef.componentInstance.mensaje = 'Chek-Out Realizado con Exito '
+                        
+                          setTimeout(() => {
+                            modalRef.close('Close click');
+                          },4000)
+      
+                          this.postHistorico(this.huesped.folio);
+      
+                      this.customerService.fetch();
+                      this.modal.dismiss();
+  
+                      this.estadoDeCuentaService.actualizaSaldo(result[0]._id,tarifaDiff).subscribe(
+                        (value)=>{   },
+                        (error)=>{   })
+                      },
+                      (err)=>{
+                        this.isLoading=false
+      
+                        if(err)
+                        {
+      
+                          const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+                          modalRef.componentInstance.alertHeader='ERROR'
+                          modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento del Check-out intente de nuevo mas tarde'
+                        
+                            setTimeout(() => {
+                              modalRef.close('Close click');
+                            },4000)
+                              }
+                              this.isLoading=false
+                      },
+                      ()=>{
+      
+                    });
+                    
+                  },
+                  (error)=>{}
+                  )
+              }
+
+
+            }else{
+              this.isLoading=false
+
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+            modalRef.componentInstance.alertHeader='ERROR'
+            modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en la cuenta'
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                if(reason=='Aceptar'){
+
+                }
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              });
+              setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
+            }
+          }
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
+            console.log((reason));
+            
               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
           });
-          setTimeout(() => {
-            modalRef.close('Close click');
-          },4000)
-      }
+        
+           
+
+      }else 
+      {
+          if (this.huesped.pendiente==0)
+          {
+            this.estatusService.actualizaEstatus(estatus,folio,this.huesped)
+              .subscribe(
+                ()=>
+                {
+                  this.isLoading=false
+                  const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+                  modalRef.componentInstance.alertHeader='EXITO'
+                  modalRef.componentInstance.mensaje = 'Chek-Out Realizado con Exito '
+                  
+                    setTimeout(() => {
+                      modalRef.close('Close click');
+                    },4000)
+
+                    this.postHistorico(this.huesped.folio);
+
+                this.customerService.fetch();
+                this.modal.dismiss();
+                },
+                (err)=>{
+                  this.isLoading=false
+
+                  if(err)
+                  {
+
+                    const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+                    modalRef.componentInstance.alertHeader='ERROR'
+                    modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento del Check-out intente de nuevo mas tarde'
+                  
+                      setTimeout(() => {
+                        modalRef.close('Close click');
+                      },4000)
+                        }
+                        this.isLoading=false
+                },
+                ()=>{
+
+              });
+
+          }else
+          {
+            this.isLoading=false
+
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+            modalRef.componentInstance.alertHeader='ERROR'
+            modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en el húesped '
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              });
+              setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
+          }
+        }
     }
 
     postHistorico(folio:number){

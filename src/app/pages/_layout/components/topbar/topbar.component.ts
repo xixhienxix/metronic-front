@@ -14,6 +14,7 @@ import { KTUtil } from '../../../../../assets/js/components/util';
 import { AuthModel } from 'src/app/modules/auth/_services/auth.service';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import {DateTime} from 'luxon'
+import { AuditoriaService } from 'src/app/main/_services/auditoria.service';
 
 @Component({
   selector: 'app-topbar',
@@ -23,6 +24,10 @@ import {DateTime} from 'luxon'
 export class TopbarComponent implements OnInit, AfterViewInit {
   user$: Observable<AuthModel>;
   fecha:Date
+  /*Temp Variables*/
+  fecha0:string;
+  fecha1:string;
+
   luxon:string
   // tobbar extras
   extraSearchDisplay: boolean;
@@ -38,14 +43,19 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   extrasUserDisplay: boolean;
   extrasUserLayout: 'offcanvas' | 'dropdown';
 
-  constructor(private layout: LayoutService, private auth: AuthService, public parametrosService:ParametrosServiceService) {
+  constructor(
+    private layout: LayoutService,
+    private auth: AuthService,
+    public parametrosService:ParametrosServiceService,
+    public auditoriaService:AuditoriaService
+      ) {
     this.user$ = this.auth.currentUserSubject.asObservable();
     this.parametrosService.getParametros().subscribe(
       (value)=>{
         this.fecha = new Date();
        this.fecha = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
-       console.log(this.fecha)
-     
+       this.fecha0=this.fecha.toString().split('T')[0]        
+       this.fecha1=this.fecha.toString().split('T')[1]      
       });
     
   }
@@ -78,6 +88,10 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     );
     this.user$ = this.auth.currentUserSubject.asObservable();
 
+  }
+
+  auditoria(){
+    this.auditoriaService.procesaAuditoria();
   }
 
   ngAfterViewInit(): void {

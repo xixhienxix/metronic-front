@@ -14,7 +14,7 @@ import { HuespedService } from 'src/app/pages/reportes/_services';
 import { AdicionalService } from 'src/app/pages/reportes/_services/adicional.service';
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 import { PromesaService } from 'src/app/pages/reportes/_services/promesa.service';
-import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../../../main/alerts/alerts.component';
 import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 

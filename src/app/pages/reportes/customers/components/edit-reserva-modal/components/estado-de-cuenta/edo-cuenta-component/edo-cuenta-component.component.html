@@ -375,7 +375,7 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-              $ {{totalCargos.toLocaleString('es-MX')}}
+              {{this.divisasService.getcurrentDivisa.Simbolo}} {{totalCargos.toLocaleString('es-MX')}}
               </label>
             </div>
         </div>
@@ -398,7 +398,7 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-              $ -{{totalDescuentos.toLocaleString('es-MX')}}
+              {{this.divisasService.getcurrentDivisa.Simbolo}} -{{totalDescuentos.toLocaleString('es-MX')}}
               </label>
             </div>
         </div>
@@ -420,7 +420,7 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-              $ -{{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString('es-MX')}}
+              {{this.divisasService.getcurrentDivisa.Simbolo}} -{{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString('es-MX')}}
               </label>
             </div>
         </div>
@@ -443,7 +443,7 @@
                 class="h4"
                 style="color: aliceblue; text-align: center; padding-top: 5px"
               >
-              $ {{(customerService.getCurrentHuespedValue.pendiente).toLocaleString('es-MX')}}
+              {{this.divisasService.getcurrentDivisa.Simbolo}} {{(customerService.getCurrentHuespedValue.pendiente).toLocaleString('es-MX')}}
               </label>
             </div>
         </div>

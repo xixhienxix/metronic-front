@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalDismissReasons, NgbActiveModal, NgbDatepickerI18n, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 import { edoCuenta } from 'src/app/pages/reportes/_models/edoCuenta.model';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
-import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../../../main/alerts/alerts.component';
 
 @Component({
   selector: 'app-edo-cuenta-component',
@@ -42,6 +43,7 @@ export class EdoCuentaComponentComponent implements OnInit {
     public estadoDeCuentaService:Edo_Cuenta_Service,
     public modalService:NgbModal,
     public i18n: NgbDatepickerI18n,
+    public divisasService:DivisasService
     
   ) {
     this.subscription=this.estadoDeCuentaService.getNotification().subscribe(data=>{

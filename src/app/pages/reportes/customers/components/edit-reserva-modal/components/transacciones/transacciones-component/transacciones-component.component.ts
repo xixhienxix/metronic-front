@@ -12,7 +12,7 @@ import { HuespedService } from 'src/app/pages/reportes/_services';
 import { AjustesComponent } from '../../../../helpers/ajustes-huesped/ajustes.component';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
-import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../../../main/alerts/alerts.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { map, startWith } from 'rxjs/operators';
 import { DetalleComponent } from '../helpers/detalle/detalle.component';
@@ -20,6 +20,7 @@ import { SuperUserComponent } from 'src/app/pages/reportes/customers/helpers/aut
 import { MatPaginator } from '@angular/material/paginator';
 import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -145,7 +146,8 @@ export class TransaccionesComponentComponent implements OnInit {
     private codigosService:CodigosDeCargoService,
     private modalService: NgbModal,
     private customerService:HuespedService,
-    public parametrosService:ParametrosServiceService
+    public parametrosService:ParametrosServiceService,
+    public divisasService:DivisasService
 
     ) {
       this.subscription=this.edoCuentaService.getNotification().subscribe(data=>{
@@ -164,6 +166,11 @@ export class TransaccionesComponentComponent implements OnInit {
 
     
   }
+
+  maxCantidad(){
+    this.abonosf.cantidadAbono.patchValue(this.customerService.getCurrentHuespedValue.pendiente)
+  }
+
   actualizaHuesped(huesped:Huesped)
   {
     this.customerService.updateHuesped(huesped).subscribe(
@@ -905,6 +912,7 @@ this.isLoading=true
           this.resetFiltros();
 
         this.formGroup.reset();
+        this.abonoFormGroup.reset();
         this.estadoDeCuenta=[]
         this.getEdoCuenta();
         
