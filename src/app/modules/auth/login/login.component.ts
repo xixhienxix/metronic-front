@@ -19,7 +19,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   isLoading:boolean
   
   loading:boolean;
-  private subscription: Subscription;
   message: any;
   // private fields
   private unsubscribe: Subscription[] = [];
@@ -65,7 +64,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   submit() {
     this.isLoading=true
-    this.authService.login(this.f.username.value,this.f.password.value).subscribe(
+    const sb = this.authService.login(this.f.username.value,this.f.password.value).subscribe(
       (value)=>
       {
         if(value)
@@ -86,6 +85,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       ()=>{
         console.log('finalize')
       })
+      this.unsubscribe.push(sb)
   }
 
   

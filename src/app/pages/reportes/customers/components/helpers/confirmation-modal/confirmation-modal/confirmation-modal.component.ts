@@ -3,6 +3,7 @@ import { NgbActiveModal,NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-confirmation-modal',
@@ -16,7 +17,7 @@ export class ConfirmationModalComponent implements OnInit {
   closeResult: string;
   @ViewChild('exito') exito= null;
   @ViewChild('error') error= null;
-
+  subscription:Subscription[]=[]
   constructor(
     public customerService: HuespedService,
     public activeModal: NgbActiveModal,
@@ -34,7 +35,7 @@ export class ConfirmationModalComponent implements OnInit {
   cambiaEstatus(huesped:Huesped)
   {
     this.huesped.estatus=this.estatus
-    this.customerService.updateHuesped(huesped)
+    const sb = this.customerService.updateHuesped(huesped)
     .subscribe(
      ()=>
      {
@@ -69,7 +70,7 @@ export class ConfirmationModalComponent implements OnInit {
      }
 
    )
-
+this.subscription.push(sb)
   }
 
   getDismissReason(reason: any): string {
@@ -81,4 +82,10 @@ export class ConfirmationModalComponent implements OnInit {
         return  `with: ${reason}`;
     }
 }
+
+ngOnDestroy(): void {
+  this.subscription.forEach(sb=> sb.unsubscribe());
 }
+}
+
+

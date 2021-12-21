@@ -61,7 +61,7 @@ export class ClientesComponent implements OnInit {
   closeResult: string;
 
     /**Subscription */
-    subscription:Subscription
+    subscription:Subscription[]=[]
 
   private subscriptions: Subscription[] = []; 
 
@@ -85,7 +85,7 @@ export class ClientesComponent implements OnInit {
   }
 
   getClientes(){
-    this.clientesServices.getClientes().subscribe(
+    const sb = this.clientesServices.getClientes().subscribe(
       (value:Historico[])=>{
         this.dataSource.data=value
       },
@@ -93,13 +93,17 @@ export class ClientesComponent implements OnInit {
 
       },
       ()=>{})
+      this.subscription.push(sb)
   }
 
   abrirDetalle(row:any){
 
   }
   
-  
+  ngOnDestroy():void
+  {
+    this.subscription.forEach(sb=>sb.unsubscribe())
+  }
   
   backgroundColor(estatus:string)
   {

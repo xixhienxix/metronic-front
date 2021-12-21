@@ -98,7 +98,8 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   comparadorInicial:Date
   comparadorFinal:Date
 
-
+  /**Subscription */
+  subscription:Subscription[]=[]
 
   fechaInvalida:boolean=false
 
@@ -181,12 +182,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
       this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
       this.comparadorInicial=new Date(DateTime.local(this.fromDate.year,this.fromDate.month,this.fromDate.day))
       this.comparadorFinal=new Date(DateTime.local(this.toDate.year,this.toDate.month,this.toDate.day))
-
-
-      console.log('fechaInicialBloqueo : '+this.fechaInicialBloqueo)
-      console.log('fechaFinalBloqueo : '+this.fechaFinalBloqueo)
-      console.log('comparadorInicial : '+this.comparadorInicial)
-      console.log('comparadorFinal : '+this.comparadorFinal)
     }
 
 
@@ -227,7 +222,7 @@ onFormSubmit(value: string) {
 
 
 getParametros(){
-  this.parametrosService.getParametros().subscribe(
+ const sb = this.parametrosService.getParametros().subscribe(
     (value)=>{
       
     },
@@ -236,21 +231,24 @@ getParametros(){
       modalRef.componentInstance.alertsHeader='Error'
       modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
     })
+    this.subscription.push(sb)
 }
 
   getHabitaciones()
   {
-    this.habitacionService.gethabitaciones()
+    const sb =this.habitacionService.gethabitaciones()
     .subscribe((infoCuartos)=>{
       this.infoCuarto=infoCuartos
     })
+
+    this.subscription.push(sb)
 
   }
 
   getCodigosCuarto()
   {
     this.codigoCuarto=[]
-    this.habitacionService.getCodigohabitaciones()
+    const sb = this.habitacionService.getCodigohabitaciones()
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -264,11 +262,12 @@ getParametros(){
       .subscribe((codigoCuarto)=>{
         this.codigoCuarto=(codigoCuarto)
       })
+      this.subscription.push(sb)
   }
 
   getEstatus()
    {
-    this.estatusService.getEstatus()
+   const sb = this.estatusService.getEstatus()
                       .pipe(map(
                         (responseData)=>{
                           const postArray = []
@@ -285,6 +284,7 @@ getParametros(){
                             this.estatusArray=estatus
                           }
                         })
+                        this.subscription.push(sb)
 
   }
 
@@ -292,12 +292,13 @@ getParametros(){
   getBloqueos()
   {
     this.listaBloqueos=[];
-      this.bloqueoService.getBloqueos().subscribe((responseData)=>{
+      const sb = this.bloqueoService.getBloqueos().subscribe((responseData)=>{
         this.listaBloqueos=responseData
         this.isLoading=false
       }, error=>{
         this.error="Algo Salio Mal Actualize la pagina"
       });
+      this.subscription.push(sb)
   }
 
 
@@ -333,7 +334,7 @@ getParametros(){
         let unique = this.tipodeCuartoFiltrados.filter(this.onlyUnique)
 
 
-  let post = this.bloqueoService.postBloqueo
+  const sb = this.bloqueoService.postBloqueo
     (
       "_id",
       desde,
@@ -362,6 +363,8 @@ getParametros(){
        //Complete Regardless
       },
     );
+    this.subscription.push(sb)
+
       this.listaBloqueos=[]
       unique=[]
       this.numCuarto=[]
@@ -413,17 +416,17 @@ initializeBloqueo(){
 
   borrar(_id:string,desde:string,hasta:string,habitacion:Array<string>,numero:Array<number>) {
 
-    this.bloqueoService.deleteBloqueo(_id).subscribe((response)=>{
+   const sb = this.bloqueoService.deleteBloqueo(_id).subscribe((response)=>{
       if(response.status==200)
         {
           this.statusBloqueo="Bloqueo Borrado Correctamente"
           this.openMini(this.miniModal)
 
-          this.bloqueoService.liberaBloqueos(_id,desde,hasta,habitacion,numero).subscribe((response)=>{
+         const sb = this.bloqueoService.liberaBloqueos(_id,desde,hasta,habitacion,numero).subscribe((response)=>{
             console.log("liberaDispo response",response)
           });
 
-
+          this.subscription.push(sb)
         }
         else
         {
@@ -431,31 +434,13 @@ initializeBloqueo(){
           this.openMini(this.miniModal)
         }
       })
-
-    //this
-    // .subscribe((response)=>{
-    //   console.log("suscribe",response)
-    //   if(response.status==200)
-    //   {
-    //     this.statusBloqueo="Bloqueo Borrado Correctamente"
-    //     this.openMini(this.miniModal)
-
-    //     this.bloqueoService.liberaBloqueos(_id,desde,hasta,habitacion,numero).subscribe((response)=>{
-    //       console.log("liberaDispo response",response)
-    //     });
-    //   }
-    //   else
-    //   {
-    //     this.statusBloqueo="Hubo un problema al eliminar el bloqueo, Actualize la pagina y intente nuevamente"
-    //     this.openMini(this.miniModal)
-    //   }
-    // });
+      this.subscription.push(sb)
 
   }
 
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sb => sb.unsubscribe());
+   this.subscriptions.forEach(sb => sb.unsubscribe());
   }
 
 
@@ -506,7 +491,7 @@ initializeBloqueo(){
     {
         for (let i=0; i<diaDif; i++) {
 
-        this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
+       const sb = this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
         .pipe(map(
           (responseData)=>{
             const postArray = []
@@ -533,6 +518,7 @@ initializeBloqueo(){
               this.mySet.delete(this.sinDisponibilidad[i])
             }
           })
+          this.subscription.push(sb)
           fromDate.setDate(fromDate.getDate() + 1);
         };
     }
@@ -540,7 +526,7 @@ initializeBloqueo(){
     else
     {
 
-      this.habitacionService.getHabitacionesbyTipo(this.cuarto)
+      const sb = this.habitacionService.getHabitacionesbyTipo(this.cuarto)
       .pipe(map(
         (responseData)=>{
           const postArray = []
@@ -555,10 +541,11 @@ initializeBloqueo(){
           this.cuartos=(cuartos)
         })
 
+      this.subscription.push(sb)
 
       for (let i=0; i<diaDif; i++) {
 
-      this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
+      const sb = this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
       .pipe(map(
         (responseData)=>{
           const postArray = []
@@ -587,6 +574,7 @@ initializeBloqueo(){
 
           console.log("mySet x tipo",this.mySet)
         })
+        this.subscription.push(sb)
         fromDate.setDate(fromDate.getDate() + 1);
       };
 
@@ -601,7 +589,7 @@ initializeBloqueo(){
     let indexTipo;
     let codigo;
 
-    this.habitacionService.getHabitacionbyNumero(value)
+    const sb = this.habitacionService.getHabitacionbyNumero(value)
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -628,7 +616,7 @@ initializeBloqueo(){
           this.tipodeCuartoFiltrados.splice(indexTipo,1)
         }
       })
-
+this.subscription.push(sb)
     //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
@@ -647,7 +635,7 @@ initializeBloqueo(){
     if($event.target.options.selectedIndex==1)
     {
         this.cuarto=""
-        this.habitacionService.gethabitaciones()
+       const sb = this.habitacionService.gethabitaciones()
         .pipe(map(
           (responseData)=>{
             const postArray = []
@@ -662,6 +650,7 @@ initializeBloqueo(){
             this.cuartos=(cuartos)
             console.log("buscaDispo this.cuartos",this.cuartos)
           })
+          this.subscription.push(sb)
     }else
     {
       this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
@@ -783,5 +772,6 @@ okayChecked() {
 closeModal(){
   this.modal.close();
 }
+
 
   }

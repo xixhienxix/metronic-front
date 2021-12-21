@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { AlertsComponent } from '../../main/alerts/alerts.component';
 import { Divisas } from './_models/divisas';
 import { Parametros } from './_models/parametros';
@@ -33,6 +34,8 @@ export class ParametrosComponent implements OnInit {
   /**SIte Helpers */
   isLoading:Boolean=false
 
+  susbcription:Subscription[]=[]
+
   formGroup : FormGroup
   zonaHoraria:TimeZones[]=[]
   fechas:Date
@@ -58,6 +61,11 @@ export class ParametrosComponent implements OnInit {
     this.getDivisas();
     this.initForm();
   }
+
+  ngOnDestroy():void
+  {
+    this.susbcription.forEach(sb=>sb.unsubscribe())
+  }
   
   getParametros(){
     this.parametrosService.getParametros().subscribe(
@@ -79,7 +87,7 @@ export class ParametrosComponent implements OnInit {
 
   getTimeZones()
   {
-    this.timezonesService.getTimeZones().subscribe(
+    const sb = this.timezonesService.getTimeZones().subscribe(
       (value:TimeZones[])=>{
         if(value)
         {this.zonaHoraria=value}
@@ -93,10 +101,11 @@ export class ParametrosComponent implements OnInit {
       },
       ()=>{}
       )
+      this.susbcription.push(sb)
   }
 
   getDivisas(){
-    this.divisasService.getDivisas().subscribe(
+    const sb = this.divisasService.getDivisas().subscribe(
       (value:Divisas[])=>{
         if(value)
         {this.divisas=value}
@@ -110,6 +119,7 @@ export class ParametrosComponent implements OnInit {
       },
       ()=>{}
       )
+      this.susbcription.push(sb)
   }
 
 
@@ -167,7 +177,7 @@ export class ParametrosComponent implements OnInit {
 
     }
 
-    this.parametrosService.postParametros(parametros).subscribe(
+    const sb = this.parametrosService.postParametros(parametros).subscribe(
       (value)=>{
         this.isLoading=false
 
@@ -184,7 +194,7 @@ export class ParametrosComponent implements OnInit {
         modalRef.componentInstance.mensaje='Hubo un error al guardar los parametros intente de nuevo mas tarde'
       },
       )
-
+this.susbcription.push(sb)
   }
 
 }

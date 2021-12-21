@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { ProgressBarMode } from '@angular/material/progress-bar';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { interval } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -16,7 +16,7 @@ export class AlertsComponent implements OnInit {
   interval:number
   countdown:number=0
   isProgress:boolean
-  
+  subscription:Subscription[]=[]
   
   constructor(public modal: NgbActiveModal,
     ) { }
@@ -26,15 +26,18 @@ export class AlertsComponent implements OnInit {
     var timer =  interval(1000).pipe(
       take(this.interval)
       );
-      timer.subscribe(x => 
+      const sb = timer.subscribe(x => 
         {
           this.countdown=this.interval-x
           console.log(this.interval-x)
           if(this.countdown==1){this.modal.close()}
         })
 
-
+this.subscription.push(sb)
   }
-
+  ngOnDestroy():void
+  {
+    this.subscription.forEach(sb=>sb.unsubscribe())
+  }
 
 }

@@ -36,7 +36,10 @@ export class ForgotPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
   }
-
+  ngOnDestroy():void
+  {
+    this.unsubscribe.forEach(sb=>sb.unsubscribe())
+  }
   // convenience getter for easy access to form fields
   get f() {
     return this.forgotPasswordForm.controls;

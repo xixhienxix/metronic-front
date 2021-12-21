@@ -19,6 +19,7 @@ import { AlertsComponent } from '../../../../../../main/alerts/alerts.component'
 import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-modifica-huesped',
@@ -65,6 +66,9 @@ export class ModificaHuespedComponent implements OnInit {
   tarifa:number;
   codigoCuartoString:string;
   codigo:any[]=[]
+
+  /*Subscription*/
+  subscription:Subscription[]=[]
 
   sinDisponibilidad:any[]=[]
   mySet = new Set();
@@ -127,7 +131,7 @@ export class ModificaHuespedComponent implements OnInit {
 
   getHabitaciones()
   {
-    this.habitacionService.gethabitaciones()
+   const sb = this.habitacionService.gethabitaciones()
     .subscribe((infoCuartos)=>{
       this.cuartos=(infoCuartos)
 
@@ -143,14 +147,14 @@ export class ModificaHuespedComponent implements OnInit {
       }
     })
 
-
+    this.subscription.push(sb)
    
   }
 
   getCodigosCuarto()
   {
     this.codigoCuarto=[]
-    this.habitacionService.getCodigohabitaciones()
+   const sb =  this.habitacionService.getCodigohabitaciones()
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -164,6 +168,8 @@ export class ModificaHuespedComponent implements OnInit {
       .subscribe((codigoCuarto)=>{
         this.codigoCuarto=(codigoCuarto)
       })
+
+      this.subscription.push(sb)
   }
 
   loadForm() {
@@ -294,7 +300,7 @@ export class ModificaHuespedComponent implements OnInit {
           // this.bandera=false;
           for (let i=0; i<(diaDif.days+1); i++) 
             {
-            this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year)
+          const sb = this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year)
             .pipe(map(
               (responseData)=>{
                 const postArray = []
@@ -330,6 +336,7 @@ export class ModificaHuespedComponent implements OnInit {
                 }
               })
               dispoFromDate.plus({ days: 1 })
+              this.subscription.push(sb)
             };
         // })
     }
@@ -340,7 +347,7 @@ export class ModificaHuespedComponent implements OnInit {
       for (let i=0; i<(diaDif.days+1); i++)  
       {
 
-      this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
+      const sb = this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
       .pipe(map(
         (responseData)=>{
           const postArray = []
@@ -371,6 +378,7 @@ export class ModificaHuespedComponent implements OnInit {
           }
         })
         dispoFromDate.plus({ days: 1 })
+        this.subscription.push(sb)
       };
     }
 
@@ -383,10 +391,12 @@ export class ModificaHuespedComponent implements OnInit {
     let indexTipo;
     ;
 
-    this.habitacionService.getHabitacionbyNumero(value)
+   const sb =  this.habitacionService.getHabitacionbyNumero(value)
       .subscribe((cuartos)=>{
         this.codigo=(cuartos)
       })
+
+      this.subscription.push(sb)
 
   }
 
@@ -436,10 +446,10 @@ export class ModificaHuespedComponent implements OnInit {
     this.huesped.llegada=this.llegadaTemp
     this.huesped.salida=this.salidaTemp
 
-    this.customerService.updateHuespedModifica(this.huespedAnterior).subscribe(
+   const sb = this.customerService.updateHuespedModifica(this.huespedAnterior).subscribe(
       (value)=>{
         
-      this.customerService.updateHuesped(this.huesped).subscribe(
+     const sb = this.customerService.updateHuesped(this.huesped).subscribe(
         (value)=>{
 
           this.customerService.setCurrentHuespedValue=this.huesped
@@ -476,6 +486,7 @@ export class ModificaHuespedComponent implements OnInit {
             }
 
         })
+        this.subscription.push(sb)
           // const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           // modalRef.componentInstance.alertHeader = 'Exito'
           // modalRef.componentInstance.mensaje='Disponibilidad liberada con exito'
@@ -490,6 +501,7 @@ export class ModificaHuespedComponent implements OnInit {
         //   modalRef.componentInstance.mensaje='No se pudo liberar la Disponibilidad'
         // }
       })
+      this.subscription.push(sb)
    }
 
     okayChecked() {
@@ -519,5 +531,7 @@ export class ModificaHuespedComponent implements OnInit {
               return  `with: ${reason}`;
           }
     }
-
+    ngOnDestroy(): void {
+      this.subscription.forEach(sb => sb.unsubscribe())
+    }
 }

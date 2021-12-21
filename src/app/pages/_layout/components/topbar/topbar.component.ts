@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { LayoutService } from '../../../../_metronic/core';
 import { AuthService } from '../../../../modules/auth/_services/auth.service';
 import { UserModel } from '../../../../modules/auth/_models/user.model';
@@ -27,7 +27,7 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   /*Temp Variables*/
   fecha0:string;
   fecha1:string;
-
+  subscription:Subscription[]=[]
   luxon:string
   // tobbar extras
   extraSearchDisplay: boolean;
@@ -50,14 +50,14 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     public auditoriaService:AuditoriaService
       ) {
     this.user$ = this.auth.currentUserSubject.asObservable();
-    this.parametrosService.getParametros().subscribe(
+    const sb = this.parametrosService.getParametros().subscribe(
       (value)=>{
         this.fecha = new Date();
        this.fecha = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
        this.fecha0=this.fecha.toString().split('T')[0]        
        this.fecha1=this.fecha.toString().split('T')[1]      
       });
-    
+    this.subscription.push(sb)
   }
 
   ngOnInit(): void {
@@ -136,5 +136,10 @@ export class TopbarComponent implements OnInit, AfterViewInit {
       // Init Header Topbar For Mobile Mode
       KTLayoutHeaderTopbar.init('kt_header_mobile_topbar_toggle');
     });
+  }
+
+  ngOnDestroy():void
+  {
+    this.subscription.forEach(sb=>sb.unsubscribe())
   }
 }

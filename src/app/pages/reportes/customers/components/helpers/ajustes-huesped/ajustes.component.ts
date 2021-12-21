@@ -8,7 +8,7 @@ import {MatTableDataSource} from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
@@ -35,6 +35,8 @@ export class AjustesComponent implements OnInit {
 
   /**OBSERVABLE */
   // edoCuenta$:Observable<edoCuenta[]>
+  /**Subscription */
+  subscription:Subscription[]=[]
 
   closeResult:string;
   alertHeader:string;
@@ -120,7 +122,7 @@ export class AjustesComponent implements OnInit {
 
   creaTabla(){
 
-    this.edoCuentaService.getCuentas(this.huesped.folio).subscribe(
+    const sb = this.edoCuentaService.getCuentas(this.huesped.folio).subscribe(
       (result)=>{
         
         for(let i =0;i<result.length;i++){
@@ -154,6 +156,7 @@ export class AjustesComponent implements OnInit {
         }
       }
     )
+    this.subscription.push(sb)
   }
 
   initForm(){
@@ -241,7 +244,7 @@ onSubmit()
 
     
 
-    this.edoCuentaService.agregarPago(pago).subscribe(
+    const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       (result)=>{
         
         const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' })
@@ -289,6 +292,7 @@ onSubmit()
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
   }
  
   applyFilter(event: Event) {
@@ -326,5 +330,9 @@ onSubmit()
     const control = this.formGroup.controls[controlName];
 
     return control.invalid && (control.dirty || control.touched);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.forEach(sb=>sb.unsubscribe)
   }
 }

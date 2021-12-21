@@ -49,6 +49,9 @@ export class HuespedComponentComponent implements OnInit {
   today:DateTime|null;
   todayString:string;
   
+  /**Subscriptions */
+  subscription:Subscription[]=[]
+
   formGroup: FormGroup;
   facturacionFormGroup: FormGroup;
 
@@ -68,7 +71,6 @@ export class HuespedComponentComponent implements OnInit {
   modifica:boolean = true;
   isLoading:boolean=false;
   
-  private subscriptions: Subscription[] = [];
 
   constructor(
     public formatter: NgbDateParserFormatter,
@@ -92,11 +94,11 @@ export class HuespedComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.customerService.huespedUpdate$.subscribe((value)=>{
+    const sb = this.customerService.huespedUpdate$.subscribe((value)=>{
       this.huesped=value
       
 
-      this.detallesService.getDetailsById(this.huesped.ID_Socio).subscribe(
+       const sb =this.detallesService.getDetailsById(this.huesped.ID_Socio).subscribe(
         (response)=>{
           this.detailsList=response
           if(response){
@@ -124,8 +126,9 @@ export class HuespedComponentComponent implements OnInit {
           this.detailsList=EMPTY_DETAILS
         }
         )
+        this.subscription.push(sb)
     })
-
+    this.subscription.push(sb)
     this.loadForm();
 
   }
@@ -223,10 +226,10 @@ export class HuespedComponentComponent implements OnInit {
 
     }
     this.isLoading=true;
-    this.customerService.updateHuesped(this.huesped).subscribe(
+    const sb = this.customerService.updateHuesped(this.huesped).subscribe(
       (value)=>{
 
-        this.detallesService.updateDetails(this.detailsList).subscribe(
+        const sb = this.detallesService.updateDetails(this.detailsList).subscribe(
           (response)=>{
             this.isLoading=false
             const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
@@ -243,6 +246,7 @@ export class HuespedComponentComponent implements OnInit {
               modalRef.componentInstance.mensaje = 'No se pudieron actualizar los datos del detalle del huesped'
             }
           })
+          this.subscription.push(sb)
       },
       (error)=>{
         if(error)
@@ -255,6 +259,7 @@ export class HuespedComponentComponent implements OnInit {
         }
       }
       );
+      this.subscription.push(sb)
 
 
   }
@@ -263,7 +268,7 @@ export class HuespedComponentComponent implements OnInit {
   }
   
   getNumeroSocio(){
-    this.detallesService.getDetails().subscribe(
+   const sb = this.detallesService.getDetails().subscribe(
       (value)=>{
         if(value){
           this.id_Socio = value.ID_Socio + 1
@@ -280,6 +285,7 @@ export class HuespedComponentComponent implements OnInit {
           modalRef.componentInstance.mensaje ='No se pudieron recuperar los datos del numero de Socio'
         }
       })
+      this.subscription.push(sb)
   }
 
   // idSocio(){
@@ -300,7 +306,7 @@ export class HuespedComponentComponent implements OnInit {
         return of(this.huesped);
       }),
     ).subscribe((res: Huesped) => this.huesped = res);
-    this.subscriptions.push(sbCreate);
+    this.subscription.push(sbCreate);
   }
 
   // helpers for View
@@ -357,7 +363,7 @@ export class HuespedComponentComponent implements OnInit {
     return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
   }
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sb => sb.unsubscribe());
+    this.subscription.forEach(sb => sb.unsubscribe());
   }
 }
 

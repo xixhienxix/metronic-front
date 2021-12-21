@@ -102,7 +102,7 @@ export class ReservasComponentComponent implements OnInit {
   clickedRows = new Set<any>();
   model:NgbDateStruct;
 
-
+  subscription:Subscription[]=[]
 
   /*TABLE*/
   displayedColumns: string[] = ['select','_id','Fecha', 'Cantidad', 'Estatus','Accion','Color','ColorAplicado'];
@@ -145,7 +145,7 @@ export class ReservasComponentComponent implements OnInit {
   ngOnInit(): void {
 
     this.getAdicionales();
-    this.customerService.huespedUpdate$.subscribe((value)=>{
+    const sb = this.customerService.huespedUpdate$.subscribe((value)=>{
       this.huesped=value
       this.huesped.llegada.split('-')[0]
       
@@ -156,6 +156,7 @@ export class ReservasComponentComponent implements OnInit {
       // this.formatFechas();
       this.loadForm();
     })
+    this.subscription.push(sb)
 
   }
 
@@ -165,7 +166,7 @@ export class ReservasComponentComponent implements OnInit {
 
     eliminarPromesa(_id:any){
       this.isLoading=true
-      this.promesaService.borrarPromesa(_id).subscribe(
+     const sb = this.promesaService.borrarPromesa(_id).subscribe(
         (result)=>{
           this.isLoading=false
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
@@ -193,11 +194,12 @@ export class ReservasComponentComponent implements OnInit {
                             }
         }
         )
+        this.subscription.push(sb)
     }
 
     getPromesa()
     {
-    this.promesaService.getPromesas(this.huesped.folio).subscribe(
+   const sb = this.promesaService.getPromesas(this.huesped.folio).subscribe(
                           (result)=>{
                             let today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
 
@@ -287,6 +289,7 @@ export class ReservasComponentComponent implements OnInit {
                             }
                           }
                         )
+                        this.subscription.push(sb)
     }
     
     
@@ -340,7 +343,7 @@ export class ReservasComponentComponent implements OnInit {
 
     this.huesped.notas=this.getServiciosAdicionales.notas.value
 
-    this.customerService.updateEstatusHuesped(this.huesped).subscribe(
+   const sb = this.customerService.updateEstatusHuesped(this.huesped).subscribe(
 
       (value)=>{
         this.isLoading=false
@@ -369,7 +372,7 @@ export class ReservasComponentComponent implements OnInit {
       },
       )
     
-    
+    this.subscription.push(sb)
   }
 
   guardarPromesa(){
@@ -384,7 +387,7 @@ export class ReservasComponentComponent implements OnInit {
     }
 this.isLoading=true
 let estatus='Vigente'
-    this.promesaService.guardarPromesa(this.huesped.folio,this.promesa.fechaPromesaPago.value,this.promesa.promesaPago.value,estatus).subscribe(
+  const sb =  this.promesaService.guardarPromesa(this.huesped.folio,this.promesa.fechaPromesaPago.value,this.promesa.promesaPago.value,estatus).subscribe(
       (value)=>{
         this.isLoading=false
 
@@ -424,6 +427,7 @@ let estatus='Vigente'
       },
       ()=>{}
       )
+      this.subscription.push(sb)
   }
 
   togglePromesas(){
@@ -435,14 +439,14 @@ let estatus='Vigente'
   }
 
   getAdicionales(): void {
-    this.adicionalService.getAdicionales()
+    const sb = this.adicionalService.getAdicionales()
                         .subscribe((adicional)=>{
                           for(let i=0; i<adicional.length;i++)
                           {
                             this.adicionalArray.push(adicional[i])
                           }
                         })
-
+this.subscription.push(sb)
   }
 
 
@@ -526,7 +530,7 @@ let estatus='Vigente'
 
 
     this.isLoading=true
-    this.edoCuentaService.agregarPago(pago).subscribe(
+    const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       (value)=>{
         this.isLoading=false
         
@@ -593,7 +597,7 @@ let estatus='Vigente'
       }
       )
       this.isLoading=false
- 
+      this.subscription.push(sb)
   }
 
   /*Modal HELPERS*/

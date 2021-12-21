@@ -311,53 +311,6 @@
 </div>
 
 
-<ng-template #error let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Error</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Ocurrio un Error al actualizar al Húesped intente de nuevo mas tarde&hellip;</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
-
-<ng-template #exito let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">{{mensaje_exito}}</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
-
-<ng-template #email let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Confirmar E-mail</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Se enviara la confirmacion de la reservacion al siguiente email: </p>
-      <input #emailSender [value]="customerService.getCurrentHuespedValue.email">
-      <p>En caso de requerir que el envio sea a un email diferente corrigalo en la casilla</p> 
-    
-  </div>
-  <div class="modal-footer">
-    <app-loader-spinner *ngIf="enviandoEmail"></app-loader-spinner>
-    <button type="button" class="btn btn-success" (click)="enviarConfirmacion(emailSender.value)">Enviar</button>
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
 
 <ng-container *ngIf="isLoading">
   <app-loader-spinner></app-loader-spinner>

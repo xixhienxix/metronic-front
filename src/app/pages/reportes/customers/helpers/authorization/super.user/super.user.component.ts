@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/modules/auth';
 import { AlertsComponent } from '../../../../../../main/alerts/alerts.component';
 
@@ -15,6 +16,9 @@ export class SuperUserComponent implements OnInit {
   modalService:NgbModal
   isLoading:boolean=false
   autorizaForm:FormGroup;
+
+  /**Subscriptions */
+  private subscription:Subscription[]=[]
 
   constructor(
     public fb : FormBuilder,
@@ -33,7 +37,7 @@ export class SuperUserComponent implements OnInit {
   onSubmit(){
     this.isLoading=true
 
-    this.authService.autoriza(this.getAutorizaForm.usuario.value,this.getAutorizaForm.password.value).subscribe(
+    const sb = this.authService.autoriza(this.getAutorizaForm.usuario.value,this.getAutorizaForm.password.value).subscribe(
       (value:any)=>{
         this.isLoading=false
         
@@ -53,10 +57,15 @@ export class SuperUserComponent implements OnInit {
         }
       }
       )
+
+      this.subscription.push(sb);
+
   }
+
   close(){
     this.modal.close();
   }
+
   passBack(exito:string) {
     this.passEntry.emit(exito);
     }
@@ -75,6 +84,10 @@ export class SuperUserComponent implements OnInit {
   controlHasError(validation, controlName): boolean {
     const control = this.autorizaForm.controls[controlName];
     return control.hasError(validation) && (control.dirty || control.touched);
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.forEach(sb => sb.unsubscribe());
   }
 
 }

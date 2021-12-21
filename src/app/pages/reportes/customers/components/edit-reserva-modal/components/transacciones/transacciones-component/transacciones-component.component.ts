@@ -88,7 +88,7 @@ export class TransaccionesComponentComponent implements OnInit {
     Precio : 0
   }
   /**Subscription */
-  subscription:Subscription
+  subscription:Subscription[]=[]
   /*Models*/
   huesped:Huesped
 
@@ -150,12 +150,13 @@ export class TransaccionesComponentComponent implements OnInit {
     public divisasService:DivisasService
 
     ) {
-      this.subscription=this.edoCuentaService.getNotification().subscribe(data=>{
+      const sb =this.edoCuentaService.getNotification().subscribe(data=>{
         if(data)
         {
           this.getEdoCuenta();
         }
       });
+      this.subscription.push(sb)
      }
 
   ngOnInit(): void {
@@ -173,7 +174,7 @@ export class TransaccionesComponentComponent implements OnInit {
 
   actualizaHuesped(huesped:Huesped)
   {
-    this.customerService.updateHuesped(huesped).subscribe(
+    const sb = this.customerService.updateHuesped(huesped).subscribe(
       (Value)=>{
         console.log("Huesped Actualizado con Exito")
 
@@ -183,6 +184,7 @@ export class TransaccionesComponentComponent implements OnInit {
         console.log("Error al Actualizar Huesped")
       }
       )
+      this.subscription.push(sb)
   }    
 
   
@@ -225,7 +227,7 @@ export class TransaccionesComponentComponent implements OnInit {
   getEdoCuenta(){
     
     // this.editService.getCurrentHuespedValue.folio
-    this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
+   const sb = this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result:edoCuenta[])=>{
         
         this.estadoDeCuenta=[]
@@ -323,10 +325,12 @@ export class TransaccionesComponentComponent implements OnInit {
       },
       ()=>{}
       )
+
+      this.subscription.push(sb)
   }
 
   getCodigosDeCargo(){
-    this.codigosService.getCodigosDeCargo().subscribe(
+    const sb = this.codigosService.getCodigosDeCargo().subscribe(
       (result:Codigos[])=>{
         for(let i=0;i<result.length;i++)
         {
@@ -366,6 +370,7 @@ export class TransaccionesComponentComponent implements OnInit {
       },
 
     );
+    this.subscription.push(sb)
   }
   nuevoConcepto(){
     if(this.nuevosConceptos==true)
@@ -481,7 +486,7 @@ this.nuevosConceptos=false
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
 
       });
-    modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+   const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
 
           if(receivedEntry.id==3)
           {
@@ -535,7 +540,7 @@ this.nuevosConceptos=false
             modalRef2.componentInstance.mensaje=receivedEntry.message
           }
       })
-
+this.subscription.push(sb)
 
   }
 
@@ -824,7 +829,7 @@ this.nuevosConceptos=false
 
     
 this.isLoading=true
-    this.edoCuentaService.agregarPago(pago).subscribe(
+    const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
@@ -865,6 +870,7 @@ this.isLoading=true
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
   }
 
   onSubmitAbono(){
@@ -898,7 +904,7 @@ this.isLoading=true
 
     
 this.isLoading=true
-    this.edoCuentaService.agregarPago(pago).subscribe(
+    const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
@@ -938,6 +944,7 @@ this.isLoading=true
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
   }
   
 
@@ -996,7 +1003,7 @@ this.isLoading=true
     }
 
     this.isLoading=true
-    this.edoCuentaService.agregarPago(descuento).subscribe(
+    const sb = this.edoCuentaService.agregarPago(descuento).subscribe(
       ()=>{
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
@@ -1044,6 +1051,7 @@ this.isLoading=true
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
 
   }
   autoriza(){
@@ -1061,7 +1069,7 @@ this.isLoading=true
 
           
       });
-    modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+   const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
       this.isLoading=false
 
           if(receivedEntry!='Usuario No Autorizado')
@@ -1074,6 +1082,8 @@ this.isLoading=true
             modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
           }
       })
+
+      this.subscription.push(sb)
   }
   /*MODALS*/
   ajustes(){
@@ -1177,5 +1187,8 @@ this.isLoading=true
         } else {
             return  `with: ${reason}`;
         }
+  }
+  ngOnDestroy(): void {
+    this.subscription.forEach(sb=>sb.unsubscribe())
   }
 }

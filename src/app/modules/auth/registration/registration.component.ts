@@ -96,7 +96,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   submit() {
     this.hasError = false;
     
-    this.authService.registro(this.f.fullname.value,this.f.email.value,this.f.username.value,this.f.password.value,this.f.agree.value).subscribe(
+   const sb = this.authService.registro(this.f.fullname.value,this.f.email.value,this.f.username.value,this.f.password.value,this.f.agree.value).subscribe(
       (value)=>{
         console.log(value)
         this.router.navigate(['auth/login'])
@@ -109,6 +109,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
       ()=>{
         
       })
+      this.unsubscribe.push(sb)
   }
 
   ngOnDestroy() {

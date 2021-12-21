@@ -14,7 +14,7 @@ import { AlertsComponent } from '../../../../../../../../main/alerts/alerts.comp
 })
 export class EdoCuentaComponentComponent implements OnInit {
   /**Subscription */
-  subscription:Subscription
+  subscription:Subscription[]=[]
   /**Models */
   alojamientoPorNoche:any[]=[]
   estadoDeCuenta:edoCuenta[]=[]
@@ -25,7 +25,6 @@ export class EdoCuentaComponentComponent implements OnInit {
   edoCuentaServiciosExtra:any[]=[]
   edoCuentaDescuentosLista:any[]=[]
   edoCuentaAbonosLista:any[]=[]
-
 
   closeResult: string;
   subTotalAlojamiento:string;
@@ -46,12 +45,13 @@ export class EdoCuentaComponentComponent implements OnInit {
     public divisasService:DivisasService
     
   ) {
-    this.subscription=this.estadoDeCuentaService.getNotification().subscribe(data=>{
+    const sb = this.estadoDeCuentaService.getNotification().subscribe(data=>{
       if(data)
       {
         this.getEdoCuenta();
       }
     });
+    this.subscription.push(sb)
    }
 
   ngOnInit(): void {
@@ -65,7 +65,7 @@ export class EdoCuentaComponentComponent implements OnInit {
   getEdoCuenta(){
 
 
-    this.estadoDeCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
+    const sb = this.estadoDeCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result:edoCuenta[])=>{
         this.totalCargos=0;
         this.totalDescuentos=0;
@@ -291,6 +291,7 @@ export class EdoCuentaComponentComponent implements OnInit {
       },
       ()=>{}
       )
+      this.subscription.push(sb)
   }
 
     /*Modal HELPERS*/
@@ -305,4 +306,9 @@ export class EdoCuentaComponentComponent implements OnInit {
               return  `with: ${reason}`;
           }
     }
+
+    ngOnDestroy(): void {
+      this.subscription.forEach(sb=>sb.unsubscribe())
+    }
+
 }

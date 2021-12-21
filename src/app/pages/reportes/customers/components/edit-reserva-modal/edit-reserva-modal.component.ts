@@ -126,8 +126,7 @@ const EMPTY_CUSTOMER: Huesped = {
 })
 
 export class EditReservaModalComponent implements OnInit {
-  @ViewChild('error') errorModal: null;
-  @ViewChild('exito') exitoModal: null;
+  @ViewChild('saldarCuenta') saldarCuentaModal: null;
   @ViewChild('email') emailModal: null;
   @ViewChild('spinner') spinnerModal: null;
 
@@ -232,7 +231,7 @@ export class EditReservaModalComponent implements OnInit {
     // }
     getAmaDeLlaves(){
 
-      this.amaDeLlavesService.getAmaDeLlaves().subscribe(
+      const sb = this.amaDeLlavesService.getAmaDeLlaves().subscribe(
         (value)=>{
           for(let i=0;i<value.length;i++)
           {
@@ -244,6 +243,7 @@ export class EditReservaModalComponent implements OnInit {
         },
         ()=>{}
         )
+        this.subscriptions.push(sb)
     }
 
     getAmaDeLlavesByID(){
@@ -254,7 +254,7 @@ export class EditReservaModalComponent implements OnInit {
        
 
 
-      this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
+      const sb = this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
         (value)=>{
             this.disponibilidadEstatus=value[0]
         },
@@ -263,6 +263,8 @@ export class EditReservaModalComponent implements OnInit {
         },
         ()=>{}
         )
+
+        this.subscriptions.push(sb)
     }
 
     formatFechas()
@@ -281,7 +283,7 @@ export class EditReservaModalComponent implements OnInit {
     }
 
     getEstatus(): void {
-      this.estatusService.getEstatus()
+     const sb = this.estatusService.getEstatus()
                         .pipe(map(
                           (responseData)=>{
                             const postArray = []
@@ -298,6 +300,8 @@ export class EditReservaModalComponent implements OnInit {
                               this.estatusArray=estatus
                             }
                           })
+
+                          this.subscriptions.push(sb)
 
     }    
     
@@ -426,7 +430,6 @@ export class EditReservaModalComponent implements OnInit {
 
         this.formGroup.controls['estatus'].setValue(this.customerService.getCurrentHuespedValue.estatus);
       }
-      console.log(result);
     }, (reason) => {
     });
     }
@@ -435,7 +438,7 @@ export class EditReservaModalComponent implements OnInit {
     {
       this.disponibilidadEstatus.Estatus_Ama_De_Llaves=estatus
 
-      this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
+     const sb = this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
         (value)=>{
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
@@ -461,6 +464,7 @@ export class EditReservaModalComponent implements OnInit {
               });
             
         })
+        this.subscriptions.push(sb)
     } 
   
 
@@ -513,7 +517,7 @@ export class EditReservaModalComponent implements OnInit {
       }
 
 
-          this.estatusService.actualizaEstatus(estatus,folio,this.huesped)
+          const sb = this.estatusService.actualizaEstatus(estatus,folio,this.huesped)
           .subscribe(
             ()=>
             {
@@ -566,7 +570,7 @@ export class EditReservaModalComponent implements OnInit {
             
             }
           )
-        
+        this.subscriptions.push(sb)
     }
 
     checkOut(estatus:number,folio:number)
@@ -587,8 +591,7 @@ export class EditReservaModalComponent implements OnInit {
         modalRef.componentInstance.mensaje = 'La fecha de salida del huesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
        
         modalRef.result.then((result) => {
-          console.log(result)
-          if(result=='Aceptar')
+        if(result=='Aceptar')
           {
             const alojamiento:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(alojamiento => alojamiento.Descripcion == 'Alojamiento');
             const abonos:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(abonos=> abonos.Abono>0)
@@ -619,9 +622,9 @@ export class EditReservaModalComponent implements OnInit {
                   Ano:fecha.year,
                   Estatus_Ama_De_Llaves:'Limpia',
                 }
-                this.disponibilidadService.actualizaDisponibilidad(dispo).subscribe(
+               const sb = this.disponibilidadService.actualizaDisponibilidad(dispo).subscribe(
                   (value)=>{
-                    this.estatusService.actualizaEstatus(4,folio,this.huesped).subscribe(
+                   const sb = this.estatusService.actualizaEstatus(4,folio,this.huesped).subscribe(
                       ()=>
                       {
                         this.isLoading=false
@@ -661,10 +664,11 @@ export class EditReservaModalComponent implements OnInit {
                       ()=>{
       
                     });
-                    
+                    this.subscriptions.push(sb)
                   },
                   (error)=>{}
                   )
+                  this.subscriptions.push(sb)
               }
 
 
@@ -673,12 +677,12 @@ export class EditReservaModalComponent implements OnInit {
 
             const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef.componentInstance.alertHeader='ERROR'
-            modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en la cuenta'
+            modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en la cuenta desea liquidar la cuenta?'
             modalRef.result.then((result) => {
               this.closeResult = `Closed with: ${result}`;
               }, (reason) => {
                 if(reason=='Aceptar'){
-
+                  this.saldarCuenta();
                 }
                   this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
               });
@@ -687,11 +691,15 @@ export class EditReservaModalComponent implements OnInit {
               },4000)
             }
           }
+          if(result=='Close click')
+          {
+            this.isLoading=false
+          }
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
             console.log((reason));
-            
-              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            this.isLoading=false
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
           });
         
            
@@ -700,7 +708,7 @@ export class EditReservaModalComponent implements OnInit {
       {
           if (this.huesped.pendiente==0)
           {
-            this.estatusService.actualizaEstatus(estatus,folio,this.huesped)
+            const sb = this.estatusService.actualizaEstatus(estatus,folio,this.huesped)
               .subscribe(
                 ()=>
                 {
@@ -737,7 +745,7 @@ export class EditReservaModalComponent implements OnInit {
                 ()=>{
 
               });
-
+              this.subscriptions.push(sb)
           }else
           {
             this.isLoading=false
@@ -756,6 +764,20 @@ export class EditReservaModalComponent implements OnInit {
           }
         }
     }
+
+    saldarCuenta(){
+      const modalRef = this.modalService.open(AlertsComponent,{size:'sm' , backdrop:'static'})
+      modalRef.componentInstance.alertHeader='Su Cuenta'
+      modalRef.componentInstance.saldo=true
+      modalRef.result.then((result) => {
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });
+
+    
+    }
+
 
     postHistorico(folio:number){
       this.isLoading=true
@@ -851,7 +873,7 @@ export class EditReservaModalComponent implements OnInit {
       this.isLoading=true
       this.huesped.email=emailSender
       this.enviandoEmail=true
-      this.emailService.enviarConfirmacion(this.huesped).subscribe(
+      const sb = this.emailService.enviarConfirmacion(this.huesped).subscribe(
         (result)=>{
           this.isLoading=false
 
@@ -877,6 +899,7 @@ export class EditReservaModalComponent implements OnInit {
 
         }
       )
+      this.subscriptions.push(sb)
     }
 
     setStep(index:number){
@@ -893,4 +916,6 @@ export class EditReservaModalComponent implements OnInit {
               return  `with: ${reason}`;
           }
     }
+
+
   }
