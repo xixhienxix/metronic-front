@@ -35,7 +35,6 @@ import localeEs from '@angular/common/locales/es-MX';
 import { registerLocaleData } from '@angular/common';
 import { SharedModule } from './shared/shared.module';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-import { SaldarCuentaComponent } from './app/pages/reportes/customers/components/edit-reserva-modal/components/_helpers/saldar-cuenta/saldar-cuenta.component';
 
 
 function appInitializer(authService: AuthService) {
@@ -49,7 +48,7 @@ function appInitializer(authService: AuthService) {
 registerLocaleData(localeEs, 'es');
 
 @NgModule({
-  declarations: [AppComponent,ClickOutsideDirective, DialogComponent, SaldarCuentaComponent],
+  declarations: [AppComponent,ClickOutsideDirective, DialogComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

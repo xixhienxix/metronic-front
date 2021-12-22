@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SaldarCuentaComponent } from './saldar-cuenta.component';
+import { SaldoCuentaComponent } from './saldo-cuenta.component';
 
-describe('SaldarCuentaComponent', () => {
-  let component: SaldarCuentaComponent;
-  let fixture: ComponentFixture<SaldarCuentaComponent>;
+describe('SaldoCuentaComponent', () => {
+  let component: SaldoCuentaComponent;
+  let fixture: ComponentFixture<SaldoCuentaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SaldarCuentaComponent ]
+      declarations: [ SaldoCuentaComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SaldarCuentaComponent);
+    fixture = TestBed.createComponent(SaldoCuentaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

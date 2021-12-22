@@ -74,7 +74,8 @@ getNotification(){
                 }
               }
               this.edoCuentaSubject = new BehaviorSubject<edoCuenta[]>(estadoDeCuenta);
-
+              this.currentCuentaValue = estadoDeCuenta
+              
               return estadoDeCuenta    
           }))
         
