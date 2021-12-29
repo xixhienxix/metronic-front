@@ -134,9 +134,11 @@ export class EditReservaModalComponent implements OnInit {
 
     /** CheckOut*/
     diasDiferencia:number
-    tarifaDiasDiferencia:number
-    _id:string
-    alojamiento:edoCuenta[]
+    totalAlojamientoNuevo:number
+    alojamiento_id:string
+    nochesReales:number
+    nochesTotales:number
+    saldoPendiente:number
 
     //DATETIMEPICKER RANGE
     fullFechaSalida:string
@@ -585,73 +587,75 @@ export class EditReservaModalComponent implements OnInit {
       let mesSalida = this.huesped.salida.split('/')[1]
       let anoSalida = this.huesped.salida.split('/')[2]
 
+      let diaLlegada = this.huesped.llegada.split('/')[0]
+      let mesLlegada = this.huesped.llegada.split('/')[1]
+      let anoLlegada = this.huesped.llegada.split('/')[2]
+
       let fechaSalida:DateTime = DateTime.fromObject({year:anoSalida,month:mesSalida,day:diaSalida})
-      console.log(this.todayDate)
-      console.log(fechaSalida)
+      let fechaLlegada:DateTime = DateTime.fromObject({year:anoLlegada,month:mesLlegada,day:diaLlegada})
+
       if(fechaSalida.startOf("day") > this.todayDate.startOf("day"))
       {
         const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
         modalRef.componentInstance.alertHeader='Advertencia'
-        modalRef.componentInstance.mensaje = 'La fecha de salida del huesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
+        modalRef.componentInstance.mensaje = 'La fecha de salida del húesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
        
         modalRef.result.then((result) => {
         if(result=='Aceptar')
           {
-            const cargos:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(cargos => cargos.Cargo > 0 );
-            this.alojamiento = this.estadoDeCuentaService.currentCuentaValue.filter(alojamiento => alojamiento.Descripcion =='Alojamiento' );
+            const nochesAlojadas:DateTime = fechaLlegada.diff(this.todayDate, ["days"])
+            const nochesReservadas:DateTime = fechaLlegada.diff(fechaSalida, ["days"])
+
+            this.nochesReales = Math.floor(nochesAlojadas.days) 
+            this.nochesTotales = Math.floor(nochesReservadas.days)
+
+            this.totalAlojamientoNuevo = this.huesped.tarifa*this.nochesReales
+
+            const cargosSinAlojamiento:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(cargos => cargos.Cargo > 0 && cargos.Descripcion !='Alojamiento');
             const abonos:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(abonos=> abonos.Abono>0)
-            const descuentos:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(descuentos=> descuentos.Forma_de_Pago=='Descuento')
+            const alojamientoAnterior = this.estadoDeCuentaService.currentCuentaValue.filter(alojamiento => alojamiento.Descripcion =='Alojamiento' );
+            this.alojamiento_id = alojamientoAnterior[0]._id
 
             const totalAbonos = abonos.reduce((previous,current)=>previous+current.Abono,0)
-            const totalDesc = descuentos.reduce((previous,current)=>previous+current.Abono,0)
-            const totalCargos = cargos.reduce((previous,current)=>previous+current.Cargo,0)
+            const totalCargosSinAlojamiento = cargosSinAlojamiento.reduce((previous,current)=>previous+current.Cargo,0)
 
-            const saldoPendiente = totalCargos-(totalAbonos+totalDesc)
-
-            const diff:DateTime = fechaSalida.diff(this.todayDate, ["days"])
-
-            const cargosAlojamiento = this.alojamiento.reduce((previous,current)=>previous+current.Cargo,0)
-
-            const tarifaDiff = cargosAlojamiento-(this.huesped.tarifa*Math.floor(diff.days))
-
-            this.diasDiferencia=Math.floor(diff.days)
-            this._id=result[0]._id
-            this.tarifaDiasDiferencia=tarifaDiff
-
+            this.saldoPendiente = (totalCargosSinAlojamiento+this.totalAlojamientoNuevo)-totalAbonos
             
-            if(saldoPendiente==0)
+            if(this.saldoPendiente==0)
             {   
-              this.checkOutfunction(Math.floor(diff.days), tarifaDiff)
-            }else{
+              this.checkOutfunction()
+
+            }else
+            {
               this.isLoading=false
 
-            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-            modalRef.componentInstance.alertHeader='Advertencia'
-            modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en la cuenta desea liquidar la cuenta?'
-            modalRef.componentInstance.saldoPendiente = saldoPendiente
-            modalRef.result.then((result) => {
-              if(result=='Aceptar'){
-                this.saldarCuenta(diff,saldoPendiente);
+              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+              modalRef.componentInstance.alertHeader='Advertencia'
+              modalRef.componentInstance.mensaje = 'Aun queda Saldo pendiente en la cuenta desea liquidar la cuenta?'
+              modalRef.result.then((result) => {
+
+                if(result=='Aceptar'){
+                  this.saldarCuenta();
+                }
+                else{
+                  this.closeResult = `Closed with: ${result}`;
+                }
+                }, (reason) => {
+                    this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                });
+      
               }
-              else{
-                this.closeResult = `Closed with: ${result}`;
-              }
-              }, (reason) => {
-                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-              });
-    
             }
-          }
-          if(result=='Close click')
-          {
-            this.isLoading=false
-          }
-          this.closeResult = `Closed with: ${result}`;
-          }, (reason) => {
-            console.log((reason));
-            this.isLoading=false
-            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          });
+            if(result=='Close click')
+            {
+              this.isLoading=false
+            }
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+              console.log((reason));
+              this.isLoading=false
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
         
            
 
@@ -707,7 +711,7 @@ export class EditReservaModalComponent implements OnInit {
             
             modalRef.result.then((result) => {
               if(result=='Aceptar'){
-                this.saldarCuenta(this.huesped.noches,this.huesped.tarifa);
+                this.saldarCuenta();
               }
               else{
                 this.closeResult = `Closed with: ${result}`;
@@ -720,17 +724,15 @@ export class EditReservaModalComponent implements OnInit {
         }
     }
 
-    saldarCuenta(diff:number,saldoPendiente:number){
-      
-
+    saldarCuenta(){
+    
       const modalRef = this.modalService.open(SaldoCuentaComponent,{size:'sm' , backdrop:'static'})
       modalRef.componentInstance.folio=this.huesped.folio
-      modalRef.componentInstance.saldoPendiente=saldoPendiente
+      modalRef.componentInstance.saldoPendiente=this.saldoPendiente
 
       const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
         //Recibir Data del Modal usando EventEmitter
-
-        this.checkOutfunction(this.diasDiferencia,this.tarifaDiasDiferencia)
+        this.checkOutfunction()
         })
 
       modalRef.result.then((result) => {
@@ -742,35 +744,44 @@ export class EditReservaModalComponent implements OnInit {
         this.subscriptions.push(sb)
     }
 
-    checkOutfunction(diff:number,tarifaDiff:number){
+    checkOutfunction(){
 
-      const salidaReal = this.todayDate.plus({days:diff})
-
-      this.huesped.salida=salidaReal.day+'/'+salidaReal.month+'/'+salidaReal.year
+      this.huesped.salida=this.todayDate.day+'/'+this.todayDate.month+'/'+this.todayDate.year
       this.huesped.pendiente=0
       this.huesped.porPagar=0
-      this.huesped.noches=diff
+      this.huesped.noches=this.nochesReales
       
-
-
       const sb = this.estatusService.actualizaEstatus(4,this.huesped.folio,this.huesped).subscribe(
         ()=>
         {
+          for(let i=1;i<=this.nochesTotales;i++){
 
-          for(let i=1;i<=diff;i++){
-      
             const fecha = this.todayDate.plus({days:i})
-    
-            let dispo:Disponibilidad = {
-              Cuarto:this.huesped.habitacion,
-              Habitacion:this.huesped.numeroCuarto,
-              Estatus:1,
-              Dia:fecha.dia,
-              Mes:fecha.month,
-              Ano:fecha.year,
-              Estatus_Ama_De_Llaves:'Limpia',
-            }
-    
+            let dispo:Disponibilidad
+
+              if(i<=this.nochesReales){
+                 dispo = {
+                  Cuarto:this.huesped.habitacion,
+                  Habitacion:this.huesped.numeroCuarto,
+                  Estatus:1,
+                  Dia:fecha.dia,
+                  Mes:fecha.month,
+                  Ano:fecha.year,
+                  Estatus_Ama_De_Llaves:'Revisar',
+                }
+              }else{
+                 dispo = {
+                  Cuarto:this.huesped.habitacion,
+                  Habitacion:this.huesped.numeroCuarto,
+                  Estatus:1,
+                  Dia:fecha.dia,
+                  Mes:fecha.month,
+                  Ano:fecha.year,
+                  Estatus_Ama_De_Llaves:'Limpia',
+                }
+              }
+           
+
            const sb = this.disponibilidadService.actualizaDisponibilidad(dispo).subscribe(
               (value)=>{
               },
@@ -783,21 +794,24 @@ export class EditReservaModalComponent implements OnInit {
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='EXITO'
           modalRef.componentInstance.mensaje = 'Chek-Out Realizado con Exito '
-          
-            setTimeout(() => {
-              modalRef.close('Close click');
-            },4000)
-            this.postHistorico();
-
-        this.customerService.fetch();
-        this.modal.dismiss();
         
-        const cargosAlojamiento = this.alojamiento.reduce((previous,current)=>previous+current.Cargo,0)
+           const sb = this.estadoDeCuentaService.actualizaSaldo(this.alojamiento_id,this.totalAlojamientoNuevo).subscribe(
+              (value)=>
+              { 
+                console.log(value)
+              },
+              (error)=>{  
+                console.log(error)
+               })
 
-            this.estadoDeCuentaService.actualizaSaldo(cargosAlojamiento[0]._id,tarifaDiff).subscribe(
-              (value)=>{   },
-              (error)=>{   })
-          
+               this.customerService.fetch();
+               this.modal.dismiss();
+               this.subscriptions.push(sb)
+               this.postHistorico();  
+
+               setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
         },
         (err)=>
         {
@@ -826,8 +840,6 @@ export class EditReservaModalComponent implements OnInit {
 
     postHistorico(){
       this.isLoading=true
-
-
        const sb = this.historicoService.addPost(this.huesped).subscribe(
             (value)=>{
               console.log(value)

@@ -20,6 +20,7 @@ import { DivisasService } from 'src/app/pages/parametros/_services/divisas.servi
 import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { Subscription } from 'rxjs';
+import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 
 @Component({
   selector: 'app-modifica-huesped',
@@ -101,8 +102,8 @@ export class ModificaHuespedComponent implements OnInit {
     public fb: FormBuilder,
     private calendar: NgbCalendar,
     public divisasService:DivisasService,
-    public parametrosService : ParametrosServiceService
-
+    public parametrosService : ParametrosServiceService,
+    public edoCuentaService : Edo_Cuenta_Service
   ) { 
 
     const current = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
@@ -455,6 +456,16 @@ export class ModificaHuespedComponent implements OnInit {
      const sb = this.customerService.updateHuesped(this.huesped).subscribe(
         (value)=>{
 
+         const alojamientoNuevo = this.tarifa * this.diaDif
+         const alojamiento = this.edoCuentaService.currentCuentaValue.filter(alojamiento=>alojamiento.Descripcion=='Alojamiento')
+
+          this.edoCuentaService.actualizaSaldo(alojamiento[0]._id,alojamientoNuevo).subscribe(
+            (value)=>
+            { console.log(value)  },
+            (error)=>{  
+              console.log(error)
+             })          
+             
           this.customerService.setCurrentHuespedValue=this.huesped
           this.passEntry.emit(this.huesped);
 
