@@ -3,6 +3,7 @@ import { NgbActiveModal,NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-confirmation-modal',
@@ -12,10 +13,11 @@ import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 export class ConfirmationModalComponent implements OnInit {
 
   @Input() huesped;
+  @Input() estatus;
   closeResult: string;
   @ViewChild('exito') exito= null;
   @ViewChild('error') error= null;
-
+  subscription:Subscription[]=[]
   constructor(
     public customerService: HuespedService,
     public activeModal: NgbActiveModal,
@@ -32,12 +34,12 @@ export class ConfirmationModalComponent implements OnInit {
 
   cambiaEstatus(huesped:Huesped)
   {
-    
-    this.customerService.updateHuesped(huesped)
+    this.huesped.estatus=this.estatus
+    const sb = this.customerService.updateHuesped(huesped)
     .subscribe(
      ()=>
      {
-      const modalRef = this.modalService.open(this.exito,{size:'sm'});
+      const modalRef = this.modalService.open(this.exito,{ size: 'sm', backdrop:'static' });
       
       modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -53,7 +55,7 @@ export class ConfirmationModalComponent implements OnInit {
      (err)=>
      {
        console.log(err.message)
-      const modalRef = this.modalService.open(this.error,{size:'sm'})
+      const modalRef = this.modalService.open(this.error,{ size: 'sm', backdrop:'static' })
       modalRef.result.then((result) => {
         this.closeResult = `Closed with: ${result}`;
         }, (reason) => {
@@ -68,7 +70,7 @@ export class ConfirmationModalComponent implements OnInit {
      }
 
    )
-
+this.subscription.push(sb)
   }
 
   getDismissReason(reason: any): string {
@@ -80,4 +82,10 @@ export class ConfirmationModalComponent implements OnInit {
         return  `with: ${reason}`;
     }
 }
+
+ngOnDestroy(): void {
+  this.subscription.forEach(sb=> sb.unsubscribe());
 }
+}
+
+

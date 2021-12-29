@@ -3,14 +3,20 @@
   <div class="form-control" >
     <!-- <label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}
     </label> -->
-    <label>{{fecha}}</label>
+    <button class="btn btn-warning" (click)="auditoria()">Auditoria</button>
   </div>
 </div>
 <div class="topbar-item">
   <div class="form-control" >
-    <label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}
+    <!-- <label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}
+    </label> -->
+    <label>{{fecha0}} - {{fecha1}}</label>
+  </div>
+</div>
+<div class="topbar-item">
+  <div class="form-control" >
+    <label>{{parametrosService.getCurrentParametrosValue.zona}}
     </label>
-  
   </div>
 </div>
 <ng-container *ngIf="extraSearchDisplay">

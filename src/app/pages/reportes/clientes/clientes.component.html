@@ -114,10 +114,10 @@
       <th class="valor-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Valor </th>
       <td class="valor-columna"  mat-cell *matCellDef="let row" [ngStyle]="{'color': row.Cargo==0 ? 'green' : 'black'}" >
         <ng-container *ngIf="row.Abono==0">
-         $ {{row.Cargo.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}} 
+         {{divisasService.getcurrentDivisa.Simbolo}} {{row.Cargo.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}} 
         </ng-container>  
         <ng-container *ngIf="row.Cargo==0">
-         $ -{{row.Abono.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}
+          {{divisasService.getcurrentDivisa.Simbolo}} -{{row.Abono.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}
         </ng-container> 
       </td>
     </ng-container>

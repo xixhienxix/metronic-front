@@ -11,6 +11,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthService } from './modules/auth/_services/auth.service';
 import { environment } from 'src/environments/environment';
+import { NgIdleKeepaliveModule } from '@ng-idle/keepalive'; // this includes the core NgIdleModule but includes keepalive providers for easy wireup
+import { MomentModule } from 'angular2-moment'; // optional, provides moment-style pipes for date formatting
+
 // Highlight JS
 import { HighlightModule, HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { SplashScreenModule } from './_metronic/partials/layout/splash-screen/splash-screen.module';
@@ -30,6 +33,8 @@ import { DialogComponent } from './pages/reportes/customers/components/nueva-res
 //Locale i18n
 import localeEs from '@angular/common/locales/es-MX';
 import { registerLocaleData } from '@angular/common';
+import { SharedModule } from './shared/shared.module';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 
 function appInitializer(authService: AuthService) {
@@ -52,6 +57,10 @@ registerLocaleData(localeEs, 'es');
     HttpClientModule,
     HighlightModule,
     ClipboardModule,
+    NgIdleKeepaliveModule.forRoot(),
+    MomentModule,
+    SharedModule,
+    MatProgressBarModule,
     // MatTabsModule,
     // MatCheckboxModule,
     // MatExpansionModule,

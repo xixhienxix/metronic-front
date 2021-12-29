@@ -46,7 +46,7 @@
                 <label class="control-label">Fecha:</label>
                 <br />
                 &nbsp;
-                <label>{{row.Fecha.split('T')[0]}}</label>
+                <label>{{row.Fecha.split('T')[0].split('-')[2] + ' de ' +i18n.getMonthFullName(row.Fecha.split('T')[0].split('-')[1]) +' del ' + row.Fecha.split('T')[0].split('-')[0]}}</label>
             </div>
         </ng-container>
         <ng-container *ngIf="fechaCancelado!=''">

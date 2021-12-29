@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsComponent } from '../reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
+import { Subscription } from 'rxjs';
+import { AlertsComponent } from '../../main/alerts/alerts.component';
 import { Divisas } from './_models/divisas';
 import { Parametros } from './_models/parametros';
 import { TimeZones } from './_models/timezone';
@@ -33,6 +34,8 @@ export class ParametrosComponent implements OnInit {
   /**SIte Helpers */
   isLoading:Boolean=false
 
+  susbcription:Subscription[]=[]
+
   formGroup : FormGroup
   zonaHoraria:TimeZones[]=[]
   fechas:Date
@@ -58,6 +61,11 @@ export class ParametrosComponent implements OnInit {
     this.getDivisas();
     this.initForm();
   }
+
+  ngOnDestroy():void
+  {
+    this.susbcription.forEach(sb=>sb.unsubscribe())
+  }
   
   getParametros(){
     this.parametrosService.getParametros().subscribe(
@@ -71,7 +79,7 @@ export class ParametrosComponent implements OnInit {
         this.formGroup.controls['auditoria'].setValue(this.parametrosService.getCurrentParametrosValue.auditoria);
       },
       (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader='Error'
         modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
       })
@@ -79,7 +87,7 @@ export class ParametrosComponent implements OnInit {
 
   getTimeZones()
   {
-    this.timezonesService.getTimeZones().subscribe(
+    const sb = this.timezonesService.getTimeZones().subscribe(
       (value:TimeZones[])=>{
         if(value)
         {this.zonaHoraria=value}
@@ -87,16 +95,17 @@ export class ParametrosComponent implements OnInit {
         {this.zonaHoraria.push(DEFAULT_TIMEZONE)}
       },
       (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader = 'Error'
         modalRef.componentInstance.mensaje='No se pudo cargar la lista de zonas horarias intente actualizando la pagina'
       },
       ()=>{}
       )
+      this.susbcription.push(sb)
   }
 
   getDivisas(){
-    this.divisasService.getDivisas().subscribe(
+    const sb = this.divisasService.getDivisas().subscribe(
       (value:Divisas[])=>{
         if(value)
         {this.divisas=value}
@@ -104,12 +113,13 @@ export class ParametrosComponent implements OnInit {
         {this.divisas.push(DEFAULT_DIVISA)}
       },
       (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader = 'Error'
         modalRef.componentInstance.mensaje='No se pudo cargar la lista de zonas horarias intente actualizando la pagina'
       },
       ()=>{}
       )
+      this.susbcription.push(sb)
   }
 
 
@@ -167,11 +177,11 @@ export class ParametrosComponent implements OnInit {
 
     }
 
-    this.parametrosService.postParametros(parametros).subscribe(
+    const sb = this.parametrosService.postParametros(parametros).subscribe(
       (value)=>{
         this.isLoading=false
 
-       const modalRef = this.modal.open(AlertsComponent,{size:'sm'})
+       const modalRef = this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
        modalRef.componentInstance.alertHeader='Exito'
        modalRef.componentInstance.mensaje='Parametros Actualizados con exito'
         this.getParametros()
@@ -179,12 +189,12 @@ export class ParametrosComponent implements OnInit {
       (error)=>{
         this.isLoading=false
 
-        const modalRef = this.modal.open(AlertsComponent,{size:'sm'})
+        const modalRef = this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader='Error'
         modalRef.componentInstance.mensaje='Hubo un error al guardar los parametros intente de nuevo mas tarde'
       },
       )
-
+this.susbcription.push(sb)
   }
 
 }

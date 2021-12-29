@@ -221,7 +221,7 @@
       </div>
       <br>
   <div class="row col-md-12">
-      <div class="col-sm-6">
+      <div class="col-sm-5">
           <input
           type="text"
           class="form-control form-control-lg form-control-solid"
@@ -234,8 +234,13 @@
           value=""
         />
       </div>
+      <div class="col-sm-2">
+        <button type="button" (click)="maxCantidad()" class="btn btn-danger">
+          [MAX]
+        </button>
+      </div>
       
-      <div class="col-sm-6">
+      <div class="col-sm-5">
               <input
               #notaAbono
               type="text"
@@ -491,10 +496,10 @@
        <th class="valor-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Valor </th>
        <td class="valor-columna"  mat-cell *matCellDef="let row" [ngStyle]="{'color': row.Cargo==0 ? 'green' : 'black'}" >
          <ng-container *ngIf="row.Abono==0">
-          $ {{row.Cargo.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}} 
+          {{this.divisasService.getcurrentDivisa.Simbolo}} {{row.Cargo.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}} 
          </ng-container>  
          <ng-container *ngIf="row.Cargo==0">
-          $ -{{row.Abono.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}
+          {{this.divisasService.getcurrentDivisa.Simbolo}} -{{row.Abono.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}
          </ng-container> 
        </td>
        <td mat-footer-cell *matFooterCellDef> ${{totalCalculado.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}  </td>

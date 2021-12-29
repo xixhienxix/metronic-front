@@ -43,15 +43,16 @@
 
   <br />
   <!-- </div>  -->
-  <div class="container">
-    <div class="col-lg-8">
+  <form [formGroup]="formGroup">
+  <div class="row container">
+    <div class="col-lg-7">
       <ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='Huesped en Casa'||customerService.getCurrentHuespedValue.estatus=='Check-Out'||customerService.getCurrentHuespedValue.estatus=='Uso Interno'||customerService.getCurrentHuespedValue.estatus=='Bloqueo / Sin Llegadas'||customerService.getCurrentHuespedValue.estatus=='Reserva Temporal'">
-        <mat-select  disabled style="width:160px; color: white; font-weight: bold; font-size: larger; " [(value)]="customerService.getCurrentHuespedValue.estatus" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn">
+        <mat-select formControlName='estatus' disabled style="color: white; font-weight: bold; font-size: larger; " [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn">
           <mat-option #option [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)"  [value]="customerService.getCurrentHuespedValue.estatus">{{customerService.getCurrentHuespedValue.estatus}}</mat-option>
         </mat-select>
       </ng-container>
       <ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='Reserva Sin Pago'||customerService.getCurrentHuespedValue.estatus=='Deposito Realizado'||customerService.getCurrentHuespedValue.estatus=='Esperando Deposito'||customerService.getCurrentHuespedValue.estatus=='Totalmente Pagada'||customerService.getCurrentHuespedValue.estatus=='Reserva Confirmada'">
-        <mat-select style="width: 160px; color: white; font-weight: bold; font-size: larger;  " #selected [(value)]="customerService.getCurrentHuespedValue.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn" >
+        <mat-select formControlName='estatus' style=" color: white; font-weight: bold; font-size: larger;  " #selected  (selectionChange)="openDialog(huesped,selected.value)" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn" >
           <ng-container *ngFor="let estatus of estatusArray">
             <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
               <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
@@ -59,21 +60,21 @@
           </ng-container>
         </mat-select>
       </ng-container>
-      <ng-container *ngIf="customerService.getCurrentHuespedValue.estatus=='No Show'||customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'">
-        <mat-select style="width:160px" [(value)]="customerService.getCurrentHuespedValue.estatus" [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn">
+      <ng-container  *ngIf="customerService.getCurrentHuespedValue.estatus=='No Show'||customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'">
+        <mat-select formControlName='estatus' [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" name="filter_for" id="demo" class="btn">
           <mat-option #option [style.background-color]="backgroundColor(customerService.getCurrentHuespedValue.estatus)" [value]="customerService.getCurrentHuespedValue.estatus">{{customerService.getCurrentHuespedValue.estatus}}</mat-option>
         </mat-select>
       </ng-container>
     </div>
-    <div class="col-lg-4">
-      <mat-select style="width: 160px; color: white; font-weight: bold; font-size: larger;  " name="estatusAma" id="amaDellaves" class="btn" >
+    <div class="col-lg-5">
+      <mat-select #selectedAma (selectionChange)='onChangeAma(selectedAma.value)' formControlName='ama' [(value)]="disponibilidadEstatus.Estatus_Ama_De_Llaves" style=" color: white; font-weight: bold; font-size: larger;" [style.background-color]="backgroundColorAmadeLlaves(disponibilidadEstatus.Estatus_Ama_De_Llaves)" name="estatusAma" id="amaDellaves" class="btn" >
         <ng-container *ngFor="let estatusAmaDeLlaves of amaDeLlavesList" >
-          <mat-option [value]="amaDeLlaves.Descripcion" [style.background-color]="backgroundColorAmadeLlaves(estatusAmaDeLlaves.Estatus)"> {{estatusAmaDeLlaves.Descripcion}}</mat-option>
+          <mat-option  [value]="estatusAmaDeLlaves.Descripcion" [style.background-color]="estatusAmaDeLlaves.Color"> {{estatusAmaDeLlaves.Descripcion}}</mat-option>
         </ng-container>
       </mat-select>
     </div>
   </div>
-  
+</form>
 <br>
 
   <!-- <div style="background-color: #00506a;" class="col-md-12 cursor-default modal-content "> -->
@@ -90,7 +91,7 @@
     </div>
 
     <label  style="color: white; font-size: large;">
-      $ {{ (customerService.getCurrentHuespedValue.porPagar).toLocaleString("es-MX") }}.00
+      {{this.divisasService.getcurrentDivisa.Simbolo}} {{ (customerService.getCurrentHuespedValue.porPagar).toLocaleString("es-MX") }}.00
     </label>
   </div>
     
@@ -103,7 +104,7 @@
         <label style="color: white"> Pagos y Descuentos: </label>
       </div>
 
-      <label style="color: white;font-size: large;"> $ {{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX")}}.00 </label>
+      <label style="color: white;font-size: large;"> {{this.divisasService.getcurrentDivisa.Simbolo}} {{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX")}}.00 </label>
     </div>
 
     <div
@@ -115,7 +116,7 @@
     </div>
 
     <label style="color: white;font-size: large;">
-      $ {{ (customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX") }}.00
+      {{this.divisasService.getcurrentDivisa.Simbolo}} {{ (customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX") }}.00
     </label>
   </div>
   </div>
@@ -161,7 +162,7 @@
       </div>
       <div class="col-lg-6">
         <button
-        [disabled]='llegaHoy'
+          [disabled]='llegaHoy'
           class="btn btn-success btn-block"
           type="submit"
           name="estatus"
@@ -310,53 +311,6 @@
 </div>
 
 
-<ng-template #error let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Error</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Ocurrio un Error al actualizar al Húesped intente de nuevo mas tarde&hellip;</p>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
-
-<ng-template #exito let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">{{mensaje_exito}}</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-
-  <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
-
-<ng-template #email let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title">Confirmar E-mail</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>Se enviara la confirmacion de la reservacion al siguiente email: </p>
-      <input #emailSender [value]="customerService.getCurrentHuespedValue.email">
-      <p>En caso de requerir que el envio sea a un email diferente corrigalo en la casilla</p> 
-    
-  </div>
-  <div class="modal-footer">
-    <app-loader-spinner *ngIf="enviandoEmail"></app-loader-spinner>
-    <button type="button" class="btn btn-success" (click)="enviarConfirmacion(emailSender.value)">Enviar</button>
-    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
-  </div>
-</ng-template>
 
 <ng-container *ngIf="isLoading">
   <app-loader-spinner></app-loader-spinner>

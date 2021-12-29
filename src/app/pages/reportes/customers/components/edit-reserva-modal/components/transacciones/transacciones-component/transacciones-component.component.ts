@@ -12,12 +12,15 @@ import { HuespedService } from 'src/app/pages/reportes/_services';
 import { AjustesComponent } from '../../../../helpers/ajustes-huesped/ajustes.component';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
-import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../../../main/alerts/alerts.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { map, startWith } from 'rxjs/operators';
 import { DetalleComponent } from '../helpers/detalle/detalle.component';
 import { SuperUserComponent } from 'src/app/pages/reportes/customers/helpers/authorization/super.user/super.user.component';
 import { MatPaginator } from '@angular/material/paginator';
+import {DateTime} from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -85,7 +88,7 @@ export class TransaccionesComponentComponent implements OnInit {
     Precio : 0
   }
   /**Subscription */
-  subscription:Subscription
+  subscription:Subscription[]=[]
   /*Models*/
   huesped:Huesped
 
@@ -114,7 +117,7 @@ export class TransaccionesComponentComponent implements OnInit {
   abonosChecked:boolean=false;
   cargosChecked:boolean=false;
   descuentosChecked:boolean=false;
-  fechaCancelado:Date;
+  fechaCancelado:DateTime;
 
   /**Forms */
   nuevosConceptosFormGroup:FormGroup;
@@ -142,15 +145,18 @@ export class TransaccionesComponentComponent implements OnInit {
     private edoCuentaService:Edo_Cuenta_Service,
     private codigosService:CodigosDeCargoService,
     private modalService: NgbModal,
-    private customerService:HuespedService
+    private customerService:HuespedService,
+    public parametrosService:ParametrosServiceService,
+    public divisasService:DivisasService
 
     ) {
-      this.subscription=this.edoCuentaService.getNotification().subscribe(data=>{
+      const sb =this.edoCuentaService.getNotification().subscribe(data=>{
         if(data)
         {
           this.getEdoCuenta();
         }
       });
+      this.subscription.push(sb)
      }
 
   ngOnInit(): void {
@@ -161,9 +167,14 @@ export class TransaccionesComponentComponent implements OnInit {
 
     
   }
+
+  maxCantidad(){
+    this.abonosf.cantidadAbono.patchValue(this.customerService.getCurrentHuespedValue.pendiente)
+  }
+
   actualizaHuesped(huesped:Huesped)
   {
-    this.customerService.updateHuesped(huesped).subscribe(
+    const sb = this.customerService.updateHuesped(huesped).subscribe(
       (Value)=>{
         console.log("Huesped Actualizado con Exito")
 
@@ -173,6 +184,7 @@ export class TransaccionesComponentComponent implements OnInit {
         console.log("Error al Actualizar Huesped")
       }
       )
+      this.subscription.push(sb)
   }    
 
   
@@ -215,7 +227,7 @@ export class TransaccionesComponentComponent implements OnInit {
   getEdoCuenta(){
     
     // this.editService.getCurrentHuespedValue.folio
-    this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
+   const sb = this.edoCuentaService.getCuentas(this.customerService.getCurrentHuespedValue.folio).subscribe(
       (result:edoCuenta[])=>{
         
         this.estadoDeCuenta=[]
@@ -295,7 +307,7 @@ export class TransaccionesComponentComponent implements OnInit {
         if (err)
         {
 
-            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje=err.message
 
@@ -313,10 +325,12 @@ export class TransaccionesComponentComponent implements OnInit {
       },
       ()=>{}
       )
+
+      this.subscription.push(sb)
   }
 
   getCodigosDeCargo(){
-    this.codigosService.getCodigosDeCargo().subscribe(
+    const sb = this.codigosService.getCodigosDeCargo().subscribe(
       (result:Codigos[])=>{
         for(let i=0;i<result.length;i++)
         {
@@ -339,7 +353,7 @@ export class TransaccionesComponentComponent implements OnInit {
 
 
 
-            const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+            const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje=err.message
             modalRef.result.then((result) => {
@@ -356,6 +370,7 @@ export class TransaccionesComponentComponent implements OnInit {
       },
 
     );
+    this.subscription.push(sb)
   }
   nuevoConcepto(){
     if(this.nuevosConceptos==true)
@@ -462,7 +477,7 @@ this.nuevosConceptos=false
 
     this.isLoading=true
 
-    const modalRef = this.modalService.open(SuperUserComponent,{size:'sm'})
+    const modalRef = this.modalService.open(SuperUserComponent,{ size: 'sm', backdrop:'static' })
     modalRef.result.then((result) => {
       this.isLoading=false
 
@@ -471,11 +486,11 @@ this.nuevosConceptos=false
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
 
       });
-    modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
-      
-          if(receivedEntry)
+   const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+
+          if(receivedEntry.id==3)
           {
-            this.fechaCancelado=new Date()
+            this.fechaCancelado=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
             
                   if(edo_cuenta.Forma_De_Pago=='No Aplica')
                   {
@@ -490,7 +505,7 @@ this.nuevosConceptos=false
                     (value)=>{
                       this.isLoading=false
 
-                      const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                      const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
                       modalRef.componentInstance.alertHeader = 'Exito'
                       modalRef.componentInstance.mensaje='Movimiento Cancelado con Exito'   
                         setTimeout(() => {
@@ -505,7 +520,7 @@ this.nuevosConceptos=false
                       this.isLoading=false
                       if(error)
                       {
-                        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+                        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
                         modalRef.componentInstance.alertHeader = 'Error'
                         modalRef.componentInstance.mensaje='No se pudo actualizar el estatus del Movimiento, Intente de nuevo mas tarde'
                       
@@ -517,15 +532,15 @@ this.nuevosConceptos=false
                     }
                   }
                     )
-          }else 
+          }
+          else 
           {
-            const modalRef2= this.modalService.open(AlertsComponent,{size:'md'})
+            const modalRef2= this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef2.componentInstance.alertHeader='Error'
-            modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
-            return
+            modalRef2.componentInstance.mensaje=receivedEntry.message
           }
       })
-
+this.subscription.push(sb)
 
   }
 
@@ -757,8 +772,7 @@ this.nuevosConceptos=false
 
   onSubmit(){
     
-    
-
+  
     let pago:edoCuenta;
 
     if(this.nuevosConceptos)
@@ -774,7 +788,7 @@ this.nuevosConceptos=false
         pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:'',
         Descripcion:this.nuevas.nuevoConcepto.value,
@@ -797,7 +811,7 @@ this.nuevosConceptos=false
         pago = {
 
           Folio:this.customerService.getCurrentHuespedValue.folio,
-          Fecha:new Date(),
+          Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
           Fecha_Cancelado:'',
           Referencia:'',
           Descripcion:this.codigoDeCargo.Descripcion,
@@ -815,10 +829,10 @@ this.nuevosConceptos=false
 
     
 this.isLoading=true
-    this.edoCuentaService.agregarPago(pago).subscribe(
+    const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
         
@@ -840,7 +854,7 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
         
@@ -856,6 +870,7 @@ this.isLoading=true
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
   }
 
   onSubmitAbono(){
@@ -874,7 +889,7 @@ this.isLoading=true
       pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:this.abonosf.notaAbono.value,
         Descripcion:this.abonosf.conceptoManual.value,
@@ -889,10 +904,10 @@ this.isLoading=true
 
     
 this.isLoading=true
-    this.edoCuentaService.agregarPago(pago).subscribe(
+    const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       ()=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
         
@@ -903,6 +918,7 @@ this.isLoading=true
           this.resetFiltros();
 
         this.formGroup.reset();
+        this.abonoFormGroup.reset();
         this.estadoDeCuenta=[]
         this.getEdoCuenta();
         
@@ -912,7 +928,7 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
         
@@ -928,6 +944,7 @@ this.isLoading=true
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
   }
   
 
@@ -950,7 +967,7 @@ this.isLoading=true
       descuento = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:'',
         Descripcion:this.second.motivoDesc.value,
@@ -971,7 +988,7 @@ this.isLoading=true
       descuento = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:new Date(),
+        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
         Referencia:'',
         Descripcion:this.second.motivoDesc.value + ' ('+this.second.qtyPrecio.value+'%'+')',
         Forma_de_Pago:'Descuento',
@@ -986,10 +1003,10 @@ this.isLoading=true
     }
 
     this.isLoading=true
-    this.edoCuentaService.agregarPago(descuento).subscribe(
+    const sb = this.edoCuentaService.agregarPago(descuento).subscribe(
       ()=>{
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Descuento Aplicado sobre el total de la cuenta'
         modalRef.result.then((result) => {
@@ -1014,7 +1031,7 @@ this.isLoading=true
         this.isLoading=false
         if(err)
         {
-          const modalRef = this.modalService.open(AlertsComponent, {size:'sm'});
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
           modalRef.result.then((result) => {
@@ -1034,11 +1051,12 @@ this.isLoading=true
       ()=>{//FINALLY
       }
       )
+      this.subscription.push(sb)
 
   }
   autoriza(){
     this.isLoading=true
-    const modalRef = this.modalService.open(SuperUserComponent,{size:'sm'})
+    const modalRef = this.modalService.open(SuperUserComponent,{ size: 'sm', backdrop:'static' })
     modalRef.result.then((result) => {
       this.isLoading=false
 
@@ -1051,23 +1069,25 @@ this.isLoading=true
 
           
       });
-    modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
+   const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
       this.isLoading=false
 
-          if(receivedEntry)
+          if(receivedEntry!='Usuario No Autorizado')
           {
             this.aplicaDescuento(receivedEntry.username);
           }else 
           {
-            const modalRef2= this.modalService.open(AlertsComponent,{size:'md'})
+            const modalRef2= this.modalService.open(AlertsComponent,{ size: 'md', backdrop:'static' })
             modalRef2.componentInstance.alertHeader='Error'
             modalRef2.componentInstance.mensaje='Usuario no autorizado para realizar descuentos'
           }
       })
+
+      this.subscription.push(sb)
   }
   /*MODALS*/
   ajustes(){
-    const modalRef = this.modalService.open(AjustesComponent,{size:'lg'})
+    const modalRef = this.modalService.open(AjustesComponent,{ size: 'lg', backdrop:'static' })
     modalRef.componentInstance.huesped = this.customerService.getCurrentHuespedValue
     modalRef.componentInstance.estadoDeCuenta=this.estadoDeCuenta
     modalRef.result.then((result) => {
@@ -1082,7 +1102,7 @@ this.isLoading=true
   }
   abrirDetalle(row:any){
 
-    const modalRef = this.modalService.open(DetalleComponent,{size:'md'})
+    const modalRef = this.modalService.open(DetalleComponent,{ size: 'md', backdrop:'static' })
     modalRef.componentInstance.row = row
     modalRef.componentInstance.folio = this.customerService.getCurrentHuespedValue.folio
     modalRef.componentInstance.fechaCancelado = row.Fecha_Cancelado.split('T')[0]
@@ -1167,5 +1187,8 @@ this.isLoading=true
         } else {
             return  `with: ${reason}`;
         }
+  }
+  ngOnDestroy(): void {
+    this.subscription.forEach(sb=>sb.unsubscribe())
   }
 }

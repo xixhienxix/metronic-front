@@ -27,9 +27,10 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import {HistoricoService} from '../../../_services/historico.service'
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {preAsigModel} from '../../../_models/_models_helpers/preAsig'
-import { AlertsComponent } from '../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import {DateTime} from 'luxon'
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
 // const todayDate = new Date();
 
@@ -179,6 +180,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   // todayString:string;
   personasXCuarto:any[]=[]
 
+  /*Subscriptions*/
+
   constructor(
     //Date Imports
     private modalService: NgbModal,
@@ -196,6 +199,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     private http: HttpClient,
     public i18n: NgbDatepickerI18n,
     public parametrosService:ParametrosServiceService,
+    public divisasService:DivisasService
     ) {
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
@@ -225,15 +229,17 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   }
 
   getParametros(){
-    this.parametrosService.getParametros().subscribe(
+    const sb = this.parametrosService.getParametros().subscribe(
       (value)=>{
         
       },
       (error)=>{
-        const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+        const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertsHeader='Error'
         modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
       })
+
+      this.subscriptions.push(sb)
   }
 
   loadCustomer() {
@@ -328,7 +334,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   getFolios(): void
   {
 
-    this.foliosService.getFolios()
+   const sb = this.foliosService.getFolios()
                       .pipe(map(
                         (responseData)=>{
                           const postArray = []
@@ -342,10 +348,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
                         .subscribe((folios)=>{
                           this.folios=(folios)
                         })
+
+                        this.subscriptions.push(sb)
+
   }
 
   getEstatus(): void {
-    this.estatusService.getEstatus()
+    const sb = this.estatusService.getEstatus()
                       .pipe(map(
                         (responseData)=>{
                           const postArray = []
@@ -362,6 +371,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
                             this.estatusArray=estatus
                           }
                         })
+
+                        this.subscriptions.push(sb)
 
   }
 
@@ -411,11 +422,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       let mesToDate = this.toDate.month.toString().padStart(2, '0');
       let anoToDate = this.toDate.year
 
-    const formData = this.formGroup.value;
-    this.huesped.origen=this.origenReserva;
-    this.huesped.llegada = diaFromDate +"/"+ mesFromDate +"/"+ anoFromDate
-    this.huesped.salida = diaToDate +"/"+ mesToDate +"/"+ anoToDate
-    this.huesped.nombre = formData.nombre;
+      const formData = this.formGroup.value;
+      this.huesped.origen=this.origenReserva;
+      this.huesped.llegada = diaFromDate +"/"+ mesFromDate +"/"+ anoFromDate
+      this.huesped.salida = diaToDate +"/"+ mesToDate +"/"+ anoToDate
+      this.huesped.nombre = formData.nombre;
 
 
         this.huesped.noches=Math.trunc((this.diaDif>=1) ? this.diaDif : (this.diaDif-1))
@@ -430,27 +441,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
         this.huesped.creada=this.todayString.split('-')[0]
         this.huesped.tipoHuesped="Regular"
 
-  //HISTORICO--------------------------------------------------------
-
-  // this.historicoService.addPost(this.huesped).subscribe(
-  //   ()=>{
-  //   },
-  //   (err)=>{
-  //     if(err)
-  //     {
-  //       console.log("Error al Guardar en el Historico log: "+ err)
-  //     }
-  //   },
-  //   ()=>{
-  //     console.log("Exito al Guardar en el historico folio: "+this.huesped.folio)
-  //   })
 
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
       ()=>{
         if(this.banderaExito)
         {
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Húesped Generado con éxito'          
           modalRef.result.then((result) => {
@@ -468,7 +465,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       },
       (err)=>{
         if(err){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje='No se pudo guardar el húesped intente de nuevo mas tarde'
           modalRef.result.then((result) => {
@@ -485,6 +482,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       });
 
       this.huesped.folio=this.huesped.folio+1
+
+      this.subscriptions.push(post)
+
     }
 
     this.modal.close();
@@ -579,7 +579,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   
   getHabitaciones()
   {
-    this.habitacionService.gethabitaciones()
+   const sb =  this.habitacionService.gethabitaciones()
     .subscribe((infoCuartos)=>{
       this.infoCuarto=infoCuartos
       for(let i=0;i<this.infoCuarto.length;i++)
@@ -592,11 +592,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
        }
       }
     })
+    this.subscriptions.push(sb)
+
   }
 
   getDispo()
   {
-    this.habitacionService.getCodigohabitaciones()
+   const sb = this.habitacionService.getCodigohabitaciones()
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -610,6 +612,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       .subscribe((codigoCuarto)=>{
         this.codigoCuarto=(codigoCuarto)
       })
+      this.subscriptions.push(sb)
+
   }
 
   searchArray(arr, codigoCuarto, capacidadMaxima) {
@@ -642,7 +646,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
     for (let i=0; i<(diaDif.days+1); i++) {
 
-      this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month,dispoFromDate.year)
+     const sb = this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month,dispoFromDate.year)
       .pipe(map(
         (responseData)=>{
           const postArray = []
@@ -683,6 +687,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
         })
       dispoFromDate.plus({ days: 1 })
+      this.subscriptions.push(sb)
+
     };
 
     }else
@@ -692,7 +698,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       let dispoToDate = this.toDate
     //
 
-    this.habitacionService.getHabitacionesbyTipo(this.cuarto)
+    const sb = this.habitacionService.getHabitacionesbyTipo(this.cuarto)
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -706,11 +712,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       .subscribe((cuartos)=>{
         this.cuartos=(cuartos)
       })
+      this.subscriptions.push(sb)
+
 
 
     for (let i=0; i<(diaDif.days+1); i++) {
 
-    this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
+    const sb = this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
     .pipe(map(
       (responseData)=>{
         const postArray = []
@@ -750,6 +758,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
       })
       dispoFromDate.plus({ days: 1 })
+      this.subscriptions.push(sb)
+
     };
 
     }
@@ -779,10 +789,12 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
       this.findInvalidControlsRecursive(this.formGroup);
 
-    this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
+    const sb = this.habitacionService.getInfoHabitaciones(numeroCuarto,codigo)
     .subscribe((infoCuartos)=>{
       this.infoCuarto=infoCuartos
     });
+
+    this.subscriptions.push(sb)
 
     if(this.quantity>this.infoCuarto[0].Personas)
     {
@@ -807,7 +819,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {
       this.dropDownHabValueIndex=$event.target.options.selectedIndex
         this.cuarto=""
-        this.habitacionService.gethabitaciones()
+        const sb = this.habitacionService.gethabitaciones()
         .pipe(map(
           (responseData)=>{
             const postArray = []
@@ -821,6 +833,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
           .subscribe((cuartos)=>{
             this.cuartos=(cuartos)
           })
+
+          this.subscriptions.push(sb)
+
         this.bandera=true
     }else
     {
@@ -843,7 +858,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {
       this.dropDownHabValueIndex=1
         this.cuarto=""
-        this.habitacionService.gethabitaciones()
+        const sb = this.habitacionService.gethabitaciones()
         .pipe(map(
           (responseData)=>{
             const postArray = []
@@ -858,6 +873,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
             this.cuartos=(cuartos)
           })
         this.bandera=true
+        this.subscriptions.push(sb)
+
     }else
     {
       this.dropDownHabValueIndex=""
@@ -985,6 +1002,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 
   onDateSelection(date: NgbDate) {
+
+    this.preAsig.clear();
 
     let fromDateNGB = {
       "year": this.fromDate.year,
@@ -1177,3 +1196,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   }
 
 
+
+
+  

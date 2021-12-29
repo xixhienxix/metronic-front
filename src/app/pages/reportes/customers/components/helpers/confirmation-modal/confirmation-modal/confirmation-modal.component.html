@@ -10,11 +10,11 @@
 </div>
 <div class="modal-body">
   <p>Esta seguro que desea actualizar el estatus de la reservacion con Folio # {{huesped.folio}}</p>
-  <p> al Estatus : {{huesped.estatus}}  </p>
+  <p> al Estatus : {{estatus}}  </p>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="customerService.fetch();closeModal('close')">Cerrar</button>
-  <button type="button" class="btn btn-primary" (click)="cambiaEstatus(huesped);closeModal('close')">Continuar</button>
+  <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="customerService.fetch();closeModal('Cancel')">Cerrar</button>
+  <button type="button" class="btn btn-primary" (click)="cambiaEstatus(huesped);closeModal('Cancel')">Continuar</button>
 </div>
 
 

@@ -15,8 +15,11 @@ import { Habitaciones } from 'src/app/pages/reportes/_models/habitaciones.model'
 import { FormBuilder,FormGroup,Validators } from '@angular/forms';
 import { NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 import { isThisTypeNode } from 'typescript';
-import { AlertsComponent } from '../alerts-component/alerts/alerts.component';
-
+import { AlertsComponent } from '../../../../../../main/alerts/alerts.component';
+import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
+import {DateTime} from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-modifica-huesped',
@@ -29,7 +32,8 @@ export class ModificaHuespedComponent implements OnInit {
   @ViewChild('matSelect') matSelect = null;
 
   huesped:Huesped;
-  huespedAnterior:any;
+  huespedAnterior:Huesped;
+  huespedSuperAnterior:Huesped;
   fullFechaSalida:string;
   fullFechaLlegada:string;
   closeResult: string;
@@ -46,14 +50,17 @@ export class ModificaHuespedComponent implements OnInit {
   selected:boolean = false;
 
   //Fechas
+
   model: NgbDateStruct;
-  fromDate: Date | null;
-  today: NgbDate | null;
-  comparadorInicial:Date;
+  fromDate: DateTime | null;
+  today: DateTime | null;
+  comparadorInicial:DateTime;
   display:boolean=true;
-  comparadorFinal:Date
-  toDate: Date | null;
+  comparadorFinal:DateTime
+  toDate: DateTime | null;
   minDate:{year:number,month:number,day:number}
+  llegadaString:string
+  salidaString:string
   //Disponibilidad
 
   cuarto:string;
@@ -61,6 +68,9 @@ export class ModificaHuespedComponent implements OnInit {
   tarifa:number;
   codigoCuartoString:string;
   codigo:any[]=[]
+
+  /*Subscription*/
+  subscription:Subscription[]=[]
 
   sinDisponibilidad:any[]=[]
   mySet = new Set();
@@ -90,80 +100,51 @@ export class ModificaHuespedComponent implements OnInit {
     public habitacionService:HabitacionesService,
     public fb: FormBuilder,
     private calendar: NgbCalendar,
+    public divisasService:DivisasService,
+    public parametrosService : ParametrosServiceService
 
   ) { 
-    const current = new Date();
-    this.minDate = {year:current.getUTCFullYear(),month:current.getUTCMonth()+1,day:current.getUTCDate()}
-    this.today= calendar.getToday();
 
-    // this.fromDate = calendar.getToday();
-    // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1);
+    const current = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.minDate = {year:current.year,month:current.month,day:current.day}
+    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    
+   
   }
 
   ngOnInit(): void {
-    this.fromDate = new Date(parseInt(this.huesped.llegada.split("/")[2]), parseInt(this.huesped.llegada.split("/")[1])-1, parseInt(this.huesped.llegada.split("/")[0]));
-    this.toDate = new Date(parseInt(this.huesped.salida.split("/")[2]), parseInt(this.huesped.salida.split("/")[1])-1, parseInt(this.huesped.salida.split("/")[0]));
-    this.formatFechas();
+    
+    const ano = this.huesped.llegada.split("/")[2]
+    const mes = this.huesped.llegada.split("/")[1]
+    const dia = this.huesped.llegada.split("/")[0]
+
+    const anoS = this.huesped.salida.split("/")[2]
+    const mesS = this.huesped.salida.split("/")[1]
+    const diaS = this.huesped.salida.split("/")[0]
+
+    this.fromDate = DateTime.fromObject({day:dia,month:mes,year:ano});
+    this.toDate = DateTime.fromObject({day:diaS,month:mesS,year:anoS});
+
+    this.fullFechaLlegada = this.fromDate.day + " de " + this.i18n.getMonthFullName(this.fromDate.month) + " del " + this.fromDate.year
+    this.fullFechaSalida = this.toDate.day + " de " + this.i18n.getMonthFullName(this.toDate.month) + " del " + this.toDate.year
+
+    this.llegadaString=this.huesped.llegada
+    this.salidaString=this.huesped.salida
+
+    this.comparadorInicial = this.fromDate
+    this.comparadorFinal = this.toDate
+
+    this.diaDif=this.toDate.diff(this.fromDate, ["days"])
+
+    
+
     this.loadForm();
     this.getCodigosCuarto();
     this.getHabitaciones();
     this.inicio=true;
   }
 
-  getHabitaciones()
-  {
-    this.habitacionService.gethabitaciones()
-    .subscribe((infoCuartos)=>{
-      this.cuartos=(infoCuartos)
-
-      this.infoCuarto=infoCuartos
-      for(let i=0;i<this.infoCuarto.length;i++)
-      {
-       const exist = this.personasXCuarto.find(x => x.Codigo === this.infoCuarto[i].Codigo);
-       
-       if(exist===undefined)
-       { 
-         this.personasXCuarto.push(this.infoCuarto[i])//FUNCIONO
-       }
-      }
-    })
-
-
-   
-  }
-
-  getCodigosCuarto()
-  {
-    this.codigoCuarto=[]
-    this.habitacionService.getCodigohabitaciones()
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-          postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
-      .subscribe((codigoCuarto)=>{
-        this.codigoCuarto=(codigoCuarto)
-      })
-  }
-
   loadForm() {
-
-    // this.modificaHuespedFormGroup = this.fb.group({
-    //   'tipoCuarto': [ undefined, Validators.required ],
-    //   'numeroHab' : [undefined,Validators.required],
-
-    // });
-    this.huespedAnterior = {
-      Habitacion:this.huesped.habitacion,
-      Cuarto:this.huesped.numeroCuarto,
-      Llegada:this.huesped.llegada,
-      Salida:this.huesped.salida
-    }
 
     this.fechasFormGroup = this.fb.group({
       fechaInicial:[''],
@@ -179,39 +160,75 @@ export class ModificaHuespedComponent implements OnInit {
     }
   }
 
+  getHabitaciones()
+  {
+   const sb = this.habitacionService.gethabitaciones()
+    .subscribe((infoCuartos)=>{
+      this.cuartos=(infoCuartos)
+
+      this.infoCuarto=infoCuartos
+      for(let i=0;i<this.infoCuarto.length;i++)
+      {
+       const exist = this.personasXCuarto.find(x => x.Codigo === this.infoCuarto[i].Codigo);
+       
+       if(exist===undefined)
+       { 
+         this.personasXCuarto.push(this.infoCuarto[i])//FUNCIONO
+       }
+      }
+    })
+
+    this.subscription.push(sb)
+   
+  }
+
+  getCodigosCuarto()
+  {
+    this.codigoCuarto=[]
+   const sb =  this.habitacionService.getCodigohabitaciones()
+    .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          if(responseData.hasOwnProperty(key))
+          postArray.push(responseData[key]);
+        }
+        return postArray
+      }))
+      .subscribe((codigoCuarto)=>{
+        this.codigoCuarto=(codigoCuarto)
+      })
+
+      this.subscription.push(sb)
+  }
+
+
+
  get fechas (){return this.fechasFormGroup.controls}
 
 
-  formatFechas()
-  {
-    const diaLlegada = parseInt(this.huesped.llegada.split("/")[0])
-    const mesLlegada = parseInt(this.huesped.llegada.split("/")[1])
-    const anoLlegada = parseInt(this.huesped.llegada.split("/")[2])
-    const fechaLlegada = new Date(anoLlegada,mesLlegada,diaLlegada)
-    this.fullFechaLlegada = fechaLlegada.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaLlegada.getUTCMonth()) + "/" + fechaLlegada.getFullYear().toString()
-
-    const diaSalida = parseInt(this.huesped.salida.split("/")[0])
-    const mesSalida = parseInt(this.huesped.salida.split("/")[1])
-    const anoSalida = parseInt(this.huesped.salida.split("/")[2])
-    const fechaSalida = new Date(anoSalida,mesSalida,diaSalida)
-    this.fullFechaSalida = fechaSalida.getUTCDate().toString() + "/" + this.i18n.getMonthShortName(fechaSalida.getUTCMonth()) + "/" + fechaSalida.getFullYear().toString()
-  }
-
   fechaSeleccionadaInicial(event:NgbDate){
+    this.expandedPane=true;
+    this.inicio=false;
+    this.cuarto=this.huesped.habitacion;
+    this.sinDisponibilidad=[];
+    this.accordionDisplay="";
+
     this.accordionDisplay="display:none";
 
-    this.fromDate = new Date(event.year,event.month-1,event.day) 
+    // this.fromDate = DateTime.fromObject({year:event.year,month:event.month,day:event.day}) 
 
-    this.huesped.llegada=event.day+"/"+event.month+"/"+event.year
+    this.llegadaString=event.day+"/"+event.month+"/"+event.year
 
-    this.comparadorInicial = new Date(event.year,event.month-1,event.day)
+    this.comparadorInicial = DateTime.fromObject({year:event.year,month:event.month,day:event.day})
   
     this.fullFechaLlegada= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
   
-    if(this.comparadorInicial>this.comparadorFinal)
+    if(this.comparadorInicial>=this.comparadorFinal)
     {
       this.display=false
-    }else if(this.comparadorInicial<this.comparadorFinal)
+    }else if(this.comparadorInicial<=this.comparadorFinal)
     {this.display=true}
 
     this.expandedPane=true;
@@ -221,35 +238,36 @@ export class ModificaHuespedComponent implements OnInit {
 
 
   fechaSeleccionadaFinal(event:NgbDate){
+    this.expandedPane=true;
+    this.inicio=false;
+    this.cuarto=this.huesped.habitacion;
+    this.sinDisponibilidad=[];
+    this.accordionDisplay="";
+
     this.accordionDisplay="display:none";
+    // this.toDate = DateTime.fromObject({year:event.year,month:event.month,day:event.day}) 
 
-    this.toDate = new Date(event.year,event.month-1,event.day) 
+    this.salidaString=event.day+"/"+event.month+"/"+event.year
 
-    this.huesped.salida=event.day+"/"+event.month+"/"+event.year
-
-    this.comparadorFinal = new Date(event.year,event.month-1,event.day)
+    this.comparadorFinal = DateTime.fromObject({year:event.year,month:event.month,day:event.day})
   
     this.fullFechaSalida= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
   
-    if(this.comparadorInicial>this.comparadorFinal)
+    if(this.comparadorInicial>=this.comparadorFinal)
     {
       this.display=false
-    }else if(this.comparadorInicial<this.comparadorFinal)
+    }else if(this.comparadorInicial<=this.comparadorFinal)
     {this.display=true}
 
     this.expandedPane=true;
     this.sinDisponibilidad=[];
-   this.diasDiferencia();
+    this.diasDiferencia();
 
   }
 
   diasDiferencia(){
-    // let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-    // let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    var Difference_In_Time=this.toDate.getTime()-this.fromDate.getTime()
-    var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-    this.diaDif=Math.floor(Difference_In_Days)
-    // this.diaDif = Math.floor((Date.UTC(this.toDate.getFullYear(), this.toDate.getMonth(), this.toDate.getDate()) - Date.UTC(this.fromDate.getFullYear(), this.fromDate.getMonth(), this.fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+
+    this.diaDif=this.comparadorFinal.diff(this.comparadorInicial, ["days"])
 
   }
 
@@ -260,19 +278,24 @@ export class ModificaHuespedComponent implements OnInit {
     this.cuarto=codigoHabitacion;
     this.sinDisponibilidad=[];
     this.accordionDisplay="";
+    
     //  let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
     //  let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
     // let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24))
+    
+    let diaDif = this.comparadorFinal.diff(this.comparadorInicial, ["years", "months", "days", "hours"])
+    this.diaDif = diaDif.days
 
-
+    let dispoFromDate = this.comparadorInicial
+    let dispoToDate = this.comparadorFinal
 
     if(codigoHabitacion=='1')
     {
           this.bandera=true
           // this.bandera=false;
-            for (let i=0; i<this.diaDif; i++) 
+          for (let i=0; i<(diaDif.days+1); i++) 
             {
-            this.disponibilidadService.getdisponibilidadTodos(this.fromDate.getDate(), this.fromDate.getMonth()+1, this.fromDate.getFullYear())
+          const sb = this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year)
             .pipe(map(
               (responseData)=>{
                 const postArray = []
@@ -291,7 +314,10 @@ export class ModificaHuespedComponent implements OnInit {
                   this.disponibilidad=(disponibles)
                   if(disponibles[i].Estatus==0)
                   {
-                    this.sinDisponibilidad.push(disponibles[i].Habitacion)
+                    if(!(dispoFromDate.startOf("day") >= this.fromDate.startOf("day") && dispoFromDate.startOf("day") <= this.toDate.startOf("day")))
+                    {
+                      this.sinDisponibilidad.push(disponibles[i].Habitacion)
+                    }
                   }
                   this.mySet.add(this.disponibilidad[i].Habitacion)
                 }
@@ -299,9 +325,13 @@ export class ModificaHuespedComponent implements OnInit {
                 {
                   this.mySet.delete(this.sinDisponibilidad[i])
                 }
-                console.log("mySEt Todos los Cuartos", this.mySet)
+                if(dispoToDate.startOf("day")< this.fromDate.startOf("day") && dispoToDate.startOf("day") > this.toDate.startOf("day"))
+                {
+                  this.mySet.add(this.huesped.numeroCuarto)
+                }
               })
-              this.fromDate.setDate(this.fromDate.getDate() + 1);
+              dispoFromDate.plus({ days: 1 })
+              this.subscription.push(sb)
             };
         // })
     }
@@ -309,9 +339,10 @@ export class ModificaHuespedComponent implements OnInit {
     else
     {
       this.bandera=false;
-      for (let i=0; i<this.diaDif; i++) {
+      for (let i=0; i<(diaDif.days+1); i++)  
+      {
 
-      this.disponibilidadService.getdisponibilidad(this.fromDate.getDate(), this.fromDate.getMonth()+1, this.fromDate.getFullYear(),this.cuarto)
+      const sb = this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
       .pipe(map(
         (responseData)=>{
           const postArray = []
@@ -329,7 +360,10 @@ export class ModificaHuespedComponent implements OnInit {
             this.disponibilidad=(disponibles)
             if(disponibles[i].Estatus==0)
             {
-              this.sinDisponibilidad.push(disponibles[i].Habitacion)
+              if(!(dispoFromDate.startOf("day") >= this.fromDate.startOf("day") && dispoFromDate.startOf("day") <= this.toDate.startOf("day")))
+              {
+                this.sinDisponibilidad.push(disponibles[i].Habitacion)
+              }
             }
              this.mySet.add(this.disponibilidad[i].Habitacion)
           }
@@ -337,40 +371,23 @@ export class ModificaHuespedComponent implements OnInit {
           {
             this.mySet.delete(this.sinDisponibilidad[i])
           }
-
-          console.log("mySet x tipo",this.mySet)
         })
-        this.fromDate.setDate(this.fromDate.getDate() + 1);
+        dispoFromDate.plus({ days: 1 })
+        this.subscription.push(sb)
       };
     }
+
   }
 
-  // checkedUp(event,index:number,codigo:string){
-  //   for(let i=0; i<this.cuartos.length;i++)
-  //   {
-  //     if(event.checked)
-  //     {
-  //       if(this.cuartos[i].Codigo==codigo)
-  //       {
-  //         if(this.cuartos[i].Numero!=index)
-  //         {
-  //           this.cuartos[i].checkBox=false
-  //         }
-  //       }
-  //     }
-
-  //   }
-  // }
   cuartoValue(selected:boolean,value:any)
   {
-    let index;
-    let indexTipo;
-    ;
 
-    this.habitacionService.getHabitacionbyNumero(value)
+   const sb =  this.habitacionService.getHabitacionbyNumero(value)
       .subscribe((cuartos)=>{
         this.codigo=(cuartos)
       })
+
+      this.subscription.push(sb)
 
   }
 
@@ -379,74 +396,69 @@ export class ModificaHuespedComponent implements OnInit {
   }
 
 
-
-
-
     habitacionSeleccionada(cuarto:number,codigo:string,tarifa:number){
       this.numCuartoNumber=cuarto;
       this.codigoCuartoString=codigo;
       this.tarifa=tarifa;
     }
 
-    // revisaDatos(){
-    //   if(this.numCuartoNumber==undefined||this.codigoCuartoString==undefined)
-    //   {
-    //     const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-    //     modalRef.componentInstance.alertHeader='Error'
-    //     modalRef.componentInstance.mensaje='Debes seleccionar una habitacion antes de guardar los cambios'
-    //     modalRef.result.then((result) => {
-    //       this.closeResult = `Closed with: ${result}`;
-    //       }, (reason) => {
-    //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    //       });
-    //       setTimeout(() => {
-    //         modalRef.close('Close click');
-    //       },4000)
-    //   }else 
-    //   {
-    //     this.actualizarDatos();
-    //   }
-    // }
     actualizarDatos(){
 
-    this.huesped.noches=this.diaDif
+      if(this.cuarto==undefined)
+      { 
+        const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader='Advertencia'
+        modalRef.componentInstance.mensaje='No ah seleccionado ninguna habitacion, seleccione una habitación para continuar'
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
 
+          return
+      }
+      if(this.comparadorInicial.startOf("day") == this.fromDate.startOf("day") && this.comparadorFinal.startOf("day") == this.toDate.startOf("day") && this.huesped.numeroCuarto == this.numCuartoNumber && this.huesped.habitacion == this.codigoCuartoString)
+      {
+        const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader='Advertencia'
+        modalRef.componentInstance.mensaje='No hay Datos que Actualizar'
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+
+          return
+      }
+
+
+   const sb = this.customerService.updateHuespedModifica(this.customerService.getCurrentHuespedValue).subscribe(
+      (value)=>{
+        
+    this.huesped.noches=this.diaDif
     this.huesped.tarifa=this.tarifa
-   
     this.huesped.habitacion=this.codigoCuartoString
     this.huesped.numeroCuarto=this.numCuartoNumber,
     this.huesped.pendiente=this.huesped.tarifa*this.diaDif
     this.huesped.porPagar=this.huesped.tarifa*this.diaDif
 
-    console.log(this.huesped.pendiente)
-    console.log(this.huesped.porPagar)
-    console.log(this.huesped.noches)
+    
+    this.huesped.llegada=this.comparadorInicial.day+'/'+this.comparadorInicial.month+'/'+this.comparadorInicial.year
+    this.huesped.salida=this.comparadorFinal.day+'/'+this.comparadorFinal.month+'/'+this.comparadorFinal.year
 
-      this.customerService.updateHuesped(this.huesped).subscribe(
+     const sb = this.customerService.updateHuesped(this.huesped).subscribe(
         (value)=>{
+
           this.customerService.setCurrentHuespedValue=this.huesped
-
-          this.customerService.updateHuespedModifica(this.huespedAnterior).subscribe(
-            (err)=>{
-              if(err)
-              {
-                const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
-                modalRef.componentInstance.alertHeader = 'Error'
-                modalRef.componentInstance.mensaje='No se pudo liberar la Disponibilidad'
-              }
-            },
-            (value)=>{
-              const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
-              modalRef.componentInstance.alertHeader = 'Exito'
-              modalRef.componentInstance.mensaje='Disponibilidad liberada con exito'
-            }
-            )
-            
-
           this.passEntry.emit(this.huesped);
-          this.customerService.setCurrentHuespedValue=this.huesped
 
-          const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Exito'
           modalRef.componentInstance.mensaje='Datos del Húesped Actualizados con Exito'
           modalRef.result.then((result) => {
@@ -463,7 +475,7 @@ export class ModificaHuespedComponent implements OnInit {
         (err)=>{
           if(err)
           {
-            const modalRef=this.modalService.open(AlertsComponent,{size:'sm'})
+            const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
             modalRef.componentInstance.alertHeader = 'Error'
             modalRef.componentInstance.mensaje='Ocurrio un Error al actualizar al húesped'
             modalRef.result.then((result) => {
@@ -476,13 +488,17 @@ export class ModificaHuespedComponent implements OnInit {
               },4000)
             }
 
-        },
-        ()=>{
-          //
-
-        }
-        )
-    }
+        })
+        this.subscription.push(sb)
+        
+        
+      },
+      (error)=>
+      { 
+      
+      })
+      this.subscription.push(sb)
+   }
 
     okayChecked() {
       this.matSelect.close()
@@ -511,5 +527,7 @@ export class ModificaHuespedComponent implements OnInit {
               return  `with: ${reason}`;
           }
     }
-
+    ngOnDestroy(): void {
+      this.subscription.forEach(sb => sb.unsubscribe())
+    }
 }

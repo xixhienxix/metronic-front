@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Huesped} from './_models/customer.model'
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { NgPaginationNumber } from 'src/app/_metronic/shared/crud-table/components/paginator/ng-pagination/ng-pagination.component';
 import { HuespedService } from './_services';
 import {Injectable} from '@angular/core'
@@ -21,20 +21,31 @@ import { Bloqueo } from './_models/bloqueo.model';
 })
 export class ReportesComponent implements OnInit {
 
-  constructor(private http:HttpClient) { }
+  private subscriptions : Subscription[]=[]
+  sb:any
+
+  constructor(private http:HttpClient) 
+  { 
+  }
 
   menssage : any;
   private huesped:Huesped[]=[];
   private postsUpdated = new Subject<Huesped[]>();
   private folios:Foliador[]=[];
 
+  ngOnDestroy(){
+    this.subscriptions.forEach((sb)=>sb.unsubscribe());
+  }
+
   getPost(){
-    this.http
+    const sb = this.http
     .get<{huesped:Huesped[]}>
     (environment.apiUrl + '/reportes/huesped')
     .subscribe( (postHuesped) => {
       this.huesped = postHuesped.huesped
     });
+    
+    this.subscriptions.push(sb);
 
   }
 
@@ -47,11 +58,14 @@ export class ReportesComponent implements OnInit {
 
   actualizaEstatusHabitacion(id:number)
   {
-    this.http
+  const sb =  this.http
     .post<{ message: string }>(environment.apiUrl+"/reportes/habitacion/estatus/:id", id)
     .subscribe(responseData => {
       console.log(responseData.message);
     });
+    
+    this.subscriptions.push(sb);
+
   }
 
 

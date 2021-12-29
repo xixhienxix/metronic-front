@@ -7,7 +7,9 @@ import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { Huesped_Detail } from 'src/app/pages/reportes/_models/huesped.details.model';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Huesped_Detail_Service } from 'src/app/pages/reportes/_services/huesped.detail.service';
-import { AlertsComponent } from '../../../../helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from '../../../../../../../../main/alerts/alerts.component';
+import {DateTime} from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 const EMPTY_DETAILS ={
   ID_Socio:null,
@@ -40,11 +42,15 @@ export class HuespedComponentComponent implements OnInit {
   checkedListaNegra:boolean=false;
 
   /**DATES */
-  fromDate: NgbDate | null;
-  toDate: NgbDate | null;
+  fromDate: DateTime | null;
+  toDate: DateTime | null;
   fechaFinalBloqueo:string
   model: NgbDateStruct;
-  today = this.calendar.getToday();
+  today:DateTime|null;
+  todayString:string;
+  
+  /**Subscriptions */
+  subscription:Subscription[]=[]
 
   formGroup: FormGroup;
   facturacionFormGroup: FormGroup;
@@ -65,7 +71,6 @@ export class HuespedComponentComponent implements OnInit {
   modifica:boolean = true;
   isLoading:boolean=false;
   
-  private subscriptions: Subscription[] = [];
 
   constructor(
     public formatter: NgbDateParserFormatter,
@@ -75,20 +80,25 @@ export class HuespedComponentComponent implements OnInit {
     public modal: NgbActiveModal,
     public fb : FormBuilder,
     public modalService : NgbModal,
-    private detallesService : Huesped_Detail_Service
+    private detallesService : Huesped_Detail_Service,
+    public parametrosService : ParametrosServiceService
   ) 
   {  
-    this.fromDate = calendar.getToday();
-    this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
+    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+
+    this.fromDate = DateTime.now().setZone({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
+    this.toDate = DateTime.now().setZone({ zone: this.parametrosService.getCurrentParametrosValue.zona}) .plus({ days: 1 }) 
+    console.log(this.fromDate)
+    console.log(this.toDate)
     this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
   }
 
   ngOnInit(): void {
-    this.customerService.huespedUpdate$.subscribe((value)=>{
+    const sb = this.customerService.huespedUpdate$.subscribe((value)=>{
       this.huesped=value
       
 
-      this.detallesService.getDetailsById(this.huesped.ID_Socio).subscribe(
+       const sb =this.detallesService.getDetailsById(this.huesped.ID_Socio).subscribe(
         (response)=>{
           this.detailsList=response
           if(response){
@@ -116,8 +126,9 @@ export class HuespedComponentComponent implements OnInit {
           this.detailsList=EMPTY_DETAILS
         }
         )
+        this.subscription.push(sb)
     })
-
+    this.subscription.push(sb)
     this.loadForm();
 
   }
@@ -157,6 +168,9 @@ export class HuespedComponentComponent implements OnInit {
     return this.formGroup.controls
   }
 
+  formatDate(fecha:any){
+  this.todayString= fecha.day+" de "+this.i18n.getMonthFullName(fecha.month)+" del "+fecha.year
+  }
 
   save() {
     this.getNumeroSocio();
@@ -212,13 +226,13 @@ export class HuespedComponentComponent implements OnInit {
 
     }
     this.isLoading=true;
-    this.customerService.updateHuesped(this.huesped).subscribe(
+    const sb = this.customerService.updateHuesped(this.huesped).subscribe(
       (value)=>{
 
-        this.detallesService.updateDetails(this.detailsList).subscribe(
+        const sb = this.detallesService.updateDetails(this.detailsList).subscribe(
           (response)=>{
             this.isLoading=false
-            const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='Exito'
               modalRef.componentInstance.mensaje = 'Datos del Huesped Actualizados con exito'
           },
@@ -227,23 +241,25 @@ export class HuespedComponentComponent implements OnInit {
             {
               this.isLoading=false
 
-              const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+              const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='Error'
               modalRef.componentInstance.mensaje = 'No se pudieron actualizar los datos del detalle del huesped'
             }
           })
+          this.subscription.push(sb)
       },
       (error)=>{
         if(error)
         {
           this.isLoading=false
 
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Error'
           modalRef.componentInstance.mensaje = 'No se pudieron actualizar los datos del Huesped'
         }
       }
       );
+      this.subscription.push(sb)
 
 
   }
@@ -252,7 +268,7 @@ export class HuespedComponentComponent implements OnInit {
   }
   
   getNumeroSocio(){
-    this.detallesService.getDetails().subscribe(
+   const sb = this.detallesService.getDetails().subscribe(
       (value)=>{
         if(value){
           this.id_Socio = value.ID_Socio + 1
@@ -264,11 +280,12 @@ export class HuespedComponentComponent implements OnInit {
       },
       (err)=>{
         if(err){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader='Error'
           modalRef.componentInstance.mensaje ='No se pudieron recuperar los datos del numero de Socio'
         }
       })
+      this.subscription.push(sb)
   }
 
   // idSocio(){
@@ -289,7 +306,7 @@ export class HuespedComponentComponent implements OnInit {
         return of(this.huesped);
       }),
     ).subscribe((res: Huesped) => this.huesped = res);
-    this.subscriptions.push(sbCreate);
+    this.subscription.push(sbCreate);
   }
 
   // helpers for View
@@ -346,7 +363,7 @@ export class HuespedComponentComponent implements OnInit {
     return parsed && this.calendar.isValid(NgbDate.from(parsed)) ? NgbDate.from(parsed) : currentValue;
   }
   ngOnDestroy(): void {
-    this.subscriptions.forEach(sb => sb.unsubscribe());
+    this.subscription.forEach(sb => sb.unsubscribe());
   }
 }
 

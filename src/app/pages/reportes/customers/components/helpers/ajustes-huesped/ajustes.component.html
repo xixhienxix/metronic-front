@@ -64,7 +64,7 @@
   <ng-container matColumnDef="Abono">
     <mat-header-cell *matHeaderCellDef>Abono</mat-header-cell>
     <mat-cell class="duration-cell" *matCellDef="let lesson">$ {{lesson.Abono.toLocaleString("es-MX")}}.00</mat-cell>
-    <mat-footer-cell *matFooterCellDef> Total: $ {{getTotal()}}.00</mat-footer-cell>
+    <mat-footer-cell *matFooterCellDef> Total: {{divisasService.getcurrentDivisa.Simbolo}} {{getTotal()}}.00</mat-footer-cell>
   </ng-container>
   
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
@@ -118,7 +118,6 @@
             <mat-footer-cell *matFooterCellDef></mat-footer-cell>
         
         </ng-container>
-        
         <ng-container matColumnDef="Cargo">
           <mat-header-cell *matHeaderCellDef>Cargo</mat-header-cell>
           <mat-cell class="duration-cell" *matCellDef="let lesson">$ {{lesson.Cargo.toLocaleString("es-MX")}}.00</mat-cell>
@@ -128,7 +127,7 @@
         <ng-container matColumnDef="Abono">
           <mat-header-cell *matHeaderCellDef>Abono</mat-header-cell>
           <mat-cell class="duration-cell" *matCellDef="let lesson">$ {{lesson.Abono.toLocaleString("es-MX")}}.00</mat-cell>
-          <mat-footer-cell *matFooterCellDef> Total: $ {{getTotalAjustes()}}.00</mat-footer-cell>
+          <mat-footer-cell *matFooterCellDef> Total: {{divisasService.getcurrentDivisa.Simbolo}} {{getTotalAjustes()}}.00</mat-footer-cell>
         </ng-container>
         
           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

@@ -5,7 +5,7 @@
         <label class="control-label">Periodo:</label>
         <br />
         &nbsp;
-        <label>{{ fullFechaLlegada }} - {{ fullFechaSalida }} </label>
+        <label>{{ fullFechaLlegada }} <br>al<br> {{ fullFechaSalida }} </label>
       </div>
       <div class="col-md-6">
         <br />
@@ -157,10 +157,10 @@
                      placeholder="Seleccione Fecha de Promesa"
                      [footerTemplate]="footerTemplate" 
                      #d="ngbDatepicker"
-                     [value]="fechaFinalBloqueo"
-                     [(ngModel)]="model"
+                     [value]="todayString"
                      (click)="d.toggle()"
-                     (dateSelect)="fechaSeleccionadaFinal($event)" >
+                     (dateSelect)="formatDate($event)" 
+                     >
               <div class="input-group-append">
                 <button [disabled]="huesped.estatus=='Reserva Cancelada'||huesped.estatus=='No Show'" class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
                   <i class="fa fa-calendar icon"></i>

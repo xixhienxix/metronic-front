@@ -140,8 +140,7 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
 
   updateHuesped(huesped:Huesped)
   {
-    return this.http
-    .post(environment.apiUrl+'/reportes/actualiza/huesped',{huesped})
+    return this.http.post(environment.apiUrl+'/reportes/actualiza/huesped',{huesped})
   }
 
   
@@ -155,6 +154,11 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   {
     return this.http
     .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida})
+  }
+
+  deleteHuesped(_id:string){
+    return this.http
+    .delete(environment.apiUrl+'/huesped/delete/'+_id)
   }
 
   ngOnDestroy() {

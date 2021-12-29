@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Parametros } from '../_models/parametros';
+import { DivisasService } from './divisas.service';
 const DEFAULT_PARAMS ={
   _id:'',
   iva:16,
@@ -22,7 +23,8 @@ export class ParametrosServiceService {
 
   private currentParametros$=new BehaviorSubject<Parametros>(DEFAULT_PARAMS);
 
-  constructor(public http:HttpClient) { }
+  constructor(public http:HttpClient,
+    private divisaService:DivisasService) { }
 
   get getCurrentParametrosValue(): Parametros {
     return this.currentParametros$.value;
@@ -31,6 +33,8 @@ export class ParametrosServiceService {
   set setCurrentParametrosValue(huesped: Parametros) {
     this.currentParametros$.next(huesped);
   }
+
+
   getParametros(){
     return this.http.get<Parametros>(environment.apiUrl+'/parametros').pipe(map(
       (value)=>{
@@ -39,7 +43,8 @@ export class ParametrosServiceService {
          {
            if(value.hasOwnProperty(key))
            postArray.push(value[key]);
-           this.setCurrentParametrosValue =postArray[0]        
+           this.setCurrentParametrosValue =postArray[0] 
+           this.divisaService.getDivisasByParametro(postArray[0].divisa)       
           }
       }))
   }

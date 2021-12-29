@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { AuthService } from '../_services/auth.service';
 import { first } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsComponent } from 'src/app/pages/reportes/customers/components/helpers/alerts-component/alerts/alerts.component';
+import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 enum ErrorStates {
   NotSubmitted,
   HasError,
@@ -36,7 +36,10 @@ export class ForgotPasswordComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
   }
-
+  ngOnDestroy():void
+  {
+    this.unsubscribe.forEach(sb=>sb.unsubscribe())
+  }
   // convenience getter for easy access to form fields
   get f() {
     return this.forgotPasswordForm.controls;
@@ -64,7 +67,7 @@ export class ForgotPasswordComponent implements OnInit {
       (value)=>{
         this.isLoading=false
 
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Email Enviado'
         modalRef.componentInstance.mensaje = 'Contraseña enviada al correo '+this.f.email.value
 
@@ -73,7 +76,7 @@ export class ForgotPasswordComponent implements OnInit {
         this.isLoading=false
 
         if(error){
-          const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje = 'Error al enviar contraseña al correo '+this.f.email.value
         }

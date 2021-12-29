@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   OnDestroy,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { TranslationService } from './modules/i18n/translation.service';
 // language list
@@ -16,6 +17,12 @@ import { SplashScreenService } from './_metronic/partials/layout/splash-screen/s
 import { Router, NavigationEnd, NavigationError } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TableExtendedService } from './_metronic/shared/crud-table';
+import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
+import { Keepalive } from '@ng-idle/keepalive';
+import { AlertsComponent } from './main/alerts/alerts.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DivisasService } from './pages/parametros/_services/divisas.service';
+
 @Component({
   // tslint:disable-next-line:component-selector
   selector: 'body[root]',
@@ -26,12 +33,18 @@ import { TableExtendedService } from './_metronic/shared/crud-table';
 export class AppComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
 
+
   constructor(
+
     private translationService: TranslationService,
     private splashScreenService: SplashScreenService,
     private router: Router,
-    private tableService: TableExtendedService
+    private tableService: TableExtendedService,
+    private divisasService:DivisasService,
+    private modalService:NgbModal
   ) {
+
+
     // register translations
     this.translationService.loadTranslations(
       enLang,
@@ -43,14 +56,18 @@ export class AppComponent implements OnInit, OnDestroy {
     );
   }
 
+
+
   ngOnInit() {
+    this.divisasService.getcurrentDivisa
     const routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         // clear filtration paginations and others
         this.tableService.setDefaults();
         // hide splash screen
         this.splashScreenService.hide();
-
+        //dismiss all modals
+        this.modalService.dismissAll();
         // scroll to top on every route change
         window.scrollTo(0, 0);
 
@@ -60,8 +77,14 @@ export class AppComponent implements OnInit, OnDestroy {
         }, 500);
       }
     });
+
+     
+
+
     this.unsubscribe.push(routerSubscription);
   }
+  
+
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());

@@ -138,8 +138,16 @@ class="form form-label-right"
       <div class="form-group">
         <label class="form-label">Fecha de Nacimiento</label>
         <div class="input-group">
-          <input formControlName="fechaNacimiento" class="form-control form-control-lg form-control-solid" placeholder="yyyy-mm-dd"
-                 name="dp" [(ngModel)]="model" ngbDatepicker [footerTemplate]="footerTemplate" #d="ngbDatepicker">
+          <input placement='bottom-left' 
+          formControlName="fechaNacimiento" 
+          class="form-control form-control-lg form-control-solid" placeholder="yyyy-mm-dd"
+          [minDate]=today              
+          [startDate]="fromDate"
+          name="dp"  ngbDatepicker 
+          [footerTemplate]="footerTemplate" 
+          #d="ngbDatepicker"
+          [value]=todayString
+          (dateSelect)="formatDate($event)">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
               <i class="fa fa-calendar icon"></i>
@@ -149,7 +157,6 @@ class="form form-label-right"
       </div>
     <ng-template #footerTemplate>
       <hr class="my-0">
-      <button class="btn btn-primary btn-sm m-2 float-left" (click)="model = today; d.close()">Today</button>
       <button class="btn btn-secondary btn-sm m-2 float-right" (click)="d.close()">Close</button>
     </ng-template>
 

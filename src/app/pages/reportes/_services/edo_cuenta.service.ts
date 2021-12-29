@@ -74,11 +74,34 @@ getNotification(){
                 }
               }
               this.edoCuentaSubject = new BehaviorSubject<edoCuenta[]>(estadoDeCuenta);
-
+              this.currentCuentaValue = estadoDeCuenta
+              
               return estadoDeCuenta    
           }))
         
 
     }
+
+    getTodasLasCuentas(){
+      return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuentas')
+      .pipe(
+          map((datosCuenta)=>{
+          let estadoDeCuenta:edoCuenta[]=[];
+            for(var i in datosCuenta)
+            {
+              if(datosCuenta.hasOwnProperty(i))
+              {
+                  estadoDeCuenta.push(datosCuenta[i])
+              }
+            }
+
+            return estadoDeCuenta    
+        }))
+      
+  }
+
+  actualizaSaldo(_id:string,monto:number){
+    return this.http.put<edoCuenta>(environment.apiUrl+'/edo_cuenta/alojamiento',{_id,monto})
+  }
 
 }
