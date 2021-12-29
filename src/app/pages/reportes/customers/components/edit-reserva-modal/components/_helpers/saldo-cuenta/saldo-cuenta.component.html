@@ -27,8 +27,7 @@
                   </div>
             </div>
             <br>
-        <div class="row col-md-12">
-            <div class="col-sm-5">
+            <div class="col-sm-12">
                 <input
                 type="text"
                 class="form-control form-control-lg form-control-solid"
@@ -38,16 +37,12 @@
                 formControlName="cantidadAbono"
                 [class.is-invalid]="isControlInvalidAbono('cantidadAbono')"
                 [class.is-valid]="isControlValidAbono('cantidadAbono')" 
-                value=""
+                [value]="customerService.getCurrentHuespedValue.pendiente"
               />
             </div>
-            <div class="col-sm-2">
-              <button type="button" (click)="maxCantidad()" class="btn btn-danger">
-                [MAX]
-              </button>
-            </div>
-            
-            <div class="col-sm-5">
+
+            <br>
+            <div class="col-sm-12">
                     <input
                     #notaAbono
                     type="text"
@@ -61,7 +56,6 @@
                     />
                
             </div>
-        </div>
         <br>
           <div  class="row col-md-12">
           
@@ -93,11 +87,8 @@
                 <br>
               </div>
               
-              <br>
         </form>
-          
-          <br />
-        
+                  
         </div>
 
 
@@ -105,6 +96,5 @@
 
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modal.close('Aceptar')">Aceptar</button>
     <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Cerrar</button>
   </div>

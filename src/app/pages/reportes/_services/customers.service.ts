@@ -156,6 +156,11 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
     .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida})
   }
 
+  deleteHuesped(_id:string){
+    return this.http
+    .delete(environment.apiUrl+'/huesped/delete/'+_id)
+  }
+
   ngOnDestroy() {
     this.subscriptions.forEach(sb => sb.unsubscribe());
   }

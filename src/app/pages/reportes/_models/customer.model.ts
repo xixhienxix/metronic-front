@@ -2,7 +2,7 @@ import { BaseModel } from '../../../_metronic/shared/crud-table';
 
 export interface Huesped extends BaseModel {
 
-  // id: number;
+  _id?: string;
   folio:number
   adultos:number;
   ninos:number;

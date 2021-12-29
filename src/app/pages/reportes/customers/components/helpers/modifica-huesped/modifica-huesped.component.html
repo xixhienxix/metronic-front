@@ -147,21 +147,22 @@
       <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Inicial</label>
       <div class="form-group" >
         <div class="input-group">
-          <input formControlName="fechaInicial" hidden class="form-control"  placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker [minDate]=minDate
-          (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker">
 
-          <input class="form-control" disabled (click)="toggleCalendarioInicial()" placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaLlegada" >
+          <input formControlName="fechaInicial" hidden class="form-control"  name="dp"  ngbDatepicker 
+          (dateSelect)="fechaSeleccionadaInicial($event)" #d="ngbDatepicker" [minDate]=today>
+
+          <input [disabled]="this.huesped.estatus == 'Huesped en Casa'" class="form-control" disabled (click)="toggleCalendarioInicial()" placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fullFechaLlegada" >
 
           <div class="input-group-append">
-            <button class="btn btn-primary" (click)="toggleCalendarioInicial()" type="button">
+            <button [disabled]="this.huesped.estatus == 'Huesped en Casa'" class="btn btn-primary" (click)="toggleCalendarioInicial()" type="button">
               <i class="fa fa-calendar icon"></i>
             </button>
           </div>
         </div>
       </div>
-      <div *ngIf="display==false" class="row">
-        <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
-      </div>  
+      <!-- <div *ngIf="display==false" class="row">
+        <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha de llegada no puede ser mayor ni igual que la fecha de salida seleccione otro rango de fechas para el bloqueo</label></small>
+      </div>   -->
     </div>
 
       <div class="col-sm-6">
@@ -197,11 +198,11 @@
         </ng-template>
         <div  class="col-sm-6">
           <ngb-datepicker [hidden]="fechaInicialDisplay" #dp 
-          (dateSelect)="fechaSeleccionadaInicial($event)" ></ngb-datepicker>
+          (dateSelect)="fechaSeleccionadaInicial($event)" [minDate]="today" [startDate]="fromDate"></ngb-datepicker>
         </div>
         <div   class="col-sm-6">
           <ngb-datepicker [hidden]="fechaFinalDisplay" 
-          (dateSelect)="fechaSeleccionadaFinal($event)" #df ></ngb-datepicker>
+          (dateSelect)="fechaSeleccionadaFinal($event)" [minDate]="today" [startDate]="toDate" #df ></ngb-datepicker>
         </div>
     </div>
 <br>
@@ -384,7 +385,7 @@
       
 
       <div class="col-lg-6">
-        <button  (click)="actualizarDatos()"  class="btn btn-warning btn-block" type="submit">
+        <button  (click)="actualizarDatos()" [disabled]="!display"  class="btn btn-warning btn-block" type="submit">
           Actualizar y Guardar
         </button>
         <br>

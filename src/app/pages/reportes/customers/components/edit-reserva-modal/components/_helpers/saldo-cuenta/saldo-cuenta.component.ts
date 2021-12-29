@@ -8,6 +8,7 @@ import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.
 import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
+import { EstatusService } from 'src/app/pages/reportes/_services/estatus.service';
 @Component({
   selector: 'app-saldo-cuenta',
   templateUrl: './saldo-cuenta.component.html',
@@ -16,6 +17,7 @@ import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 export class SaldoCuentaComponent implements OnInit {
   @Output() passEntry: EventEmitter<any> = new EventEmitter();
 
+  tarifaDiasDiferencia:number
   folio:number;
   subscription:Subscription[]=[]
   abonoFormGroup:FormGroup
@@ -23,21 +25,23 @@ export class SaldoCuentaComponent implements OnInit {
   isLoading:boolean=false
   estadoDeCuenta:edoCuenta[]=[]
   formasDePago:string[]=['Efectivo','Tarjeta de Credito','Tarjeta de Debito']
-
+  saldoPendiente:number
 
   constructor(public modal: NgbActiveModal,
     public fb :FormBuilder,
     public customerService:HuespedService,
     public parametrosService:ParametrosServiceService,
     public edoCuentaService:Edo_Cuenta_Service,
-    public modalService:NgbModal
+    public modalService:NgbModal,
+    public estatusService:EstatusService
   ) {
+    
    }
 
   ngOnInit(): void {
     this.abonoFormGroup= this.fb.group({
-      conceptoManual : ['',Validators.required],
-      cantidadAbono : ['',Validators.required],
+      conceptoManual : ['Pago de Cuenta',Validators.required],
+      cantidadAbono : [this.saldoPendiente,Validators.required],
       formaDePagoAbono : ['',Validators.required],
       notaAbono : [''],
     })
@@ -79,22 +83,23 @@ export class SaldoCuentaComponent implements OnInit {
 this.isLoading=true
     const sb = this.edoCuentaService.agregarPago(pago).subscribe(
       (value:any)=>{
+
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
-        
-        this.passBack(value)
 
-          setTimeout(() => {
-            modalRef.close('Close click');
-          },4000)
+        setTimeout(() => {
+          modalRef.close('Close click');
+          this.modal.close('Close click');
+        },4000)
             
-
-        this.abonoFormGroup.reset();
         this.estadoDeCuenta=[]
         this.edoCuentaService.getCuentas(this.folio);
+        this.passBack(value)
+        
 
+        
       },
       (err)=>
       {
@@ -104,8 +109,6 @@ this.isLoading=true
           const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje=err.message
-        
-         
 
           this.isLoading=false
       
