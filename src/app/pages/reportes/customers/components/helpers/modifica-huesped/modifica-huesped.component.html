@@ -205,7 +205,7 @@
           (dateSelect)="fechaSeleccionadaFinal($event)" [minDate]="today" [startDate]="toDate" #df ></ngb-datepicker>
         </div>
     </div>
-<br>
+  <br>
 
 
 
@@ -214,14 +214,14 @@
         <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor que la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
       </div>
     </div>
-   
 
-<br>
-    <div class="row col-md-12">
-
+  <br>
+    <div class="row col-md-12">      
         <div class="col-sm-6">
+
           <label style="color:#00506a; font-weight: bold;" class="form-label">Tipo de Habitación </label>
-          <mat-select #habValues
+
+          <mat-select #habValues formControlName="id"
                       class="form-control form-control-lg form-control-solid"
                       name="habitacion"
                       (selectionChange)="habValue($event.value)"
@@ -238,24 +238,17 @@
         </div>
 
       <div class="col-sm-6">
-        <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Numero de Habitacion </label>
-        <mat-select #matSelect
-                      disabled={{!bandera}}
-                      class="form-control form-control-lg form-control-solid"
-                     
-                      placeholder="-- {{placeHolder}} -- ">
-             <footer>
-              <button style="background-color: #319dd7;" (click)="okayChecked()" mat-raised-button class="btn btn-blocked">Confirmar</button>
-            </footer>
-              <div>
-                  <mat-option *ngFor="let numero of mySet" #matOption (click)="cuartoValue(matOption.selected,matOption.value);" [value]="numero">{{numero}}</mat-option>
-              </div>
-          </mat-select> -->
         <small *ngIf="mySet.size==0 && bandera==true"> No hay Disponibilidad para ese tipo de Habitacion en ese rango de fechas, consulte disponibilidad para otras opciones</small>
       </div> 
  </div>
 
     <br>
+    <div class="row">
+      <br>
+    </div>
+<ng-container *ngIf="isLoading">
+  <app-inline-spinner></app-inline-spinner>
+</ng-container>
 
 
   <ng-container *ngIf="mySet.size !==0 ">
@@ -272,7 +265,6 @@
             <!-- <mat-icon>account_circle</mat-icon> -->
            </mat-panel-description>
         </mat-expansion-panel-header>
-
         <!--Contenido del Accordion 1 Habitacion-->
         <div  class="table-responsive angular-bootstrap-table">
           <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
@@ -312,7 +304,7 @@
             <ng-container *ngIf="bandera==true">
             <ng-container *ngFor="let codigosCuarto of personasXCuarto;  ">
               <div style="color: rgba(128, 128, 128, 0.623);" class="font-weight-bold modal-header"><a style="color: black">{{codigosCuarto.Codigo.replace("_"," ").toUpperCase()}}</a> (Cap. Max.: {{codigosCuarto.Personas}})</div>
-                  <table class="table overflow-hidden table-head-custom table-vertical-center">
+              <table class="table overflow-hidden table-head-custom table-vertical-center">
                     <thead>
                       <th  >
                         HAB
@@ -397,4 +389,4 @@
     </div>
   </div>
 
-
+</form>

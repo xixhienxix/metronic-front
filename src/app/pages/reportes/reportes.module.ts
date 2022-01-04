@@ -76,6 +76,7 @@ import { SuperUserComponent } from './customers/helpers/authorization/super.user
 import { ClientesComponent } from './clientes/clientes.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SaldoCuentaComponent } from './customers/components/edit-reserva-modal/components/_helpers/saldo-cuenta/saldo-cuenta.component';
+import { InlineSpinnerComponent } from './helpers/inline-spinner/inline-spinner.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -119,7 +120,8 @@ registerLocaleData(localeEs);
     DetalleComponent,
     SuperUserComponent,
     ClientesComponent,
-    SaldoCuentaComponent
+    SaldoCuentaComponent,
+    InlineSpinnerComponent
       ],
   imports: [
     MatSlideToggleModule,

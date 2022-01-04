@@ -45,7 +45,6 @@ Dia:1,
 Mes:1,
 Ano:2021,
 Estatus_Ama_De_Llaves:'Limpia'
-
 }
 
 const EMPTY_CUSTOMER: Huesped = {
@@ -603,11 +602,13 @@ export class EditReservaModalComponent implements OnInit {
         modalRef.result.then((result) => {
         if(result=='Aceptar')
           {
-            const nochesAlojadas:DateTime = fechaLlegada.diff(this.todayDate, ["days"])
-            const nochesReservadas:DateTime = fechaLlegada.diff(fechaSalida, ["days"])
+            const nochesAlojadas:DateTime = this.todayDate.diff(fechaLlegada, ["days"])
+            const nochesReservadas:DateTime = fechaSalida.diff(fechaLlegada, ["days"])
+            
+            this.nochesReales = Math.ceil(nochesAlojadas.days) 
+            this.nochesTotales = Math.ceil(nochesReservadas.days)
 
-            this.nochesReales = Math.floor(nochesAlojadas.days) 
-            this.nochesTotales = Math.floor(nochesReservadas.days)
+            if(nochesAlojadas==0){this.nochesReales=1}
 
             this.totalAlojamientoNuevo = this.huesped.tarifa*this.nochesReales
 
@@ -764,7 +765,7 @@ export class EditReservaModalComponent implements OnInit {
                   Cuarto:this.huesped.habitacion,
                   Habitacion:this.huesped.numeroCuarto,
                   Estatus:1,
-                  Dia:fecha.dia,
+                  Dia:fecha.day,
                   Mes:fecha.month,
                   Ano:fecha.year,
                   Estatus_Ama_De_Llaves:'Revisar',
@@ -774,7 +775,7 @@ export class EditReservaModalComponent implements OnInit {
                   Cuarto:this.huesped.habitacion,
                   Habitacion:this.huesped.numeroCuarto,
                   Estatus:1,
-                  Dia:fecha.dia,
+                  Dia:fecha.day,
                   Mes:fecha.month,
                   Ano:fecha.year,
                   Estatus_Ama_De_Llaves:'Limpia',
@@ -799,13 +800,14 @@ export class EditReservaModalComponent implements OnInit {
               (value)=>
               { 
                 console.log(value)
+                this.customerService.fetch();
+
               },
               (error)=>{  
                 console.log(error)
                })
 
-               this.customerService.fetch();
-               this.modal.dismiss();
+             this.modal.dismiss();
                this.subscriptions.push(sb)
                this.postHistorico();  
 
@@ -839,6 +841,10 @@ export class EditReservaModalComponent implements OnInit {
 
 
     postHistorico(){
+      this.huesped.salida=this.todayDate.day+'/'+this.todayDate.month+'/'+this.todayDate.year
+      this.huesped.pendiente=0
+      this.huesped.porPagar=0
+      this.huesped.noches=this.nochesReales
       this.isLoading=true
        const sb = this.historicoService.addPost(this.huesped).subscribe(
             (value)=>{
