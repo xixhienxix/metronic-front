@@ -94,12 +94,10 @@ this.isLoading=true
           this.modal.close('Close click');
         },4000)
             
-        this.estadoDeCuenta=[]
-        this.edoCuentaService.getCuentas(this.folio);
+        // this.estadoDeCuenta=[]
+        // this.edoCuentaService.getCuentas(this.folio);
         this.passBack(value)
-        
-
-        
+      
       },
       (err)=>
       {

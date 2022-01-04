@@ -30,7 +30,7 @@ export class IddleService {
    initiateIddle(){
      //Idle
      // sets an idle timeout of 5 seconds, for testing purposes.
-     this.idle.setIdle(250);
+     this.idle.setIdle(2500);
      // sets a timeout period of 5 seconds. after 10 seconds of inactivity, the user will be considered timed out.
      this.idle.setTimeout(5);
      // sets the default interrupts, in this case, things like clicks, scrolls, touches to the document
@@ -51,12 +51,11 @@ export class IddleService {
      
      this.idle.onIdleStart.subscribe(() => {
          this.idleState = 'Su sesión esta inactiva'
-         console.log(this.idleState);
          const modalRef = this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
          modalRef.componentInstance.alertHeader='Advertencia'
-         modalRef.componentInstance.mensaje='Su sesion esta inactiva, la session se cerrara en: '
+         modalRef.componentInstance.mensaje='Su sesion esta inactiva, la session se cerrara en 5 segundos'
          modalRef.componentInstance.isProgress=true
-         modalRef.componentInstance.interval=10
+         modalRef.componentInstance.interval=5
          
      });
      

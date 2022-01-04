@@ -20,6 +20,7 @@ import { DivisasService } from 'src/app/pages/parametros/_services/divisas.servi
 import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { Subscription } from 'rxjs';
+import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 
 @Component({
   selector: 'app-modifica-huesped',
@@ -62,6 +63,7 @@ export class ModificaHuespedComponent implements OnInit {
   llegadaString:string
   salidaString:string
   //Disponibilidad
+  isLoading:boolean=false;
 
   cuarto:string;
   numCuartoNumber:number;
@@ -101,8 +103,8 @@ export class ModificaHuespedComponent implements OnInit {
     public fb: FormBuilder,
     private calendar: NgbCalendar,
     public divisasService:DivisasService,
-    public parametrosService : ParametrosServiceService
-
+    public parametrosService : ParametrosServiceService,
+    public edoCuentaService : Edo_Cuenta_Service
   ) { 
 
     const current = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
@@ -148,7 +150,8 @@ export class ModificaHuespedComponent implements OnInit {
 
     this.fechasFormGroup = this.fb.group({
       fechaInicial:[''],
-      fechaFinal:['']
+      fechaFinal:[''],
+      id:['']
     })
 
 
@@ -173,7 +176,7 @@ export class ModificaHuespedComponent implements OnInit {
        
        if(exist===undefined)
        { 
-         this.personasXCuarto.push(this.infoCuarto[i])//FUNCIONO
+         this.personasXCuarto.push(this.infoCuarto[i])
        }
       }
     })
@@ -211,9 +214,11 @@ export class ModificaHuespedComponent implements OnInit {
   fechaSeleccionadaInicial(event:NgbDate){
     this.expandedPane=true;
     this.inicio=false;
-    this.cuarto=this.huesped.habitacion;
+    // this.cuarto=this.huesped.habitacion;
     this.sinDisponibilidad=[];
     this.accordionDisplay="";
+    this.fechasFormGroup.get('id').setValue(0);
+
 
     this.accordionDisplay="display:none";
 
@@ -240,9 +245,11 @@ export class ModificaHuespedComponent implements OnInit {
   fechaSeleccionadaFinal(event:NgbDate){
     this.expandedPane=true;
     this.inicio=false;
-    this.cuarto=this.huesped.habitacion;
+    // this.cuarto=this.huesped.habitacion;
     this.sinDisponibilidad=[];
     this.accordionDisplay="";
+    this.fechasFormGroup.get('id').setValue(0);
+
 
     this.accordionDisplay="display:none";
     // this.toDate = DateTime.fromObject({year:event.year,month:event.month,day:event.day}) 
@@ -273,110 +280,35 @@ export class ModificaHuespedComponent implements OnInit {
 
   habValue(codigoHabitacion:string)
   {
+    this.mySet.clear()
+
+    this.isLoading=true;
     this.expandedPane=true;
-    this.inicio=false;
-    this.cuarto=codigoHabitacion;
     this.sinDisponibilidad=[];
     this.accordionDisplay="";
-    
-    //  let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-    //  let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    // let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24))
-    
+    this.cuarto=codigoHabitacion;
+
     let diaDif = this.comparadorFinal.diff(this.comparadorInicial, ["years", "months", "days", "hours"])
     this.diaDif = diaDif.days
 
-    let dispoFromDate = this.comparadorInicial
-    let dispoToDate = this.comparadorFinal
+    this.bandera=false;
+    const comparadorInicialString=this.comparadorInicial.day+'/'+this.comparadorInicial.month+'/'+this.comparadorInicial.year
+    const comparadorFinalString=this.comparadorFinal.day+'/'+this.comparadorFinal.month+'/'+this.comparadorFinal.year
 
-    if(codigoHabitacion=='1')
-    {
-          this.bandera=true
-          // this.bandera=false;
-          for (let i=0; i<(diaDif.days+1); i++) 
-            {
-          const sb = this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year)
-            .pipe(map(
-              (responseData)=>{
-                const postArray = []
-                for(const key in responseData)
-                {
-                  if(responseData.hasOwnProperty(key))
-                   postArray.push(responseData[key]);
-                }
-                return postArray
-              }))
-              .subscribe((disponibles)=>{
-                this.mySet.clear()
+if(this.cuarto=='1'){this.bandera=true}else{this.bandera=false}
+    const sb =this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,codigoHabitacion,this.huesped.numeroCuarto,this.diaDif, this.huesped.folio)
+    .subscribe(
+      (disponibles)=>{
+        for(let i=0;i<=disponibles.length;i++){
+          this.mySet.add(disponibles[i])
+        }
+        this.isLoading=false
+
+      },
+      (error)=>{})
     
-                for(i=0;i<disponibles.length;i++)
-                {
-                  this.disponibilidad=(disponibles)
-                  if(disponibles[i].Estatus==0)
-                  {
-                    if(!(dispoFromDate.startOf("day") >= this.fromDate.startOf("day") && dispoFromDate.startOf("day") <= this.toDate.startOf("day")))
-                    {
-                      this.sinDisponibilidad.push(disponibles[i].Habitacion)
-                    }
-                  }
-                  this.mySet.add(this.disponibilidad[i].Habitacion)
-                }
-                for(i=0;i<this.sinDisponibilidad.length;i++)
-                {
-                  this.mySet.delete(this.sinDisponibilidad[i])
-                }
-                if(dispoToDate.startOf("day")< this.fromDate.startOf("day") && dispoToDate.startOf("day") > this.toDate.startOf("day"))
-                {
-                  this.mySet.add(this.huesped.numeroCuarto)
-                }
-              })
-              dispoFromDate.plus({ days: 1 })
-              this.subscription.push(sb)
-            };
-        // })
-    }
-
-    else
-    {
-      this.bandera=false;
-      for (let i=0; i<(diaDif.days+1); i++)  
-      {
-
-      const sb = this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
-      .pipe(map(
-        (responseData)=>{
-          const postArray = []
-          for(const key in responseData)
-          {
-            if(responseData.hasOwnProperty(key))
-             postArray.push(responseData[key]);
-          }
-          return postArray
-        }))
-        .subscribe((disponibles)=>{
-          this.mySet.clear()
-          for(i=0;i<disponibles.length;i++)
-          {
-            this.disponibilidad=(disponibles)
-            if(disponibles[i].Estatus==0)
-            {
-              if(!(dispoFromDate.startOf("day") >= this.fromDate.startOf("day") && dispoFromDate.startOf("day") <= this.toDate.startOf("day")))
-              {
-                this.sinDisponibilidad.push(disponibles[i].Habitacion)
-              }
-            }
-             this.mySet.add(this.disponibilidad[i].Habitacion)
-          }
-          for(i=0;i<this.sinDisponibilidad.length;i++)
-          {
-            this.mySet.delete(this.sinDisponibilidad[i])
-          }
-        })
-        dispoFromDate.plus({ days: 1 })
-        this.subscription.push(sb)
-      };
-    }
-
+      this.subscription.push(sb)
+  
   }
 
   cuartoValue(selected:boolean,value:any)
@@ -455,6 +387,19 @@ export class ModificaHuespedComponent implements OnInit {
      const sb = this.customerService.updateHuesped(this.huesped).subscribe(
         (value)=>{
 
+         const alojamientoNuevo = this.tarifa * this.diaDif
+         const alojamiento = this.edoCuentaService.currentCuentaValue.filter(alojamiento=>alojamiento.Descripcion=='Alojamiento')
+
+          this.edoCuentaService.actualizaSaldo(alojamiento[0]._id,alojamientoNuevo).subscribe(
+            (value)=>
+            { console.log(value)  
+              
+              this.edoCuentaService.sendNotification(true)
+            },
+            (error)=>{  
+              console.log(error)
+             })          
+             
           this.customerService.setCurrentHuespedValue=this.huesped
           this.passEntry.emit(this.huesped);
 

@@ -5,15 +5,27 @@ import { HttpClient,HttpParams } from '@angular/common/http';
 import {environment} from "../../../../environments/environment"
 import { catchError, map, tap } from 'rxjs/operators';
 import { HabitacionesService }  from './habitaciones.service'
+import { DateTime } from 'luxon'
 @Injectable({
   providedIn: 'root'
 })
 export class DisponibilidadService {
-  private listaFolios: Disponibilidad[] = [];
-  private cuartos : any[]=[];
-  private sinDisponibilidad : any[]=[];
-  mySet = new Set();
+  private mySet = new Set();
+  private dispo:any[] = []
 
+  getDisponibilidadCompleta(llegada:string,salida:string,tipoCuarto:string,numeroCuarto:number,dias:number,folio:number){
+    const params = new HttpParams()
+    .set('llegada', llegada)
+    .set('salida', salida)
+    .set('cuarto',tipoCuarto)
+    .set('numeroCuarto',numeroCuarto.toString())
+    .set('dias',dias.toString())
+    .set('folio',folio.toString())
+
+
+    return this.http.get<any>(environment.apiUrl+'/disponibilidad/completa',{params:params})
+
+  }
 
   getdisponibilidad(dia:number,mes:number,ano:number,cuarto:string) :Observable<Disponibilidad[]> {
     const params = new HttpParams()

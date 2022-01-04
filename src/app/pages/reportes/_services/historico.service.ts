@@ -79,7 +79,7 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
   }
 
   addPost(huesped:Huesped) {
-    return this.http.post<any>(environment.apiUrl+"/reportes/historico", huesped)
+    return this.http.post<Huesped>(environment.apiUrl+"/guarda/historico", huesped)
     }
 
 
