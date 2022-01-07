@@ -1,5 +1,4 @@
 <div class="modal-content">
-<ng-container *ngIf="huesped.id == undefined">
   <div style="background-color: #00506a;" class="modal-header">
     <div style="text-align: center; color: white;" class="text-center modal-title h4 col-10"
       id="example-modal-sizes-title-lg">
@@ -10,20 +9,71 @@
     <button style="background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
 
   </div>
-</ng-container>
 
 
 </div>
-
-    <div class="cursor-default overlay overlay-block modal-body" style="background-color: #e6e9ed">
-   <form (ngSubmit)="onSubmit(); customerServiceFetch()" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
+<div class="cursor-default overlay overlay-block modal-body" style="background-color: #e6e9ed">
+<form (ngSubmit)="onSubmit(); customerServiceFetch()" [formGroup]="formGroup" class="form form-label-right" style="background-color: #e6e9ed">
 
 <div class="row">
+  <div class="input-group col-lg-3">
+    <div class="input-group-prepend">
+      <label style="padding-top: 15%; color:#00506a; font-weight: bold;">
+        Noches:
+      </label>
+    </div>
+    <label style="padding-left: 20%; padding-top: 2%;" class="font-weight-bold h1"> {{huesped.noches}}</label>
+  </div>
+</div>
+  <div class="row">
+    <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Incial</label> -->
+    <div class="col-lg-6">
+      <div class="form-group">
+        <label style="color:#00506a; font-weight: bold;" class="form-label">Fecha Inicial</label>
+        <div class="input-group">
 
+          <input hidden class="form-control" placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+          (dateSelect)="fechaSeleccionadaInicial($event)" [minDate]="today" [startDate]="fromDate" #d="ngbDatepicker">
 
+          <input class="form-control" placeholder="yyyy-mm-dd" name="dpnotHidden" #dd [value]="fechaInicial" >
+
+            <div class="input-group-append">
+            <button class="btn btn-primary" (click)="d.toggle()" type="button">
+              <i class="fa fa-calendar icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Fecha Final</label> -->
+    <div class="col-lg-6">
+      <div class="form-group" >
+        <label style="color:#00506a; font-weight: bold;" class="form-label">Fecha Final</label>
+        <div class="input-group">
+          <input hidden class="form-control" [minDate]="tomorrow" [startDate]="toDate" placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+          (dateSelect)="fechaSeleccionadaFinal($event)" #f="ngbDatepicker">
+
+          <input class="form-control"  placeholder="yyyy-mm-dd" name="dpnotHidden" #ff  [value]="fechaFinal" >
+
+          <div class="input-group-append">
+            <button class="btn btn-primary" (click)="f.toggle()" type="button">
+              <i class="fa fa-calendar icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="display==false" class="row">
+    <small> <label #contentPlaceholder  style="color: #fa6d7c; font-weight:bold">La fecha inicial no puede ser mayor ni igual a la fecha final seleccione otro rango de fechas para el bloqueo</label></small>
+</div>
+
+  <div class="row">
 
 <!--Hidden-->
-  <div class="hidden form-group">
+  <!-- <div class="hidden form-group">
     <div class="input-group">
       <input hidden name="datepicker"
              class="form-control"
@@ -49,11 +99,11 @@
         </span>
       </ng-template>
     </div>
-  </div>
+  </div> -->
 <!--Hidden-->
 
 
-  <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Rango de Fecha</label>
+  <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Selecciona Rango de Fecha</label>
   <div class="mb-3 input-group col-lg-9">
     <div class="input-group-prepend">
       <button style="border-top: 2px solid #dadcdf;border-bottom: 2px solid #dadcdf;border-left: 2px solid #dadcdf; background-color: transparent;" class="btn btn-outline-secondary calendar" (click)="datepicker.toggle()" type="button">
@@ -66,17 +116,17 @@
               class="form-control"
               [value]="rangoFechas(dpFromDate.value,dpToDate.value)"
               (click)="datepicker.toggle()">
-  </div>
-  <div class="input-group col-lg-3">
+  </div> -->
+  <!-- <div class="input-group col-lg-3">
     <div class="input-group-prepend">
       <label style="padding-top: 15%; color:#00506a; font-weight: bold;">
         Noches:
       </label>
     </div>
     <label style="padding-left: 20%; padding-top: 2%;" class="font-weight-bold h1"> {{huesped.noches}}</label>
-  </div>
+  </div> -->
    <!--Hidden-->
-   <input hidden      #dpToDate
+   <!-- <input hidden      #dpToDate
                       class="form-control" placeholder="yyyy-mm-dd"
                       name="dpToDate"
                       [value]="formatter.format(toDate)"
@@ -87,13 +137,13 @@
                       name="dpFromDate"
                       [value]="formatter.format(fromDate)"
                       (input)="fromDate = validateInput(fromDate, dpFromDate.value)"
-                      >
+                      > -->
   <!--Hidden-->
   <!--Calendar Footer-->
-    <ng-template #footerTemplate>
+    <!-- <ng-template #footerTemplate>
     <hr class="my-0">
     <button class="float-right m-2 btn btn-secondary btn-sm" (click)="datepicker.close()">Confirmar</button>
-    </ng-template>
+    </ng-template> -->
   <!--Calendar Footer-->
 </div>
 
@@ -177,20 +227,20 @@
               <div class="row">
                 <label style="color:#00506a; font-weight: bold;" class="form-label" >Habitación </label>
                 <div class="col-lg-12">
-                      <select
-                          class="form-control form-control-lg form-control-solid"
-                          name="habitacion"
-                          formControlName="habitacion"
-                          (change)="habValue($event)"
-                          #tipodeCuartoDropDown
-                          value="1"
-                          >
-                        <option value="0">-- Selecciona Habitación ---</option>
-                        <option value="1">Todas las Habitaciones</option>
-                        <ng-container *ngFor="let tipoCuarto of codigoCuarto">
-                          <option> {{tipoCuarto.replace("_"," ")}} </option>
-                        </ng-container>
-                      </select>
+                  <mat-select #tipodeCuartoDropDown
+                  class="form-control form-control-lg "
+                  name="habitacion"
+                  formControlName="habitacion"
+                  (selectionChange)="buscaDispo($event.value)"
+                  placeholder="-- Seleccione Tipo de Habitación -- " 
+                  required
+                  [disabled]="!display"
+                  >
+                  <mat-option value="0">-- Selecciona Habitación --</mat-option>
+                      <mat-option value="1">Todos los Tipos de Cuartos</mat-option>
+                      <mat-option *ngFor="let tipoCuarto of codigoCuarto" [value]="tipoCuarto">{{tipoCuarto.replace("_"," ")}} </mat-option>
+                  </mat-select>
+                   
                       <mat-error *ngIf="habitacion.errors?.required">
                         * Campo Obligatorio
                       </mat-error>
@@ -199,21 +249,9 @@
 
 <br>
 
-          <div class="row">
-              <div class="col-lg-12">
-                  <div>
-                    <button
-                      style="background-color: #ffce54;"
-                        class="btn btn-block"
-                        (click)="setStep(1);buscaDispo(); "
-                        type="button"
-                        > Buscar Disponibilidad
-                    </button>
-                  </div>
-              </div>
-          </div>
-<br>
-
+<ng-container *ngIf="isLoading">
+  <app-inline-spinner></app-inline-spinner>
+</ng-container>
   <ng-container *ngIf="mySet.size !==0 ">
       <mat-accordion [style]="accordionDisplay" class="example-headers-align" multi>
         <mat-expansion-panel  [expanded]="step === 1"  hideToggle>
@@ -222,10 +260,8 @@
               CON DISPONIBILIDAD
             </mat-panel-title>
             <mat-panel-description *ngIf="bandera==false">
-             <!-- <mat-icon>account_circle</mat-icon> -->
             </mat-panel-description>
             <mat-panel-description *ngIf="bandera==true">
-              <!-- <mat-icon>account_circle</mat-icon> -->
              </mat-panel-description>
           </mat-expansion-panel-header>
 
@@ -498,7 +534,7 @@
                 style="background-color:#99d284 ;"
                 type="submit"
                 name="estatus"
-                [disabled]="preAsig.size===0||!isControlValid('nombre') || this.todayString!=dpFromDate.value"
+                [disabled]="preAsig.size===0||!isControlValid('nombre') || this.todayString!=dd.value"
                 (click)="setEstatus(1)"
                 >
                   Realiza Walk-In

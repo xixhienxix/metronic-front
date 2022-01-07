@@ -1,4 +1,4 @@
-import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {  Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
 import { from, of, Subscription } from 'rxjs';
@@ -73,6 +73,7 @@ const EMPTY_CUSTOMER: Huesped = {
   selector: 'app-edit-customer-modal',
   templateUrl: './nueva-reserva-modal.component.html',
   styleUrls: ['./nueva-reserva-modal.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   styles:[`
 
 
@@ -119,15 +120,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 //DATETIMEPICKER RANGE
   hoveredDate: NgbDate | null = null;
-  todayDate:DateTime
-  todayString:string
-
-
-  fromDate: DateTime;
-  toDate: DateTime;
-
-  today: DateTime;
-
+  
   ToDoListForm:any;
   diaDif:number;
 
@@ -144,7 +137,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   inicio : boolean = true;
   id:number;
   folio:number;
-  isLoading$;
   model:NgbDateStruct;
   huesped: Huesped;
   foliador:Foliador;
@@ -158,29 +150,45 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   dropDownHabValueIndex:any
   origenReserva='Online'
 
-  public folios:Foliador[]=[];
-  public cuartos:Habitaciones[]=[];
-  public codigoCuarto:Habitaciones[]=[];
-  //Disponibilidad
-  public infoCuarto:Habitaciones[]=[];
-  public disponibilidad:Disponibilidad[]=[];
+  /*FECHAS*/
+  today: DateTime | null;
+  tomorrow: DateTime | null;
+  fechaInicial:string
+  fechaFinal:string
+  comparadorInicial:Date
+  comparadorFinal:Date
+  todayDate:DateTime
+  todayString:string
+  fromDate: DateTime;
+  toDate: DateTime;
 
-  public sinDisponibilidad:any[]=[]
-  public estatusArray:Estatus[]=[];
-  public folioactualizado:any;
-  cuarto:string;
-  private subscriptions: Subscription[] = [];
-  public listaFolios:Foliador[];
+  /**DOM */
+  display:boolean=true
+  isLoading:boolean=false;
   displayNone:string = "display:none"
   showDropDown=false;
   accordionDisplay="";
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
+
+/**Models */
+  public folios:Foliador[]=[];
+  public cuartos:Habitaciones[]=[];
+  public codigoCuarto:Habitaciones[]=[];
+  public infoCuarto:Habitaciones[]=[];
+  public disponibilidad:Disponibilidad[]=[];
+  public sinDisponibilidad:any[]=[]
+  public estatusArray:Estatus[]=[];
+  public folioactualizado:any;
+  cuarto:string;
+  public listaFolios:Foliador[];
   estatusID:number;
-  // todayString:string;
   personasXCuarto:any[]=[]
 
-  /*Subscriptions*/
+    /*Subscriptions*/
+  private subscriptions: Subscription[] = [];
+  
+
 
   constructor(
     //Date Imports
@@ -203,29 +211,32 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     ) {
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
+      this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+      this.tomorrow = this.today.plus({days:1})
 
-      // this.today = calendar.getToday();
-      // this.minDate = {year: this.today.year, month: this.today.month, day: this.today.day};
-      // this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
       this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.toDate = this.toDate.plus({ days: 1 });
 
       this.minDate=calendar.getToday();
+
+      this.fechaInicial=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
+      this.fechaFinal=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year
+      
+      this.comparadorInicial=new Date(DateTime.local(this.fromDate.year,this.fromDate.month,this.fromDate.day))
+      this.comparadorFinal=new Date(DateTime.local(this.toDate.year,this.toDate.month,this.toDate.day))
     }
 
 
 
   ngOnInit(): void {
     this.getParametros();
-    this.isLoading$ = this.customersService.isLoading$;
     this.historicoService.fetch();
     this.loadCustomer();
     this.getHabitaciones();
     this.getDispo();
     this.getFolios();
     this.getEstatus();
-    console.log("print del todayString inicial"+this.todayString)
   }
 
   getParametros(){
@@ -380,7 +391,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   this.prepareHuesped();
   this.create();
   this.getFolios();
-  this.initializeHuesped();
+    this.huesped=EMPTY_CUSTOMER
+    this.banderaExito=true;
+
   }
 
   edit() {
@@ -495,61 +508,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.historicoService.patchState({ searchTerm });
   }
 
-  initializeHuesped()
-  {
-    this.banderaExito=true;
-
-    this.inicio==true;
-    this.huesped.id=undefined
-    this.huesped.folio=undefined
-    this.huesped.adultos=1
-    this.huesped.ninos=1
-    this.huesped.nombre=''
-    this.huesped.estatus=''
-    this.huesped.llegada=''
-    this.huesped.salida=''
-    this.huesped.noches=1
-    this.huesped.tarifa=500
-    this.huesped.porPagar=500
-    this.huesped.pendiente=500
-    this.huesped.origen='Online'
-    this.huesped.habitacion=''
-    this.huesped.telefono=''
-    this.huesped.email=''
-    this.huesped.motivo=''
-    this.huesped.fechaNacimiento=''
-    this.huesped.trabajaEn=''
-    this.huesped.tipoDeID=''
-    this.huesped.numeroDeID=''
-    this.huesped.direccion=''
-    this.huesped.pais=''
-    this.huesped.ciudad=''
-    this.huesped.codigoPostal=''
-    this.huesped.lenguaje='Español'
-    this.huesped.numeroCuarto=0,
-    this.huesped.creada=this.todayString.split('-')[0]
-    this.huesped.tipoHuesped="Regular"  
-  }
-
-// resetFoliador()
-// {
-//   this.foliosService.getFolios().pipe(map(
-//     (responseData)=>{
-//       const postArray = []
-//       for(const key in responseData)
-//       {
-//         if(responseData.hasOwnProperty(key))
-//         postArray.push(responseData[key]);
-//       }
-//       return postArray
-//     }))
-//     .subscribe((folios)=>{
-//       this.folios=(folios)
-//       this.huesped.folio=this.folios[0].Folio
-//     })
-// }
-
-
+  
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sb => sb.unsubscribe());
@@ -581,6 +540,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   {
    const sb =  this.habitacionService.gethabitaciones()
     .subscribe((infoCuartos)=>{
+      this.cuartos=(infoCuartos)
+
       this.infoCuarto=infoCuartos
       for(let i=0;i<this.infoCuarto.length;i++)
       {
@@ -624,147 +585,61 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     return arr;
   }
 
-  buscaDispo()
-  {
-    this.formGroup.controls['checkbox'].setValue(false);
+  resetDispo(){
+    this.accordionDisplay="display:none"
+    this.disponibilidad=[]
+    this.mySet.clear()
+    this.cuarto=''
+    this.preAsig.clear();
+    this.formGroup.get("habitacion").patchValue(0);
 
-    this.inicio=false;
-    this.accordionDisplay="";
-    this.mySet.clear();
-    this.sinDisponibilidad=[]
+  }
+
+  buscaDispo(codigoCuarto:string)
+  {
+    this.resetDispo()
+
+    this.cuarto=codigoCuarto
+    // this.cuartos=this.codigos
+    if(this.cuarto=='1'){
+      this.bandera=true
+      this.dropDownHabValueIndex=1
+    }else{
+      this.bandera=false
+      this.dropDownHabValueIndex=''
+    }
+    
+    let folio=1
+
+    this.formGroup.controls['checkbox'].setValue(false);
+    this.isLoading=true;
+    // this.inicio=true;
+
+
 
     let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
     this.diaDif = diaDif.days
 
-    if(this.bandera)
-    {
-      //DIAS DE DIFERENCIA
-    // var diaDif=this.toDate.startOf("day")-this.fromDate.startOf("day")
+    const comparadorInicialString=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
+    const comparadorFinalString=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
 
-    let dispoFromDate = this.fromDate
-    let dispoToDate = this.toDate
 
-    for (let i=0; i<(diaDif.days+1); i++) {
-
-     const sb = this.disponibilidadService.getdisponibilidadTodos(dispoFromDate.day, dispoFromDate.month,dispoFromDate.year)
-      .pipe(map(
-        (responseData)=>{
-          const postArray = []
-          for(const key in responseData)
-          {
-            if(responseData.hasOwnProperty(key))
-             postArray.push(responseData[key]);
-          }
-          return postArray
-        }))
-        .subscribe((disponibles)=>{
-          for(let x=0;x<disponibles.length;x++)
-          {
-            this.disponibilidad=(disponibles)
-
-            if(i==0)
-            {
-              if(disponibles[x].Estatus==2||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
-            }
-            else if (i==(this.diaDif))
-            {
-              if(disponibles[x].Estatus==3||disponibles[x].Estatus==0||disponibles[x].Estatus==4) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
-            }
-            else
-
-                if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
-                {
-                  this.sinDisponibilidad.push(disponibles[x].Habitacion)
-                }
-
-            this.mySet.add(this.disponibilidad[x].Habitacion)
-          }
-
-          for(i=0;i<this.sinDisponibilidad.length;i++)
-          {
-            this.mySet.delete(this.sinDisponibilidad[i])
-          }
-
-        })
-      dispoFromDate.plus({ days: 1 })
+    const sb =this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,this.huesped.numeroCuarto,this.diaDif, folio)
+    .subscribe(
+      (disponibles)=>{
+        this.accordionDisplay=''
+        this.isLoading=false
+        this.inicio=false;
+        for(let i=0;i<disponibles.length;i++){
+          this.mySet.add(disponibles[i])
+        }
+        this.setStep(1)  
+      },
+      (error)=>{})
+    
       this.subscriptions.push(sb)
-
-    };
-
-    }else
-    {
-     
-      let dispoFromDate = this.fromDate
-      let dispoToDate = this.toDate
-    //
-
-    const sb = this.habitacionService.getHabitacionesbyTipo(this.cuarto)
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-          postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
-      .subscribe((cuartos)=>{
-        this.cuartos=(cuartos)
-      })
-      this.subscriptions.push(sb)
-
-
-
-    for (let i=0; i<(diaDif.days+1); i++) {
-
-    const sb = this.disponibilidadService.getdisponibilidad(dispoFromDate.day, dispoFromDate.month, dispoFromDate.year,this.cuarto)
-    .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-           postArray.push(responseData[key]);
-        }
-        return postArray
-      }))
-      .subscribe((disponibles)=>{
-        for(let x=0;x<disponibles.length;x++)
-        {
-          this.disponibilidad=(disponibles)
-
-          if(i==0)
-          {
-            if(disponibles[x].Estatus==2||disponibles[x].Estatus==0) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
-          }
-          else if (i==(this.diaDif))
-          {
-            if(disponibles[x].Estatus==3||disponibles[x].Estatus==0||disponibles[x].Estatus==4) { this.sinDisponibilidad.push(disponibles[x].Habitacion) }
-          } else
-
-              if(disponibles[x].Estatus==0||disponibles[x].Estatus==4)
-              {
-                this.sinDisponibilidad.push(disponibles[x].Habitacion)
-              }
-
-          this.mySet.add(this.disponibilidad[x].Habitacion)
-        }
-
-        for(i=0;i<this.sinDisponibilidad.length;i++)
-        {
-          this.mySet.delete(this.sinDisponibilidad[i])
-        }
-
-      })
-      dispoFromDate.plus({ days: 1 })
-      this.subscriptions.push(sb)
-
-    };
 
     }
-    this.inicio=false;
-  }
 
 
 
@@ -803,87 +678,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       this.maxNinos=this.infoCuarto[0].Personas_Extra
     }
 
-    // this.cuarto=codigo;
 
   }
 
-  habValue($event)
-  {
-    this.accordionDisplay="display:none"
-    this.disponibilidad=[]
-    this.mySet.clear
-    this.cuartos=[]
-    // this.sinDisponibilidad=[]
-
-    if($event.target.options.selectedIndex==1)
-    {
-      this.dropDownHabValueIndex=$event.target.options.selectedIndex
-        this.cuarto=""
-        const sb = this.habitacionService.gethabitaciones()
-        .pipe(map(
-          (responseData)=>{
-            const postArray = []
-            for(const key in responseData)
-            {
-              if(responseData.hasOwnProperty(key))
-              postArray.push(responseData[key]);
-            }
-            return postArray
-          }))
-          .subscribe((cuartos)=>{
-            this.cuartos=(cuartos)
-          })
-
-          this.subscriptions.push(sb)
-
-        this.bandera=true
-    }else
-    {
-      this.dropDownHabValueIndex=$event.target.options[$event.target.options.selectedIndex].text
-      this.cuarto = $event.target.options[$event.target.options.selectedIndex].text.replace(" ","_");
-      this.bandera=false
-    }
-
-  }
-
-  habValueIndex(value)
-  {
-    this.accordionDisplay="display:none"
-    this.disponibilidad=[]
-    this.mySet.clear
-    this.cuartos=[]
-    // this.sinDisponibilidad=[]
-
-    if(value==1)
-    {
-      this.dropDownHabValueIndex=1
-        this.cuarto=""
-        const sb = this.habitacionService.gethabitaciones()
-        .pipe(map(
-          (responseData)=>{
-            const postArray = []
-            for(const key in responseData)
-            {
-              if(responseData.hasOwnProperty(key))
-              postArray.push(responseData[key]);
-            }
-            return postArray
-          }))
-          .subscribe((cuartos)=>{
-            this.cuartos=(cuartos)
-          })
-        this.bandera=true
-        this.subscriptions.push(sb)
-
-    }else
-    {
-      this.dropDownHabValueIndex=""
-      if(value!=undefined)
-      {this.cuarto = value.replace(" ","_");}
-      this.bandera=false
-    }
-
-  }
 
 
 
@@ -896,11 +693,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   setStep(index: number) {
     this.step = index;
-    // this.inicio=false;
-    // this.disponibilidad=[]
-    // this.mySet.clear
-    // this.cuartos=[]
-    // this.sinDisponibilidad=[]
+  
   }
 
   nextStep() {
@@ -911,8 +704,64 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.step--;
   }
 
+//Date Helpers
+fechaSeleccionadaInicial(event:NgbDate){
+ 
+  this.resetDispo()
 
+  this.formGroup.get("habitacion").patchValue(0);
 
+  this.fromDate = DateTime.fromObject({day:event.day,month:event.month,year:event.year})
+
+  this.comparadorInicial = new Date(event.year,event.month-1,event.day)
+
+  this.fechaInicial= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
+
+  let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
+  this.diaDif = diaDif.days
+
+  if(this.comparadorInicial>this.comparadorFinal)
+  {
+    this.display=false
+    this.huesped.noches=1
+  }
+  else if(this.comparadorInicial<this.comparadorFinal)
+  { this.display=true
+    this.huesped.noches=this.diaDif
+  }else if (this.comparadorInicial==this.comparadorFinal)
+  {
+    this.display=false
+  }
+}
+
+fechaSeleccionadaFinal(event:NgbDate){
+  
+  this.resetDispo()
+
+  this.formGroup.get("habitacion").patchValue(0);
+
+  this.toDate = DateTime.fromObject({day:event.day,month:event.month,year:event.year})
+
+  this.comparadorFinal = new Date(event.year,event.month-1,event.day)
+
+  this.fechaFinal= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
+
+  let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
+  this.diaDif = diaDif.days
+
+  if(this.comparadorInicial>this.comparadorFinal)
+  {
+    this.display=false
+    this.huesped.noches=1
+  }else if(this.comparadorInicial<this.comparadorFinal)
+  { 
+    this.display=true
+    this.huesped.noches=this.diaDif
+  }else if (this.comparadorInicial==this.comparadorFinal)
+  {
+    this.display=false
+  }
+}
 
 
 //Maximos Y Minimos Adultos Niños
@@ -1001,46 +850,39 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 
 
-  onDateSelection(date: NgbDate) {
+  // onDateSelection(date: NgbDate) {
+  //   this.accordionDisplay="display:none"
+  //   this.disponibilidad=[]
+  //   this.mySet.clear
+  //   this.cuarto=''
+  //   this.preAsig.clear();
 
-    this.preAsig.clear();
+  //   this.formGroup.get("habitacion").patchValue(0);
 
-    let fromDateNGB = {
-      "year": this.fromDate.year,
-      "month": this.fromDate.month,
-      "day": this.fromDate.day
-    }
+  //   let fromDateNGB = {
+  //     "year": this.fromDate.year,
+  //     "month": this.fromDate.month,
+  //     "day": this.fromDate.day
+  //   }
 
-    if (!this.fromDate && !this.toDate) {
-      // this.fromDate = date;
-      this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
-    } else if (this.fromDate && !this.toDate && date && date.after(fromDateNGB)) {
-      this.toDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
-    } else {
-      this.toDate = null;
-      // this.fromDate = date;
-      this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+  //   if (!this.fromDate && !this.toDate) {
+  //     // this.fromDate = date;
+  //     this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+  //   } else if (this.fromDate && !this.toDate && date && date.after(fromDateNGB)) {
+  //     this.toDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+  //   } else {
+  //     this.toDate = null;
+  //     // this.fromDate = date;
+  //     this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
 
-    }
-    if(this.disponibilidad.length!=0)
-    {
-      this.disponibilidad=[]
-      this.inicio=true
-      this.cuartos=[]
-      this.mySet.clear()
-      this.habValueIndex(this.dropDownHabValueIndex)
+  //   }
+  
 
-      // this.codigoCuarto=[]
-    }
-    this.habValueIndex(this.cuarto)
-    this.codigoCuarto=[]
-    this.getDispo()
 
-    this.formGroup.get("habitacion").patchValue(0);
 
 
     // this.tipodeCuartoDropDown.value = 0;
-  }
+  //}
 
   isHovered(date: NgbDate) {
     return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
@@ -1060,28 +902,28 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   }
 
-  rangoFechas(llegada:string,salida:string)
-  {
+  // rangoFechas(llegada:string,salida:string)
+  // {
     
-    let rangodeFechas
+  //   let rangodeFechas
 
-    let toDate =   new DateTime(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
-    let fromDate = new DateTime(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
+  //   let toDate =   new DateTime(parseInt(salida.split("/")[2]), parseInt(salida.split("/")[0]), parseInt(salida.split("/")[1]));
+  //   let fromDate = new DateTime(parseInt(llegada.split("/")[2]), parseInt(llegada.split("/")[0]), parseInt(llegada.split("/")[1]));
 
-    const diaDif = fromDate.diff(toDate, ["years", "months", "days", "hours"])
+  //   const diaDif = fromDate.diff(toDate, ["years", "months", "days", "hours"])
 
-    // let diaDif = Math.floor((DateTime(toDate.year, toDate.month, toDate.day) - DateTime(fromDate.year, fromDate.month, fromDate.day) ) );
+  //   // let diaDif = Math.floor((DateTime(toDate.year, toDate.month, toDate.day) - DateTime(fromDate.year, fromDate.month, fromDate.day) ) );
 
-    if(!isNaN(diaDif.days)){
-    this.huesped.noches=diaDif.days
-    }else
-    this.huesped.noches=1
+  //   if(!isNaN(diaDif.days)){
+  //   this.huesped.noches=diaDif.days
+  //   }else
+  //   this.huesped.noches=1
 
 
-    rangodeFechas = llegada.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(llegada.split("/")[0]))+"/"+llegada.split("/")[2]+" - " +salida.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(salida.split("/")[0]))+"/"+salida.split("/")[2]
+  //   rangodeFechas = llegada.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(llegada.split("/")[0]))+"/"+llegada.split("/")[2]+" - " +salida.split("/")[1]+"/"+this.i18n.getMonthShortName(parseInt(salida.split("/")[0]))+"/"+salida.split("/")[2]
 
-    return rangodeFechas
-  }
+  //   return rangodeFechas
+  // }
 
 
   getmyData(){
@@ -1150,34 +992,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       });
 
       this.inicio==true;
-      this.huesped.id=undefined
-      this.huesped.folio=undefined
-      this.huesped.adultos=1
-      this.huesped.ninos=1
-      this.huesped.nombre=''
-      this.huesped.estatus=''
-      this.huesped.llegada=''
-      this.huesped.salida=''
-      this.huesped.noches=1
-      this.huesped.tarifa=500
-      this.huesped.porPagar=500
-      this.huesped.pendiente=500
-      this.huesped.origen='Online'
-      this.huesped.habitacion=''
-      this.huesped.telefono=''
-      this.huesped.email=''
-      this.huesped.motivo=''
-      this.huesped.fechaNacimiento=''
-      this.huesped.trabajaEn=''
-      this.huesped.tipoDeID=''
-      this.huesped.numeroDeID=''
-      this.huesped.direccion=''
-      this.huesped.pais=''
-      this.huesped.ciudad=''
-      this.huesped.codigoPostal=''
-      this.huesped.lenguaje='Español'
-      this.huesped.numeroCuarto=0
-
+      this.huesped=EMPTY_CUSTOMER
+  
   }
 
   private getDismissReason(reason: any): string {

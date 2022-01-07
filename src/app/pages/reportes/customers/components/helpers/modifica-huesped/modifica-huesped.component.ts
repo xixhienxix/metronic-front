@@ -295,10 +295,12 @@ export class ModificaHuespedComponent implements OnInit {
     const comparadorInicialString=this.comparadorInicial.day+'/'+this.comparadorInicial.month+'/'+this.comparadorInicial.year
     const comparadorFinalString=this.comparadorFinal.day+'/'+this.comparadorFinal.month+'/'+this.comparadorFinal.year
 
-if(this.cuarto=='1'){this.bandera=true}else{this.bandera=false}
+    if(this.cuarto=='1'){this.bandera=true}else{this.bandera=false}
+    
     const sb =this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,codigoHabitacion,this.huesped.numeroCuarto,this.diaDif, this.huesped.folio)
     .subscribe(
       (disponibles)=>{
+        if(disponibles.length==0){this.inicio=false}
         for(let i=0;i<=disponibles.length;i++){
           this.mySet.add(disponibles[i])
         }

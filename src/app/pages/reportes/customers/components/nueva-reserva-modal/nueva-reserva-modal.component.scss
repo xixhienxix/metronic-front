@@ -53,3 +53,6 @@ select {
  width: 100% !important;
  height: 100% !important;
 }
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 9999 !important;
+}
