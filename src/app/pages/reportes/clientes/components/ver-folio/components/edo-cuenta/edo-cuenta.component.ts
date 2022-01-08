@@ -141,7 +141,7 @@ export class EdoCuentaComponent implements OnInit {
                 this.edoCuentaAlojamientosActivos.push(edoCuentaAlojamientoTemp)
 
                 // fechaIncial.setDate(fechaIncial.getDate() + 1);
-                this.subTotalAlojamiento = result[i].Total.toLocaleString()
+                this.subTotalAlojamiento = result[i].Cargo.toLocaleString()
 
                 fromDate.setDate(fromDate.getDate() + 1);
               }

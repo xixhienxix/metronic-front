@@ -27,7 +27,7 @@ export class EdoCuentaComponentComponent implements OnInit {
   edoCuentaAbonosLista:any[]=[]
 
   closeResult: string;
-  subTotalAlojamiento:number;
+  subTotalAlojamiento:string;
   totalCalculado:number
   subTotalServiciosExtra:number=0;
   impuestoSobreHospedaje:number=0;
@@ -139,10 +139,10 @@ export class EdoCuentaComponentComponent implements OnInit {
                   Estatus:result[i].Estatus,
                   Autorizo:result[i].Autorizo
                 }
-                this.subTotalAlojamiento=result[i].Cargo
 
                 this.impuestoSobreHospedaje = result[i].Total*3/100
                 this.edoCuentaAlojamientosActivos.push(edoCuentaAlojamientoTemp)
+                this.subTotalAlojamiento = result[i].Cargo.toLocaleString()
 
                 // fechaIncial.setDate(fechaIncial.getDate() + 1);
                 fromDate.setDate(fromDate.getDate() + 1);

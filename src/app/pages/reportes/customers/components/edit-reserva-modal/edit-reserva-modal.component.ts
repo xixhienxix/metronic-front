@@ -220,11 +220,14 @@ export class EditReservaModalComponent implements OnInit {
       this.getEstatus();
       this.getAmaDeLlaves();
       this.getAmaDeLlavesByID();
+      
 
       this.formGroup = this.fb.group({
         estatus : [this.customersService.getCurrentHuespedValue.estatus],
         ama:[this.disponibilidadEstatus.Estatus_Ama_De_Llaves]
       }) 
+      this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
+
     }
 
     get getFormGroupValues (){
@@ -256,7 +259,7 @@ export class EditReservaModalComponent implements OnInit {
 
       let habitacion=this.customerService.getCurrentHuespedValue.habitacion
       let numeroCuarto=this.customerService.getCurrentHuespedValue.numeroCuarto
-      let diaDeHoy=DateTime.now({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
+      let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
        
 
 
