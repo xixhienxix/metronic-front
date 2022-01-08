@@ -1,0 +1,105 @@
+<div style="background-color: #00506a" class="modal-content">
+    <button
+      style="
+        position: absolute;
+        top: 2%;
+        right: 1%;
+        background-color: #fa6d7c;
+        font-weight: bold;
+        color: white;
+      "
+      class="btn"
+      (click)="modal.close()"
+    >
+      X
+    </button>
+    <br />
+    <div class="container">
+      <div
+        style="font: bold; color: white; pointer-events: none;"
+        class="modal-title h4 col-12"
+        id="example-modal-sizes-title-lg"
+      >
+        <div class="row col-md-6">
+          <h2 style="font-size: 1.5em">{{ historicoService.getCurrentClienteValue.nombre}}</h2>
+        </div>
+        <div class="row">
+          <small style="color: white; font-size: 1em"
+            >ID RVA : &nbsp;
+            <small style="font-size: 1em; font-weight: bold; color: #319dd7">{{
+              historicoService.getCurrentClienteValue.folio
+            }}</small>
+          </small>
+          &nbsp; &nbsp; &nbsp; &nbsp;
+          <small style="color: white; font-size: 1em"
+            >Hab.: &nbsp;
+            <small style="font-weight: bold; font-size: 1em; color: #319dd7"
+              >{{ historicoService.getCurrentClienteValue.numeroCuarto }} - {{ historicoService.getCurrentClienteValue.habitacion.replace("_"," ") }}</small
+            >
+          </small>
+        </div>
+      </div>
+    </div>
+  
+    <br />
+    <!-- </div>  -->
+    <div class="row container">
+      <div class="col-lg-7">
+        <mat-select style="background-color: #fA6D7C;"
+            [(value)]="selected"
+            class="form-control form-control-lg form-control-solid"
+            name="habitacion"
+        >
+            <mat-option style="background-color: #fA6D7C;" value="0">{{historicoService.getCurrentClienteValue.estatus}} </mat-option>
+        </mat-select>
+      </div>
+
+    </div>
+  <br>
+
+ 
+  </div>
+  
+  <mat-tab-group mat-stretch-tabs [selectedIndex]="selectedIndex" class="col-md-12" style=" padding: 3px">
+  
+    <mat-tab style="min-width: 72px" class="stretch-tab-reserva" label="Reserva">
+      <app-reserva (next)="setStep(2)"></app-reserva>
+    </mat-tab>
+  
+    <!--HUESPED TAB-->
+    <mat-tab label="Huésped">
+      <app-huesped></app-huesped>
+    </mat-tab>
+  
+    <mat-tab label="Transacciones">
+      <app-transacciones></app-transacciones>
+    </mat-tab>
+  
+    <mat-tab label="Edo de Cuenta">
+      <app-edo-cuenta></app-edo-cuenta>
+    </mat-tab>
+  </mat-tab-group>
+  
+  
+
+
+    <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
+      <br>
+    <div class="f col-lg-12">
+      <button
+        disabled
+        class="btn btn-success btn-block"
+        type="submit"
+        value="7">
+        Copiar Reservación
+      </button>
+      <br>
+    </div>
+    </div>
+  
+  
+  
+  <ng-container *ngIf="isLoading">
+    <app-loader-spinner></app-loader-spinner>
+  </ng-container>
+  

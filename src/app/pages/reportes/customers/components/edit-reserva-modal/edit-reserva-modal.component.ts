@@ -841,11 +841,13 @@ export class EditReservaModalComponent implements OnInit {
 
 
     postHistorico(){
+      
       this.huesped.salida=this.todayDate.day+'/'+this.todayDate.month+'/'+this.todayDate.year
       this.huesped.pendiente=0
       this.huesped.porPagar=0
       this.huesped.noches=this.nochesReales
       this.isLoading=true
+
        const sb = this.historicoService.addPost(this.huesped).subscribe(
             (value)=>{
               console.log(value)

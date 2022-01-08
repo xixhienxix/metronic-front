@@ -17,14 +17,52 @@ const DEFAULT_STATE: ITableState = {
   entityId: undefined
 };
 
+const EMPTY_HISTORICO = {
+  id_Socio:1,
+  habitacion:'',
+  llegada:'',
+  salida:'',
+  numeroCuarto:0,
+  adultos:1,
+  creada:'',
+  email:'',
+  estatus:'',
+  estatus_historico:'',
+  folio:1,
+  motivo:'',
+  ninos:1,
+  noches:1,
+  nombre:'',
+  origen:'',
+  pendiente:0,
+  porPagar:0,
+  tarifa:0,
+  telefono:'',
+  tipoHuesped:''
+}
+
 @Injectable({
   providedIn: 'root'
 })
 
 export class HistoricoService extends TableService<Historico> implements OnDestroy {
    API_URL = `${environment.apiUrl}/reportes/historico`;
+   clienteUpdate$: Observable<Historico>;
+
+   private currentCliente$=new BehaviorSubject<Historico>(EMPTY_HISTORICO);
+
   constructor(@Inject(HttpClient) http) {
     super(http);
+    this.clienteUpdate$=this.currentCliente$.asObservable();
+
+  }
+
+  get getCurrentClienteValue(): Historico {
+    return this.currentCliente$.value;
+  }
+
+  set setCurrentClienteValue(cliente: Historico) {
+    this.currentCliente$.next(cliente);
   }
   //
   getAll() :Observable<Historico[]> {

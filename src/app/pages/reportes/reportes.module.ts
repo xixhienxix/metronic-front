@@ -77,6 +77,11 @@ import { ClientesComponent } from './clientes/clientes.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SaldoCuentaComponent } from './customers/components/edit-reserva-modal/components/_helpers/saldo-cuenta/saldo-cuenta.component';
 import { InlineSpinnerComponent } from './helpers/inline-spinner/inline-spinner.component';
+import { VerFolioComponent } from './clientes/components/ver-folio/ver-folio.component';
+import { HuespedComponent } from './clientes/components/ver-folio/components/huesped/huesped.component';
+import { ReservaComponent } from './clientes/components/ver-folio/components/reserva/reserva.component';
+import { TransaccionesComponent } from './clientes/components/ver-folio/components/transacciones/transacciones.component';
+import { EdoCuentaComponent } from './clientes/components/ver-folio/components/edo-cuenta/edo-cuenta.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -121,7 +126,12 @@ registerLocaleData(localeEs);
     SuperUserComponent,
     ClientesComponent,
     SaldoCuentaComponent,
-    InlineSpinnerComponent
+    InlineSpinnerComponent,
+    VerFolioComponent,
+    HuespedComponent,
+    ReservaComponent,
+    TransaccionesComponent,
+    EdoCuentaComponent
       ],
   imports: [
     MatSlideToggleModule,

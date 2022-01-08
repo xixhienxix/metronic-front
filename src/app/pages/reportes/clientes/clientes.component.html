@@ -12,9 +12,9 @@
     <div class="card-body">
       <!-- begin: Filtration form -->
         <div class="form-group row">
-            <div class="row" [formGroup]="filterGroup">
+            <div class="row" >
               <div class="col-lg-4">
-                <select class="form-control" name="estatus" placeholder="Filtro de Estatus" formControlName="estatus">
+                <select class="form-control" name="estatus" placeholder="Filtro de Estatus" >
                   <option value="">Todos</option>
                   <ng-container *ngFor="let estatus of estatusArray ">
                     <option>{{estatus.estatus}}</option>
@@ -23,7 +23,7 @@
                 </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
               </div>
               <div class="col-lg-4">
-                <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" formControlName="habitacion">
+                <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" >
                   <option selected value="">All</option>
                   <ng-container *ngFor="let tipo of codigoCuarto">
                     <option>
@@ -33,7 +33,7 @@
                 </select><small class="form-text text-muted"><b>Filtro</b> Por Habitacion</small>
               </div>
               <div class="col-lg-4">
-                <select class="form-control" name="origen" placeholder="Filtro de Origenes" formControlName="origen">
+                <select class="form-control" name="origen" placeholder="Filtro de Origenes" >
                   <option value="">Todos</option>
                   <ng-container *ngFor="let origen of origenArray ">
                     <option>{{origen.Descripcion}}</option>
@@ -42,9 +42,9 @@
                 </select><small class="form-text text-muted"><b>Fitro </b> Por Origen</small>
               </div>
             </div>
-          <div class="col-lg-4" [formGroup]="searchGroup">
+          <div class="col-lg-4" >
             <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Buscar" value=""
-              formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
+              /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
           </div>
         </div>
       <!-- end: Filtration form -->
@@ -52,92 +52,72 @@
 
   
       <!-- begin:Table -->
-      <table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
+<table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
   
-        <!-- Checkbox Column -->
-        <ng-container matColumnDef="select">
-          <th class="header-align-right" mat-header-cell *matHeaderCellDef>
-            <td class="header-align-right" mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
-            <button [disabled]="row.Descripcion=='Alojamiento'||row.Estatus=='Cancelado'||row.Estatus=='Devolucion'" 
+        <!-- Cancelar Column -->
+    <ng-container matColumnDef="cancelar">
+      <th class="header-align-right" mat-header-cell *matHeaderCellDef></th>
+        <td class="header-align-right" mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
+          <button [disabled]="row.Descripcion=='Alojamiento'||row.Estatus=='Cancelado'||row.Estatus=='Devolucion'" 
             class="btn btn-danger">
                 x
-            </button>
-          </td>
-          <td mat-footer-cell *matFooterCellDef>  </td>
-  
-        </ng-container>
+          </button>
+       </td>
+    </ng-container>
+
+        <!-- Folio Column -->
+    <ng-container matColumnDef="folio">
+      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Folio </th>
+      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.folio}} </td>
+    </ng-container>
   
     <!-- Fecha Column -->
-    <ng-container matColumnDef="Fecha">
-      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Fecha </th>
-      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.Fecha.split('T')[0].split('-')[2]+'-'+row.Fecha.split('T')[0].split('-')[1]+'-'+row.Fecha.split('T')[0].split('-')[0]}} </td>
-      <td mat-footer-cell *matFooterCellDef>  </td>
-  
+    <ng-container matColumnDef="llegada">
+      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Llegada </th>
+      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.llegada}} </td>
+    </ng-container>
+
+    <!-- Salida Column -->
+    <ng-container matColumnDef="salida">
+      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Salida </th>
+      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.salida}} </td>
+    </ng-container>
+
+    <!-- Nombre Column -->
+    <ng-container matColumnDef="nombre">
+      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.nombre}} </td>
     </ng-container>
   
-    <!-- Concepto Column -->
-    <ng-container matColumnDef="Concepto">
-      <th class="concepto-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Concepto </th>
-      <td class="concepto-columna"  mat-cell *matCellDef="let row">{{row.Descripcion}} 
-         <ng-container *ngIf="row.Cargo!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(C)</ng-container>  
-         <ng-container *ngIf="row.Abono!=0 && row.Forma_de_Pago!='Descuento' && row.Estatus=='Activo'">(A)</ng-container>  
-         <ng-container *ngIf="row.Estatus=='Cancelado'">(X)</ng-container>  
-         <ng-container *ngIf="row.Estatus=='Devolucion'">(R)</ng-container>  
-         <ng-container *ngIf="row.Forma_de_Pago=='Descuento' && row.Estatus!='Cancelado'">(D)</ng-container>  
+    <!-- Habitacion Column -->
+    <ng-container matColumnDef="habitacion">
+      <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> Habitacion </th>
+      <td hidden  mat-cell *matCellDef="let row">  {{row.habitacion}}</td>
+    </ng-container>
 
+    <!-- Numero Habitacion Column -->
+    <ng-container matColumnDef="cuarto">
+      <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> Cuarto </th>
+      <td hidden  mat-cell *matCellDef="let row">  {{row.numeroCuarto}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="edit">
+      <th class="header-align-right" mat-header-cell *matHeaderCellDef>Ver</th>
+        <td class="header-align-right" mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
+          <button 
+            (click)="verFolio(row)"
+            class="btn btn-info">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+          </button>
        </td>
-  
-    </ng-container>
-  
-
-         <!-- _id. Column -->
-    <ng-container matColumnDef="_id">
-      <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> _id </th>
-      <td hidden  mat-cell *matCellDef="let row">  {{row._id}}</td>
     </ng-container>
 
-    <!-- F.P. Column -->
-    <ng-container matColumnDef="F.P.">
-      <th  hidden mat-header-cell  *matHeaderCellDef mat-sort-header> F.P. </th>
-      <td hidden  mat-cell *matCellDef="let row">  {{row.Forma_de_Pago}}</td>
-    </ng-container>
-
-         <!-- Cantidad Column -->
-         <ng-container matColumnDef="Cantidad">
-           <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> Cantidad </th>
-           <td hidden  mat-cell *matCellDef="let row">  {{row.Cantidad}}</td>
-         </ng-container>
-  
-    
-    <!-- Valor PAgo Column -->
-    <ng-container hidden matColumnDef="Valor">
-      <th class="valor-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> Valor </th>
-      <td class="valor-columna"  mat-cell *matCellDef="let row" [ngStyle]="{'color': row.Cargo==0 ? 'green' : 'black'}" >
-        <ng-container *ngIf="row.Abono==0">
-         {{divisasService.getcurrentDivisa.Simbolo}} {{row.Cargo.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}} 
-        </ng-container>  
-        <ng-container *ngIf="row.Cargo==0">
-          {{divisasService.getcurrentDivisa.Simbolo}} -{{row.Abono.toLocaleString("es-MX",{ minimumFractionDigits: 2 })}}
-        </ng-container> 
-      </td>
-    </ng-container>
-  
-       <!-- Fecha Column -->
-       <ng-container matColumnDef="Fecha_Cancelado">
-         <th hidden  mat-header-cell *matHeaderCellDef mat-sort-header> Fecha_Cancelado </th>
-         <td hidden mat-cell *matCellDef="let row"> {{row.Fecha_Cancelado.split('T')[0]}} </td>
-     
-       </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row     
-    *matRowDef="let row; columns: displayedColumns;"
-    (click)="abrirDetalle(row)"></tr>
-    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-  </table>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"(click)="verFolio(row)"></tr>
+</table>
       <!-- end: Table -->
       <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator>
 
-      
     </div>
   </div>

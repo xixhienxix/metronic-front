@@ -1,0 +1,288 @@
+
+<div
+  
+  class="cursor-default modal-content"
+>
+<div class="row container">
+
+  <div style="margin-top: 5px" class="col-sm-12">
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <label style="font-weight: bold;font-size: medium; "> &nbsp; ID Socio : </label>
+    <label style="font-size: medium;" >&nbsp;{{historicoService.getCurrentClienteValue.id_Socio}}</label>
+
+    
+  </div>
+</div>
+<br>
+  <div class="row container">
+    <div style="margin-top: 5px" class="col-sm-4">
+      <mat-radio-button checked class="example-margin">{{historicoService.getCurrentClienteValue.tipoHuesped}}</mat-radio-button >
+    </div>
+  </div>
+<br>
+  <div class="row container">
+    <div class="col-lg-12">
+      <label class="form-label">Nombre Completo</label>
+      <input
+        type="text"
+        disabled
+        class="form-control form-control-lg form-control-solid"
+        name="nombre"
+        autocomplete="off"
+        value="{{ historicoService.getCurrentClienteValue.nombre }}"
+      />
+    </div>
+  </div>
+  <br>
+  <div class="row container">
+    <div class="col-lg-6">
+      <label class="form-label">Email</label>
+      <input
+        type="email"
+        disabled
+        class="form-control form-control-lg form-control-solid"
+        name="email"
+        autocomplete="off"
+        value="{{historicoService.getCurrentClienteValue.email}}"
+      />
+
+    </div>
+
+    <div class="col-lg-6">
+      <label class="form-label">Teléfono</label>
+      <input
+        type="tel"
+        disabled
+        class="form-control form-control-lg form-control-solid"
+        name="telefono"
+        autocomplete="off"
+        value="{{ historicoService.getCurrentClienteValue.telefono }}"
+      />
+      <br />
+      
+    </div>
+  </div>
+</div>
+  <div style="background-color: #319dd7" class="modal-content">
+
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    >  Otros Detalles </label>
+  </div>
+
+<div class="row container">
+  <div class="col-lg-6">
+      <div class="form-group">
+        <label class="form-label">Fecha de Nacimiento</label>
+        <div class="input-group">
+          <input placement='bottom-left' 
+          disabled
+          class="form-control form-control-lg form-control-solid" placeholder="yyyy-mm-dd"
+          name="dp"   
+          value="{{historicoService.getCurrentClienteValue.fechaNacimiento}}">
+        </div>
+      </div>
+   
+
+  </div>
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">Trabaja En:</label>
+    <input
+    disabled
+      class="form-control form-control-lg form-control-solid"
+      name="trabajaEn"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.trabajaEn }}"
+    />
+    <br />
+    
+  </div>
+</div>
+<div class="row container">
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">Tipo de ID</label>
+    <input
+    disabled
+      class="form-control form-control-lg form-control-solid"
+      name="tipoDeID"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.tipoDeID }}"
+    />
+    <br />
+   
+  </div>
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">Numero de ID</label>
+    <input
+    disabled
+      class="form-control form-control-lg form-control-solid"
+      name="numeroDeID"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.numeroDeID }}"
+    />
+    <br />
+    
+  </div>
+</div>
+<div class="row container">
+  <div class="col-lg-12">
+    <label class="form-label">Dirección</label>
+    <input
+      disabled
+      type="text"
+      class="form-control form-control-lg form-control-solid"
+      name="direccion"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.direccion }}"
+    />
+    
+  </div>
+</div>
+<div class="row container">
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">País</label>
+    <input
+      disabled
+      class="form-control form-control-lg form-control-solid"
+      name="pais"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.pais }}"
+    />
+    <br />
+
+  </div>
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">Ciudad</label>
+    <input
+    disabled
+      class="form-control form-control-lg form-control-solid"
+      name="ciudad"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.ciudad }}"
+    />
+    <br />
+  </div>
+</div>
+<div class="row container">
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">Codigo Postal</label>
+    <input
+    disabled
+    class="form-control form-control-lg form-control-solid"
+      name="codigoPostal"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.codigoPostal }}"
+    />
+    <br />
+
+  </div>
+  <div class="col-lg-6">
+    <br />
+    <label class="form-label">Lenguaje</label>
+    <input
+    disabled
+    class="form-control form-control-lg form-control-solid"
+      name="lenguaje"
+      autocomplete="off"
+      value="{{ historicoService.getCurrentClienteValue.lenguaje }}"
+    />
+    <br />
+  </div>
+</div>
+
+<div style="background-color: #319dd7" class="modal-content">
+
+  <label
+    class="h4"
+    style="color: aliceblue; text-align: center; padding-top: 5px"
+  >  Otros Detalles </label>
+</div>
+
+  <br>
+  <div class="row container">
+    <div class="col-lg-12">
+      <label class="form-label">Nombre / Razon Social</label>
+      <input
+      disabled
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="razonsocial"
+        autocomplete="off"
+      />
+     
+    </div>
+    <br>
+    <div class="col-lg-12">
+      <label class="form-label">RFC</label>
+      <input
+      disabled
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="rfc"
+        autocomplete="off"
+      />
+      
+    </div>
+  </div>
+  <br>
+  <div class="row container">
+    <div class="col-lg-6">
+      <label class="form-label">EMAIL</label>
+      <input
+      disabled
+        type="text"
+        class="form-control form-control-lg form-control-solid"
+        name="email"
+        autocomplete="off"
+      />
+    </div>
+  <div class="col-lg-6">
+    <label class="form-label">USO DE CFDI</label>
+    <mat-form-field appearance="fill">
+      <mat-label></mat-label>
+      <mat-select  >
+        <mat-option *ngFor="let cfdi of cfdiList" [value]="cfdi">{{cfdi}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  </div>
+ 
+<br>
+
+
+
+<div style="background-color: #319dd7" class="modal-content">
+
+  <label
+    class="h4"
+    style="color: aliceblue; text-align: center; padding-top: 5px"
+  > Notas Internas del historicoService.getCurrentClienteValue </label>
+</div>
+<br>
+  <div class="row">
+    <div style="text-align: center;" class="col-md-12">
+      <textarea  style="border: 2px solid rgb(177, 177, 177)" class="form-control">           - NOTAS EXTRAS DEL CLIENTE</textarea>
+    </div>
+  </div>
+  <br>
+  
+<br>
+  <div style="background-color: #319dd7" class="modal-content">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    > Historial de Visitas </label>
+
+
+  </div>
+  <br>
+
+
+

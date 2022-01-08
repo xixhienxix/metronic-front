@@ -31,6 +31,9 @@ import { Subscription } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { Historico } from '../_models/historico.model';
 import { DivisasService } from '../../parametros/_services/divisas.service';
+import { HuespedService } from '../_services';
+import { HistoricoService } from '../_services/historico.service';
+import { VerFolioComponent } from './components/ver-folio/ver-folio.component';
 
 
 @Component({
@@ -46,15 +49,16 @@ export class ClientesComponent implements OnInit {
   searchGroup:FormGroup;
 
   /**Models */
+  clientes:Historico[]=[]
   public estatusArray:Estatus[]=[];
   public codigoCuarto:Habitaciones[]=[];
   public origenArray:Origen[]=[];
-  public cliente:Historico[]=[];
+  public cliente:Historico;
   public folios:Foliador[]=[];
 
   /**MAT TABLE */
   dataSource = new MatTableDataSource<Historico>();
-  displayedColumns:string[] = ['folio','nombre','estatus','habitacion','llegada','salida','noches']
+  displayedColumns:string[] = ['cancelar','folio','llegada','salida','nombre','habitacion','cuarto','edit']
 
   /**Helpers */
   isLoading: boolean;
@@ -71,23 +75,78 @@ export class ClientesComponent implements OnInit {
     public clientesServices : ClientesService,
     public modalService:NgbModal,
     public fb : FormBuilder,
-    public divisasService : DivisasService
+    public divisasService : DivisasService,
+    public customerService: HuespedService,
+    public historicoService : HistoricoService
     ) 
     {  
-      
     }
 
-
-  
-
   ngOnInit(): void {
-  this.getClientes();
+    this.getAll();
+    // this.filterForm();
+    this.getClientes();
   }
+
+  getAll(){
+    const sb = this.historicoService.getAll().subscribe(
+      (value)=>{
+        console.log(value)
+        this.dataSource.data=value
+        this.clientes=value
+      },
+      (error)=>{
+        console.log(error)
+      })
+  }
+
+  // filterForm() {
+  //   this.filterGroup = this.fb.group({
+  //     origen: [''],
+  //     estatus: [''],
+  //     habitacion: [''],
+  //     searchTerm: [''],
+  //   });
+  //   this.subscriptions.push(
+  //     this.filterGroup.controls.estatus.valueChanges.subscribe(() =>
+  //       this.filter()
+  //     )
+  //   );
+  //   this.subscriptions.push(
+  //     this.filterGroup.controls.habitacion.valueChanges.subscribe(() => this.filter())
+  //   );
+  //   this.subscriptions.push(
+  //     this.filterGroup.controls.origen.valueChanges.subscribe(() => this.filter())
+  //   );
+  // }
+
+  // filter() {
+  //   const filter = {};
+  //   const estatus = this.filterGroup.get('estatus').value;
+
+  //   if (estatus) {
+  //     filter['estatus'] = estatus;
+  //   }
+
+  //   const habitacion = this.filterGroup.get('habitacion').value;
+  //   if (habitacion) {
+  //     filter['habitacion'] = habitacion;
+  //   }
+
+  //   const origen = this.filterGroup.get('origen').value;
+  //   if(origen){
+  //     filter['origen']=origen;
+  //   }
+
+
+  //   this.customerService.patchState({ filter });
+  // }
 
   getClientes(){
     const sb = this.clientesServices.getClientes().subscribe(
       (value:Historico[])=>{
         this.dataSource.data=value
+
       },
       (error)=>{
 
@@ -96,7 +155,14 @@ export class ClientesComponent implements OnInit {
       this.subscription.push(sb)
   }
 
-  abrirDetalle(row:any){
+  verFolio(row:any){
+
+    this.clientes = this.clientes.filter(cliente=>cliente.folio==row.folio)
+    for(let i=0;i<=this.clientes.length;i++)
+    {this.historicoService.setCurrentClienteValue=this.clientes[0]}
+
+    const modalRef = this.modalService.open(VerFolioComponent,{size:'md',backdrop: 'static'})
+    modalRef.componentInstance.cliente = this.cliente
 
   }
   
@@ -105,19 +171,7 @@ export class ClientesComponent implements OnInit {
     this.subscription.forEach(sb=>sb.unsubscribe())
   }
   
-  backgroundColor(estatus:string)
-  {
-    let color;
 
-    for (let i=0;i<this.estatusArray.length;i++)
-    {
-      if(estatus==this.estatusArray[i].estatus)
-      {
-        color = this.estatusArray[i].color
-      }
-    }
-    return color;
-  }
 
  
 }

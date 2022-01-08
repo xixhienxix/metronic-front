@@ -1,0 +1,148 @@
+<div class="container" >
+    <div class="row">
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">Periodo:</label>
+        <br />
+        &nbsp;
+        <label>{{ fullFechaLlegada }} <br>al<br> {{ fullFechaSalida }} </label>
+      </div>
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">Número de Noches:</label>
+        <br />
+        &nbsp;
+        <label>{{ historicoService.getCurrentClienteValue.noches }} </label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">ID de Reserva:</label>
+        <br />
+        &nbsp;
+        <label>{{ historicoService.getCurrentClienteValue.folio }}</label>
+      </div>
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">Habitacion / Cama:</label>
+        <br />
+        &nbsp;
+        <label>{{ historicoService.getCurrentClienteValue.habitacion.replace("_"," ")  }} - {{historicoService.getCurrentClienteValue.numeroCuarto}}</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">Adultos / Personas:</label>
+        <br />
+        &nbsp;
+        <label>{{ historicoService.getCurrentClienteValue.adultos }} </label>
+      </div>
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">Niños:</label>
+        <br />
+        &nbsp;
+        <label>{{ historicoService.getCurrentClienteValue.ninos }} </label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <br />
+        <label class="control-label">Creada:</label>
+        <br />
+        &nbsp;
+        <label>{{ historicoService.getCurrentClienteValue.creada }} </label>
+      </div>
+      <div class="col-md-6">
+        <label class="control-label">
+          <br />
+          Origen de Reserva:
+        </label>
+        <br />
+        &nbsp;
+       <label>{{ historicoService.getCurrentClienteValue.origen }}</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <br />
+        <label class="font-weight-bold control-label"
+          >Pago Via Pagina Web:</label
+        >
+        <br />
+        &nbsp;
+        <label>Paypal - 0 </label>
+      </div>
+      <div class="col-md-6">
+        <br />
+        <label class="font-weight-bold control-label"
+          >Pagado Via Pagina Web:</label
+        >
+        <br />
+        &nbsp;
+        <label>$0.00 </label>
+      </div>
+    </div>
+  </div>
+
+  <br />
+  <div style="background-color: #319dd7" class="modal-content sub-menu">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    >
+      Estancia
+    </label>
+  </div>
+
+  <div class="row col-md-12">
+    <div class="col-sm-6">
+      <br />
+      <label class="control-label">Pagado por Noche:</label>
+      <br />
+      <input
+        disabled
+        style="width: 150px"
+        class="form-control"
+        type="text"
+        value="$ {{
+          ((historicoService.getCurrentClienteValue.tarifa)).toLocaleString('es-MX')
+        }}    MXN"
+      />
+    </div>
+
+    <div class="col-sm-6">
+      <br />
+      <label class="control-label">Pagado por Estancia:</label>
+      <br />
+      <input
+        disabled
+        style="width: 150px"
+        class="form-control"
+        type="text"
+        value="$ {{
+          (historicoService.getCurrentClienteValue.tarifa * historicoService.getCurrentClienteValue.noches).toLocaleString('es-MX')
+        }}    MXN"
+      />
+    </div>
+  </div>
+
+<br>
+
+
+  <div style="background-color: #319dd7" class="modal-content sub-menu">
+    <label
+      class="h4"
+      style="color: aliceblue; text-align: center; padding-top: 5px"
+    >
+      SERVICIOS ADICIONALES
+    </label>
+  </div>
+
+<br>
+
+

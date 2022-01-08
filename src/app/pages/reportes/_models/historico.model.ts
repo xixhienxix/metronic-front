@@ -3,6 +3,7 @@ import { BaseModel } from '../../../_metronic/shared/crud-table';
 export interface Historico extends BaseModel {
 
   // id: number;
+  id_Socio:number;
   folio:number
   adultos:number;
   ninos:number;
@@ -20,17 +21,19 @@ export interface Historico extends BaseModel {
   telefono:string;
   email:string;
   motivo:string;
+  creada?:string;
   //Otros Detalles
-  fechaNacimiento:string;
-  trabajaEn:string;
-  tipoDeID:string;
-  numeroDeID:string;
-  direccion:string;
-  pais:string;
-  ciudad:string;
-  codigoPostal:string;
-  lenguaje:string;
+  fechaNacimiento?:string;
+  trabajaEn?:string;
+  tipoDeID?:string;
+  numeroDeID?:string;
+  direccion?:string;
+  pais?:string;
+  ciudad?:string;
+  codigoPostal?:string;
+  lenguaje?:string;
   numeroCuarto:number;
   estatus_historico:string;
+  tipoHuesped:string;
 }
 
