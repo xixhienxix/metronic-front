@@ -149,67 +149,69 @@
           <th>Acciones</th>
         </thead>
         <tbody>
-          <tr *ngFor="let huesped of customerService.items$ | async">
+          <tr *ngFor="let huesped of customerService.items$ | async ">
+<ng-container *ngIf="huesped.estatus!='Check-Out'">
+  <td>{{ huesped.folio }}</td>
+  <td>{{ huesped.nombre }}</td>
+  <td ><!--cambiaEstatus(huesped)-->
+    <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+      <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+        <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+      </mat-select>
+    </ng-container>
+    <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+      <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+        <ng-container *ngFor="let estatus of estatusArray">
+          <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+            <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+          </ng-container>
+        </ng-container>
+      </mat-select>
+    </ng-container>
+    <ng-container *ngIf="huesped.estatus=='No Show'||huesped.estatus=='Reserva Cancelada'">
+      <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+        <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+      </mat-select>
+    </ng-container>
+  </td>
+  <td>
 
-            <td>{{ huesped.folio }}</td>
-            <td>{{ huesped.nombre }}</td>
-            <td ><!--cambiaEstatus(huesped)-->
-              <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
-                <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
-                </mat-select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
-                <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
-                  <ng-container *ngFor="let estatus of estatusArray">
-                    <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
-                      <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
-                    </ng-container>
-                  </ng-container>
-                </mat-select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus=='No Show'||huesped.estatus=='Reserva Cancelada'">
-                <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
-                </mat-select>
-              </ng-container>
-            </td>
-            <td>
-
-              <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion.replace("_"," ")}}
-              </label>
-              <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion.replace("_"," ")}}
-              </label>
-    </td>
-            <td>{{ huesped.llegada }}</td>
-            <td>{{ huesped.salida }}</td>
-            <td style="text-align: center;">{{ huesped.noches }}</td>
-            <!-- <td>{{ huesped.tarifa }}</td>
-            <td>{{ huesped.porPagar }}</td> -->
-            <td>{{divisasService.getcurrentDivisa.Simbolo}} {{ huesped.pendiente.toLocaleString("es-MX") }}</td>
-            <td style="display:none;">{{ huesped.origen }}</td>
-            <!-- <td>{{ huesped.habitacion }}</td> -->
+    <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion.replace("_"," ")}}
+    </label>
+    <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion.replace("_"," ")}}
+    </label>
+</td>
+  <td>{{ huesped.llegada }}</td>
+  <td>{{ huesped.salida }}</td>
+  <td style="text-align: center;">{{ huesped.noches }}</td>
+  <!-- <td>{{ huesped.tarifa }}</td>
+  <td>{{ huesped.porPagar }}</td> -->
+  <td>{{divisasService.getcurrentDivisa.Simbolo}} {{ huesped.pendiente.toLocaleString("es-MX") }}</td>
+  <td style="display:none;">{{ huesped.origen }}</td>
+  <!-- <td>{{ huesped.habitacion }}</td> -->
 
 
-            <td>
+  <td>
 
-              <a
-                title="Editar Folio"
-                class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
-                (click)="edit(huesped.folio)">
-                <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
-                  class="svg-icon svg-icon-md svg-icon-primary">
-                </span>
-              </a>
+    <a
+      title="Editar Folio"
+      class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
+      (click)="edit(huesped.folio)">
+      <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
+        class="svg-icon svg-icon-md svg-icon-primary">
+      </span>
+    </a>
 
-              <!-- <a title="Delete huesped" class="btn btn-icon btn-light btn-hover-danger btn-sm"
-                >
-                (click)="delete(huesped.folio)"
-                <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
-                  class="svg-icon svg-icon-md svg-icon-danger">
-                </span>
-              </a> -->
-            </td>
+    <!-- <a title="Delete huesped" class="btn btn-icon btn-light btn-hover-danger btn-sm"
+      >
+      (click)="delete(huesped.folio)"
+      <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
+        class="svg-icon svg-icon-md svg-icon-danger">
+      </span>
+    </a> -->
+  </td>
+</ng-container>
+            
           </tr>
         </tbody>
       </table>
