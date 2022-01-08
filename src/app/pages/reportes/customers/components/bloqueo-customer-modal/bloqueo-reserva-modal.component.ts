@@ -91,7 +91,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   hoveredDate: NgbDate | null = null;
 
   //Date Variables
-
+  diaDif:number;
   fromDate: DateTime
   today: DateTime
   toDate: DateTime
@@ -152,7 +152,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   fechaFinalBloqueo:string
   display:boolean=true
   isSubmitted:boolean
-
+  inicio:boolean=true
 
   public tipoCuartoForm: FormBuilder
 
@@ -351,7 +351,7 @@ getParametros(){
         this.statusBloqueo="Bloqueo Generado con Exito"
         this.openMini(this.miniModal)
         this.initializeBloqueo()
-
+        this.inicio=true
       },
       (err)=>{
         if (err)
@@ -474,112 +474,134 @@ initializeBloqueo(){
 
   habValue($event)
   {
-    this.cuarto=$event.value;
+    this.inicio=false
+    if($event.value==1){this.cuarto='1'}
+    else{this.cuarto=$event.value}
+
     this.sinDisponibilidad=[];
+    
+     let toDate = DateTime.fromObject({year:this.toDate.year, month:this.toDate.month, day:this.toDate.day});
+     let fromDate = DateTime.fromObject({year:this.fromDate.year, month:this.fromDate.month - 1, day:this.fromDate.day});
 
-    let toDate =   new Date(this.toDate.year, this.toDate.month - 1, this.toDate.day);
-    let fromDate = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    let diaDif = Math.floor((Date.UTC(toDate.getFullYear(), toDate.getMonth(), toDate.getDate()) - Date.UTC(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate()) ) / (1000 * 60 * 60 * 24));
+     let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
+    this.diaDif = diaDif.days
 
-    if(diaDif==0)
+    const comparadorInicialString=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
+    const comparadorFinalString=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
+
+    if(this.diaDif==0)
     {
-      diaDif=1;
+      this.diaDif=1;
     }
+   
+    const sb =this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,0,this.diaDif, 0)
+    .subscribe(
+      (disponibles)=>{
+        this.isLoading=false
+        this.mySet.clear()
+        for(let i=0;i<disponibles.length;i++){
+          this.mySet.add(disponibles[i])
+        }
+      },
+      (error)=>{})
+    
+      this.subscriptions.push(sb)
+
+    // if($event.value==1)
+    // {
+    //     for (let i=0; i<diaDif; i++) {
+
+    //    const sb = this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
+    //     .pipe(map(
+    //       (responseData)=>{
+    //         const postArray = []
+    //         for(const key in responseData)
+    //         {
+    //           if(responseData.hasOwnProperty(key))
+    //            postArray.push(responseData[key]);
+    //         }
+    //         return postArray
+    //       }))
+    //       .subscribe((disponibles)=>{
+    //         this.mySet.clear()
+
+    //         for(i=0;i<disponibles.length;i++)
+    //         {
+    //           this.disponibilidad=(disponibles)
+    //           if(disponibles[i].Estatus==0)
+    //           {
+    //             this.sinDisponibilidad.push(disponibles[i].Habitacion)
+    //           }
+    //         }
+    //         for(i=0;i<this.sinDisponibilidad.length;i++)
+    //         {
+    //           this.mySet.delete(this.sinDisponibilidad[i])
+    //         }
+    //       })
+    //       this.subscription.push(sb)
+
+    //       fromDate = fromDate.plus({days:1});
+    //     };
+    // }
+
+    // else
+    // {
+
+    //   const sb = this.habitacionService.getHabitacionesbyTipo(this.cuarto)
+    //   .pipe(map(
+    //     (responseData)=>{
+    //       const postArray = []
+    //       for(const key in responseData)
+    //       {
+    //         if(responseData.hasOwnProperty(key))
+    //         postArray.push(responseData[key]);
+    //       }
+    //       return postArray
+    //     }))
+    //     .subscribe((cuartos)=>{
+    //       this.cuartos=(cuartos)
+    //     })
+
+    //   this.subscription.push(sb)
+
+    //   for (let i=0; i<diaDif; i++) {
+
+    //   const sb = this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
+    //   .pipe(map(
+    //     (responseData)=>{
+    //       const postArray = []
+    //       for(const key in responseData)
+    //       {
+    //         if(responseData.hasOwnProperty(key))
+    //          postArray.push(responseData[key]);
+    //       }
+    //       return postArray
+    //     }))
+    //     .subscribe((disponibles)=>{
+    //       this.mySet.clear()
+    //       for(i=0;i<disponibles.length;i++)
+    //       {
+    //         this.disponibilidad=(disponibles)
+    //         if(disponibles[i].Estatus==0)
+    //         {
+    //           this.sinDisponibilidad.push(disponibles[i].Habitacion)
+    //         }
+    //          this.mySet.add(this.disponibilidad[i].Habitacion)
+    //       }
+    //       for(i=0;i<this.sinDisponibilidad.length;i++)
+    //       {
+    //         this.mySet.delete(this.sinDisponibilidad[i])
+    //       }
+
+    //       console.log("mySet x tipo",this.mySet)
+    //     })
+    //     this.subscription.push(sb)
+        
+    //     fromDate = fromDate.plus({days:1});
+    //   };
 
 
-    if($event.value==1)
-    {
-        for (let i=0; i<diaDif; i++) {
-
-       const sb = this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
-        .pipe(map(
-          (responseData)=>{
-            const postArray = []
-            for(const key in responseData)
-            {
-              if(responseData.hasOwnProperty(key))
-               postArray.push(responseData[key]);
-            }
-            return postArray
-          }))
-          .subscribe((disponibles)=>{
-            this.mySet.clear()
-
-            for(i=0;i<disponibles.length;i++)
-            {
-              this.disponibilidad=(disponibles)
-              if(disponibles[i].Estatus==0)
-              {
-                this.sinDisponibilidad.push(disponibles[i].Habitacion)
-              }
-            }
-            for(i=0;i<this.sinDisponibilidad.length;i++)
-            {
-              this.mySet.delete(this.sinDisponibilidad[i])
-            }
-          })
-          this.subscription.push(sb)
-          fromDate.setDate(fromDate.getDate() + 1);
-        };
-    }
-
-    else
-    {
-
-      const sb = this.habitacionService.getHabitacionesbyTipo(this.cuarto)
-      .pipe(map(
-        (responseData)=>{
-          const postArray = []
-          for(const key in responseData)
-          {
-            if(responseData.hasOwnProperty(key))
-            postArray.push(responseData[key]);
-          }
-          return postArray
-        }))
-        .subscribe((cuartos)=>{
-          this.cuartos=(cuartos)
-        })
-
-      this.subscription.push(sb)
-
-      for (let i=0; i<diaDif; i++) {
-
-      const sb = this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
-      .pipe(map(
-        (responseData)=>{
-          const postArray = []
-          for(const key in responseData)
-          {
-            if(responseData.hasOwnProperty(key))
-             postArray.push(responseData[key]);
-          }
-          return postArray
-        }))
-        .subscribe((disponibles)=>{
-          this.mySet.clear()
-          for(i=0;i<disponibles.length;i++)
-          {
-            this.disponibilidad=(disponibles)
-            if(disponibles[i].Estatus==0)
-            {
-              this.sinDisponibilidad.push(disponibles[i].Habitacion)
-            }
-             this.mySet.add(this.disponibilidad[i].Habitacion)
-          }
-          for(i=0;i<this.sinDisponibilidad.length;i++)
-          {
-            this.mySet.delete(this.sinDisponibilidad[i])
-          }
-
-          console.log("mySet x tipo",this.mySet)
-        })
-        this.subscription.push(sb)
-        fromDate.setDate(fromDate.getDate() + 1);
-      };
-
-
-    }
+    // }
 
   }
 

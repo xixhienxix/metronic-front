@@ -43,20 +43,20 @@ export class DisponibilidadService {
      )
    }
 
-   getdisponibilidadTodos(dia:number,mes:number,ano:number) :Observable<Disponibilidad[]> {
-    const params = new HttpParams()
-    .set('dia', dia.toString())
-    .set('mes', mes.toString())
-    .set('ano',ano.toString())
+  //  getdisponibilidadTodos(dia:number,mes:number,ano:number) :Observable<Disponibilidad[]> {
+  //   const params = new HttpParams()
+  //   .set('dia', dia.toString())
+  //   .set('mes', mes.toString())
+  //   .set('ano',ano.toString())
 
-    return this.http
-     .get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad/todos',{params:params})
-     .pipe(
-       map(responseData=>{
-       return responseData
-     })
-     )
-   }
+  //   return this.http
+  //    .get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad/todos',{params:params})
+  //    .pipe(
+  //      map(responseData=>{
+  //      return responseData
+  //    })
+  //    )
+  //  }
 
    actualizaDisponibilidad(disponibilidad:Disponibilidad){
     return this.http.put(environment.apiUrl+"/update/disponibilidad",disponibilidad)

@@ -620,7 +620,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     // this.inicio=true;
 
 
-
     let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
     this.diaDif = diaDif.days
 

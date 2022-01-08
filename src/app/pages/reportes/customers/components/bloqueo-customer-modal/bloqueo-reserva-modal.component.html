@@ -70,15 +70,17 @@
                     class="form-control form-control-lg form-control-solid"
                     name="habitacion"
                     (selectionChange)="habValue($event)"
+                    #habitacion
                     placeholder="-- Seleccione Tipo de Habitación -- " required
                     >
             <mat-option value="1">Todos los Tipos de Cuartos</mat-option>
             <mat-option *ngFor="let tipoCuarto of codigoCuarto" [value]="tipoCuarto">{{tipoCuarto.replace("_"," ")}} </mat-option>
         </mat-select>
             <!--Error Block-->
-        <mat-error *ngIf="tipoCuarto.hasError('required')">
+        <mat-error *ngIf="tipoCuarto.hasError('required') && inicio==false">
           <strong>*Campo Obligatorio</strong>
         </mat-error>
+
       </div>
     </div>
 <br>
@@ -99,8 +101,16 @@
               </div>
           </mat-select>
                       <!--Error Block-->
-        <mat-error *ngIf="numeroHab.hasError('required')">
+        <mat-error *ngIf="numeroHab.hasError('required') && inicio==false">
           <strong>*Campo Obligatorio</strong>
+        </mat-error>
+        <br>
+        <mat-error *ngIf="mySet.size==0 && inicio==false && habitacion.value!=1">
+          <strong>*Los Cuartos de {{habitacion.value}} se encuentran ocupados seleccione otro tipo de habitacion</strong>
+        </mat-error>
+        <br>
+        <mat-error *ngIf="mySet.size==0 && inicio==false && habitacion.value==1">
+          <strong>*Todas las habitaciones se encuentran ocupadas para esta fecha, seleccione otro rango de fechas</strong>
         </mat-error>
       </div>
     </div>
@@ -161,7 +171,7 @@
 
 <div class="table-responsive angular-bootstrap-table">
   <div class="font-weight-bold text-uppercase modal-header">Lista de Bloqueos
-    <button style="background-color: #319dd7; color: white; font-weight: bold;" class="btn" (click)="getBloqueos()"> Actualizar</button>
+    <!-- <button style="background-color: #319dd7; color: white; font-weight: bold;" class="btn" (click)="getBloqueos()"> Actualizar</button> -->
   </div>
   <table style="overflow-y: 100px;" class="table table-head-custom table-vertical-center ">
     <thead>
@@ -188,7 +198,7 @@
         <tr>
           <td>
             <ng-container *ngFor="let habitacion of bloqueos.Habitacion">
-              {{habitacion}}
+              {{habitacion}} 
             </ng-container>
           </td>
           <td>
