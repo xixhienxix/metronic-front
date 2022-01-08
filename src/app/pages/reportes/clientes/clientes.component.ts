@@ -156,13 +156,20 @@ export class ClientesComponent implements OnInit {
   }
 
   verFolio(row:any){
+    let clientes
+    
+    clientes = this.clientes.filter(cliente=>cliente.folio==row.folio)
+    
+    for(let i=0;i<this.clientes.length;i++)
+    {
+      this.historicoService.setCurrentClienteValue=clientes[0]
+    }
 
-    this.clientes = this.clientes.filter(cliente=>cliente.folio==row.folio)
-    for(let i=0;i<=this.clientes.length;i++)
-    {this.historicoService.setCurrentClienteValue=this.clientes[0]}
+    if(this.historicoService.getCurrentClienteValue!=undefined)
+    {    
+      const modalRef = this.modalService.open(VerFolioComponent,{size:'md',backdrop: 'static'})
+    }
 
-    const modalRef = this.modalService.open(VerFolioComponent,{size:'md',backdrop: 'static'})
-    modalRef.componentInstance.cliente = this.cliente
 
   }
   
