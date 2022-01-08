@@ -406,7 +406,6 @@
     id="descuentosRadio"
     class="example-margin">Descuentos</mat-radio-button>
   </div>
-</div>
   <div style="margin-top: 5px" class="col-sm-6">
     <mat-radio-button 
     class="example-margin" 
@@ -414,6 +413,8 @@
     id="cancelados"
     (change)="selectedTable($event)">Cancelaciones y Devoluciones</mat-radio-button>
   </div>
+</div>
+  
 
 <div class="row col-md-12" style="justify-content: center;">
     <table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
