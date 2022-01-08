@@ -12,21 +12,21 @@
 <br>
 <div class="row col-md-12" style="justify-content: center;">
   
-  <div style="margin-top: 5px" class="col-sm-4">
+  <div style="margin-top: 4px" class="col-sm-4">
     <mat-radio-button 
     (change)="selectedTable($event)"
     [checked]="todosChecked"
     id="todos"
     class="example-margin">Todos</mat-radio-button>
   </div>
-  <div style="margin-top: 5px" class="col-sm-4">
+  <div style="margin-top: 4px" class="col-sm-4">
     <mat-radio-button 
     class="example-margin" 
     [checked]="abonosChecked"
     id="abonosRadio"
     (change)="selectedTable($event)">Abonos</mat-radio-button>
   </div>
-  <div style="margin-top: 5px" class="col-sm-4">
+  <div style="margin-top: 4px" class="col-sm-4">
     <mat-radio-button 
     class="example-margin" 
     [checked]="cargosChecked"
@@ -36,21 +36,22 @@
 
 </div>
 <div class="row col-md-12" style="justify-content: center;">
-  <div style="margin-top: 5px" class="col-sm-6">
+  <div style="margin-top: 5px" class="col-sm-5">
     <mat-radio-button 
     (change)="selectedTable($event)"
     [checked]="descuentosChecked"
     id="descuentosRadio"
     class="example-margin">Descuentos</mat-radio-button>
   </div>
-</div>
-  <div style="margin-top: 5px" class="col-sm-6">
+  <div style="margin-top: 5px" class="col-sm-7">
     <mat-radio-button 
     class="example-margin" 
     [checked]="canceladosChecked"
     id="cancelados"
     (change)="selectedTable($event)">Cancelaciones y Devoluciones</mat-radio-button>
   </div>
+</div>
+
 
 <div class="row col-md-12" style="justify-content: center;">
     <table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
