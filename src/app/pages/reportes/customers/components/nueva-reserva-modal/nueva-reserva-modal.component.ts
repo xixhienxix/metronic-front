@@ -460,6 +460,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       ()=>{
         if(this.banderaExito)
         {
+          this.formGroup.get("habitacion").patchValue(0);
+
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Húesped Generado con éxito'          
@@ -478,6 +480,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       },
       (err)=>{
         if(err){
+          this.formGroup.get("habitacion").patchValue(0);
+
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje='No se pudo guardar el húesped intente de nuevo mas tarde'

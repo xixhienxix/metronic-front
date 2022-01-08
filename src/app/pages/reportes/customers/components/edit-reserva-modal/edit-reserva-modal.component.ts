@@ -44,7 +44,8 @@ Estatus:1,
 Dia:1,
 Mes:1,
 Ano:2021,
-Estatus_Ama_De_Llaves:'Limpia'
+Estatus_Ama_De_Llaves:'Limpia',
+Folio_Huesped:0
 }
 
 const EMPTY_CUSTOMER: Huesped = {
@@ -769,6 +770,7 @@ export class EditReservaModalComponent implements OnInit {
                   Mes:fecha.month,
                   Ano:fecha.year,
                   Estatus_Ama_De_Llaves:'Revisar',
+                  Folio_Huesped:this.huesped.folio
                 }
               }else{
                  dispo = {
@@ -779,6 +781,7 @@ export class EditReservaModalComponent implements OnInit {
                   Mes:fecha.month,
                   Ano:fecha.year,
                   Estatus_Ama_De_Llaves:'Limpia',
+                  Folio_Huesped:this.huesped.folio
                 }
               }
            
