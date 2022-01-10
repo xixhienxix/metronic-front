@@ -67,7 +67,9 @@
       </ng-container>
     </div>
     <div class="col-lg-5">
-      <mat-select #selectedAma (selectionChange)='onChangeAma(selectedAma.value)' formControlName='ama' [(value)]="disponibilidadEstatus.Estatus_Ama_De_Llaves" style=" color: white; font-weight: bold; font-size: larger;" [style.background-color]="backgroundColorAmadeLlaves(disponibilidadEstatus.Estatus_Ama_De_Llaves)" name="estatusAma" id="amaDellaves" class="btn" >
+      <mat-select #selectedAma (selectionChange)='onChangeAma(selectedAma.value)' formControlName='ama' [(value)]="disponibilidadEstatus.Estatus_Ama_De_Llaves" style=" color: white; font-weight: bold; font-size: larger;" 
+      [style.background-color]="colorAma" 
+      name="estatusAma" id="amaDellaves" class="btn" >
         <ng-container *ngFor="let estatusAmaDeLlaves of amaDeLlavesList" >
           <mat-option  [value]="estatusAmaDeLlaves.Descripcion" [style.background-color]="estatusAmaDeLlaves.Color"> {{estatusAmaDeLlaves.Descripcion}}</mat-option>
         </ng-container>

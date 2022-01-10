@@ -186,6 +186,10 @@ export class EditReservaModalComponent implements OnInit {
     /*INDEXES*/
     selectedIndex:number
 
+    /*DOM*/
+    colorAma:string
+
+
     constructor(
       //Date Imports
       private modalService: NgbModal,
@@ -219,14 +223,13 @@ export class EditReservaModalComponent implements OnInit {
       this.loadCustomer();
       this.getEstatus();
       this.getAmaDeLlaves();
-      this.getAmaDeLlavesByID();
+      // this.getAmaDeLlavesByID();
       
 
       this.formGroup = this.fb.group({
         estatus : [this.customersService.getCurrentHuespedValue.estatus],
-        ama:[this.disponibilidadEstatus.Estatus_Ama_De_Llaves]
+        ama:['']
       }) 
-      this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
 
     }
 
@@ -246,6 +249,7 @@ export class EditReservaModalComponent implements OnInit {
           {
             this.amaDeLlavesList.push(value[i])
           }
+          this.getAmaDeLlavesByID()
         },
         (error)=>{
           console.log(error)
@@ -262,10 +266,16 @@ export class EditReservaModalComponent implements OnInit {
       let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
        
 
-
       const sb = this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
         (value)=>{
             this.disponibilidadEstatus=value[0]
+            this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
+            for(let i=0;i<this.amaDeLlavesList.length;i++){
+              if(this.amaDeLlavesList[i].Descripcion==value[0].Estatus_Ama_De_Llaves)
+              {
+                this.colorAma=this.amaDeLlavesList[i].Color
+              }
+            }
         },
         (error)=>{
           console.log(error)
@@ -395,17 +405,17 @@ export class EditReservaModalComponent implements OnInit {
     return color;
   }
 
-  backgroundColorAmadeLlaves(estatus:string){
-    let color;
-    for (let i=0;i<this.amaDeLlavesList.length;i++)
-    {
-      if(estatus==this.amaDeLlavesList[i].Descripcion)
-      {
-        color = this.amaDeLlavesList[i].Color
-      }
-    }
-    return color;
-  }
+  // backgroundColorAmadeLlaves(estatus:string){
+  //   let color;
+  //   for (let i=0;i<this.amaDeLlavesList.length;i++)
+  //   {
+  //     if(estatus==this.amaDeLlavesList[i].Descripcion)
+  //     {
+  //       color = this.amaDeLlavesList[i].Color
+  //     }
+  //   }
+  //   return color;
+  // }
 
   openDialog(huesped:Huesped,estatus:string) {
     const modalRef = this.modalService.open(ConfirmationModalComponent,
