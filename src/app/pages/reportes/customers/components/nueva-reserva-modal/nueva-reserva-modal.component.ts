@@ -170,6 +170,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   accordionDisplay="";
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
+  noDisabledCheckIn:boolean
 
 /**Models */
   public folios:Foliador[]=[];
@@ -209,6 +210,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     public parametrosService:ParametrosServiceService,
     public divisasService:DivisasService
     ) {
+      
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
       this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
@@ -225,6 +227,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       
       this.comparadorInicial=new Date(DateTime.local(this.fromDate.year,this.fromDate.month,this.fromDate.day))
       this.comparadorFinal=new Date(DateTime.local(this.toDate.year,this.toDate.month,this.toDate.day))
+
     }
 
 
@@ -237,7 +240,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.getDispo();
     this.getFolios();
     this.getEstatus();
+
+    if(this.fromDate.day==this.todayDate.day && this.fromDate.month==this.todayDate.month && this.fromDate.year==this.todayDate.year)
+    {this.noDisabledCheckIn=true}
+    else
+    {this.noDisabledCheckIn=false}
   }
+
+
 
   getParametros(){
     const sb = this.parametrosService.getParametros().subscribe(
@@ -723,6 +733,11 @@ fechaSeleccionadaInicial(event:NgbDate){
   let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
   this.diaDif = diaDif.days
 
+  if(this.fromDate.day==this.todayDate.day && this.fromDate.month==this.todayDate.month && this.fromDate.year==this.todayDate.year)
+    {this.noDisabledCheckIn=true}
+    else
+    {this.noDisabledCheckIn=false}
+
   if(this.comparadorInicial>this.comparadorFinal)
   {
     this.display=false
@@ -751,6 +766,11 @@ fechaSeleccionadaFinal(event:NgbDate){
 
   let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
   this.diaDif = diaDif.days
+
+  if(this.fromDate.day==this.todayDate.day && this.fromDate.month==this.todayDate.month && this.fromDate.year==this.todayDate.year)
+    {this.noDisabledCheckIn=true}
+    else
+    {this.noDisabledCheckIn=false}
 
   if(this.comparadorInicial>this.comparadorFinal)
   {

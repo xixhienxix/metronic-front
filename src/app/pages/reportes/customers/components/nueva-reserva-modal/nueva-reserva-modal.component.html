@@ -32,7 +32,7 @@
         <label style="color:#00506a; font-weight: bold;" class="form-label">Fecha Inicial</label>
         <div class="input-group">
 
-          <input hidden class="form-control" placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker
+          <input hidden class="form-control" placeholder="yyyy-mm-dd" name="dp"  ngbDatepicker 
           (dateSelect)="fechaSeleccionadaInicial($event)" [minDate]="today" [startDate]="fromDate" #d="ngbDatepicker">
 
           <input class="form-control" placeholder="yyyy-mm-dd" name="dpnotHidden" #dd [value]="fechaInicial" >
@@ -534,7 +534,7 @@
                 style="background-color:#99d284 ;"
                 type="submit"
                 name="estatus"
-                [disabled]="preAsig.size===0||!isControlValid('nombre') || this.todayString!=dd.value"
+                [disabled]="preAsig.size===0||!isControlValid('nombre') || !noDisabledCheckIn"
                 (click)="setEstatus(1)"
                 >
                   Realiza Walk-In
