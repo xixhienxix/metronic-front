@@ -33,8 +33,8 @@ export interface Huesped extends BaseModel {
   numeroCuarto:number;
   creada:string;
   tipoHuesped:string;
-  notas?:string;
-  vip?:string;
-  ID_Socio?:number;
+  notas:string;
+  vip:string;
+  ID_Socio:number;
 }
 

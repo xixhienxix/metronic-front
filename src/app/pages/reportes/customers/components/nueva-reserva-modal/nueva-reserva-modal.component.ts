@@ -66,7 +66,10 @@ const EMPTY_CUSTOMER: Huesped = {
   lenguaje:'Español',
   numeroCuarto: 0,
   creada:'',
-  tipoHuesped:"Regular"
+  tipoHuesped:"Regular",
+  notas:'',
+  vip:'',
+  ID_Socio:0
 };
 
 @Component({
@@ -401,9 +404,46 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   this.prepareHuesped();
   this.create();
   this.getFolios();
-    this.huesped=EMPTY_CUSTOMER
-    this.banderaExito=true;
+    // this.huesped=EMPTY_CUSTOMER
+    // this.banderaExito=true;
+    
 
+  }
+
+  resetHuesped(){
+    this.huesped.id=undefined,
+    this.huesped.folio=undefined,
+    this.huesped.adultos=1,
+    this.huesped.ninos=0,
+    this.huesped.nombre= '',
+    this.huesped.estatus= '',
+    this.huesped.llegada='',
+    this.huesped.salida='',
+    this.huesped.noches= 1,
+    this.huesped.tarifa=500,
+    this.huesped.porPagar= 500,
+    this.huesped.pendiente=500,
+    this.huesped.origen= '',
+    this.huesped.habitacion= '',
+    this.huesped.telefono="",
+    this.huesped.email="",
+    this.huesped.motivo="",
+    //  OtrosDatos
+    this.huesped.fechaNacimiento='',
+    this.huesped.trabajaEn='',
+    this.huesped.tipoDeID='',
+    this.huesped.numeroDeID='',
+    this.huesped.direccion='',
+    this.huesped.pais='',
+    this.huesped.ciudad='',
+    this.huesped.codigoPostal='',
+    this.huesped.lenguaje='Español',
+    this.huesped.numeroCuarto= 0,
+    this.huesped.creada='',
+    this.huesped.tipoHuesped="Regular",
+    this.huesped.notas='',
+    this.huesped.vip='',
+    this.huesped.ID_Socio=0
   }
 
   edit() {
@@ -468,9 +508,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
       ()=>{
-        if(this.banderaExito)
-        {
-          this.formGroup.get("habitacion").patchValue(0);
+
+
 
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
@@ -483,10 +522,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
             setTimeout(() => {
               modalRef.close('Close click');
             },4000)
-            this.banderaExito=false;
-
-            
-        }
+            this.banderaExito=false 
       },
       (err)=>{
         if(err){
@@ -526,6 +562,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sb => sb.unsubscribe());
+    this.resetHuesped();
+    this.formGroup.patchValue({['habitacion']: 0});
+
+
   }
 
   // helpers for View
@@ -605,7 +645,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.mySet.clear()
     this.cuarto=''
     this.preAsig.clear();
-    this.formGroup.get("habitacion").patchValue(0);
+    // this.formGroup.get("habitacion").patchValue(0);
+    this.formGroup.patchValue({['habitacion']: 0});
 
   }
 
@@ -722,7 +763,9 @@ fechaSeleccionadaInicial(event:NgbDate){
  
   this.resetDispo()
 
-  this.formGroup.get("habitacion").patchValue(0);
+  // this.formGroup.get("habitacion").patchValue(0);
+  this.formGroup.patchValue({['habitacion']: 0});
+
 
   this.fromDate = DateTime.fromObject({day:event.day,month:event.month,year:event.year})
 
@@ -738,12 +781,12 @@ fechaSeleccionadaInicial(event:NgbDate){
     else
     {this.noDisabledCheckIn=false}
 
-  if(this.comparadorInicial>this.comparadorFinal)
+  if(this.comparadorInicial>=this.comparadorFinal)
   {
     this.display=false
     this.huesped.noches=1
   }
-  else if(this.comparadorInicial<this.comparadorFinal)
+  else if(this.comparadorInicial<=this.comparadorFinal)
   { this.display=true
     this.huesped.noches=this.diaDif
   }else if (this.comparadorInicial==this.comparadorFinal)
@@ -772,11 +815,11 @@ fechaSeleccionadaFinal(event:NgbDate){
     else
     {this.noDisabledCheckIn=false}
 
-  if(this.comparadorInicial>this.comparadorFinal)
+  if(this.comparadorInicial>=this.comparadorFinal)
   {
     this.display=false
     this.huesped.noches=1
-  }else if(this.comparadorInicial<this.comparadorFinal)
+  }else if(this.comparadorInicial<=this.comparadorFinal)
   { 
     this.display=true
     this.huesped.noches=this.diaDif
