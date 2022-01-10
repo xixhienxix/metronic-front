@@ -187,8 +187,8 @@ export class EditReservaModalComponent implements OnInit {
     selectedIndex:number
 
     /*DOM*/
-    colorAma:string
-
+    colorAma:string='LIMPIA'
+    cargando:boolean=true
 
     constructor(
       //Date Imports
@@ -276,6 +276,7 @@ export class EditReservaModalComponent implements OnInit {
                 this.colorAma=this.amaDeLlavesList[i].Color
               }
             }
+            this.cargando=false
         },
         (error)=>{
           console.log(error)
