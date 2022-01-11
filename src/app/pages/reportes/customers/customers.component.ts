@@ -136,6 +136,8 @@ export class CustomersComponent
   private foliosSub:Subscription;
   public codigoCuarto:Habitaciones[]=[];
 
+  /**DOM */
+  cargando:boolean=true
   oldDropValue:string
 
   constructor(
@@ -177,7 +179,7 @@ export class CustomersComponent
     this.grouping = this.customerService.grouping;
     this.paginator = this.customerService.paginator;
     this.sorting = this.customerService.sorting;
-    const sb = this.customerService.isLoading$.subscribe(res => this.isLoading = res);
+    const sb = this.customerService.isLoading$.subscribe((res) => this.isLoading = res);
     this.subscriptions.push(sb);
     this.sorting.direction = 'desc';
   }
@@ -206,6 +208,7 @@ export class CustomersComponent
                           {
                             // this.estatusDesc.push(estatus[i].estatus)
                             this.estatusArray=estatus
+                            this.cargando=false
                           }
                         })
 
@@ -570,33 +573,7 @@ this.origenService.getOrigenes()
     return color;
   }
 
-  // cambiaEstatus(huesped:Huesped)
-  // {
-  //   this.customerService.updateHuesped(huesped)
-  //   .subscribe(
-  //    ()=>
-  //    {
-  //     this.modalService.open(this.exito,{ size: 'sm', backdrop:'static' }).result.then((result) => {
-  //       this.closeResult = `Closed with: ${result}`;
-  //       }, (reason) => {
-  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-  //       });
-  //       this.customerService.fetch();
-  //   },
-  //    (err)=>
-  //    {
-  //      console.log(err.message)
-  //     this.modalService.open(this.error,{ size: 'sm', backdrop:'static' }).result.then((result) => {
-  //       this.closeResult = `Closed with: ${result}`;
-  //       }, (reason) => {
-  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-  //       });     },
-  //    ()=>{
 
-  //    }
-
-  //  )
-  // }
 
   getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {

@@ -37,9 +37,14 @@
                 formControlName="cantidadAbono"
                 [class.is-invalid]="isControlInvalidAbono('cantidadAbono')"
                 [class.is-valid]="isControlValidAbono('cantidadAbono')" 
-                [value]="customerService.getCurrentHuespedValue.pendiente"
+                [value]="saldoPendiente"
               />
             </div>
+            <!-- <div class="col-sm-2">
+              <button type="button" (click)="maxCantidad()" class="btn btn-danger">
+                [MAX]
+              </button>
+            </div> -->
 
             <br>
             <div class="col-sm-12">

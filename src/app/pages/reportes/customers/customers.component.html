@@ -84,135 +84,138 @@
 
     <!-- begin:Table -->
     <div class="table-responsive angular-bootstrap-table">
-      <table class="table overflow-hidden table-head-custom table-vertical-center">
-        <thead>
-          <!-- <th class="selection-cell-header" data-row-selection="true">
-            <label class="checkbox checkbox-single"><input type="checkbox" (click)="grouping.selectAllRows()"
-                [checked]="grouping.checkAreAllRowsSelected()" /><span></span></label>
-          </th> -->
-          <th>
-            # de Reserva
-            <app-sort-icon column="id" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th>
-            Nombre
-            <app-sort-icon column="firstName" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th style="text-align: center;">
-            Estatus
-            <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th>
-            Habitación
-            <app-sort-icon column="type" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th>
-            Día de Llegada
-            <app-sort-icon column="llegada" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th>
-            Día de Salida
-            <app-sort-icon column="salida" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th>
-            Noches
-            <app-sort-icon column="noches" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <!-- <th>
-            Tarifa X Noche
-            <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th>
-            Por Pagar
-            <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th> -->
-          <th>
-            Pago Pendiente
-            <app-sort-icon column="pago pendiente" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-          <th style="display:none;">
-            Origen
-            <app-sort-icon column="origen" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
-              (sort)="sort($event)"></app-sort-icon>
-          </th>
-
-          <th>Acciones</th>
-        </thead>
-        <tbody>
-          <tr *ngFor="let huesped of customerService.items$ | async">
-
-            <td>{{ huesped.folio }}</td>
-            <td>{{ huesped.nombre }}</td>
-            <td ><!--cambiaEstatus(huesped)-->
-              <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
-                <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
-                </mat-select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
-                <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
-                  <ng-container *ngFor="let estatus of estatusArray">
-                    <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
-                      <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
-                    </ng-container>
-                  </ng-container>
-                </mat-select>
-              </ng-container>
-              <ng-container *ngIf="huesped.estatus=='No Show'||huesped.estatus=='Reserva Cancelada'">
-                <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
-                  <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
-                </mat-select>
-              </ng-container>
-            </td>
-            <td>
-
-              <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion.replace("_"," ")}}
-              </label>
-              <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion.replace("_"," ")}}
-              </label>
+        <table class="table overflow-hidden table-head-custom table-vertical-center">
+          <thead>
+            <!-- <th class="selection-cell-header" data-row-selection="true">
+              <label class="checkbox checkbox-single"><input type="checkbox" (click)="grouping.selectAllRows()"
+                  [checked]="grouping.checkAreAllRowsSelected()" /><span></span></label>
+            </th> -->
+            <th>
+              # de Reserva
+              <app-sort-icon column="id" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Nombre
+              <app-sort-icon column="firstName" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th style="text-align: center;">
+              Estatus
+              <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Habitación
+              <app-sort-icon column="type" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Día de Llegada
+              <app-sort-icon column="llegada" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Día de Salida
+              <app-sort-icon column="salida" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Noches
+              <app-sort-icon column="noches" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <!-- <th>
+              Tarifa X Noche
+              <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Por Pagar
+              <app-sort-icon column="por pagar" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th> -->
+            <th>
+              Pago Pendiente
+              <app-sort-icon column="pago pendiente" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th style="display:none;">
+              Origen
+              <app-sort-icon column="origen" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+  
+            <th>Acciones</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let huesped of customerService.items$ | async ">
+  <ng-container *ngIf="huesped.estatus!='Check-Out'">
+    <td>{{ huesped.folio }}</td>
+    <td>{{ huesped.nombre }}</td>
+    <td ><!--cambiaEstatus(huesped)-->
+      <ng-container *ngIf="huesped.estatus=='Huesped en Casa'||huesped.estatus=='Check-Out'||huesped.estatus=='Uso Interno'||huesped.estatus=='Bloqueo / Sin Llegadas'||huesped.estatus=='Reserva Temporal'">
+        <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+          <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+        </mat-select>
+      </ng-container>
+      <ng-container *ngIf="huesped.estatus=='Reserva Sin Pago'||huesped.estatus=='Deposito Realizado'||huesped.estatus=='Esperando Deposito'||huesped.estatus=='Totalmente Pagada'||huesped.estatus=='Reserva Confirmada'">
+        <mat-select style="width: 160px;" #selected [(value)]="huesped.estatus"  (selectionChange)="openDialog(huesped)" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn" >
+          <ng-container *ngFor="let estatus of estatusArray">
+            <ng-container  *ngIf="estatus.id==2||estatus.id==3||estatus.id==8||estatus.id==9||estatus.id==10">
+              <mat-option #option [style.background-color]="estatus.color" [value]="estatus.estatus">{{estatus.estatus}}</mat-option>
+            </ng-container>
+          </ng-container>
+        </mat-select>
+      </ng-container>
+      <ng-container *ngIf="huesped.estatus=='No Show'||huesped.estatus=='Reserva Cancelada'">
+        <mat-select style="width:160px" [(value)]="huesped.estatus" [style.background-color]="backgroundColor(huesped.estatus)" name="filter_for" id="demo" class="btn">
+          <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
+        </mat-select>
+      </ng-container>
     </td>
-            <td>{{ huesped.llegada }}</td>
-            <td>{{ huesped.salida }}</td>
-            <td style="text-align: center;">{{ huesped.noches }}</td>
-            <!-- <td>{{ huesped.tarifa }}</td>
-            <td>{{ huesped.porPagar }}</td> -->
-            <td>{{divisasService.getcurrentDivisa.Simbolo}} {{ huesped.pendiente.toLocaleString("es-MX") }}</td>
-            <td style="display:none;">{{ huesped.origen }}</td>
-            <!-- <td>{{ huesped.habitacion }}</td> -->
+    <td>
+  
+      <label class="btn"  *ngIf="huesped.numeroCuarto == 0"> S/N - {{huesped.habitacion.replace("_"," ")}}
+      </label>
+      <label class="btn"  *ngIf="huesped.numeroCuarto != 0">{{huesped.numeroCuarto}} - {{huesped.habitacion.replace("_"," ")}}
+      </label>
+  </td>
+    <td>{{ huesped.llegada }}</td>
+    <td>{{ huesped.salida }}</td>
+    <td style="text-align: center;">{{ huesped.noches }}</td>
+    <!-- <td>{{ huesped.tarifa }}</td>
+    <td>{{ huesped.porPagar }}</td> -->
+    <td>{{divisasService.getcurrentDivisa.Simbolo}} {{ huesped.pendiente.toLocaleString("es-MX") }}</td>
+    <td style="display:none;">{{ huesped.origen }}</td>
+    <!-- <td>{{ huesped.habitacion }}</td> -->
+  
+  
+    <td>
+  
+      <a
+        title="Editar Folio"
+        class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
+        (click)="edit(huesped.folio)">
+        <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
+          class="svg-icon svg-icon-md svg-icon-primary">
+        </span>
+      </a>
+  
+      <!-- <a title="Delete huesped" class="btn btn-icon btn-light btn-hover-danger btn-sm"
+        >
+        (click)="delete(huesped.folio)"
+        <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
+          class="svg-icon svg-icon-md svg-icon-danger">
+        </span>
+      </a> -->
+    </td>
+  </ng-container>
+              
+            </tr>
+          </tbody>
+        </table>
 
-
-            <td>
-
-              <a
-                title="Editar Folio"
-                class="mx-3 btn btn-icon btn-light btn-hover-primary btn-sm"
-                (click)="edit(huesped.folio)">
-                <span [inlineSVG]="'./assets/media/svg/icons/Communication/Write.svg'" cacheSVG="true"
-                  class="svg-icon svg-icon-md svg-icon-primary">
-                </span>
-              </a>
-
-              <!-- <a title="Delete huesped" class="btn btn-icon btn-light btn-hover-danger btn-sm"
-                >
-                (click)="delete(huesped.folio)"
-                <span [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
-                  class="svg-icon svg-icon-md svg-icon-danger">
-                </span>
-              </a> -->
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
     <!-- end: Table -->
     <app-paginator class="flex-wrap d-flex justify-content-between align-items-center" [paginator]="paginator"

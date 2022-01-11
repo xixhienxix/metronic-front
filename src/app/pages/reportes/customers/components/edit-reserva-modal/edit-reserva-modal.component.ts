@@ -190,6 +190,7 @@ export class EditReservaModalComponent implements OnInit {
     colorAma:string='LIMPIA'
     cargando:boolean=true
 
+
     constructor(
       //Date Imports
       private modalService: NgbModal,
@@ -608,16 +609,7 @@ export class EditReservaModalComponent implements OnInit {
       let fechaSalida:DateTime = DateTime.fromObject({year:anoSalida,month:mesSalida,day:diaSalida})
       let fechaLlegada:DateTime = DateTime.fromObject({year:anoLlegada,month:mesLlegada,day:diaLlegada})
 
-      if(fechaSalida.startOf("day") > this.todayDate.startOf("day"))
-      {
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-        modalRef.componentInstance.alertHeader='Advertencia'
-        modalRef.componentInstance.mensaje = 'La fecha de salida del húesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
-       
-        modalRef.result.then((result) => {
-        if(result=='Aceptar')
-          {
-            const nochesAlojadas:DateTime = this.todayDate.diff(fechaLlegada, ["days"])
+      const nochesAlojadas:DateTime = this.todayDate.diff(fechaLlegada, ["days"])
             const nochesReservadas:DateTime = fechaSalida.diff(fechaLlegada, ["days"])
             
             this.nochesReales = Math.ceil(nochesAlojadas.days) 
@@ -636,6 +628,17 @@ export class EditReservaModalComponent implements OnInit {
             const totalCargosSinAlojamiento = cargosSinAlojamiento.reduce((previous,current)=>previous+current.Cargo,0)
 
             this.saldoPendiente = (totalCargosSinAlojamiento+this.totalAlojamientoNuevo)-totalAbonos
+
+
+      if(fechaSalida.startOf("day") >= this.todayDate.startOf("day") )
+      {
+        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertHeader='Advertencia'
+        modalRef.componentInstance.mensaje = 'La fecha de salida del húesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
+       
+        modalRef.result.then((result) => {
+        if(result=='Aceptar')
+          {
             
             if(this.saldoPendiente==0)
             {   
@@ -696,6 +699,7 @@ export class EditReservaModalComponent implements OnInit {
 
                 this.customerService.fetch();
                 this.modal.dismiss();
+
                 },
                 (err)=>{
                   this.isLoading=false
@@ -728,6 +732,7 @@ export class EditReservaModalComponent implements OnInit {
             modalRef.result.then((result) => {
               if(result=='Aceptar'){
                 this.saldarCuenta();
+                modalRef.close();
               }
               else{
                 this.closeResult = `Closed with: ${result}`;
@@ -748,7 +753,8 @@ export class EditReservaModalComponent implements OnInit {
 
       const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
         //Recibir Data del Modal usando EventEmitter
-        this.checkOutfunction()
+        this.checkOutfunction();
+        modalRef.close();
         })
 
       modalRef.result.then((result) => {
