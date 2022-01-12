@@ -84,6 +84,7 @@
 
     <!-- begin:Table -->
     <div class="table-responsive angular-bootstrap-table">
+      
       <table class="table overflow-hidden table-head-custom table-vertical-center">
         <thead>
           <!-- <th class="selection-cell-header" data-row-selection="true">
@@ -102,6 +103,11 @@
           </th>
           <th style="text-align: center;">
             Estatus
+            <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th style="text-align: center;">
+            Limpieza
             <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
               (sort)="sort($event)"></app-sort-icon>
           </th>
@@ -173,6 +179,13 @@
         <mat-option #option [style.background-color]="backgroundColor(huesped.estatus)" [value]="huesped.estatus">{{huesped.estatus}}</mat-option>
       </mat-select>
     </ng-container>
+  </td>
+  <td>
+    <mat-select (selectionChange)='onChangeAma(selectedAma.value,huesped.numeroCuarto,huesped.habitacion,huesped.folio)' style="width:120px" #selectedAma  [value]="huesped.estatus_Ama_De_Llaves" [style.background-color]="backgroundColorAmadeLlaves(huesped.estatus_Ama_De_Llaves)" name="estatusAma" id="amaDellaves" class="btn" >
+      <ng-container *ngFor="let estatusAmaDeLlaves of amaDeLlavesList" >
+        <mat-option  [value]="estatusAmaDeLlaves.Descripcion" [style.background-color]="estatusAmaDeLlaves.Color"> {{estatusAmaDeLlaves.Descripcion}}</mat-option>
+      </ng-container>
+    </mat-select>
   </td>
   <td>
 

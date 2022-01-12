@@ -14,7 +14,7 @@ import {environment} from "../../../../environments/environment"
 import { map, filter, switchMap } from 'rxjs/operators';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {Huesped} from '../_models/customer.model'
-
+import {DateTime} from 'luxon'
 import {
   GroupingState,
   PaginatorState,
@@ -51,7 +51,22 @@ import { OrigenService } from '../_services/origen.service';
 import { IddleService } from '../_services/iddle.service';
 import { AuditoriaService } from 'src/app/main/_services/auditoria.service';
 import { DivisasService } from '../../parametros/_services/divisas.service';
-
+import { Disponibilidad } from '../_models/disponibilidad.model';
+import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
+import { AmaLlavesService } from '../_services/ama-llaves.service';
+import { Ama_De_Llaves } from '../_models/ama-llaves';
+const DISPONIBILIDAD_DEFAULT:Disponibilidad ={
+  id:1,
+  Cuarto:'',
+  Habitacion:100,
+  Estatus:1,
+  Dia:1,
+  Mes:1,
+  Ano:2021,
+  Estatus_Ama_De_Llaves:'Limpia',
+  Folio_Huesped:0
+  }
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
@@ -124,17 +139,22 @@ export class CustomersComponent
   searchGroup: FormGroup;
   closeResult: string;
 
+    /**DATES */
+    todayDate:DateTime
   // foliador:Foliador;
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public estatusDesc:Estatus[]=[];
   public estatusArray:Estatus[]=[];
   public origenArray:Origen[]=[];
+  public listaHuespedes:Huesped[]=[];
+  public amaDeLlavesList:Ama_De_Llaves[]=[];
   public foliosprueba1: [];
   public huesped:Huesped;
   private subscriptions: Subscription[] = []; // Read more: => https://brianflove.com/2016/12/11/anguar-2-unsubscribe-observables/
   private foliosSub:Subscription;
   public codigoCuarto:Habitaciones[]=[];
+  disponibilidadEstatus:Disponibilidad=DISPONIBILIDAD_DEFAULT
 
   oldDropValue:string
 
@@ -153,14 +173,18 @@ export class CustomersComponent
     public estatusService : EstatusService,
     private iddleService:IddleService,
     private auditoriaService:AuditoriaService,
-    public divisasService : DivisasService
-  ) {
+    public divisasService : DivisasService,
+    public parametrosService:ParametrosServiceService,
+    public disponibilidadService:DisponibilidadService,
+    public amaDeLlavesService:AmaLlavesService
 
+  ) {
   }
 
 
   // angular lifecircle hooks
   ngOnInit(): void {
+
     this.divisasService.getcurrentDivisa.Simbolo
 
     this.iddleService.initiateIddle();
@@ -172,6 +196,7 @@ export class CustomersComponent
     this.getTipoCuarto();
     this.filterForm();
     this.searchForm();
+    this.getAmaDeLlaves();
     // this.getEstatusAmaDeLlaves();
     this.customerService.fetch();
     this.grouping = this.customerService.grouping;
@@ -180,13 +205,35 @@ export class CustomersComponent
     const sb = this.customerService.isLoading$.subscribe(res => this.isLoading = res);
     this.subscriptions.push(sb);
     this.sorting.direction = 'desc';
-  }
 
+
+
+    
+    console.log(this.customerService.items$)
+    // this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
+  }
 
 
 
   ngOnDestroy() {
     this.subscriptions.forEach((sb) => sb.unsubscribe());
+  }
+
+  getAmaDeLlaves(){
+
+    const sb = this.amaDeLlavesService.getAmaDeLlaves().subscribe(
+      (value)=>{
+        for(let i=0;i<value.length;i++)
+        {
+          this.amaDeLlavesList.push(value[i])
+        }
+      },
+      (error)=>{
+        console.log(error)
+      },
+      ()=>{}
+      )
+      this.subscriptions.push(sb)
   }
 
   getEstatus(): void {
@@ -297,7 +344,49 @@ this.origenService.getOrigenes()
                         })
   }
 
+  onChangeAma(estatus:string,habitacion:number,cuarto:string,folio:number)
+    {
+      this.todayDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
 
+
+      this.disponibilidadEstatus.Estatus_Ama_De_Llaves=estatus
+      this.disponibilidadEstatus.Ano=this.todayDate.year
+      this.disponibilidadEstatus.Mes=this.todayDate.month
+      this.disponibilidadEstatus.Dia=this.todayDate.day
+      this.disponibilidadEstatus.Habitacion=habitacion
+      this.disponibilidadEstatus.Cuarto=cuarto
+      this.disponibilidadEstatus.Folio_Huesped=folio
+
+
+     const sb = this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
+        (value)=>{
+          this.customerService.fetch();
+
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+          modalRef.componentInstance.alertHeader = 'Exito'
+          modalRef.componentInstance.mensaje='Estatus de habitacion Actualizado'
+        
+          modalRef.result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+
+            });
+       },
+        (error)=>{
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='No se pudo Actualizar el Estatus de Ama de Llaves'
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+  
+              });
+            
+        })
+        this.subscriptions.push(sb)
+    } 
 
   // filtration
   filterForm() {
@@ -570,33 +659,26 @@ this.origenService.getOrigenes()
     return color;
   }
 
-  // cambiaEstatus(huesped:Huesped)
-  // {
-  //   this.customerService.updateHuesped(huesped)
-  //   .subscribe(
-  //    ()=>
-  //    {
-  //     this.modalService.open(this.exito,{ size: 'sm', backdrop:'static' }).result.then((result) => {
-  //       this.closeResult = `Closed with: ${result}`;
-  //       }, (reason) => {
-  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-  //       });
-  //       this.customerService.fetch();
-  //   },
-  //    (err)=>
-  //    {
-  //      console.log(err.message)
-  //     this.modalService.open(this.error,{ size: 'sm', backdrop:'static' }).result.then((result) => {
-  //       this.closeResult = `Closed with: ${result}`;
-  //       }, (reason) => {
-  //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-  //       });     },
-  //    ()=>{
+ getAmaDeLlavesByID(estatus:string,habitacion:string,numeroCuarto:number){
 
-  //    }
+    let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
+     
+    const sb =  this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day, diaDeHoy.month, diaDeHoy.year, numeroCuarto, habitacion).subscribe(
+      (value) => {
+        console.log(numeroCuarto)
+        console.log(habitacion)
+        this.disponibilidadEstatus = value[0];
+      },
+      (error) => {
+        console.log(error);
+      },
+      () => { }
+    )
 
-  //  )
-  // }
+      this.subscriptions.push(sb)
+  }
+
+ 
 
   getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -606,6 +688,18 @@ this.origenService.getOrigenes()
     } else {
         return  `with: ${reason}`;
     }
+}
+
+backgroundColorAmadeLlaves(estatus:string){
+  let color;
+  for (let i=0;i<this.amaDeLlavesList.length;i++)
+  {
+    if(estatus==this.amaDeLlavesList[i].Descripcion)
+    {
+      color = this.amaDeLlavesList[i].Color
+    }
+  }
+  return color;
 }
 
 oldDropdownValue(event)

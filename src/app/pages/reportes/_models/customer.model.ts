@@ -36,5 +36,6 @@ export interface Huesped extends BaseModel {
   notas?:string;
   vip?:string;
   ID_Socio?:number;
+  estatus_Ama_De_Llaves?:string;
 }
 
