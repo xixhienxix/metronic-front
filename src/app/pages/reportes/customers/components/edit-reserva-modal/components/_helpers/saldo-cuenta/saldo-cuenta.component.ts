@@ -122,9 +122,9 @@ this.isLoading=true
     this.passEntry.emit(exito);
     }
 
-  maxCantidad(){
-    this.abonosf.cantidadAbono.patchValue(this.customerService.getCurrentHuespedValue.pendiente)
-  }
+  // maxCantidad(){
+  //   this.abonosf.cantidadAbono.patchValue(this.saldoPendiente)
+  // }
 
   isControlValidAbono(controlName: string): boolean {
     const control = this.abonoFormGroup.controls[controlName];
@@ -139,6 +139,7 @@ this.isLoading=true
 
   ngOnDestroy():void{
     this.subscription.forEach(sb=>sb.unsubscribe())
+    this.modal.dismiss();
   }
 
 }

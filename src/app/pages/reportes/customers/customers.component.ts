@@ -156,6 +156,8 @@ export class CustomersComponent
   public codigoCuarto:Habitaciones[]=[];
   disponibilidadEstatus:Disponibilidad=DISPONIBILIDAD_DEFAULT
 
+  /**DOM */
+  cargando:boolean=true
   oldDropValue:string
 
   constructor(
@@ -202,7 +204,7 @@ export class CustomersComponent
     this.grouping = this.customerService.grouping;
     this.paginator = this.customerService.paginator;
     this.sorting = this.customerService.sorting;
-    const sb = this.customerService.isLoading$.subscribe(res => this.isLoading = res);
+    const sb = this.customerService.isLoading$.subscribe((res) => this.isLoading = res);
     this.subscriptions.push(sb);
     this.sorting.direction = 'desc';
 
@@ -253,6 +255,7 @@ export class CustomersComponent
                           {
                             // this.estatusDesc.push(estatus[i].estatus)
                             this.estatusArray=estatus
+                            this.cargando=false
                           }
                         })
 

@@ -186,6 +186,11 @@ export class EditReservaModalComponent implements OnInit {
     /*INDEXES*/
     selectedIndex:number
 
+    /*DOM*/
+    colorAma:string='LIMPIA'
+    cargando:boolean=true
+
+
     constructor(
       //Date Imports
       private modalService: NgbModal,
@@ -219,14 +224,13 @@ export class EditReservaModalComponent implements OnInit {
       this.loadCustomer();
       this.getEstatus();
       this.getAmaDeLlaves();
-      this.getAmaDeLlavesByID();
+      // this.getAmaDeLlavesByID();
       
 
       this.formGroup = this.fb.group({
         estatus : [this.customersService.getCurrentHuespedValue.estatus],
-        ama:[this.disponibilidadEstatus.Estatus_Ama_De_Llaves]
+        ama:['']
       }) 
-      this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
 
     }
 
@@ -246,6 +250,7 @@ export class EditReservaModalComponent implements OnInit {
           {
             this.amaDeLlavesList.push(value[i])
           }
+          this.getAmaDeLlavesByID()
         },
         (error)=>{
           console.log(error)
@@ -262,10 +267,17 @@ export class EditReservaModalComponent implements OnInit {
       let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
        
 
-
       const sb = this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
         (value)=>{
             this.disponibilidadEstatus=value[0]
+            this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
+            for(let i=0;i<this.amaDeLlavesList.length;i++){
+              if(this.amaDeLlavesList[i].Descripcion==value[0].Estatus_Ama_De_Llaves)
+              {
+                this.colorAma=this.amaDeLlavesList[i].Color
+              }
+            }
+            this.cargando=false
         },
         (error)=>{
           console.log(error)
@@ -395,17 +407,17 @@ export class EditReservaModalComponent implements OnInit {
     return color;
   }
 
-  backgroundColorAmadeLlaves(estatus:string){
-    let color;
-    for (let i=0;i<this.amaDeLlavesList.length;i++)
-    {
-      if(estatus==this.amaDeLlavesList[i].Descripcion)
-      {
-        color = this.amaDeLlavesList[i].Color
-      }
-    }
-    return color;
-  }
+  // backgroundColorAmadeLlaves(estatus:string){
+  //   let color;
+  //   for (let i=0;i<this.amaDeLlavesList.length;i++)
+  //   {
+  //     if(estatus==this.amaDeLlavesList[i].Descripcion)
+  //     {
+  //       color = this.amaDeLlavesList[i].Color
+  //     }
+  //   }
+  //   return color;
+  // }
 
   openDialog(huesped:Huesped,estatus:string) {
     const modalRef = this.modalService.open(ConfirmationModalComponent,
@@ -597,16 +609,7 @@ export class EditReservaModalComponent implements OnInit {
       let fechaSalida:DateTime = DateTime.fromObject({year:anoSalida,month:mesSalida,day:diaSalida})
       let fechaLlegada:DateTime = DateTime.fromObject({year:anoLlegada,month:mesLlegada,day:diaLlegada})
 
-      if(fechaSalida.startOf("day") > this.todayDate.startOf("day"))
-      {
-        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
-        modalRef.componentInstance.alertHeader='Advertencia'
-        modalRef.componentInstance.mensaje = 'La fecha de salida del húesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
-       
-        modalRef.result.then((result) => {
-        if(result=='Aceptar')
-          {
-            const nochesAlojadas:DateTime = this.todayDate.diff(fechaLlegada, ["days"])
+      const nochesAlojadas:DateTime = this.todayDate.diff(fechaLlegada, ["days"])
             const nochesReservadas:DateTime = fechaSalida.diff(fechaLlegada, ["days"])
             
             this.nochesReales = Math.ceil(nochesAlojadas.days) 
@@ -625,6 +628,17 @@ export class EditReservaModalComponent implements OnInit {
             const totalCargosSinAlojamiento = cargosSinAlojamiento.reduce((previous,current)=>previous+current.Cargo,0)
 
             this.saldoPendiente = (totalCargosSinAlojamiento+this.totalAlojamientoNuevo)-totalAbonos
+
+
+      if(fechaSalida.startOf("day") >= this.todayDate.startOf("day") )
+      {
+        const modalRef = this.modalService.open(AlertsComponent,{size:'sm'})
+        modalRef.componentInstance.alertHeader='Advertencia'
+        modalRef.componentInstance.mensaje = 'La fecha de salida del húesped es posterior al dia de hoy, desea realizar un Check-Out anticipado?'
+       
+        modalRef.result.then((result) => {
+        if(result=='Aceptar')
+          {
             
             if(this.saldoPendiente==0)
             {   
@@ -685,6 +699,7 @@ export class EditReservaModalComponent implements OnInit {
 
                 this.customerService.fetch();
                 this.modal.dismiss();
+
                 },
                 (err)=>{
                   this.isLoading=false
@@ -717,6 +732,7 @@ export class EditReservaModalComponent implements OnInit {
             modalRef.result.then((result) => {
               if(result=='Aceptar'){
                 this.saldarCuenta();
+                modalRef.close();
               }
               else{
                 this.closeResult = `Closed with: ${result}`;
@@ -737,7 +753,8 @@ export class EditReservaModalComponent implements OnInit {
 
       const sb = modalRef.componentInstance.passEntry.subscribe((receivedEntry) => {
         //Recibir Data del Modal usando EventEmitter
-        this.checkOutfunction()
+        this.checkOutfunction();
+        modalRef.close();
         })
 
       modalRef.result.then((result) => {
