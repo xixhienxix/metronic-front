@@ -78,7 +78,10 @@ const EMPTY_CUSTOMER: Huesped = {
   lenguaje:'Español',
   numeroCuarto:0,
   creada:'',
-  tipoHuesped:"Regular"
+  tipoHuesped:"Regular",
+  notas:'',
+  vip:'',
+  ID_Socio:0
 };
 
 
