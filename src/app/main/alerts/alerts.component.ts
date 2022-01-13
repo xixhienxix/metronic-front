@@ -12,6 +12,11 @@ import { take } from 'rxjs/operators';
 })
 export class AlertsComponent implements OnInit {
   mensaje:string;
+  mensaje1:string;
+  mensaje2:string;
+  mensaje3:string;
+  mensaje4:string;
+  mensajeExtra:boolean=false
   alertHeader:string;
   interval:number
   countdown:number=0
@@ -19,10 +24,18 @@ export class AlertsComponent implements OnInit {
   subscription:Subscription[]=[]
   
   constructor(public modal: NgbActiveModal,
-    ) { }
+    ) {
+     }
+
+    ngAfterContentInit(){
+      console.log(this.mensajeExtra)
+      if(this.mensajeExtra==true){
+        this.mensajeExtra=true
+      }
+    }
 
   ngOnInit(): void {
-
+    
     var timer =  interval(1000).pipe(
       take(this.interval)
       );

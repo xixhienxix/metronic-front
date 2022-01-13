@@ -15,6 +15,8 @@ import { AuthModel } from 'src/app/modules/auth/_services/auth.service';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import {DateTime} from 'luxon'
 import { AuditoriaService } from 'src/app/main/_services/auditoria.service';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 
 @Component({
   selector: 'app-topbar',
@@ -42,12 +44,14 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   extrasLanguagesDisplay: boolean;
   extrasUserDisplay: boolean;
   extrasUserLayout: 'offcanvas' | 'dropdown';
+  closeResult: string;
 
   constructor(
     private layout: LayoutService,
     private auth: AuthService,
     public parametrosService:ParametrosServiceService,
-    public auditoriaService:AuditoriaService
+    public auditoriaService:AuditoriaService,
+    public modal : NgbModal
       ) {
     this.user$ = this.auth.currentUserSubject.asObservable();
     const sb = this.parametrosService.getParametros().subscribe(
@@ -91,7 +95,28 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   }
 
   auditoria(){
-    this.auditoriaService.procesaAuditoria();
+        const mensaje='El proceso de Auditoria realiza las siguientes revisiones a los Húespedes y Reservaciones vigentes '
+        const mensaje1='- Cambiara todas las reservaciones que llegan al dia a estatus No-Show siempre y cuando pase de la hora de NoShow determinada en la seccion de Parametros'
+        const mensaje2='- Camibiara a Check-Out todos los húespedes cuyas cuentas esten en 0s y tengan fecha de salida del dia de hoy siempre y cuando pase de la hora de NoShow determinada en la seccion de Parametros'
+        const mensaje3='Desea continuar???'
+    const modalRef = this.modal.open(AlertsComponent,{size:'sm'})
+    modalRef.componentInstance.alertHeader = 'Precaucion'
+    modalRef.componentInstance.mensaje=mensaje
+    modalRef.componentInstance.mensaje1=mensaje1
+    modalRef.componentInstance.mensaje2=mensaje2
+    modalRef.componentInstance.mensaje3=mensaje3
+    modalRef.componentInstance.mensajeExtra=true
+    
+      modalRef.result.then((result) => {
+        if(result=='Aceptar')        
+        {
+          this.auditoriaService.procesaAuditoria();
+        } 
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+        });
+
   }
 
   ngAfterViewInit(): void {
@@ -137,6 +162,16 @@ export class TopbarComponent implements OnInit, AfterViewInit {
       KTLayoutHeaderTopbar.init('kt_header_mobile_topbar_toggle');
     });
   }
+  
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+        return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+        return 'by clicking on a backdrop';
+    } else {
+        return  `with: ${reason}`;
+    }
+}
 
   ngOnDestroy():void
   {

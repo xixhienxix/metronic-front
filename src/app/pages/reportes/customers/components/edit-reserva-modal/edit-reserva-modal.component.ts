@@ -464,6 +464,7 @@ export class EditReservaModalComponent implements OnInit {
 
      const sb = this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
         (value)=>{
+          this.customerService.fetch();
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Estatus de habitacion Actualizado'

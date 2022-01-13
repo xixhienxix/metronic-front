@@ -6,6 +6,16 @@
   </div>
   <div class="modal-body">
     <p>{{mensaje}}</p>
+      <br>
+        <p *ngIf="mensajeExtra">{{mensaje1}}</p>
+        <br>
+        <p *ngIf="mensajeExtra">{{mensaje2}}</p>
+        <br>
+        <p *ngIf="mensajeExtra">{{mensaje3}}</p>
+        <br>
+        <p *ngIf="mensajeExtra">{{mensaje4}}</p>
+        <br>
+      
 
     <ng-container *ngIf="isProgress">
       <p>{{countdown}}</p>
