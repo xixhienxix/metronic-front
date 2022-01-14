@@ -9,7 +9,7 @@
         color: white;
       "
       class="btn"
-      (click)="modal.close()"
+      (click)="modalActive.close()"
     >
       X
     </button>
@@ -23,7 +23,7 @@
         <div class="row col-md-6">
           <h2 style="font-size: 1.5em">{{ historicoService.getCurrentClienteValue.nombre}}</h2>
         </div>
-        <div class="row">
+        <!-- <div class="row">
           <small style="color: white; font-size: 1em"
             >ID RVA : &nbsp;
             <small style="font-size: 1em; font-weight: bold; color: #319dd7">{{
@@ -37,20 +37,24 @@
               >{{ historicoService.getCurrentClienteValue.numeroCuarto }} - {{ historicoService.getCurrentClienteValue.habitacion.replace("_"," ") }}</small
             >
           </small>
-        </div>
+        </div> -->
       </div>
+      <br>
+      <button  (click)="nvareserva()" class="btn btn-primary col-sm-12">
+        Generar Nueva Reserva
+      </button>
     </div>
   
     <br />
     <!-- </div>  -->
     <div class="row container">
-      <div class="col-lg-7">
+      <div class="col-lg-12">
         <mat-select style="background-color: #fA6D7C;"
             [(value)]="selected"
             class="form-control form-control-lg form-control-solid"
             name="habitacion"
         >
-            <mat-option style="background-color: #fA6D7C;" value="0">{{historicoService.getCurrentClienteValue.estatus}} </mat-option>
+            <mat-option style="background-color: #fA6D7C; text-align:center" value="0">{{historicoService.getCurrentClienteValue.estatus}} </mat-option>
         </mat-select>
       </div>
 
@@ -77,8 +81,8 @@
     <mat-tab label="Edo de Cuenta">
       <app-edo-cuenta></app-edo-cuenta>
     </mat-tab> -->
-    <mat-tab>
-      
+    <mat-tab style="font-weight: bold; font-size: xx-large;" label="CLIENTE">
+      <app-vista-cliente></app-vista-cliente>
     </mat-tab>
   </mat-tab-group>
   

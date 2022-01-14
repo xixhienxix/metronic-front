@@ -415,22 +415,21 @@
             placeholder="Teléfono"
             autocomplete="off"
             formControlName="telefono"
-            value="{{huesped.telefono}}"/>
-           <!--[class.is-invalid]="isControlInvalid('telefono')"/>-->
-          <!--[class.is-invalid]="isControlInvalid('telefono')"
-            [class.is-valid]="isControlValid('telefono')"-->
+            value="{{huesped.telefono}}"
+            [class.is-invalid]="isControlInvalid('telefono')"
+            [class.is-valid]="isControlValid('telefono')"/>
           <!-- <div class="invalid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Invalido
           </div> -->
           <!-- <div class="valid-feedback" *ngIf="isControlValid('telefono')">
             Teléfono Escrito Correctamente
-          </div>
+          </div>-->
           <div
             class="invalid-feedback"
             *ngIf="controlHasError('minlength', 'telefono')"
           >
             Minimo 10 numeros
-          </div>
+          </div> 
           <div
             class="invalid-feedback"
             *ngIf="controlHasError('maxlength', 'telefono')"
@@ -441,8 +440,8 @@
           class="invalid-feedback"
           *ngIf="controlHasError('pattern', 'telefono')"
           >
-           Solo se permiten números
-        </div> -->
+           Solo se permiten letras
+        </div>
         </div>
 
       </div>

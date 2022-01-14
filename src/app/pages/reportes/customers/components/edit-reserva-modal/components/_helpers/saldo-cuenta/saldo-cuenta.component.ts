@@ -85,14 +85,7 @@ this.isLoading=true
       (value:any)=>{
 
         this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
-        modalRef.componentInstance.alertHeader = 'Exito'
-        modalRef.componentInstance.mensaje='Movimiento agregado al Estado de Cuenta del Húesped'
-
-        setTimeout(() => {
-          modalRef.close('Close click');
-          this.modal.close('Close click');
-        },4000)
+       
             
         // this.estadoDeCuenta=[]
         // this.edoCuentaService.getCuentas(this.folio);

@@ -31,6 +31,7 @@ import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import {DateTime} from 'luxon'
 import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
+import { Huesped_Detail_Service } from '../../../_services/huesped.detail.service';
 
 // const todayDate = new Date();
 
@@ -187,7 +188,14 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   cuarto:string;
   public listaFolios:Foliador[];
   estatusID:number;
-  personasXCuarto:any[]=[]
+  personasXCuarto:any[]=[];
+
+  
+  /**Clienter Distinguido */
+  nombreHistorico:string
+  emailHistorico:string
+  telefonoHistorico:string
+  id_Socio:number=0
 
     /*Subscriptions*/
   private subscriptions: Subscription[] = [];
@@ -211,7 +219,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     private http: HttpClient,
     public i18n: NgbDatepickerI18n,
     public parametrosService:ParametrosServiceService,
-    public divisasService:DivisasService
+    public divisasService:DivisasService,
+    public detallesService:Huesped_Detail_Service
     ) {
       
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
@@ -244,13 +253,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.getFolios();
     this.getEstatus();
 
+    this.formGroup.controls['habitacion'].setValue(0);
+
     if(this.fromDate.day==this.todayDate.day && this.fromDate.month==this.todayDate.month && this.fromDate.year==this.todayDate.year)
     {this.noDisabledCheckIn=true}
     else
     {this.noDisabledCheckIn=false}
   }
-
-
 
   getParametros(){
     const sb = this.parametrosService.getParametros().subscribe(
@@ -273,9 +282,20 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       this.huesped = EMPTY_CUSTOMER;
       this.huesped.folio=this.folio;
       this.huesped.origen = "Online";
+
+      const socio = this.folios.filter(socio=>socio.Letra=='S')
+      for(let i=0;i<socio.length;i++){
+        this.huesped.ID_Socio=socio[i].Folio
+      }
+
       this.loadForm();
 
     } else {
+
+      const socio = this.folios.filter(socio=>socio.Letra=='S')
+      for(let i=0;i<socio.length;i++){
+        this.huesped.ID_Socio=socio[i].Folio
+      }
 
       const sb = this.customersService.getItemById(this.folio).pipe(
         first(),
@@ -289,6 +309,13 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       });
       this.subscriptions.push(sb);
     }
+  }
+
+  ngAfterViewInit(){
+    this.formGroup.controls['nombre'].setValue(this.nombreHistorico);
+    this.formGroup.controls['email'].setValue(this.emailHistorico);
+    this.formGroup.controls['telefono'].setValue(this.telefonoHistorico);
+    this.huesped.ID_Socio=this.id_Socio
   }
 
   loadForm() {
@@ -371,6 +398,17 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
                         }))
                         .subscribe((folios)=>{
                           this.folios=(folios)
+                          
+                          if(this.id_Socio==0){
+                            const socio = this.folios.filter(socio=>socio.Letra=='S')
+                          for(let i=0;i<socio.length;i++){
+                            this.huesped.ID_Socio=socio[i].Folio
+                          }
+                          }
+                          else {
+                            this.huesped.ID_Socio = this.id_Socio
+                          }
+
                         })
 
                         this.subscriptions.push(sb)
@@ -401,6 +439,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   }
 
   save() {
+
   this.prepareHuesped();
   this.create();
   this.getFolios();
@@ -508,9 +547,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
       ()=>{
-
-
-
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Húesped Generado con éxito'          
@@ -911,6 +947,7 @@ fechaSeleccionadaFinal(event:NgbDate){
     this.huesped.nombre=event.nombre;
     this.huesped.email=event.email;
     this.huesped.telefono=event.telefono;
+    this.huesped.ID_Socio=event.id_Socio
 
   }
 

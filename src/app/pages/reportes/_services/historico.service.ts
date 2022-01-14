@@ -17,7 +17,7 @@ const DEFAULT_STATE: ITableState = {
   entityId: undefined
 };
 
-const EMPTY_HISTORICO = {
+const EMPTY_HISTORICO:Historico = {
   id_Socio:1,
   habitacion:'',
   llegada:'',
@@ -38,7 +38,16 @@ const EMPTY_HISTORICO = {
   porPagar:0,
   tarifa:0,
   telefono:'',
-  tipoHuesped:''
+  tipoHuesped:'',
+  fechaNacimiento:'',
+  trabajaEn:'',
+  tipoDeID:'',
+  numeroDeID:'',
+  direccion:'',
+  pais:'',
+  ciudad:'',
+  codigoPostal:'',
+  lenguaje:'',
 }
 
 @Injectable({
@@ -119,6 +128,10 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
   addPost(huesped:Huesped) {
     return this.http.post<Huesped>(environment.apiUrl+"/guarda/historico", huesped)
     }
+
+  getHistoricoVisitas(id_Socio:number){
+    return this.http.post<Historico[]>(environment.apiUrl+"/historico/visitas",id_Socio)
+  }
 
 
   ngOnDestroy() {

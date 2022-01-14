@@ -780,6 +780,7 @@ export class EditReservaModalComponent implements OnInit {
       const sb = this.estatusService.actualizaEstatus(4,this.huesped.folio,this.huesped).subscribe(
         ()=>
         {
+          this.customerService.fetch();
           for(let i=1;i<=this.nochesTotales;i++){
 
             const fecha = this.todayDate.plus({days:i})
@@ -812,6 +813,7 @@ export class EditReservaModalComponent implements OnInit {
 
            const sb = this.disponibilidadService.actualizaDisponibilidad(dispo).subscribe(
               (value)=>{
+                this.customerService.fetch();
               },
               (error)=>{}
               )
@@ -879,6 +881,7 @@ export class EditReservaModalComponent implements OnInit {
             (value)=>{
               console.log(value)
               this.isLoading=false
+              this.customerService.fetch();
 
               const sb = this.customerService.deleteHuesped(this.huesped._id).subscribe(
                 (value)=>{

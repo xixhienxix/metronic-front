@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NuevaReservaModalComponent } from '../../../customers/components/nueva-reserva-modal/nueva-reserva-modal.component';
+import { Huesped } from '../../../_models/customer.model';
 import { Historico } from '../../../_models/historico.model';
 import { HistoricoService } from '../../../_services/historico.service';
 
@@ -13,13 +16,16 @@ export class VerFolioComponent implements OnInit {
   
   isLoading:boolean
   cliente:Historico
+  huesped:Huesped
   /**DOM */
   selectedIndex:number
   selected:string='0'
 
   constructor(    
-    public modal: NgbActiveModal,
-    public historicoService:HistoricoService
+    public modalService: NgbModal,
+    public modalActive: NgbActiveModal,
+    public historicoService:HistoricoService,
+    private router : Router
     ) {
       console.log(this.historicoService.getCurrentClienteValue)
    }
@@ -27,6 +33,23 @@ export class VerFolioComponent implements OnInit {
   ngOnInit(): void {
     // this.selected=this.historicoService.getCurrentClienteValue.estatus
     this.historicoService.getCurrentClienteValue
+  }
+
+  nvareserva()
+  {
+    this.huesped=this.historicoService.getCurrentClienteValue
+      const modalRef = this.modalService.open(NuevaReservaModalComponent, { size: 'md',backdrop: 'static' });
+      modalRef.componentInstance.nombreHistorico = this.historicoService.getCurrentClienteValue.nombre
+      modalRef.componentInstance.emailHistorico = this.historicoService.getCurrentClienteValue.email
+      modalRef.componentInstance.telefonoHistorico = this.historicoService.getCurrentClienteValue.telefono
+      modalRef.componentInstance.id_Socio = this.historicoService.getCurrentClienteValue.id_Socio
+
+      modalRef.result.then( () =>
+      () => { 
+        this.modalActive.close();
+        this.router.navigate(['reportes/customers'])
+      }
+      );
   }
 
   setStep(index:number){
