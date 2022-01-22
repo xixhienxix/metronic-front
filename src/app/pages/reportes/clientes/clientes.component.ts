@@ -13,7 +13,7 @@ import {
   IGroupingView,
   ISearchView,
 } from '../../../_metronic/shared/crud-table';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Estatus } from '../_models/estatus.model';
 import { Habitaciones } from '../_models/habitaciones.model';
@@ -39,7 +39,8 @@ import { VerFolioComponent } from './components/ver-folio/ver-folio.component';
 @Component({
   selector: 'app-clientes',
   templateUrl: './clientes.component.html',
-  styleUrls: ['./clientes.component.scss']
+  styleUrls: ['./clientes.component.scss'],
+
 })
 
 export class ClientesComponent implements OnInit {
@@ -80,6 +81,14 @@ export class ClientesComponent implements OnInit {
     public historicoService : HistoricoService
     ) 
     {  
+      const sb = this.historicoService.getNotification().subscribe(data=>{
+        if(data)
+        {
+          this.getAll();
+          this.cliente=data
+        }
+      });
+      this.subscription.push(sb)
     }
 
   ngOnInit(): void {
@@ -91,56 +100,19 @@ export class ClientesComponent implements OnInit {
   getAll(){
     const sb = this.historicoService.getAll().subscribe(
       (value)=>{
-        console.log(value)
+       
         this.dataSource.data=value
         this.clientes=value
+        if(this.cliente){
+          this.historicoService.setCurrentClienteValue=this.cliente
+        }
       },
       (error)=>{
         console.log(error)
       })
   }
 
-  // filterForm() {
-  //   this.filterGroup = this.fb.group({
-  //     origen: [''],
-  //     estatus: [''],
-  //     habitacion: [''],
-  //     searchTerm: [''],
-  //   });
-  //   this.subscriptions.push(
-  //     this.filterGroup.controls.estatus.valueChanges.subscribe(() =>
-  //       this.filter()
-  //     )
-  //   );
-  //   this.subscriptions.push(
-  //     this.filterGroup.controls.habitacion.valueChanges.subscribe(() => this.filter())
-  //   );
-  //   this.subscriptions.push(
-  //     this.filterGroup.controls.origen.valueChanges.subscribe(() => this.filter())
-  //   );
-  // }
 
-  // filter() {
-  //   const filter = {};
-  //   const estatus = this.filterGroup.get('estatus').value;
-
-  //   if (estatus) {
-  //     filter['estatus'] = estatus;
-  //   }
-
-  //   const habitacion = this.filterGroup.get('habitacion').value;
-  //   if (habitacion) {
-  //     filter['habitacion'] = habitacion;
-  //   }
-
-  //   const origen = this.filterGroup.get('origen').value;
-  //   if(origen){
-  //     filter['origen']=origen;
-  //   }
-
-
-  //   this.customerService.patchState({ filter });
-  // }
 
   getClientes(){
     const sb = this.clientesServices.getClientes().subscribe(
@@ -169,8 +141,6 @@ export class ClientesComponent implements OnInit {
     {    
       const modalRef = this.modalService.open(VerFolioComponent,{size:'md',backdrop: 'static'})
     }
-
-
   }
   
   ngOnDestroy():void

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { NuevaReservaModalComponent } from '../../../customers/components/nueva-reserva-modal/nueva-reserva-modal.component';
 import { Huesped } from '../../../_models/customer.model';
 import { Historico } from '../../../_models/historico.model';
@@ -10,7 +11,9 @@ import { HistoricoService } from '../../../_services/historico.service';
 @Component({
   selector: 'app-ver-folio',
   templateUrl: './ver-folio.component.html',
-  styleUrls: ['./ver-folio.component.scss']
+  styleUrls: ['./ver-folio.component.scss'],
+  encapsulation: ViewEncapsulation.None,
+
 })
 export class VerFolioComponent implements OnInit {
   
@@ -21,17 +24,18 @@ export class VerFolioComponent implements OnInit {
   selectedIndex:number
   selected:string='0'
 
+  /**Subscription */
+  subscription:Subscription[]=[]
+
   constructor(    
     public modalService: NgbModal,
     public modalActive: NgbActiveModal,
     public historicoService:HistoricoService,
     private router : Router
     ) {
-      console.log(this.historicoService.getCurrentClienteValue)
    }
 
   ngOnInit(): void {
-    // this.selected=this.historicoService.getCurrentClienteValue.estatus
     this.historicoService.getCurrentClienteValue
   }
 
@@ -51,6 +55,8 @@ export class VerFolioComponent implements OnInit {
       }
       );
   }
+
+
 
   setStep(index:number){
     this.selectedIndex=index;

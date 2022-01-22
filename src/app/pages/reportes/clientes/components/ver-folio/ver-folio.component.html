@@ -54,7 +54,15 @@
             class="form-control form-control-lg form-control-solid"
             name="habitacion"
         >
-            <mat-option style="background-color: #fA6D7C; text-align:center" value="0">{{historicoService.getCurrentClienteValue.estatus}} </mat-option>
+        <ng-container *ngIf="historicoService.getCurrentClienteValue.estatus=='Check-Out'">
+          <mat-option style="background-color: #fA6D7C; text-align:center" value="0">HIZO CHECKOUT </mat-option>
+        </ng-container>
+        <ng-container *ngIf="historicoService.getCurrentClienteValue.estatus=='No Show'">
+          <mat-option style="background-color: #fA6D7C; text-align:center" value="0">NO SE PRESENTÓ </mat-option>
+        </ng-container>
+        <ng-container *ngIf="historicoService.getCurrentClienteValue.estatus=='Reserva Cancelada'">
+          <mat-option style="background-color: #fA6D7C; text-align:center" value="0">CANCELÓ </mat-option>
+        </ng-container>
         </mat-select>
       </div>
 
@@ -81,13 +89,13 @@
     <mat-tab label="Edo de Cuenta">
       <app-edo-cuenta></app-edo-cuenta>
     </mat-tab> -->
-    <mat-tab style="font-weight: bold; font-size: xx-large;" label="CLIENTE">
+    <mat-tab  label="CLIENTE">
       <app-vista-cliente></app-vista-cliente>
     </mat-tab>
   </mat-tab-group>
   
   
-
+<!-- 
 
     <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
       <br>
@@ -101,7 +109,7 @@
       </button>
       <br>
     </div>
-    </div>
+    </div> -->
   
   
   

@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {DateTime} from 'luxon'
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
@@ -9,7 +10,9 @@ import { edoCuenta } from 'src/app/pages/reportes/_models/edoCuenta.model';
 import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Edo_Cuenta_Service } from 'src/app/pages/reportes/_services/edo_cuenta.service';
 import { EstatusService } from 'src/app/pages/reportes/_services/estatus.service';
+import { HistoricoService } from 'src/app/pages/reportes/_services/historico.service';
 import { environment } from 'src/environments/environment';
+import { AlertsComponent } from '../alerts/alerts.component';
 
 @Injectable({
   providedIn: 'root'
@@ -24,12 +27,18 @@ export class AuditoriaService {
   totalCargos:number=0;
   totalDescuentos:number=0;
 
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private http:HttpClient,
     private parametrosService:ParametrosServiceService,
     private estatusService:EstatusService,
     private customerservice:HuespedService,
     private edoCuentaService:Edo_Cuenta_Service,
+    private historicoService : HistoricoService,
+    private customerService: HuespedService,
+    private modal:NgbModal
+
     ) 
   {   }
   
@@ -70,6 +79,7 @@ export class AuditoriaService {
               if((this.totalCargos-(this.totalAbonos+this.totalDescuentos))==0){
                 this.revisaCheckOut(values[i]);
               }
+              this.revisaCanceladas(values[i]);
             }
           },
           (error) => {});
@@ -97,6 +107,8 @@ export class AuditoriaService {
    revisaNoShow(huesped:Huesped){
     if(huesped.estatus=='Reserva Sin Pago' || huesped.estatus=='Esperando Deposito')
     {
+      huesped.estatus='No Show'
+
       let diaLlegada = huesped.llegada.split('/')[0]
       let mesLlegada = huesped.llegada.split('/')[1]
       let anoLlegada = huesped.llegada.split('/')[2]
@@ -110,15 +122,18 @@ export class AuditoriaService {
       
        if(fechaLlegada.ts<=horaNoShow.ts){
 
-       this.estatusService.actualizaEstatus(11,huesped.folio,huesped).subscribe(
+       const sb = this.estatusService.actualizaEstatus(11,huesped.folio,huesped).subscribe(
           (value)=>{
             console.log(value)
+
+            this.postHistorico(huesped)
             this.customerservice.fetch()
           },
           (error)=>{
             console.log(error)
           }
           )
+          this.subscriptions.push(sb);
 
        }
     }
@@ -126,8 +141,11 @@ export class AuditoriaService {
 
      }
      revisaCheckOut(huesped:Huesped){
+
       if(huesped.estatus=='Huesped en Casa')
       {
+        huesped.estatus='Check-Out'
+
         let diaSalida = huesped.salida.split('/')[0]
         let mesSalida = huesped.salida.split('/')[1]
         let anoSalida = huesped.salida.split('/')[2]
@@ -142,6 +160,8 @@ export class AuditoriaService {
   
          this.estatusService.actualizaEstatus(4,huesped.folio,huesped).subscribe(
             (value)=>{
+              this.postHistorico(huesped)
+
               console.log(value)
               this.customerservice.fetch()
             },
@@ -153,7 +173,54 @@ export class AuditoriaService {
          }
       }
       
-
 }
 
-}
+
+  revisaCanceladas(huesped:Huesped){
+    if(huesped.estatus=='Huesped en Casa')
+    {
+      huesped.estatus='Reserva Cancelada'
+      this.estatusService.actualizaEstatus(12,huesped.folio,huesped).subscribe(
+          (value)=>{
+            this.postHistorico(huesped)
+
+            console.log(value)
+            this.customerservice.fetch()
+          },
+          (error)=>{
+            console.log(error)
+          }
+          )
+    }
+    
+  }
+
+  postHistorico(huesped:Huesped){
+    const sb = this.historicoService.addPost(huesped).subscribe(
+      (value)=>{
+        console.log(value)
+        this.customerService.fetch();
+
+        const sb = this.customerService.deleteHuesped(huesped._id).subscribe(
+          (value)=>{
+            
+          },
+          (error)=>{})
+          this.subscriptions.push(sb)
+      },
+      (error)=>{
+        if(error){
+          const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+          modalRef.componentInstance.alertHeader='ERROR'
+          modalRef.componentInstance.mensaje = 'Ocurrio un Error al momento de Guardar al huesped en el historico'
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+        }
+      }
+      )
+
+  this.subscriptions.push(sb);
+  }
+
+  }

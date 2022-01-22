@@ -133,7 +133,7 @@ registerLocaleData(localeEs);
     ReservaComponent,
     TransaccionesComponent,
     EdoCuentaComponent,
-    VistaClienteComponent
+    VistaClienteComponent,
       ],
   imports: [
     MatSlideToggleModule,

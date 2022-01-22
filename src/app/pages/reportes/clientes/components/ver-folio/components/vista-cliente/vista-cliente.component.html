@@ -3,14 +3,27 @@
     <div class="row container">
         <div class="col-lg-6">
             <label style="font-weight: bold;font-size: medium; "> &nbsp; ID Socio : </label>
+
             <label style="font-size: medium;" >&nbsp; {{historicoService.getCurrentClienteValue.id_Socio}}</label>
         </div>
         <div class="col-lg-6">
-            <mat-radio-button checked class="example-margin">{{historicoService.getCurrentClienteValue.tipoHuesped}}</mat-radio-button >
+            <!-- <mat-radio-button checked class="example-margin">{{historicoService.getCurrentClienteValue.tipoHuesped}}</mat-radio-button > -->
+        </div>
+        <div class="row container">
+          <div style="margin-top: 5px" class="col-sm-4">
+            <mat-radio-button (change)="vipChecked()" [checked]="checkedVIP" class="example-margin">VIP</mat-radio-button >
+          </div>
+          <div style="margin-top: 5px" class="col-sm-4">
+            <mat-radio-button (change)="regularChecked()" [checked]="checkedRegular" class="example-margin">REGULAR</mat-radio-button >
+          </div>
+          <div style="margin-top: 5px" class="col-sm-4">
+            <mat-radio-button (change)="listaNegraChecked()" [checked]="checkedListaNegra" class="example-margin">LISTA NEGRA</mat-radio-button >
+          </div>
         </div>
     </div>
                
-  
+
+
 <br>
 <div class="row container">
   <div class="col-lg-12">
@@ -62,14 +75,16 @@
     style="color: aliceblue; text-align: center; padding-top: 5px"
   >  Otros Detalles </label>
 </div>
-
+<form [formGroup]="formGroup">
 <div class="row container">
 <div class="col-lg-6">
+  <br />
+
     <div class="form-group">
       <label class="form-label">Fecha de Nacimiento</label>
       <div class="input-group">
         <input placement='bottom-left' 
-        disabled
+        formControlName="fechaNacimiento"
         class="form-control form-control-lg form-control-solid" placeholder="yyyy-mm-dd"
         name="dp"   
         value="{{historicoService.getCurrentClienteValue.fechaNacimiento}}">
@@ -82,7 +97,7 @@
   <br />
   <label class="form-label">Trabaja En:</label>
   <input
-  disabled
+  formControlName="trabajaEn"
     class="form-control form-control-lg form-control-solid"
     name="trabajaEn"
     autocomplete="off"
@@ -97,7 +112,7 @@
   <br />
   <label class="form-label">Tipo de ID</label>
   <input
-  disabled
+  formControlName="tipoDeID"
     class="form-control form-control-lg form-control-solid"
     name="tipoDeID"
     autocomplete="off"
@@ -110,7 +125,7 @@
   <br />
   <label class="form-label">Numero de ID</label>
   <input
-  disabled
+  formControlName="numeroDeID"
     class="form-control form-control-lg form-control-solid"
     name="numeroDeID"
     autocomplete="off"
@@ -124,7 +139,7 @@
 <div class="col-lg-12">
   <label class="form-label">Dirección</label>
   <input
-    disabled
+  formControlName="direccion"
     type="text"
     class="form-control form-control-lg form-control-solid"
     name="direccion"
@@ -139,7 +154,7 @@
   <br />
   <label class="form-label">País</label>
   <input
-    disabled
+  formControlName="pais"
     class="form-control form-control-lg form-control-solid"
     name="pais"
     autocomplete="off"
@@ -152,7 +167,7 @@
   <br />
   <label class="form-label">Ciudad</label>
   <input
-  disabled
+  formControlName="ciudad"
     class="form-control form-control-lg form-control-solid"
     name="ciudad"
     autocomplete="off"
@@ -166,7 +181,7 @@
   <br />
   <label class="form-label">Codigo Postal</label>
   <input
-  disabled
+  formControlName="codigoPostal"
   class="form-control form-control-lg form-control-solid"
     name="codigoPostal"
     autocomplete="off"
@@ -179,7 +194,7 @@
   <br />
   <label class="form-label">Lenguaje</label>
   <input
-  disabled
+  formControlName="lenguaje"
   class="form-control form-control-lg form-control-solid"
     name="lenguaje"
     autocomplete="off"
@@ -202,7 +217,7 @@
   <div class="col-lg-12">
     <label class="form-label">Nombre / Razon Social</label>
     <input
-    disabled
+    formControlName="razonsocial"
       type="text"
       class="form-control form-control-lg form-control-solid"
       name="razonsocial"
@@ -214,7 +229,7 @@
   <div class="col-lg-12">
     <label class="form-label">RFC</label>
     <input
-    disabled
+    formControlName="rfc"
       type="text"
       class="form-control form-control-lg form-control-solid"
       name="rfc"
@@ -228,7 +243,7 @@
   <div class="col-lg-6">
     <label class="form-label">EMAIL</label>
     <input
-    disabled
+    formControlName="email"
       type="text"
       class="form-control form-control-lg form-control-solid"
       name="email"
@@ -239,18 +254,18 @@
   <label class="form-label">USO DE CFDI</label>
   <mat-form-field appearance="fill">
     <mat-label></mat-label>
-    <mat-select value="Gastos en General">
+    <!-- <mat-select value="Gastos en General">
         <mat-option>Gastos en General</mat-option>
-    </mat-select>
-    <!-- <mat-select  >
-      <mat-option *ngFor="let cfdi of cfdiList" [value]="cfdi">{{cfdi}}</mat-option>
     </mat-select> -->
+    <mat-select          formControlName="cfdi"    >
+      <mat-option *ngFor="let cfdi of cfdiList" [value]="cfdi">{{cfdi}}</mat-option>
+    </mat-select>
   </mat-form-field>
 </div>
 </div>
 
 <br>
-
+</form>
 
 
 <div style="background-color: #319dd7" class="modal-content">
@@ -281,30 +296,28 @@
   
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort>
-
-
       <!-- Folio Column -->
       <ng-container matColumnDef="folio">
-        <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> Folio </th>
-        <td mat-cell hidden *matCellDef="let row"> {{row.Color}} </td>
+        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Folio </th>
+        <td mat-cell  *matCellDef="let row"> {{row.folio}} </td>
       </ng-container>
 
       <!-- Fecha Column -->
       <ng-container matColumnDef="creada">
-        <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> Fecha </th>
-        <td mat-cell hidden *matCellDef="let row"> {{row._id}} </td>
+        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Creada </th>
+        <td mat-cell  *matCellDef="let row"> {{row.creada}} </td>
       </ng-container>
 
       <!-- Noches Column -->
       <ng-container matColumnDef="noches">
-        <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> Noches </th>
-        <td mat-cell hidden *matCellDef="let row"> {{row.ColorAplicado}} </td>
+        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Noches </th>
+        <td mat-cell  *matCellDef="let row"> {{row.noches}} </td>
       </ng-container> 
 
       <!-- Total Column -->
       <ng-container matColumnDef="tarifa">
-        <th mat-header-cell hidden *matHeaderCellDef mat-sort-header> Tarifa </th>
-        <td mat-cell hidden *matCellDef="let row"> {{row.ColorAplicado}} </td>
+        <th mat-header-cell  *matHeaderCellDef mat-sort-header> Tarifa </th>
+        <td mat-cell  *matCellDef="let row"> {{row.tarifa}} </td>
       </ng-container> 
 
   
@@ -321,6 +334,21 @@
     <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator> -->
   </div>
 <br>
+
+
+<div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
+  <br>
+<div class="f col-lg-12">
+  <button
+    (click)="prepareHistorico()"
+    class="btn btn-success btn-block"
+    type="submit"
+    value="7">
+    Actualizar y Guardar
+  </button>
+  <br>
+</div>
+</div>
 
 
 

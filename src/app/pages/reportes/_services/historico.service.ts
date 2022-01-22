@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, Inject, Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
 import { exhaustMap, map } from 'rxjs/operators';
 import { TableService, TableResponseModel, ITableState, BaseModel, PaginatorState, SortState, GroupingState } from '../../../_metronic/shared/crud-table';
 import { Historico } from '../_models/historico.model';
@@ -48,6 +48,9 @@ const EMPTY_HISTORICO:Historico = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'',
+  razonsocial:'',
+  rfc:'',
+  cfdi:''
 }
 
 @Injectable({
@@ -59,8 +62,10 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
    clienteUpdate$: Observable<Historico>;
 
    private currentCliente$=new BehaviorSubject<Historico>(EMPTY_HISTORICO);
+   private subject =new Subject<any>();
 
   constructor(@Inject(HttpClient) http) {
+    
     super(http);
     this.clienteUpdate$=this.currentCliente$.asObservable();
 
@@ -73,6 +78,16 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
   set setCurrentClienteValue(cliente: Historico) {
     this.currentCliente$.next(cliente);
   }
+
+  sendNotification(value:any)
+  {
+      this.subject.next(value);
+  }
+
+  getNotification(){
+    return this.subject.asObservable();
+  }
+
   //
   getAll() :Observable<Historico[]> {
     return this.http
@@ -83,6 +98,15 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
      })
      )
 
+   }
+
+   getVisitasById(id:number){
+    return this.http.get<Historico[]>(environment.apiUrl + '/reportes/historico/visitas/'+id)
+    .pipe(
+      map(responseData=>{
+      return responseData
+    })
+    )
    }
 
   // READ
@@ -129,8 +153,14 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
     return this.http.post<Huesped>(environment.apiUrl+"/guarda/historico", huesped)
     }
 
-  getHistoricoVisitas(id_Socio:number){
-    return this.http.post<Historico[]>(environment.apiUrl+"/historico/visitas",id_Socio)
+
+  updateHistorico(cliente:Historico){
+    const clients=cliente
+    return this.http.post<Historico>(environment.apiUrl+"/historico/actualizaDatos",cliente).pipe(
+      map((data=>{
+        this.sendNotification(cliente);
+        }
+    )));
   }
 
 

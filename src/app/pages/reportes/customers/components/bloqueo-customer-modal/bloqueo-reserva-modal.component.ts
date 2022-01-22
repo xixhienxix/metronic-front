@@ -16,8 +16,6 @@ import {  NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { BloqueoService } from '../../../_services/bloqueo.service'
 import { Bloqueo } from '../../../_models/bloqueo.model';
-import {FormControl} from '@angular/forms';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { DisponibilidadService } from '../../../_services/disponibilidad.service';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
@@ -87,7 +85,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   last_selection = null;
 //DATETIMEPICKER RANGE
 
-  habitacionfb = new FormControl();
   hoveredDate: NgbDate | null = null;
 
   //Date Variables
@@ -106,8 +103,12 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   checkAll = false;
   isLoading$;
   habitaciones:Habitaciones;
-  bloqueoFormGroup: FormGroup;
+  
+  /**Form */
+
+  bloqueoFormGroup:FormGroup;
   myControl: FormGroup;
+
   mySet = new Set();
   placeHolder:string="-- Seleccione Habitación --"
   setEmpty:boolean=true;
@@ -124,6 +125,9 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   public tipodeCuartoFiltrados:Array<string>=[];
   cuarto:string;
   numCuarto: Array<number>=[];
+
+  /**Selected items */
+  disponiblesIndexados:any[]=[];
 
   sinSalidasChecked:boolean=false;
   sinLlegadasChecked:boolean=false;
@@ -194,11 +198,8 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     this.getEstatus();
     this.getBloqueos();
 
+    
   }
-//VALIDATORS & FORM
-myselectedFoods = ['',Validators.required];
-
-foodForm: FormControl = new FormControl(this.myselectedFoods);
 
 loadForm() {
 
@@ -483,8 +484,8 @@ initializeBloqueo(){
      let toDate = DateTime.fromObject({year:this.toDate.year, month:this.toDate.month, day:this.toDate.day});
      let fromDate = DateTime.fromObject({year:this.fromDate.year, month:this.fromDate.month - 1, day:this.fromDate.day});
 
-     let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
-    this.diaDif = diaDif.days
+     let diaDif = toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
+     this.diaDif = diaDif.days
 
     const comparadorInicialString=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
     const comparadorFinalString=this.toDate.day+'/'+this.toDate.month+'/'+this.toDate.year
@@ -497,112 +498,71 @@ initializeBloqueo(){
     const sb =this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,0,this.diaDif, 0)
     .subscribe(
       (disponibles)=>{
+        disponibles.sort()
         this.isLoading=false
-        this.mySet.clear()
+
         for(let i=0;i<disponibles.length;i++){
-          this.mySet.add(disponibles[i])
+          this.disponiblesIndexados.push({value:disponibles[i],selected:false})
         }
+        // this.mySet.clear()
+
+        // for(let i=0;i<disponibles.length;i++){
+        //   this.mySet.add(disponibles[i])
+        // }
+      
       },
-      (error)=>{})
+      (error)=>{
+        
+      })
     
       this.subscriptions.push(sb)
 
-    // if($event.value==1)
-    // {
-    //     for (let i=0; i<diaDif; i++) {
-
-    //    const sb = this.disponibilidadService.getdisponibilidadTodos(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear())
-    //     .pipe(map(
-    //       (responseData)=>{
-    //         const postArray = []
-    //         for(const key in responseData)
-    //         {
-    //           if(responseData.hasOwnProperty(key))
-    //            postArray.push(responseData[key]);
-    //         }
-    //         return postArray
-    //       }))
-    //       .subscribe((disponibles)=>{
-    //         this.mySet.clear()
-
-    //         for(i=0;i<disponibles.length;i++)
-    //         {
-    //           this.disponibilidad=(disponibles)
-    //           if(disponibles[i].Estatus==0)
-    //           {
-    //             this.sinDisponibilidad.push(disponibles[i].Habitacion)
-    //           }
-    //         }
-    //         for(i=0;i<this.sinDisponibilidad.length;i++)
-    //         {
-    //           this.mySet.delete(this.sinDisponibilidad[i])
-    //         }
-    //       })
-    //       this.subscription.push(sb)
-
-    //       fromDate = fromDate.plus({days:1});
-    //     };
-    // }
-
-    // else
-    // {
-
-    //   const sb = this.habitacionService.getHabitacionesbyTipo(this.cuarto)
-    //   .pipe(map(
-    //     (responseData)=>{
-    //       const postArray = []
-    //       for(const key in responseData)
-    //       {
-    //         if(responseData.hasOwnProperty(key))
-    //         postArray.push(responseData[key]);
-    //       }
-    //       return postArray
-    //     }))
-    //     .subscribe((cuartos)=>{
-    //       this.cuartos=(cuartos)
-    //     })
-
-    //   this.subscription.push(sb)
-
-    //   for (let i=0; i<diaDif; i++) {
-
-    //   const sb = this.disponibilidadService.getdisponibilidad(fromDate.getDate(), fromDate.getMonth()+1, fromDate.getFullYear(),this.cuarto)
-    //   .pipe(map(
-    //     (responseData)=>{
-    //       const postArray = []
-    //       for(const key in responseData)
-    //       {
-    //         if(responseData.hasOwnProperty(key))
-    //          postArray.push(responseData[key]);
-    //       }
-    //       return postArray
-    //     }))
-    //     .subscribe((disponibles)=>{
-    //       this.mySet.clear()
-    //       for(i=0;i<disponibles.length;i++)
-    //       {
-    //         this.disponibilidad=(disponibles)
-    //         if(disponibles[i].Estatus==0)
-    //         {
-    //           this.sinDisponibilidad.push(disponibles[i].Habitacion)
-    //         }
-    //          this.mySet.add(this.disponibilidad[i].Habitacion)
-    //       }
-    //       for(i=0;i<this.sinDisponibilidad.length;i++)
-    //       {
-    //         this.mySet.delete(this.sinDisponibilidad[i])
-    //       }
-
-    //       console.log("mySet x tipo",this.mySet)
-    //     })
-    //     this.subscription.push(sb)
-        
-    //     fromDate = fromDate.plus({days:1});
-    //   };
 
 
-    // }
 
+  }
+
+  selectedAll(selected:boolean){
+    let index;
+    let indexTipo;
+    let codigo;
+
+    for(let i=0; i<=this.disponiblesIndexados.length;i++){
+
+      const sb = this.habitacionService.getHabitacionbyNumero(this.disponiblesIndexados[i].value)
+      .pipe(map(
+      (responseData)=>{
+        const postArray = []
+        for(const key in responseData)
+        {
+          if(responseData.hasOwnProperty(key))
+          postArray.push(responseData[key]);
+        }
+        return postArray
+      }))
+      .subscribe((cuartos)=>{
+        codigo=(cuartos)
+        if(selected==true)
+        {
+          this.numCuarto.push(this.disponiblesIndexados[i].value);
+          this.tipodeCuartoFiltrados.push(codigo[0].Codigo)
+
+        }else if(selected==false)
+        {
+          index=this.numCuarto.indexOf(this.disponiblesIndexados[i].value,0)
+          this.numCuarto.splice(index,1)
+
+          indexTipo = this.tipodeCuartoFiltrados.indexOf(codigo[0].Codigo,0)
+          this.tipodeCuartoFiltrados.splice(indexTipo,1)
+        }
+      })
+
+    this.subscription.push(sb)
+    console.log(this.numCuarto)
+    console.log(this.tipodeCuartoFiltrados)
+        //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+    }
+    
   }
 
   cuartoValue(selected:boolean,value:any)
@@ -638,8 +598,8 @@ initializeBloqueo(){
           this.tipodeCuartoFiltrados.splice(indexTipo,1)
         }
       })
-this.subscription.push(sb)
-    //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+    this.subscription.push(sb)
+        //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
   Allchecked(event:any)
@@ -785,11 +745,6 @@ private getDismissReason(reason: any): string {
 }
 
 
-//CheckBox
-okayChecked() {
-  // this.last_selection = this.formGroup.controls.project.value
-  this.matSelect.close()
-}
 
 closeModal(){
   this.modal.close();

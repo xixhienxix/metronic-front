@@ -35,5 +35,10 @@ export interface Historico extends BaseModel {
   numeroCuarto:number;
   estatus_historico:string;
   tipoHuesped:string;
+  
+  razonsocial:string;
+  rfc:string;
+  cfdi:string;
+  
 }
 

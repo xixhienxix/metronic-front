@@ -14,11 +14,17 @@
   </div>
 </div>
 <br>
-  <div class="row container">
-    <div style="margin-top: 5px" class="col-sm-4">
-      <mat-radio-button checked class="example-margin">{{historicoService.getCurrentClienteValue.tipoHuesped}}</mat-radio-button >
-    </div>
+<div class="row container">
+  <div style="margin-top: 5px" class="col-sm-4">
+    <mat-radio-button (change)="vipChecked()" [checked]="checkedVIP" class="example-margin">VIP</mat-radio-button >
   </div>
+  <div style="margin-top: 5px" class="col-sm-4">
+    <mat-radio-button (change)="regularChecked()" [checked]="checkedRegular" class="example-margin">REGULAR</mat-radio-button >
+  </div>
+  <div style="margin-top: 5px" class="col-sm-4">
+    <mat-radio-button (change)="listaNegraChecked()" [checked]="checkedListaNegra" class="example-margin">LISTA NEGRA</mat-radio-button >
+  </div>
+</div>
 <br>
   <div class="row container">
     <div class="col-lg-12">
