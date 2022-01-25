@@ -4,4 +4,5 @@ export interface Foliador extends BaseModel
 {
   Folio:number,
   Letra:string;
+  
 }
