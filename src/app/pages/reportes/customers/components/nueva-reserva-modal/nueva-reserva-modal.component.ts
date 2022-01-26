@@ -4,7 +4,6 @@ import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,N
 import { from, of, Subscription } from 'rxjs';
 import { catchError,  first,  tap } from 'rxjs/operators';
 import { Huesped } from '../../../_models/customer.model';
-import { Foliador } from '../../../_models/Foliador.model';
 import { Estatus } from '../../../_models/estatus.model';
 import { HuespedService } from '../../../_services';
 import { EstatusService } from '../../../_services/estatus.service';
@@ -31,7 +30,9 @@ import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import {DateTime} from 'luxon'
 import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
-import { Huesped_Detail_Service } from '../../../_services/huesped.detail.service';
+import { Foliador } from '../../../_models/foliador.model';
+import { MatTableDataSource } from '@angular/material/table';
+import { Historico } from '../../../_models/historico.model';
 
 // const todayDate = new Date();
 
@@ -143,7 +144,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   folio:number;
   model:NgbDateStruct;
   huesped: Huesped;
-  foliador:Foliador;
+  foliador:Foliador
   banderaExito:boolean;
   habitaciones:Habitaciones;
   folioLetra:string;
@@ -174,7 +175,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   accordionDisplay="";
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
-  noDisabledCheckIn:boolean
+  noDisabledCheckIn:boolean;
+  hiddenCliente:boolean=true
+  
 
 /**Models */
   public folios:Foliador[]=[];
@@ -200,7 +203,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     /*Subscriptions*/
   private subscriptions: Subscription[] = [];
   
-
+/**MAT TABLE */
+displayedColumns:string[]=['id_Socio','nombre','email','telefono']
+dataSource=new MatTableDataSource<Historico>();
 
   constructor(
     //Date Imports
@@ -248,6 +253,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     this.getParametros();
     this.historicoService.fetch();
     this.loadCustomer();
+    this.getHistorico();
     this.getHabitaciones();
     this.getDispo();
     this.getFolios();
@@ -261,6 +267,18 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     {this.noDisabledCheckIn=false}
   }
 
+  getHistorico(){
+    const sb = this.historicoService.items$.subscribe(
+      (result)=>{
+          this.dataSource.data=result
+      },
+      
+      ()=>{})
+
+      this.subscriptions.push(sb)
+  }
+
+
   getParametros(){
     const sb = this.parametrosService.getParametros().subscribe(
       (value)=>{
@@ -273,6 +291,15 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       })
 
       this.subscriptions.push(sb)
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   loadCustomer() {
@@ -942,12 +969,11 @@ fechaSeleccionadaFinal(event:NgbDate){
 }
 
 
-  onSelectHuesped(event)
+  onSelectHuesped(row:any)
   {
-    this.huesped.nombre=event.nombre;
-    this.huesped.email=event.email;
-    this.huesped.telefono=event.telefono;
-    this.huesped.ID_Socio=event.id_Socio
+    this.huesped.nombre=row.nombre;
+    this.huesped.email=row.email;
+    this.huesped.telefono=row.telefono;
 
   }
 
@@ -1054,21 +1080,21 @@ fechaSeleccionadaFinal(event:NgbDate){
 
 
 
-    showList(x)
-    {
-      this.displayNone=""
+    // showList(x)
+    // {
+    //   this.displayNone=""
 
-      if(x.key!="Backspace" && x.key!="Shift" && x.key!="Control" && x.key!="Enter") {this.searchValue += x.key;}
-      else
-      if (x.key=="Backspace")
-      {
-        this.searchValue =this.searchValue.substring(0, this.searchValue.length - 1);
+    //   if(x.key!="Backspace" && x.key!="Shift" && x.key!="Control" && x.key!="Enter") {this.searchValue += x.key;}
+    //   else
+    //   if (x.key=="Backspace")
+    //   {
+    //     this.searchValue =this.searchValue.substring(0, this.searchValue.length - 1);
 
-        if(this.searchValue==""){this.displayNone="display:none"}
-      }
+    //     if(this.searchValue==""){this.displayNone="display:none"}
+    //   }
 
 
-    }
+    // }
 
     limpiaInput(){
       this.searchValue=""
