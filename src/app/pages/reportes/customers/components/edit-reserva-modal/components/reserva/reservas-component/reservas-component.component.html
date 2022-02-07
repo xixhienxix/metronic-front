@@ -105,7 +105,7 @@
       <label class="control-label">A Pagar por Noche:</label>
       <br />
       <input
-        disabled
+        [attr.disabled]="inputDisabled"
         style="width: 150px"
         class="form-control"
         type="text"
@@ -148,6 +148,7 @@
             <label style="color:#00506a; font-weight: bold;" class="form-label">Fecha de Promesa</label>
             <div class="input-group">
               <input 
+              [attr.disabled]="inputDisabled"
               formControlName="fechaPromesaPago"  
                      class="form-control form-control-lg form-control-solid" 
                      name="dp" 
@@ -162,7 +163,7 @@
                      (dateSelect)="formatDate($event)" 
                      >
               <div class="input-group-append">
-                <button [disabled]="huesped.estatus=='Reserva Cancelada'||huesped.estatus=='No Show'" class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
+                <button [attr.disabled]="huesped.estatus=='Reserva Cancelada'||huesped.estatus=='No Show'" class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
                   <i class="fa fa-calendar icon"></i>
                 </button>
               </div>
@@ -180,6 +181,7 @@
           <label class="control-label">Cantidad Acordada:</label>
           <br />
           <input
+          [attr.disabled]="inputDisabled"
             formControlName="promesaPago"
             style="width: 150px"
             class="form-control"
@@ -473,6 +475,7 @@
 <p></p> -->
       <form [formGroup]="thirdForm">
         <input 
+        [attr.disabled]="inputDisabled"
         class="form-control col-md-12"
         formControlName='pagoManualInput'
         placeholder="$ Cantidad Recibida"

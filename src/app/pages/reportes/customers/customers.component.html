@@ -181,7 +181,7 @@
     </ng-container>
   </td>
   <td>
-    <mat-select (selectionChange)='onChangeAma(selectedAma.value,huesped.numeroCuarto,huesped.habitacion,huesped.folio)' style="width:120px" #selectedAma  [value]="huesped.estatus_Ama_De_Llaves" [style.background-color]="backgroundColorAmadeLlaves(huesped.estatus_Ama_De_Llaves)" name="estatusAma" id="amaDellaves" class="btn" >
+    <mat-select (selectionChange)='onChangeAma(selectedAma.value,huesped.numeroCuarto,huesped.habitacion,huesped.folio)' style="width:120px" #selectedAma  [value]="huesped.estatus_Ama_De_Llaves.toUpperCase()" [style.background-color]="backgroundColorAmadeLlaves(huesped.estatus_Ama_De_Llaves)" name="estatusAma" id="amaDellaves" class="btn" >
       <ng-container *ngFor="let estatusAmaDeLlaves of amaDeLlavesList" >
         <mat-option  [value]="estatusAmaDeLlaves.Descripcion" [style.background-color]="estatusAmaDeLlaves.Color"> {{estatusAmaDeLlaves.Descripcion}}</mat-option>
       </ng-container>

@@ -177,15 +177,21 @@ export class AuditoriaService {
 
 
   revisaCanceladas(huesped:Huesped){
-    if(huesped.estatus=='Huesped en Casa')
+    if(huesped.estatus=='Reserva Cancelada')
     {
-      huesped.estatus='Reserva Cancelada'
       this.estatusService.actualizaEstatus(12,huesped.folio,huesped).subscribe(
           (value)=>{
             this.postHistorico(huesped)
 
             console.log(value)
-            this.customerservice.fetch()
+
+            const sb = this.customerService.deleteHuesped(huesped._id).subscribe(
+              (value)=>{
+                this.customerservice.fetch()
+
+              },
+              (error)=>{})
+              this.subscriptions.push(sb)
           },
           (error)=>{
             console.log(error)
@@ -199,11 +205,11 @@ export class AuditoriaService {
     const sb = this.historicoService.addPost(huesped).subscribe(
       (value)=>{
         console.log(value)
-        this.customerService.fetch();
 
         const sb = this.customerService.deleteHuesped(huesped._id).subscribe(
           (value)=>{
-            
+            this.customerService.fetch();
+
           },
           (error)=>{})
           this.subscriptions.push(sb)

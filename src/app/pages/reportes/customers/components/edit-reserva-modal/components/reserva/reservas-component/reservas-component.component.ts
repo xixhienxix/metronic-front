@@ -117,6 +117,7 @@ export class ReservasComponentComponent implements OnInit {
   todayString:string;
   pagoManual:boolean=false;
   formadePago:string='Efectivo';
+  inputDisabled:boolean=false
 
   constructor(
     public i18n: NgbDatepickerI18n,
@@ -143,6 +144,9 @@ export class ReservasComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    if(this.customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'||this.customerService.getCurrentHuespedValue.estatus=='No Show'||this.customerService.getCurrentHuespedValue.estatus=='Check-Out')
+    {this.inputDisabled=true}
 
     this.getAdicionales();
     const sb = this.customerService.huespedUpdate$.subscribe((value)=>{

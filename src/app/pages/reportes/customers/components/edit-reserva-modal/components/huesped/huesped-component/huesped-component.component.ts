@@ -68,8 +68,8 @@ export class HuespedComponentComponent implements OnInit {
 'Gastos de transportación escolar obligatoria.','Depósitos en cuentas para el ahorro, primas que tengan como base planes de pensiones.','Pagos por servicios educativos (colegiaturas)','Por definir'];
 
   /*Diseño Dinamico*/
-  modifica:boolean = true;
   isLoading:boolean=false;
+  inputDisabled:boolean=false;
   
 
   constructor(
@@ -94,10 +94,12 @@ export class HuespedComponentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    if(this.customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'||this.customerService.getCurrentHuespedValue.estatus=='No Show'||this.customerService.getCurrentHuespedValue.estatus=='Check-Out')
+    {this.inputDisabled=true}
+
     const sb = this.customerService.huespedUpdate$.subscribe((value)=>{
       this.huesped=value
-      
-
        const sb =this.detallesService.getDetailsById(this.huesped.ID_Socio).subscribe(
         (response)=>{
           this.detailsList=response

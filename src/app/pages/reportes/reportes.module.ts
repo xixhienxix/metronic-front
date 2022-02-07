@@ -83,6 +83,8 @@ import { ReservaComponent } from './clientes/components/ver-folio/components/res
 import { TransaccionesComponent } from './clientes/components/ver-folio/components/transacciones/transacciones.component';
 import { EdoCuentaComponent } from './clientes/components/ver-folio/components/edo-cuenta/edo-cuenta.component';
 import { VistaClienteComponent } from './clientes/components/ver-folio/components/vista-cliente/vista-cliente.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -174,6 +176,8 @@ registerLocaleData(localeEs);
     MatTableModule,
     MatPaginatorModule,
     SharedModule,
+    MatProgressSpinnerModule,
+    MatSortModule
 
        // RouterModule.forChild([
     //   {

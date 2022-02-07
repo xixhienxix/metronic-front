@@ -121,6 +121,7 @@ export class TransaccionesComponentComponent implements OnInit {
   cargosChecked:boolean=false;
   descuentosChecked:boolean=false;
   fechaCancelado:DateTime;
+  inputDisabled:boolean=false
 
   /**Forms */
   nuevosConceptosFormGroup:FormGroup;
@@ -163,6 +164,8 @@ export class TransaccionesComponentComponent implements OnInit {
      }
 
   ngOnInit(): void {
+    if(this.customerService.getCurrentHuespedValue.estatus=='Reserva Cancelada'||this.customerService.getCurrentHuespedValue.estatus=='No Show'||this.customerService.getCurrentHuespedValue.estatus=='Check-Out')
+    {this.inputDisabled=true}
 
     this.loadForm();
     this.getCodigosDeCargo();

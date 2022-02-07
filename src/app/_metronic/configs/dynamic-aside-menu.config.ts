@@ -24,6 +24,8 @@ export const DynamicAsideMenuConfig = {
       svg: './assets/media/svg/icons/Home/Library.svg'
     },
 
+  
+
 
     { section: 'Components' },
 

@@ -25,6 +25,7 @@ export class VistaClienteComponent implements OnInit {
   isLoading:boolean=false;
 
   cliente:Historico
+  tipoHuesped:string
   listaVisitasPrevias:Historico[]=[]
   cfdiList: string[] = ['Adquisición de mercancías', 'Devoluciones, descuentos o bonificaciones', 'Gastos en general', 
   'Construcciones', 'Mobiliario y equipo de oficina por inversiones', 'Equipo de transporte',
@@ -36,7 +37,7 @@ export class VistaClienteComponent implements OnInit {
   subscription:Subscription[]=[]
 
     /*TABLE*/
-    displayedColumns: string[] = ['folio','creada','noches','tarifa'];
+    displayedColumns: string[] = ['folio','llegada','noches','tarifa'];
     dataSource: MatTableDataSource<any>;
 
   constructor(
@@ -60,7 +61,8 @@ export class VistaClienteComponent implements OnInit {
     this.getHistoricoVisitas()
 
     this.formGroup = this.fb.group({
-  
+      emailPrincipal : [this.historicoService.getCurrentClienteValue.email],
+      telefonoPrincipal:[this.historicoService.getCurrentClienteValue.telefono],
       trabajaEn: [this.historicoService.getCurrentClienteValue.trabajaEn, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
       fechaNacimiento: [this.historicoService.getCurrentClienteValue.fechaNacimiento, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
       tipoDeID: [this.historicoService.getCurrentClienteValue.tipoDeID, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
@@ -70,10 +72,10 @@ export class VistaClienteComponent implements OnInit {
       ciudad: [this.historicoService.getCurrentClienteValue.ciudad, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
       codigoPostal: [this.historicoService.getCurrentClienteValue.codigoPostal, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
       lenguaje: [this.historicoService.getCurrentClienteValue.lenguaje, Validators.compose([Validators.nullValidator,Validators.minLength(3),Validators.maxLength(100)])],
-      razonsocial : [this.historicoService.getCurrentClienteValue.razonsocial,Validators.required],
-      rfc:[this.historicoService.getCurrentClienteValue.rfc,Validators.required],
-      cfdi:[this.historicoService.getCurrentClienteValue.cfdi,Validators.required],
-      email:[this.historicoService.getCurrentClienteValue.email,Validators.required],
+      razonsocial : [this.historicoService.getCurrentClienteValue.razonsocial],
+      rfc:[this.historicoService.getCurrentClienteValue.rfc],
+      cfdi:[this.historicoService.getCurrentClienteValue.cfdi],
+      email:[this.historicoService.getCurrentClienteValue.email],
     });
   }
 
@@ -95,16 +97,19 @@ export class VistaClienteComponent implements OnInit {
       })
   }
   vipChecked(){
+    this.tipoHuesped='VIP'
     this.checkedListaNegra=false;
     this.checkedRegular=false;
     this.checkedVIP=true
   }
   regularChecked(){
+    this.tipoHuesped='Regular'
     this.checkedListaNegra=false;
     this.checkedRegular=true;
     this.checkedVIP=false
   }
   listaNegraChecked(){
+    this.tipoHuesped='Lista Negra'
     this.checkedListaNegra=true;
     this.checkedRegular=false;
     this.checkedVIP=false
@@ -118,8 +123,11 @@ export class VistaClienteComponent implements OnInit {
 
     const formData = this.formGroup.value;
     
-
-
+    let nuevoEmail
+    if(formData.email === undefined || formData.email=='' && formData.email){nuevoEmail=formData.emailPrincipal}
+    if(formData.emailPrincipal === undefined || formData.emailPrincipal==''){nuevoEmail=formData.email}
+    if(formData.email == this.historicoService.getCurrentClienteValue.email){nuevoEmail=formData.emailPrincipal}
+    if(formData.emailPrincipal == this.historicoService.getCurrentClienteValue.email) {nuevoEmail=formData.email}
     const detailsList:Historico = {
       id_Socio:this.historicoService.getCurrentClienteValue.id_Socio,
       folio:this.historicoService.getCurrentClienteValue.folio,
@@ -137,12 +145,14 @@ export class VistaClienteComponent implements OnInit {
       pendiente:this.historicoService.getCurrentClienteValue.pendiente,
       origen:this.historicoService.getCurrentClienteValue.origen,
       habitacion:this.historicoService.getCurrentClienteValue.habitacion,
-      telefono:this.historicoService.getCurrentClienteValue.telefono,
-      email:formData.email,
+      telefono:formData.telefonoPrincipal,
+
+      email:nuevoEmail,
+      
       motivo:this.historicoService.getCurrentClienteValue.motivo,
       creada:this.historicoService.getCurrentClienteValue.creada,
 
-      tipoHuesped:formData.tipoHuesped,
+      tipoHuesped:this.tipoHuesped,
       fechaNacimiento:formData.fechaNacimiento,
       trabajaEn:formData.trabajaEn,
       tipoDeID:formData.tipoDeID,

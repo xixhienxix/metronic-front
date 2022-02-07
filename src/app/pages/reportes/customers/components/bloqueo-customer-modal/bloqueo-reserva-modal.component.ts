@@ -20,6 +20,10 @@ import { DisponibilidadService } from '../../../_services/disponibilidad.service
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import {DateTime} from 'luxon'
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+
+type listaHabitaciones = {key:number;value:string}
 
 let date: Date = new Date();
 declare global {
@@ -76,7 +80,9 @@ declare global {
 export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 {
   // @ViewChild('menuTrigger') menuTrigger: MatMenuTrigger;
-  @ViewChild('matSelect') matSelect = null;
+  @ViewChild('matSelect') matSelectCuarto;
+  @ViewChild('allSelected') private allSelected: MatOption;
+
   @ViewChild('exito') miniModal = null;
   @ViewChild('fechaIncorrecta') fechaIncorrecta = null;
 
@@ -127,7 +133,7 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   numCuarto: Array<number>=[];
 
   /**Selected items */
-  disponiblesIndexados:any[]=[];
+  disponiblesIndexados:listaHabitaciones[]=[];
 
   sinSalidasChecked:boolean=false;
   sinLlegadasChecked:boolean=false;
@@ -157,6 +163,8 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
   display:boolean=true
   isSubmitted:boolean
   inicio:boolean=true
+  disponibesZero:boolean=false;
+  datosFaltantes:boolean=false
 
   public tipoCuartoForm: FormBuilder
 
@@ -315,6 +323,12 @@ getParametros(){
 
   private postBloqueo(text:string) {
 
+    if(this.bloqueoFormGroup.invalid||(this.sinSalidasChecked==false&&this.sinLlegadasChecked==false&&this.fueraDeServicioChecked==false))
+    {
+      this.datosFaltantes=true
+      return
+    }
+
 
     let desde;
     let hasta;
@@ -353,6 +367,7 @@ getParametros(){
         this.openMini(this.miniModal)
         this.initializeBloqueo()
         this.inicio=true
+        this.disponiblesIndexados=[]
       },
       (err)=>{
         if (err)
@@ -476,15 +491,17 @@ initializeBloqueo(){
   habValue($event)
   {
     this.inicio=false
+    this.disponiblesIndexados=[]
+
     if($event.value==1){this.cuarto='1'}
     else{this.cuarto=$event.value}
 
     this.sinDisponibilidad=[];
     
      let toDate = DateTime.fromObject({year:this.toDate.year, month:this.toDate.month, day:this.toDate.day});
-     let fromDate = DateTime.fromObject({year:this.fromDate.year, month:this.fromDate.month - 1, day:this.fromDate.day});
+     let fromDate = DateTime.fromObject({year:this.fromDate.year, month:this.fromDate.month, day:this.fromDate.day});
 
-     let diaDif = toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
+     let diaDif = toDate.diff(fromDate, ["days"])
      this.diaDif = diaDif.days
 
     const comparadorInicialString=this.fromDate.day+'/'+this.fromDate.month+'/'+this.fromDate.year
@@ -495,21 +512,23 @@ initializeBloqueo(){
       this.diaDif=1;
     }
    
-    const sb =this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,0,this.diaDif, 0)
+    const sb = this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,0,this.diaDif, 0)
     .subscribe(
       (disponibles)=>{
+        if(disponibles.length==0){
+          this.disponibesZero=true
+        }else{this.disponibesZero=false}
         disponibles.sort()
         this.isLoading=false
 
         for(let i=0;i<disponibles.length;i++){
-          this.disponiblesIndexados.push({value:disponibles[i],selected:false})
+          this.disponiblesIndexados.push({key:i,value:disponibles[i]})
         }
         // this.mySet.clear()
 
         // for(let i=0;i<disponibles.length;i++){
         //   this.mySet.add(disponibles[i])
         // }
-      
       },
       (error)=>{
         
@@ -522,50 +541,35 @@ initializeBloqueo(){
 
   }
 
-  selectedAll(selected:boolean){
-    let index;
-    let indexTipo;
-    let codigo;
+  async toggleAllSelection() {
+    if (this.allSelected.selected) {
+      this.bloqueoFormGroup.controls.numeroHab
+        .patchValue([...this.disponiblesIndexados.map(item => item.key), 0]);
 
-    for(let i=0; i<=this.disponiblesIndexados.length;i++){
-
-      const sb = this.habitacionService.getHabitacionbyNumero(this.disponiblesIndexados[i].value)
-      .pipe(map(
-      (responseData)=>{
-        const postArray = []
-        for(const key in responseData)
-        {
-          if(responseData.hasOwnProperty(key))
-          postArray.push(responseData[key]);
+        for(let i=0;i<this.disponiblesIndexados.length;i++){
+          await this.cuartoValue(true,this.disponiblesIndexados[i].value)
         }
-        return postArray
-      }))
-      .subscribe((cuartos)=>{
-        codigo=(cuartos)
-        if(selected==true)
-        {
-          this.numCuarto.push(this.disponiblesIndexados[i].value);
-          this.tipodeCuartoFiltrados.push(codigo[0].Codigo)
 
-        }else if(selected==false)
-        {
-          index=this.numCuarto.indexOf(this.disponiblesIndexados[i].value,0)
-          this.numCuarto.splice(index,1)
-
-          indexTipo = this.tipodeCuartoFiltrados.indexOf(codigo[0].Codigo,0)
-          this.tipodeCuartoFiltrados.splice(indexTipo,1)
-        }
-      })
-
-    this.subscription.push(sb)
-    console.log(this.numCuarto)
-    console.log(this.tipodeCuartoFiltrados)
-        //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
+    } else {
+      this.bloqueoFormGroup.controls.numeroHab.patchValue([]);
+      for(let i=0;i<this.disponiblesIndexados.length;i++){
+        await this.cuartoValue(false,this.disponiblesIndexados[i].value)
+      }
     }
-    
   }
 
-  cuartoValue(selected:boolean,value:any)
+  tosslePerOne(all){ 
+    if (this.allSelected.selected) {  
+     this.allSelected.deselect();
+     return false;
+ }
+   if(this.bloqueoFormGroup.controls.numeroHab.value.length==this.disponiblesIndexados.length)
+     this.allSelected.select();
+ 
+ }
+
+
+  async cuartoValue(selected:boolean,value:any)
   {
     let index;
     let indexTipo;
@@ -602,14 +606,7 @@ initializeBloqueo(){
         //this.numCuarto=this.cuarto = $event.target.options[$event.target.options.selectedIndex].text;
   }
 
-  Allchecked(event:any)
-  {
-    if(this.checkAll==false)
-    {
-      this.checkAll=true;
-    }else
-    this.checkAll=false;
-  }
+
   numCuartos($event)
   {
     this.cuartos=[]
@@ -659,7 +656,7 @@ fechaSeleccionadaInicial(event:NgbDate){
   {
     this.display=false
   }else if(this.comparadorInicial<this.comparadorFinal)
-  {this.display=true}
+  {this.display>=true}
 }
 
 fechaSeleccionadaFinal(event:NgbDate){
@@ -673,7 +670,7 @@ fechaSeleccionadaFinal(event:NgbDate){
   if(this.comparadorInicial>this.comparadorFinal)
   {
     this.display=false
-  }else if(this.comparadorInicial<this.comparadorFinal)
+  }else if(this.comparadorInicial<=this.comparadorFinal)
   {this.display=true}
 }
 

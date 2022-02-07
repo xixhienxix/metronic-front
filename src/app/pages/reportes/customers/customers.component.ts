@@ -698,6 +698,7 @@ this.origenService.getOrigenes()
 
 backgroundColorAmadeLlaves(estatus:string){
   let color;
+  estatus=estatus.toUpperCase();
   for (let i=0;i<this.amaDeLlavesList.length;i++)
   {
     if(estatus==this.amaDeLlavesList[i].Descripcion)

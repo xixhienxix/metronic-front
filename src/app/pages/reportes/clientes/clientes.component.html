@@ -1,7 +1,7 @@
 <div class="card card-custom gutter-b">
     <div class="card-header">
       <div class="card-title ">
-        <h3 class="card-label">Lista de húespedes</h3>
+        <h3 class="card-label">Lista de Clientes</h3>
       </div>
       <div  class="card-toolbar">
         &nbsp; &nbsp; &nbsp;
@@ -11,99 +11,97 @@
   
     <div class="card-body">
       <!-- begin: Filtration form -->
-        <div class="form-group row">
-            <div class="row" >
-              <div class="col-lg-4">
-                <select class="form-control" name="estatus" placeholder="Filtro de Estatus" >
-                  <option value="">Todos</option>
-                  <ng-container *ngFor="let estatus of estatusArray ">
-                    <option>{{estatus.estatus}}</option>
-                  </ng-container>
-  
-                </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
-              </div>
-              <div class="col-lg-4">
-                <select class="form-control" placeholder="Filtra por habitacion" name="habitacion" >
-                  <option selected value="">All</option>
-                  <ng-container *ngFor="let tipo of codigoCuarto">
-                    <option>
-                      {{tipo.replace("_"," ")}}
-                    </option>
-                  </ng-container>
-                </select><small class="form-text text-muted"><b>Filtro</b> Por Habitacion</small>
-              </div>
-              <div class="col-lg-4">
-                <select class="form-control" name="origen" placeholder="Filtro de Origenes" >
-                  <option value="">Todos</option>
-                  <ng-container *ngFor="let origen of origenArray ">
-                    <option>{{origen.Descripcion}}</option>
-                  </ng-container>
-  
-                </select><small class="form-text text-muted"><b>Fitro </b> Por Origen</small>
-              </div>
-            </div>
-          <div class="col-lg-4" >
-            <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Buscar" value=""
-              /><small class="form-text text-muted"><b>Buscar</b> Por Nombre</small>
+      <div class="form-group row">
+        <div class="row" [formGroup]="filterGroup">
+          <div class="col-lg-4">
+            <select class="form-control" name="tipoHuesped" placeholder="Filtro de Tipo de Hùesped" formControlName="tipoHuesped">
+              <option value="">Todos</option>
+              <ng-container *ngFor="let tipoHuesped of tipoHuespedArray ">
+                <option>{{tipoHuesped}}</option>
+              </ng-container>
+
+            </select><small class="form-text text-muted"><b>Fitro </b> Por Estatus</small>
+          </div>
+          <div class="col-lg-4">
+            <select class="form-control" placeholder="Filtra por Email" name="email" formControlName="email">
+              <option selected value="">Todos</option>
+              <ng-container *ngFor="let email of emails">
+                <option>
+                  {{email}}
+                </option>
+              </ng-container>
+            </select><small class="form-text text-muted"><b>Filtro</b>Por ID de Email</small>
+          </div>
+          <div class="col-lg-4">
+            <select class="form-control" name="id_Socio" placeholder="Filtro de Cliente" formControlName="id_Socio">
+              <option value="">Todos</option>
+              <ng-container *ngFor="let id_Socio of id_SocioArray ">
+                <option>{{id_Socio}}</option>
+              </ng-container>
+
+            </select><small class="form-text text-muted"><b>Fitro </b> Por ID de Cliente</small>
           </div>
         </div>
+      <div class="col-lg-4" [formGroup]="searchGroup">
+        <input  oninput="this.value = this.value.toLowerCase()" type="text" class="form-control" name="searchText" placeholder="Buscar" value=""
+          formControlName="searchTerm" /><small class="form-text text-muted"><b>Buscar</b> </small>
+      </div>
+    </div>
       <!-- end: Filtration form -->
   
 
   
       <!-- begin:Table -->
-<table mat-table [dataSource]="dataSource" matSort class="table overflow-hidden table-head-custom table-vertical-center">
+<!-- <table mat-table [dataSource]="historicoService.items$ | async" matSort >
   
-        <!-- Cancelar Column -->
-    <ng-container matColumnDef="cancelar">
-      <th class="header-align-right" mat-header-cell *matHeaderCellDef></th>
-        <td class="header-align-right" mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
-          <button [disabled]="row.Descripcion=='Alojamiento'||row.Estatus=='Cancelado'||row.Estatus=='Devolucion'" 
-            class="btn btn-danger">
-                x
-          </button>
-       </td>
-    </ng-container>
-
-        <!-- Folio Column -->
-    <ng-container matColumnDef="folio">
-      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Folio </th>
-      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.folio}} </td>
+    <ng-container matColumnDef="id_Socio">
+      <th  mat-header-cell *matHeaderCellDef mat-sort-header> ID Cliente 
+        <app-sort-icon column="id_Socio" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+      </th>
+      <td  mat-cell *matCellDef="let row"> {{row.id_Socio}} </td>
     </ng-container>
   
-    <!-- Fecha Column -->
-    <ng-container matColumnDef="llegada">
-      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Llegada </th>
-      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.llegada}} </td>
-    </ng-container>
-
-    <!-- Salida Column -->
-    <ng-container matColumnDef="salida">
-      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Salida </th>
-      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.salida}} </td>
-    </ng-container>
-
-    <!-- Nombre Column -->
     <ng-container matColumnDef="nombre">
-      <th class="fecha-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
-      <td class="fecha-columna" mat-cell *matCellDef="let row"> {{row.nombre}} </td>
-    </ng-container>
-  
-    <!-- Habitacion Column -->
-    <ng-container matColumnDef="habitacion">
-      <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> Habitacion </th>
-      <td hidden  mat-cell *matCellDef="let row">  {{row.habitacion}}</td>
+      <th class="nombre-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Cliente 
+        <app-sort-icon column="nombre" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+      </th>
+      <td class="nombre-columna" mat-cell *matCellDef="let row"> {{row.nombre}} </td>
     </ng-container>
 
-    <!-- Numero Habitacion Column -->
-    <ng-container matColumnDef="cuarto">
-      <th hidden mat-header-cell  *matHeaderCellDef mat-sort-header> Cuarto </th>
-      <td hidden  mat-cell *matCellDef="let row">  {{row.numeroCuarto}}</td>
+    <ng-container matColumnDef="telefono">
+      <th class="telefono-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Telèfono </th>
+      <td class="telefono-columna" mat-cell *matCellDef="let row"> {{row.telefono}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th class="email-columna"  mat-header-cell *matHeaderCellDef mat-sort-header> Email 
+        <app-sort-icon column="email" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+      </th>
+      <td class="email-columna" mat-cell *matCellDef="let row"> {{row.email}} </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="rfc">
+      <th class="email-columna" mat-header-cell  *matHeaderCellDef mat-sort-header> RFC 
+        
+      </th>
+      <td class="email-columna"  mat-cell *matCellDef="let row">  {{row.rfc}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="tipoHuesped">
+      <th  mat-header-cell  *matHeaderCellDef mat-sort-header> 
+        Estatus
+        <app-sort-icon column="tipoHuesped" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+      </th>
+      <td   mat-cell *matCellDef="let row">  {{row.tipoHuesped}}</td>
     </ng-container>
 
     <ng-container matColumnDef="edit">
-      <th class="header-align-right" mat-header-cell *matHeaderCellDef>Ver</th>
-        <td class="header-align-right" mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
+      <th mat-header-cell *matHeaderCellDef>Ver</th>
+        <td mat-cell (click)="$event.stopPropagation()" *matCellDef="let row">
           <button 
             (click)="verFolio(row)"
             class="btn btn-info">
@@ -115,9 +113,67 @@
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"(click)="verFolio(row)"></tr>
-</table>
+</table> -->
       <!-- end: Table -->
-      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator>
 
+      <table class="table overflow-hidden table-head-custom table-vertical-center">
+        <thead>
+
+          <th>
+            ID Cliente
+            <app-sort-icon column="id_Socio" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th>
+            Cliente
+            <app-sort-icon column="nombre" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th style="text-align: center;">
+            Telèfono
+            <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th style="text-align: center;">
+            Email
+            <app-sort-icon column="estatus_Ama_De_Llaves" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th>
+            RFC
+            <app-sort-icon column="habitacion" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th>
+            Estatus
+            <app-sort-icon column="llegada" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+              (sort)="sort($event)"></app-sort-icon>
+          </th>
+          <th>Ver</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cliente of historicoService.items$ | async ">
+            <td>{{ cliente.id_Socio}}</td>
+            <td>{{ cliente.nombre }}</td>
+            <td>{{ cliente.telefono }}</td>
+            <td>{{ cliente.email }}</td>
+            <td>{{ cliente.rfc }}</td>
+            <td>{{ cliente.tipoHuesped }}</td>
+
+            <td>
+              <button 
+              (click)="verFolio(cliente)"
+              class="btn btn-info">
+              <i class="fa fa-eye" aria-hidden="true"></i>
+            </button>
+            </td>
+
+            
+          </tr>
+        </tbody>
+      </table>
+      <!-- <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Pagina"></mat-paginator> -->
+      <app-paginator class="flex-wrap d-flex justify-content-between align-items-center" [paginator]="paginator"
+      [isLoading]="isLoading" (paginate)="paginate($event)"></app-paginator> 
     </div>
   </div>

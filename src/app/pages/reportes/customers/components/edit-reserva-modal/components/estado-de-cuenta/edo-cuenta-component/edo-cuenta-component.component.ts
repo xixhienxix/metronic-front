@@ -37,6 +37,9 @@ export class EdoCuentaComponentComponent implements OnInit {
   totalAbonos:number=0;
   totalCargos:number=0;
 
+  /**DOMM */
+  inputDisabled:boolean =false
+
   constructor(
     public customerService:HuespedService,
     public estadoDeCuentaService:Edo_Cuenta_Service,
@@ -55,6 +58,8 @@ export class EdoCuentaComponentComponent implements OnInit {
    }
 
   ngOnInit(): void {
+
+
     this.customerService.getCurrentHuespedValue.habitacion
     this.estadoDeCuentaService.currentCuentaValue
     this.getEdoCuenta()

@@ -1,8 +1,8 @@
 import {  Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbDateAdapter, NgbDateParserFormatter, NgbDateStruct,NgbDate, NgbCalendar,NgbDatepickerI18n, } from '@ng-bootstrap/ng-bootstrap';
-import { from, of, Subscription } from 'rxjs';
-import { catchError,  first,  tap } from 'rxjs/operators';
+import { from, merge, of, Subscription } from 'rxjs';
+import { catchError,  first,  startWith,  switchMap,  tap } from 'rxjs/operators';
 import { Huesped } from '../../../_models/customer.model';
 import { Estatus } from '../../../_models/estatus.model';
 import { HuespedService } from '../../../_services';
@@ -33,6 +33,8 @@ import { DivisasService } from 'src/app/pages/parametros/_services/divisas.servi
 import { Foliador } from '../../../_models/foliador.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { Historico } from '../../../_models/historico.model';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 // const todayDate = new Date();
 
@@ -120,7 +122,9 @@ const EMPTY_CUSTOMER: Huesped = {
 export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 {
   @ViewChild('tipodeCuartoDropDown') tipodeCuartoDropDown: null;
-
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
+  
   @Input()
 
 //DATETIMEPICKER RANGE
@@ -176,10 +180,12 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   _isDisabled:boolean=true;
   banderaDisabled:boolean=true;
   noDisabledCheckIn:boolean;
-  hiddenCliente:boolean=true
+  hiddenCliente:boolean=true;
+  hiddenClienteTable:boolean=false;
   
 
 /**Models */
+public listaHistorico:Historico[]=[];
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
@@ -205,7 +211,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   
 /**MAT TABLE */
 displayedColumns:string[]=['id_Socio','nombre','email','telefono']
-dataSource=new MatTableDataSource<Historico>();
+dataSource = new MatTableDataSource<Historico>();
+resultsLength = 0;
+  isLoadingResults = true;
+  isRateLimitReached = false;
 
   constructor(
     //Date Imports
@@ -225,9 +234,11 @@ dataSource=new MatTableDataSource<Historico>();
     public i18n: NgbDatepickerI18n,
     public parametrosService:ParametrosServiceService,
     public divisasService:DivisasService,
-    public detallesService:Huesped_Detail_Service
     ) {
-      
+
+    
+
+
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
       this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
@@ -267,10 +278,17 @@ dataSource=new MatTableDataSource<Historico>();
     {this.noDisabledCheckIn=false}
   }
 
+
+
+
   getHistorico(){
     const sb = this.historicoService.items$.subscribe(
       (result)=>{
-          this.dataSource.data=result
+        this.resultsLength=result.length
+        this.listaHistorico=result
+        this.dataSource.data=result
+
+    
       },
       
       ()=>{})
@@ -294,6 +312,8 @@ dataSource=new MatTableDataSource<Historico>();
   }
 
   applyFilter(event: Event) {
+    this.hiddenClienteTable=true
+
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
@@ -339,11 +359,18 @@ dataSource=new MatTableDataSource<Historico>();
   }
 
   ngAfterViewInit(){
-    this.formGroup.controls['nombre'].setValue(this.nombreHistorico);
-    this.formGroup.controls['email'].setValue(this.emailHistorico);
-    this.formGroup.controls['telefono'].setValue(this.telefonoHistorico);
-    this.huesped.ID_Socio=this.id_Socio
+    if(this.nombreHistorico!=undefined){    this.formGroup.controls['nombre'].setValue(this.nombreHistorico);  }
+    if(this.emailHistorico!=undefined){    this.formGroup.controls['email'].setValue(this.emailHistorico);  }
+    if(this.telefonoHistorico!=undefined){    this.formGroup.controls['telefono'].setValue(this.telefonoHistorico);  }
+    if(this.huesped!=undefined){    this.huesped.ID_Socio=this.id_Socio    }
+
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+
   }
+
+
+
 
   loadForm() {
 
@@ -538,7 +565,38 @@ dataSource=new MatTableDataSource<Historico>();
     this.subscriptions.push(sbCreate);
   }
 
+  revisaClienteDistinguido(){
+    const formData = this.formGroup.value;
+
+    const clienteDistinguido = this.listaHistorico.filter((existe)=>existe.email==formData.email)
+
+    if(clienteDistinguido.length != 0){
+      const modalRef = this.modalService.open(AlertsComponent,{size : 'sm'})
+      modalRef.componentInstance.alertHeader = 'Informaciòn'
+      modalRef.componentInstance.mensaje='Este correo pertenese a un numero de Socio, quiere utilizar el mismo nùmero de socio para esta reservaciòn?'
+    
+      modalRef.result.then((result) => {
+        if(result=='Aceptar')        
+        {
+          this.huesped.ID_Socio=clienteDistinguido[0].id_Socio
+          this.onSubmit();
+        } else {
+          this.onSubmit();
+        }
+        this.closeResult = `Closed with: ${result}`;
+        }, (reason) => {
+            this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+
+        });
+    }else{
+      this.onSubmit();
+
+    }
+  }
+
   private prepareHuesped() {
+
+    const formData = this.formGroup.value;
 
     for(let habitaciones of this.preAsig)
     {
@@ -551,7 +609,6 @@ dataSource=new MatTableDataSource<Historico>();
       let mesToDate = this.toDate.month.toString().padStart(2, '0');
       let anoToDate = this.toDate.year
 
-      const formData = this.formGroup.value;
       this.huesped.origen=this.origenReserva;
       this.huesped.llegada = diaFromDate +"/"+ mesFromDate +"/"+ anoFromDate
       this.huesped.salida = diaToDate +"/"+ mesToDate +"/"+ anoToDate
@@ -971,9 +1028,17 @@ fechaSeleccionadaFinal(event:NgbDate){
 
   onSelectHuesped(row:any)
   {
+    
+    this.hiddenClienteTable=false
+    this.hiddenCliente=true
+
     this.huesped.nombre=row.nombre;
+    this.formGroup.get('nombre').patchValue(row.nombre)
     this.huesped.email=row.email;
+    this.formGroup.get('email').patchValue(row.email)
     this.huesped.telefono=row.telefono;
+    this.formGroup.get('telefono').patchValue(row.telefono)
+
 
   }
 

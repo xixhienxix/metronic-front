@@ -191,7 +191,8 @@ export class EditReservaModalComponent implements OnInit {
 
     /*DOM*/
     colorAma:string='LIMPIA'
-    cargando:boolean=true
+    cargando:boolean=true;
+    estatusAmaDom:string;
 
 
     constructor(
@@ -232,7 +233,7 @@ export class EditReservaModalComponent implements OnInit {
 
       this.formGroup = this.fb.group({
         estatus : [this.customersService.getCurrentHuespedValue.estatus],
-        ama:['']
+        ama:[this.customerService.getCurrentHuespedValue.estatus_Ama_De_Llaves]
       }) 
 
     }
@@ -273,9 +274,9 @@ export class EditReservaModalComponent implements OnInit {
       const sb = this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
         (value)=>{
             this.disponibilidadEstatus=value[0]
-            this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
+            this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves.toUpperCase())
             for(let i=0;i<this.amaDeLlavesList.length;i++){
-              if(this.amaDeLlavesList[i].Descripcion==value[0].Estatus_Ama_De_Llaves)
+              if(this.amaDeLlavesList[i].Descripcion==value[0].Estatus_Ama_De_Llaves.toUpperCase())
               {
                 this.colorAma=this.amaDeLlavesList[i].Color
               }

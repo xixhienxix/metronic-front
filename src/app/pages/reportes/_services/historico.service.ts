@@ -156,6 +156,7 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
 
   updateHistorico(cliente:Historico){
     const clients=cliente
+    console.log(environment.apiUrl)
     return this.http.post<Historico>(environment.apiUrl+"/historico/actualizaDatos",cliente).pipe(
       map((data=>{
         this.sendNotification(cliente);

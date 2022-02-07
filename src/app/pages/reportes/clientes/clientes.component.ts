@@ -51,15 +51,18 @@ export class ClientesComponent implements OnInit {
 
   /**Models */
   clientes:Historico[]=[]
-  public estatusArray:Estatus[]=[];
-  public codigoCuarto:Habitaciones[]=[];
-  public origenArray:Origen[]=[];
+  public tipoHuespedArray:string[]=['VIP','Regular','Lista Negra'];
+  public emails:string[]=[];
+  public id_SocioArray:number[]=[];
   public cliente:Historico;
   public folios:Foliador[]=[];
 
   /**MAT TABLE */
   dataSource = new MatTableDataSource<Historico>();
-  displayedColumns:string[] = ['cancelar','folio','llegada','salida','nombre','habitacion','cuarto','edit']
+  displayedColumns:string[] = ['id_Socio','nombre','telefono','email','rfc','tipoHuesped','edit']
+  sorting: SortState;
+  paginator: PaginatorState;
+
 
   /**Helpers */
   isLoading: boolean;
@@ -93,15 +96,23 @@ export class ClientesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAll();
+    this.historicoService.fetch();
+
     // this.filterForm();
     this.getClientes();
+    this.filterForm();
+    this.searchForm();
+    this.sorting = this.historicoService.sorting;
+    this.paginator = this.historicoService.paginator;
+
+
   }
 
   getAll(){
     const sb = this.historicoService.getAll().subscribe(
       (value)=>{
        
-        this.dataSource.data=value
+        // this.dataSource.data=value
         this.clientes=value
         if(this.cliente){
           this.historicoService.setCurrentClienteValue=this.cliente
@@ -118,7 +129,10 @@ export class ClientesComponent implements OnInit {
     const sb = this.clientesServices.getClientes().subscribe(
       (value:Historico[])=>{
         this.dataSource.data=value
-
+        for(let i=0; i < value.length; i++){
+          this.emails.push(value[i].email)
+          this.id_SocioArray.push(value[i].id_Socio)
+        }
       },
       (error)=>{
 
@@ -126,6 +140,90 @@ export class ClientesComponent implements OnInit {
       ()=>{})
       this.subscription.push(sb)
   }
+
+  // filtration
+  filterForm() {
+    this.filterGroup = this.fb.group({
+      id_Socio: [''],
+      tipoHuesped: [''],
+      email: [''],
+      searchTerm: [''],
+    });
+    this.subscriptions.push(
+      this.filterGroup.controls.tipoHuesped.valueChanges.subscribe(() =>
+        this.filter()
+      )
+    );
+    this.subscriptions.push(
+      this.filterGroup.controls.email.valueChanges.subscribe(() => this.filter())
+    );
+    this.subscriptions.push(
+      this.filterGroup.controls.id_Socio.valueChanges.subscribe(() => this.filter())
+    );
+  }
+    // pagination
+    paginate(paginator: PaginatorState) {
+      this.customerService.patchState({ paginator });
+    }
+
+  filter() {
+    const filter = {};
+    const tipoHuesped = this.filterGroup.get('tipoHuesped').value;
+
+    if (tipoHuesped) {
+      filter['tipoHuesped'] = tipoHuesped;
+    }
+
+    const email = this.filterGroup.get('email').value;
+    if (email) {
+      filter['email'] = email;
+    }
+
+    const id_Socio = this.filterGroup.get('id_Socio').value;
+    if(id_Socio){
+      filter['id_Socio']=id_Socio;
+    }
+
+
+    this.historicoService.patchState({ filter });
+  }
+
+    // search
+    searchForm() {
+      this.searchGroup = this.fb.group({
+        searchTerm: [''],
+      });
+      const searchEvent = this.searchGroup.controls.searchTerm.valueChanges
+        .pipe(
+          /*
+        The user can type quite quickly in the input box, and that could trigger a lot of server requests. With this operator,
+        we are limiting the amount of server requests emitted to a maximum of one every 150ms
+        */
+          debounceTime(150),
+          distinctUntilChanged()
+        )
+        .subscribe((val) => this.search(val));
+      this.subscriptions.push(searchEvent);
+    }
+  
+    search(searchTerm: string) {
+      this.historicoService.patchState({ searchTerm });
+    }
+
+    // sorting
+    sort(column: string) {
+      const sorting = this.sorting;
+      const isActiveColumn = sorting.column === column;
+      if (!isActiveColumn) {
+        sorting.column = column;
+        sorting.direction = 'desc';
+      } else {
+        sorting.direction = sorting.direction === 'desc' ? 'asc' : 'desc';
+      }
+      this.historicoService.patchState({ sorting });
+    }
+
+    //En Filtration and sorting
 
   verFolio(row:any){
     let clientes

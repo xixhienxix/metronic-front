@@ -23,12 +23,25 @@
   opacity: 0.8;
   z-index: 1000;
 }
-.tab-label {
-  min-width: 72px;
+
+  
+/* Styles for tab labels */
+.mat-tab-label {
+  min-width: 80px !important;
+  padding: 5px;
+  background-color: transparent;
+  font-weight: 700;
 }
-// .stretch-tab-reserva{
-//   max-width: 10px;
-// }
-// .stretched-tabs {
-//   max-width: 100px;
-// }
+
+/* Styles for the active tab label */
+.mat-tab-label.mat-tab-label-active {
+  min-width: 80px !important;
+  padding: 5px;
+  background-color: transparent;
+  font-weight: 700;
+}
+
+/* Styles for the ink bar */
+.mat-ink-bar {
+  background-color: green;
+}

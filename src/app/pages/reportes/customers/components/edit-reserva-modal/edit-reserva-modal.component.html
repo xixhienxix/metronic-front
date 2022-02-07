@@ -68,11 +68,11 @@
       </div>
         <div class="col-lg-5">
           <ng-container *ngIf="!cargando">
-            <mat-select #selectedAma (selectionChange)='onChangeAma(selectedAma.value)' formControlName='ama' [(value)]="disponibilidadEstatus.Estatus_Ama_De_Llaves" style=" color: white; font-weight: bold; font-size: larger;" 
+            <mat-select #selectedAma (selectionChange)='onChangeAma(selectedAma.value)' formControlName='ama' style=" color: white; font-weight: bold; font-size: larger;" 
             [style.background-color]="colorAma" 
             name="estatusAma" id="amaDellaves" class="btn" >
               <ng-container *ngFor="let estatusAmaDeLlaves of amaDeLlavesList" >
-                <mat-option style="  font-weight: bold; font-size: medium;  " [value]="estatusAmaDeLlaves.Descripcion" [style.background-color]="estatusAmaDeLlaves.Color"> {{estatusAmaDeLlaves.Descripcion}}</mat-option>
+                <mat-option style="  font-weight: bold; font-size: medium;  " [value]="estatusAmaDeLlaves.Descripcion" [style.background-color]="estatusAmaDeLlaves.Color"> {{estatusAmaDeLlaves.Descripcion.toUpperCase()}}</mat-option>
               </ng-container>
             </mat-select>
           </ng-container>
@@ -111,6 +111,7 @@
       <label style="color: white;font-size: large;"> {{this.divisasService.getcurrentDivisa.Simbolo}} {{(customerService.getCurrentHuespedValue.porPagar-customerService.getCurrentHuespedValue.pendiente).toLocaleString("es-MX")}}.00 </label>
     </div>
 
+
     <div
     style="background-color: #e43748; color: white"
     class="col px-3 py-3 rounded-sm mr-7 mb-7"
@@ -126,14 +127,14 @@
   </div>
 </div>
 
-<mat-tab-group mat-stretch-tabs [selectedIndex]="selectedIndex" class="col-md-12" style=" padding: 3px">
+<mat-tab-group [selectedIndex]="selectedIndex" class="col-md-12" >
 
-  <mat-tab style="min-width: 72px" class="stretch-tab-reserva" label="Reserva">
+  <mat-tab label="Reserva">
     <app-reservas-component (next)="setStep(2)"></app-reservas-component>
   </mat-tab>
 
   <!--HUESPED TAB-->
-  <mat-tab label="Huésped">
+  <mat-tab  label="Huésped">
     <app-huesped-component></app-huesped-component>
   </mat-tab>
 
@@ -239,7 +240,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="customerService.getCurrentHuespedValue.estatus=='Huesped en Casa'">
+<div *ngIf="customerService.getCurrentHuespedValue.estatus=='Huesped en Casa' ">
   <div style="background-color: #00506a; text-align: center; padding-top: 5px; padding-bottom: 5px;" class="h4 modal-content">
     <label style="color: aliceblue"> Estado de Reserva / Folio </label>
     <div style="justify-content: space-around;" class="row">
