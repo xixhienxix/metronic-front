@@ -1,0 +1,72 @@
+<div class="card card-custom gutter-b">
+    <div class="card-header">
+      <div class="card-title ">
+        <h3 class="card-label">Habitación</h3>
+      </div>
+
+    </div> 
+  
+    <div class="card-body">
+
+  
+      <!-- begin: Grouping -->
+      <ng-container *ngIf="grouping.getSelectedRowsCount()">
+        <div class="form">
+          <div class="row align-items-center form-group-actions margin-top-20 margin-bottom-20">
+            <div class="col-xl-12">
+              <div class="form-group form-group-inline">
+                <div class="form-label form-label-no-wrap">
+                  <label class="font-bold font-danger"><span>Selected records count:
+                      <b>{{ grouping.getSelectedRowsCount() }}</b></span></label>
+                </div>
+               
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <!-- end: Grouping -->
+  
+      <!-- begin:Table -->
+      <div class="table-responsive angular-bootstrap-table">
+        
+        <table class="table overflow-hidden table-head-custom table-vertical-center">
+          <thead>
+        
+            <th>
+              Nombre de la Habitación
+              <app-sort-icon column="folio" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th style="text-align: center;">
+              Tipo
+              <app-sort-icon column="estatus" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th style="text-align: center;">
+              Capacidad
+              <app-sort-icon column="estatus_Ama_De_Llaves" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>
+              Inventario
+              <app-sort-icon column="habitacion" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
+                (sort)="sort($event)"></app-sort-icon>
+            </th>
+            <th>Acciones</th>
+          </thead>
+          <tbody>
+            <!-- <tr *ngFor="let habitacion of inventarioArr ">
+                <td>{{ inventario.Codigo }}</td>
+                <td>{{ inventario.Descripcion }}</td>
+                <td>{{ inventario.Personas }}</td>
+                <td>{{ inventario.Inventario }}</td>
+            </tr> -->
+          </tbody>
+        </table>
+      </div>
+      <!-- end: Table -->
+      <app-paginator class="flex-wrap d-flex justify-content-between align-items-center" [paginator]="paginator"
+        [isLoading]="isLoading" (paginate)="paginate($event)"></app-paginator>
+    </div>
+  </div>

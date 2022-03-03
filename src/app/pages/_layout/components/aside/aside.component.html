@@ -53,15 +53,10 @@
             cacheSVG="true"
             class="svg-icon menu-icon"
           ></span>
-          <span class="menu-text" translate="MENU.DASHBOARD"></span>
+          <span style="font-weight: bold; color: white;" class="menu-text" translate="MENU.DASHBOARD"></span>
         </a>
       </li>
       <!-- end::1 Level -->
-
-
-
-
-
 
 <!-- Reportes -->
       <!-- begin::1 Level -->
@@ -135,6 +130,7 @@
         </div>
       </li>
       <!-- end::1 Level -->
+      <!-- CLIENTEs -->
       <li
         class="menu-item menu-item-submenu"
         aria-haspopup="true"
@@ -204,6 +200,7 @@
           </ul>
         </div>
       </li>
+
 
 
 <!-- Applications -->
@@ -301,6 +298,65 @@
       </li> -->
       <!-- end::1 Level -->
       <hr>
+    </ul>
+
+    <ul class="menu-nav" [ngClass]="ulCSSClasses">
+      <li
+      class="menu-item"
+      aria-haspopup="true"
+      routerLinkActive="menu-item-active"
+
+      >
+      <a class="menu-link">
+        <span
+          [inlineSVG]="'./assets/media/svg/icons/Home/settings.svg'"
+          cacheSVG="true"
+          class="svg-icon menu-icon"
+        ></span>
+        <span style="font-weight: bold; color: white;" class="menu-text">Configuraciones</span>
+      </a>
+      </li>
+
+          <!-- begin::1 Level -->
+          <li
+          class="menu-item"
+          aria-haspopup="true"
+          routerLinkActive="menu-item-active"
+        >
+          <a class="menu-link" routerLink="habitacion" routerLinkActive="active">
+            <span
+              [inlineSVG]="'./assets/media/svg/icons/Home/Home.svg'"
+              cacheSVG="true"
+              class="svg-icon menu-icon"
+            ></span>
+            <span class="menu-text">Habitaciones</span>
+          </a>
+        </li>
+        <!-- end::1 Level -->
+        
+                  
+
+            <!-- //TARIFAS -->
+          <li
+          class="menu-item menu-item-submenu"
+          aria-haspopup="true"
+          data-menu-toggle="hover"
+          routerLinkActive="menu-item-open"
+          >
+          <a
+          class="menu-link"
+          routerLink="/tarifas/tarifario"
+          routerLinkActive="active">
+            <span
+            [inlineSVG]="'./assets/media/svg/icons/Shopping/Cart3.svg'"
+            cacheSVG="true"
+            class="svg-icon menu-icon"
+          ></span>
+          <span class="menu-text">Tarifas</span>
+          <i class="menu-arrow"></i>
+        </a>
+        </li>
+
 
           <!-- begin::1 Level -->
           <li
@@ -319,6 +375,7 @@
         </li>
         <!-- end::1 Level -->
     </ul>
+
     <hr>
     <hr>
     <hr>

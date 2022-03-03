@@ -23,6 +23,14 @@ export const DynamicAsideMenuConfig = {
       page: '/parametros',
       svg: './assets/media/svg/icons/Home/Library.svg'
     },
+    {
+      title: 'Tarifas',
+      root: true,
+      icon: 'flaticon2-expand',
+      page: '/tarifas',
+      svg: './assets/media/svg/icons/Home/Library.svg'
+    },
+
 
   
 

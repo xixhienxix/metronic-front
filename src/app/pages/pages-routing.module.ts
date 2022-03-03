@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { AuthGuard } from '../modules/auth/_services/auth.guard';
 import { LayoutComponent } from './_layout/layout.component';
- 
 
 
 const routes: Routes = [
@@ -18,16 +17,26 @@ const routes: Routes = [
         import('./reportes/reportes.module').then((m) => m.ReportesModule),
       },
       {
+        path: 'habitacion',
+      loadChildren: () =>
+        import('./habitaciones/habitaciones.module').then((m) => m.HabitacionesModule),
+      },
+      {
+        path:'tarifas/tarifario',
+        loadChildren:()=>
+        import('./tarifas/tarifas.module').then((m) => m.TarifasModule),
+      },
+      {
       path: 'dashboard',
       loadChildren: () =>
         import('./dashboard/dashboard.module').then((m) => m.DashboardModule),
-    },
+    },    
     {
       path: 'builder',
       loadChildren: () =>
         import('./builder/builder.module').then((m) => m.BuilderModule),
     },
-    {
+    { 
       path: 'parametros',
       loadChildren: () =>
         import('./parametros/parametros.module').then((m) => m.ParametrosModule),
@@ -100,3 +109,4 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class PagesRoutingModule { }
+

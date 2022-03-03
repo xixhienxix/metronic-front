@@ -8,6 +8,7 @@ import { Estatus } from '../../../_models/estatus.model';
 import { HuespedService } from '../../../_services';
 import { EstatusService } from '../../../_services/estatus.service';
 import { CustomAdapter, CustomDateParserFormatter } from '../../../../../_metronic/core';
+
 import { ReportesComponent } from '../../../reportes.component'
 import { HttpClient } from "@angular/common/http";
 import { map} from 'rxjs/operators'

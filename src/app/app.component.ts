@@ -19,7 +19,6 @@ import { Subscription } from 'rxjs';
 import { TableExtendedService } from './_metronic/shared/crud-table';
 import { DEFAULT_INTERRUPTSOURCES, Idle } from '@ng-idle/core';
 import { Keepalive } from '@ng-idle/keepalive';
-import { AlertsComponent } from './main/alerts/alerts.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DivisasService } from './pages/parametros/_services/divisas.service';
 

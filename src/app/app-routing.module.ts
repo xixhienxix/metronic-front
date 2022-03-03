@@ -20,6 +20,11 @@ export const routes: Routes = [
       import('./pages/layout.module').then((m) => m.LayoutModule),
   },
   {
+    path:'tarifas',
+    canActivate: [AuthGuard],
+    redirectTo: 'tarifas/tarifario' 
+  },
+  {
   path:'reportes',
   canActivate: [AuthGuard],
   redirectTo: 'reportes/customers' 
@@ -29,16 +34,19 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     redirectTo: 'parametros' 
   },
-  { path: '**',   
-    redirectTo: 'auth/login' 
-  },
+  // {
+  //   path:'clientes',
+  //   canActivate: [AuthGuard],
+  //   redirectTo: 'reportes/clientes' 
+  // },
   {
-    path:'clientes',
+    path:'habitacion',
     canActivate: [AuthGuard],
-    redirectTo: 'reportes/clientes' 
-    },
-    { path: '**',   
-      redirectTo: 'auth/login' },
+    redirectTo: 'habitacion/main' 
+  },
+  { path: '**',   
+  redirectTo: 'auth/login' 
+},
 ];
 
 @NgModule({

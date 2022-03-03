@@ -6,6 +6,7 @@ import { CustomersComponent } from './customers/customers.component';
 import { ProductsComponent } from './products/products.component';
 import { ProductEditComponent } from './products/product-edit/product-edit.component';
 import { ClientesComponent } from './clientes/clientes.component';
+import { TarifarioComponent } from '../tarifas/tarifario/tarifario.component';
 
 const routes: Routes = [
   {
