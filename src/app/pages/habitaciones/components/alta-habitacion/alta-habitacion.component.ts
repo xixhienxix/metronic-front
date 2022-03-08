@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
@@ -86,7 +86,7 @@ export class AltaHabitacionComponent implements OnInit {
       descripcion: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(300)])],
       personas: [1, Validators.compose([Validators.required,Validators.min(1)])],
       extras: [0, Validators.required],
-      vista: ['', Validators.required],
+      vista: [''],
       inventario: [1, Validators.required],
       nombreHabs: this.fb.array([])
     })
@@ -114,6 +114,17 @@ export class AltaHabitacionComponent implements OnInit {
 
   get inputs() {
     return this.formGroup.controls["nombreHabs"] as FormArray;
+  }
+
+  checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
+
+    for (let control of this.formGroup.get('formGroup')['controls']['nombreHabs']['controls']) {
+        console.log(control)
+    }
+
+    let pass = group.get('password').value;
+    let confirmPass = group.get('confirmPassword').value
+    return pass === confirmPass ? null : { notSame: true }
   }
 
   getTiposHAB(){
@@ -214,23 +225,24 @@ export class AltaHabitacionComponent implements OnInit {
     let habitacionNueva:Habitacion
 
     if(this.formGroup.invalid){
+      this.findInvalidControls()
       Object.keys(this.formGroup.controls).forEach(key => {
         this.formGroup.get(key).markAsDirty();
       });
       return
     }
 
-    for(let i=0; i<this.formGroup.controls.nombreHabs.value.length;i++){
-      for(let x=1;x<this.formGroup.controls.nombreHabs.value.length;x++){
-        if(this.formGroup.controls.nombreHabs.value[i].nombreHabs==this.formGroup.controls.nombreHabs.value[x].nombreHabs)
-        {
-          if(this.formGroup.controls.nombreHabs.value[i].nombreHabs!=''){
-            this.nombresIguales=true
-            return
-          }
-        }
-      }
-    }
+    // for(let i=0; i<this.formGroup.controls.nombreHabs.value.length;i++){
+    //   for(let x=1;x<this.formGroup.controls.nombreHabs.value.length;x++){
+    //     if(this.formGroup.controls.nombreHabs.value[i].nombreHabs==this.formGroup.controls.nombreHabs.value[x].nombreHabs)
+    //     {
+    //       if(this.formGroup.controls.nombreHabs.value[i].nombreHabs!=''){
+    //         this.nombresIguales=true
+    //         return
+    //       }
+    //     }
+    //   }
+    // }
 
     habitacionNueva = {
       Codigo:this.formGroup.value.nombre,
@@ -258,6 +270,7 @@ export class AltaHabitacionComponent implements OnInit {
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
+          this.formGroup.reset();
       },
       (error)=>{
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
@@ -275,6 +288,17 @@ export class AltaHabitacionComponent implements OnInit {
       }
     )   
   }
+
+  public findInvalidControls() {
+    const invalid = [];
+    const controls = this.formGroup.controls;
+    for (const name in controls) {
+        if (controls[name].invalid) {
+            invalid.push(name);
+        }
+    }
+    return invalid;
+}
 
   checkbox(value:any){
     if(value){
