@@ -2,8 +2,8 @@
     <div class="card-header">
       <div class="card-title ">
         <h3 class="card-label">Habitación</h3>
+        <button style="position: absolute; right: 0px; margin: 10px;" class="btn btn-primary" (click)="altaDehabitacion()">Agregar Nueva Habitacin</button>
       </div>
-
     </div> 
   
     <div class="card-body">
@@ -32,7 +32,6 @@
         
         <table class="table overflow-hidden table-head-custom table-vertical-center">
           <thead>
-        
             <th>
               Nombre de la Habitación
               <app-sort-icon column="folio" [activeColumn]="sorting.column" [activeDirection]="sorting.direction"
@@ -56,12 +55,12 @@
             <th>Acciones</th>
           </thead>
           <tbody>
-            <!-- <tr *ngFor="let habitacion of inventarioArr ">
-                <td>{{ inventario.Codigo }}</td>
-                <td>{{ inventario.Descripcion }}</td>
-                <td>{{ inventario.Personas }}</td>
-                <td>{{ inventario.Inventario }}</td>
-            </tr> -->
+            <tr *ngFor="let habitacion of habitacionService.items$ | async">
+                <td>{{ habitacion.Codigo }}</td>
+                <td>{{ habitacion.Tipo }}</td>
+                <td>{{ habitacion.Personas }}</td>
+                <td>{{ habitacion.Inventario }}</td>
+            </tr>
           </tbody>
         </table>
       </div>

@@ -50,83 +50,85 @@ export class HabitacionMainComponent implements OnInit {
     public modalService :NgbModal,
     private router:Router
   ) {  
-    this.habitacionService.fetch(); 
-  }
+    }
 
   ngOnInit(): void {
 
-    const sb = this.habitacionService.items$.subscribe(
-      (value)=>{
-     
-      if(value.length===0){
-        const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-        modalRef.componentInstance.alertsHeader='Advertencia'
-        modalRef.componentInstance.mensaje='No tiene Habitaciones dadas de Alta, debe crear una habitacion para comenzar con la applicacion'
-
-        modalRef.result.then((result) => {
-          if(result=='Aceptar')        
-          {
-            this.router.navigate(['/habitacion/alta'])
-          } 
-          this.closeResult = `Closed with: ${result}`;
-          }, (reason) => {
-              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-          });
-      }
-        else {
-          this.habitacionesArr=value
-        }
-
-        // for(let {Codigo, Descripcion, Personas } of value)
-        
-        //   this.inventario[Codigo] = { 
-        //     Codigo, 
-        //     Descripcion,
-        //     Personas, 
-        //     Inventario: this.inventario[Codigo] ? this.inventario[Codigo].count + 1 : 1
-        //   }
-
-      },
-      (error)=>{
-
-      });
-
-      this.subscriptions.push(sb);
+    this.habitacionService.fetch()
+    const sb = this.habitacionService.isLoading$.subscribe((res) => this.isLoading = res);
+    this.subscriptions.push(sb);
 
     this.grouping = this.habitacionService.grouping;
     this.paginator = this.habitacionService.paginator;
     this.sorting = this.habitacionService.sorting;
   }
-// sorting
-sort(column: string) {
-  const sorting = this.sorting;
-  const isActiveColumn = sorting.column === column;
-  if (!isActiveColumn) {
-    sorting.column = column;
-    sorting.direction = 'desc';
-  } else {
-    sorting.direction = sorting.direction === 'desc' ? 'asc' : 'desc';
+
+  ngAfterViewInit(){
+
+    
+    // const sb = this.habitacionService.items$.subscribe(
+    //   (value)=>{
+     
+    //   if(value.length===0){
+    //     const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+    //     modalRef.componentInstance.alertsHeader='Advertencia'
+    //     modalRef.componentInstance.mensaje='No tiene Habitaciones dadas de alta, debe crear una habitación para comenzar con la applicación'
+
+    //     modalRef.result.then((result) => {
+    //       if(result=='Aceptar')        
+    //       {
+    //         this.router.navigate(['/habitacion/alta'])
+    //       } 
+    //       this.closeResult = `Closed with: ${result}`;
+    //       }, (reason) => {
+    //           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    //       });
+    //   }
+    //     else {
+    //       this.habitacionesArr=value
+    //     }
+    //   },
+    //   (error)=>{
+
+    //   });
+
+    //   this.subscriptions.push(sb);
   }
-  this.habitacionService.patchState({ sorting });
-}
 
-// pagination
-paginate(paginator: PaginatorState) {
-  this.habitacionService.patchState({ paginator });
-}
-
-private getDismissReason(reason: any): string {
-  if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-  } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-  } else {
-      return  `with: ${reason}`;
+  altaDehabitacion(){
+    this.router.navigate(['/habitacion/alta'])
   }
-}
 
-ngOnDestroy() {
-  this.subscriptions.forEach((sb) => sb.unsubscribe());
-}
+  // sorting
+  sort(column: string) {
+    const sorting = this.sorting;
+    const isActiveColumn = sorting.column === column;
+    if (!isActiveColumn) {
+      sorting.column = column;
+      sorting.direction = 'desc';
+    } else {
+      sorting.direction = sorting.direction === 'desc' ? 'asc' : 'desc';
+    }
+    this.habitacionService.patchState({ sorting });
+  }
+
+  // pagination
+  paginate(paginator: PaginatorState) {
+    this.habitacionService.patchState({ paginator });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+        return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+        return 'by clicking on a backdrop';
+    } else {
+        return  `with: ${reason}`;
+    }
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach((sb) => sb.unsubscribe());
+  }
 
 }
