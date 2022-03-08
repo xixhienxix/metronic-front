@@ -99,6 +99,68 @@ export class HabitacionMainComponent implements OnInit {
     this.router.navigate(['/habitacion/alta'])
   }
 
+  popDelete(habitacion:Habitacion){
+    const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertsHeader='Advertencia'
+        modalRef.componentInstance.mensaje='Esta seguro que quiere eliminar esta habitación'
+
+        modalRef.result.then((result) => {
+          if(result=='Aceptar')        
+          {
+            const sb = this.habitacionService.buscarHabitacion(habitacion).subscribe(
+              (value)=>{
+                if(value.length!=0){
+                  const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+                        modalRef.componentInstance.alertsHeader='Error'
+                        modalRef.componentInstance.mensaje='Hay reservaciones asignadas a esta habitación, cambie estos folio de habitación antes de borrar la misma'
+                        modalRef.result.then((result) => {
+                          this.closeResult = `Closed with: ${result}`;
+                          }, (reason) => {
+                              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+                          });
+
+                }else{
+                  this.deletehab(habitacion._id)
+                }
+              }) 
+          } 
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+  }
+
+  deletehab(_id:string){
+    const sd =  this.habitacionService.deleteHabitacion(_id).subscribe(
+      (value)=>{
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje='Habitación Eliminada con éxito'          
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+          this.habitacionService.fetch();
+      },
+      (error)=>{
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje='No se pudo Eliminar la habitación intente de nuevo mas tarde'          
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+      })
+  }
+
   // sorting
   sort(column: string) {
     const sorting = this.sorting;

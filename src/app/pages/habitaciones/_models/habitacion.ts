@@ -2,6 +2,7 @@ import { BaseModel } from '../../../_metronic/shared/crud-table';
 
 export interface Habitacion extends BaseModel
 {
+  _id?:string,
   Codigo:string,
   Numero:string[],
   Tipo:string,

@@ -127,6 +127,10 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
     return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion})
   }
 
+  buscarHabitacion(habitacion:Habitacion){
+    return this.http.post<Habitacion[]>(environment.apiUrl+'/habitacion/buscar',{habitacion})
+  }
+
   ngOnDestroy() {
     this.subscriptions.forEach(sb => sb.unsubscribe());
   }

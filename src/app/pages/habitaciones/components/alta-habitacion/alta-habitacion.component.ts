@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, Form, FormArray, FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
@@ -12,6 +12,7 @@ import { Habitacion } from '../../_models/habitacion';
 import { Tipos_Habitacion } from '../../_models/tipos';
 import { HabitacionesService } from '../../_services/habitaciones.service';
 import { TiposService } from '../../_services/tipos.service';
+import { NoWhiteSpacesValidator } from '../../_validators/nonwhitespaces.validator/nonwhitespaces.validator.component';
 
 type listaAmenidades = {key:number;value:string}
 type listaCamas = {key:number;value:string;cantidad:number}
@@ -81,7 +82,7 @@ export class AltaHabitacionComponent implements OnInit {
     
 
     this.formGroup = this.fb.group({
-      nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
+      nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100),NoWhiteSpacesValidator.cannotContainSpace])],
       tipo: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       descripcion: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(300)])],
       personas: [1, Validators.compose([Validators.required,Validators.min(1)])],
@@ -115,16 +116,8 @@ export class AltaHabitacionComponent implements OnInit {
   get inputs() {
     return this.formGroup.controls["nombreHabs"] as FormArray;
   }
-
-  checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => { 
-
-    for (let control of this.formGroup.get('formGroup')['controls']['nombreHabs']['controls']) {
-        console.log(control)
-    }
-
-    let pass = group.get('password').value;
-    let confirmPass = group.get('confirmPassword').value
-    return pass === confirmPass ? null : { notSame: true }
+  get f(){
+    return this.formGroup.controls;
   }
 
   getTiposHAB(){
@@ -218,7 +211,23 @@ export class AltaHabitacionComponent implements OnInit {
   }
 
   resetForm(){
-    this.formGroup.reset();
+
+    this.formGroup.controls['descripcion'].patchValue('')
+    this.formGroup.controls['tipo'].patchValue('')
+    this.formGroup.controls['nombre'].patchValue('')
+    this.formGroup.controls['vista'].patchValue('')
+    
+    this.quantity=1
+    this.quantityExtra=0
+    this.formGroup.controls['personas'].patchValue(this.quantity)
+    this.formGroup.controls['extras'].patchValue(this.quantity)
+    this.formGroup.controls['inventario'].patchValue(1)
+    this.camasArr=[]
+    this.amenidadesArr=[]
+    this.inputs.reset();
+    this.amenidadesFC.reset();
+    this.camasFC.reset();
+  
   }
 
   onSubmit(){
@@ -231,7 +240,7 @@ export class AltaHabitacionComponent implements OnInit {
       });
       return
     }
-
+    let codigo = this.formGroup.value.nombre.trim('')
     // for(let i=0; i<this.formGroup.controls.nombreHabs.value.length;i++){
     //   for(let x=1;x<this.formGroup.controls.nombreHabs.value.length;x++){
     //     if(this.formGroup.controls.nombreHabs.value[i].nombreHabs==this.formGroup.controls.nombreHabs.value[x].nombreHabs)
@@ -270,8 +279,10 @@ export class AltaHabitacionComponent implements OnInit {
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
-          this.formGroup.reset();
-      },
+          
+          this.resetForm();
+
+        },
       (error)=>{
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Error'
@@ -327,6 +338,13 @@ export class AltaHabitacionComponent implements OnInit {
     isControlTouched(controlName): boolean {
       const control = this.formGroup.controls[controlName];
       return control.dirty || control.touched;
+    }
+
+    isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+        const invalidCtrl = !!(control?.invalid && control?.parent?.dirty);
+        const invalidParent = !!(control?.parent?.invalid && control?.parent?.dirty);
+    
+        return invalidCtrl || invalidParent;
     }
 
     plus()
