@@ -11,27 +11,96 @@
         <form [formGroup]="formGroup" >
 
         <div class="float-child"> <!--First Container-->
-                    <div class="form-group col-lg-12">
-                        <label style="color:#00506a; font-weight: bold;">Nombre de la Habitación</label>
-                        <input formControlName="nombre" style="background-color: #e6e9ed;" class="form-control">
+                    <div class="row col-lg-12">
+                        <div class="form-group col-lg-12">
+                            <label style="color:#00506a; font-weight: bold;">Nombre de la Habitación</label>
+                            <input 
+                                formControlName="nombre" 
+                                style="background-color: #e6e9ed;" 
+                                class="form-control"
+                                [class.is-invalid]="isControlInvalid('nombre')"
+                                [class.is-valid]="isControlValid('nombre')">
+                                <div
+                                class="invalid-feedback"
+                                *ngIf="controlHasError('required', 'nombre')"
+                              >
+                                El codigo del Cuarto es requerido
+                              </div>
+                              <div
+                                class="invalid-feedback"
+                                *ngIf="controlHasError('minlength', 'nombre')"
+                              >
+                                El minimo de caracteres para el Codigo son 3
+                              </div>
+                              <div
+                                class="invalid-feedback"
+                                *ngIf="controlHasError('maxlength', 'nombre')"
+                              >
+                                El Maximó de caracteres para el codigo son 100
+                              </div>
+                        </div>
                     </div>
-                    <div class="form-group col-lg-12">
-                        <label style="color:#00506a; font-weight: bold;">Tipo de la Habitación</label>
-                        <mat-select #tipodeCuartoDropDown
-                        class="form-control form-control-lg "
-                        formControlName="tipo"
-                        placeholder="-- Seleccione Tipo de Habitación -- " 
-                        required
-                        >
-                        <mat-option value="0">-- Selecciona Tipo de Habitación --</mat-option>
-                            <mat-option value="1">Todos los Tipos de Cuartos</mat-option>
-                            <mat-option *ngFor="let tipoCuarto of tiposArr" [value]="tipoCuarto.Descripcion">{{tipoCuarto.Descripcion}} </mat-option>
-                        </mat-select>
+                    <div class="row col-lg-12">
+                        <div class="form-group col-lg-12">
+                            <label style="color:#00506a; font-weight: bold;">Tipo de la Habitación</label>
+                            <mat-select #tipodeCuartoDropDown
+                            class="form-control form-control-lg "
+                            formControlName="tipo"
+                            placeholder="-- Seleccione Tipo de Habitación -- " 
+                            required
+                            [class.is-invalid]="isControlInvalid('tipo')"
+                            [class.is-valid]="isControlValid('tipo')"
+                            >
+                            <mat-option value="0">-- Selecciona Tipo de Habitación --</mat-option>
+                                <mat-option *ngFor="let tipoCuarto of tiposArr" [value]="tipoCuarto.Descripcion">{{tipoCuarto.Descripcion}} </mat-option>
+                            </mat-select>                        
+                        </div>
+                        <div
+                                class="invalid-feedback"
+                                *ngIf="controlHasError('required', 'tipo')"
+                              >
+                                El Tipo de Cuarto es requerido
+                              </div>
+                              <div
+                                class="invalid-feedback"
+                                *ngIf="controlHasError('minlength', 'tipo')"
+                              >
+                                El minimo de caracteres para el tipo de cuarto son 3
+                              </div>
+                              <div
+                                class="invalid-feedback"
+                                *ngIf="controlHasError('maxlength', 'tipo')"
+                              >
+                                El Maximó de caracteres para el tipo de cuarto son 100
+                              </div>
                     </div>
                 <div class="row col-lg-12">
                     <div class="form-group col-lg-12">
                         <label style="color:#00506a; font-weight: bold;">Descripción</label>
-                        <textarea formControlName="descripcion" style="background-color: #e6e9ed;" class="form-control"></textarea>
+                        <textarea 
+                        formControlName="descripcion" 
+                        style="background-color: #e6e9ed;" 
+                        class="form-control"
+                        [class.is-invalid]="isControlInvalid('descripcion')"
+                        [class.is-valid]="isControlValid('descripcion')"></textarea>
+                        <div
+                        class="invalid-feedback"
+                        *ngIf="controlHasError('required', 'descripcion')"
+                      >
+                        La Descripción del cuarto es requerida
+                      </div>
+                      <div
+                        class="invalid-feedback"
+                        *ngIf="controlHasError('minlength', 'descripcion')"
+                      >
+                        El minimo de caracteres para la descripcion son 3
+                      </div>
+                      <div
+                        class="invalid-feedback"
+                        *ngIf="controlHasError('maxlength', 'descripcion')"
+                      >
+                        El Maximó de caracteres para la descripción son 100
+                      </div>
                     </div>
                 </div>
                 <div class="row col-lg-12">
@@ -50,6 +119,7 @@
                                 placeholder=""
                                 disabled
                                 [value]="quantity"
+                                min="1"
                                 formControlName="personas"
                                 [class.is-invalid]="isControlInvalid('personas')"
                                 [class.is-valid]="isControlValid('personas')"
@@ -196,7 +266,7 @@
             <br>     
             <div class="input-group">
                 <div class="input-group-append">
-                    <button style="background-color: transparent;border-right: 2px solid #e6e9ed; border-left: 2px solid #dadcdf; border-top : 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusInv()" type="button">
+                    <button style="background-color: transparent;border-right: 2px solid #e6e9ed; border-left: 2px solid #dadcdf; border-top : 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="removeInput()" type="button">
                         <i class="fa fa-minus">
                         </i>
                     </button>
@@ -213,7 +283,7 @@
                     >
     
                 <div class="input-group-append">
-                    <button style="border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; background-color: transparent;" class="btn btn-secondary" (click)="plusInv()" type="button">
+                    <button style="border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; background-color: transparent;" class="btn btn-secondary" (click)="addInput()" type="button">
                         <i class="fa fa-plus">
                         </i>
                     </button>
@@ -223,17 +293,25 @@
             <div class="form-group col-md-12" style="font-weight: bold;">
                 <mat-checkbox #checked >¿Deseas asignar Numeración o Nombre Especiales? </mat-checkbox>
             </div> 
+            <div class="form-group col-md-12" style="font-weight: bold;">
+                <small class="col-lg-12" style="color: red;" *ngIf="nombresIguales">Los Nombres de las habitaciones no pueden ser identicos</small>
+            </div>
             <ng-container *ngIf="checked.checked">
-                    <ng-container *ngFor="let inventario of inventarioArr; let i= index">
-                            <div class="form-group" style="float:left; margin: 5px;">
-                                <input 
-                                [formControl]="nombreHabitacionesFC.value[i]"
-                                placeholder="{{inventario}}.-" 
-                                style="background-color: #e6e9ed;" class="form-control"
-                                type="text">
-                            </div>
-                    </ng-container>        
+                <ng-container formArrayName="lessons">
+                    <ng-container *ngFor="let inputForm of inputs.controls; let i = index">
+                        <div [formGroup]="inputForm" class="form-group" style="float:left; margin: 5px;">
+                            <input 
+                            formControlName="nombreHabs"
+                            placeholder="{{i+1}}.-" 
+                            style="background-color: #e6e9ed;" 
+                            class="form-control"
+                            type="text"
+                            [class.is-invalid]="nombresIguales">
+                        </div>
+                    </ng-container> 
+                </ng-container>       
             </ng-container> 
+
             <br> 
             <div class="row form-group col-md-12">
                 <label style="color:#00506a; font-weight: bold;">Orden de Visualizacion en el Calendario</label>
@@ -252,8 +330,8 @@
         </form>
     </div><!--Fin  FloatContainer-->
     <div class="card-footer col-lg-12">
+        <button style="float:right; margin: 5px;" class="btn btn-danger" (click)="resetForm()">CANCELAR</button>
         <button style="float:right; margin: 5px;" class="btn btn-primary" (click)="onSubmit()">ACEPTAR</button>
-        <button style="float:right; margin: 5px;" class="btn btn-danger">Cancelar</button>
     </div>
 
   

@@ -18,22 +18,26 @@ const DEFAULT_STATE: ITableState = {
 
 const DEFAULT_HABITACION = {
   Codigo:'',
-  Numero:1,
+  Numero:[],
+  Tipo:'',
   Descripcion:'',
-  Estatus:1,
-  Camas:1,
+  Camas:[],
   Personas:1,
   Personas_Extra:1,
-  Tarifa:1000
+  Inventario:1,
+  Vista:'',
+  Amenidades:[]
 }
 // Codigo:string,
-// Numero:number,
+// Numero:string[],
+// Tipo:string,
 // Descripcion:string,
-// Estatus:number;
-// Camas:number;
 // Personas:number;
 // Personas_Extra:number;
-// Tarifa:number;
+// Inventario:number,
+// Vista:string,
+// Camas:string[],
+// Amenidades:string[]
 
 @Injectable({
   providedIn: 'root'
@@ -117,6 +121,10 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   {
     return this.http
     .post(environment.apiUrl+'/codigos/adicional',{descripcion,precio})
+  }
+
+  postHabitacion(habitacion:Habitacion){
+    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion})
   }
 
   ngOnDestroy() {
