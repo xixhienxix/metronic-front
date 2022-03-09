@@ -61,12 +61,12 @@
           </thead>
           <tbody>
             <tr *ngFor="let habitacion of habitacionService.items$ | async">
-              <td>{{ habitacion.Codigo }}</td>
-              <td>{{ habitacion.Numero }}</td>
-              <td>{{ habitacion.Tipo }}</td>
-                <td>{{ habitacion.Personas }}</td>
-                <td>{{ habitacion.Inventario }}</td>
-                <td>
+              <td style="text-align: center; vertical-align: middle;">{{ habitacion.Codigo }}</td>
+              <td style="text-align: center; vertical-align: middle;">{{ habitacion.Numero }}</td>
+              <td style="text-align: center; vertical-align: middle;">{{ habitacion.Tipo }}</td>
+                <td style="text-align: center; vertical-align: middle;">{{ habitacion.Personas }}</td>
+                <td style="text-align: center; vertical-align: middle;">{{ habitacion.Inventario }}</td>
+                <td style="text-align: center; vertical-align: middle;">
                 <a
                 title="Borrar Habitación"
                 class="btn btn-icon btn-light btn-hover-danger btn-sm"

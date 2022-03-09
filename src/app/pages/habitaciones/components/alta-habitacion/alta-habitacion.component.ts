@@ -3,6 +3,7 @@ import { AbstractControl, Form, FormArray, FormBuilder, FormControl, FormGroup, 
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
+import { Router } from '@angular/router';
 import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
@@ -69,7 +70,8 @@ export class AltaHabitacionComponent implements OnInit {
     public fb : FormBuilder,
     public tiposHabitacionService:TiposService,
     public modalService : NgbModal,
-    public habitacionService:HabitacionesService
+    public habitacionService:HabitacionesService,
+    public router : Router
   ) { 
 
   }
@@ -221,9 +223,9 @@ export class AltaHabitacionComponent implements OnInit {
     this.quantityExtra=0
     this.formGroup.controls['personas'].patchValue(this.quantity)
     this.formGroup.controls['extras'].patchValue(this.quantity)
-    this.formGroup.controls['inventario'].patchValue(1)
+    // this.formGroup.controls['inventario'].patchValue(1)
     this.camasArr=[]
-    this.amenidadesArr=[]
+    // this.amenidadesArr=[]
     this.inputs.reset();
     this.amenidadesFC.reset();
     this.camasFC.reset();
@@ -310,6 +312,10 @@ export class AltaHabitacionComponent implements OnInit {
     }
     return invalid;
 }
+
+  back(){
+    this.router.navigate(['/habitacion'])
+  }
 
   checkbox(value:any){
     if(value){
