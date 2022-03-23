@@ -214,7 +214,6 @@ export class CustomersComponent
 
 
     
-    console.log(this.customerService.items$)
     // this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
   }
 

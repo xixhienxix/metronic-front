@@ -50,6 +50,8 @@ border: 2px solid #564caf; /* Green */
 }
 
 .float-child {
-  width: 50%;
   float: left;
 }  
+.cdk-overlay-container, .cdk-overlay-pane {
+  z-index: 19999 !important;
+}

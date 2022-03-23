@@ -11,6 +11,8 @@ export interface Habitacion extends BaseModel
   Personas_Extra:number;
   Inventario:number,
   Vista:string,
-  Camas:string[],
-  Amenidades:string[]
+  Camas:number,
+  Tipos_Camas:string[],
+  Amenidades:string[],
+  Orden:Number
 }

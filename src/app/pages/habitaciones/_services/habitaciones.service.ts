@@ -21,12 +21,14 @@ const DEFAULT_HABITACION = {
   Numero:[],
   Tipo:'',
   Descripcion:'',
-  Camas:[],
+  Camas:1,
   Personas:1,
   Personas_Extra:1,
   Inventario:1,
   Vista:'',
-  Amenidades:[]
+  Amenidades:[],
+  Tipos_Camas:[],
+  Orden:1
 }
 // Codigo:string,
 // Numero:string[],
@@ -123,13 +125,25 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
     .post(environment.apiUrl+'/codigos/adicional',{descripcion,precio})
   }
 
-  postHabitacion(habitacion:Habitacion){
-    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion})
+  postHabitacion(habitacion:Habitacion,editar:boolean){
+    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar})
   }
 
   buscarHabitacion(habitacion:Habitacion){
     return this.http.post<Habitacion[]>(environment.apiUrl+'/habitacion/buscar',{habitacion})
   }
+
+  getCodigohabitaciones() :Observable<Habitacion[]> {
+
+    return this.http
+     .get<Habitacion[]>(environment.apiUrl + '/reportes/tipo')
+     .pipe(
+       map(responseData=>{
+       return responseData
+     })
+     )
+
+   }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sb => sb.unsubscribe());

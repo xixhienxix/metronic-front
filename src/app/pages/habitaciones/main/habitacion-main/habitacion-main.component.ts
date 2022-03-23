@@ -5,6 +5,7 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 import { GroupingState, PaginatorState, SortState } from 'src/app/_metronic/shared/crud-table';
+import { AltaHabitacionComponent } from '../../components/alta-habitacion/alta-habitacion.component';
 import { Habitacion } from '../../_models/habitacion';
 import { HabitacionesService } from '../../_services/habitaciones.service';
 
@@ -97,6 +98,13 @@ export class HabitacionMainComponent implements OnInit {
 
   altaDehabitacion(){
     this.router.navigate(['/habitacion/alta'])
+  }
+
+  edit(habitacion:Habitacion){
+    const modalRef=this.modalService.open(AltaHabitacionComponent,{ size: 'lg', backdrop:'static' })
+    modalRef.componentInstance.habitacion=habitacion
+    modalRef.componentInstance.edicion=true
+
   }
 
   popDelete(habitacion:Habitacion){

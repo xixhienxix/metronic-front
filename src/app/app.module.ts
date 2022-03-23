@@ -61,6 +61,7 @@ registerLocaleData(localeEs, 'es');
     MomentModule,
     SharedModule,
     MatProgressBarModule,
+    
     // MatTabsModule,
     // MatCheckboxModule,
     // MatExpansionModule,

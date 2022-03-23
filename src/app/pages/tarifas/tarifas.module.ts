@@ -5,7 +5,7 @@ import { InlineSVGModule } from 'ng-inline-svg';
 import { GeneralModule } from '../../_metronic/partials/content/general/general.module';
 import { CRUDTableModule } from '../../_metronic/shared/crud-table';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDatepicker, NgbModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { HighlightModule } from 'ngx-highlightjs';
 // import { ECommerceComponent } from './reportes.component';
 
@@ -35,25 +35,26 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { MatSortModule } from '@angular/material/sort';
-import { TarifarioComponent } from './tarifario/tarifario.component';
 import { TarifasComponent } from './tarifas.component';
 import { TarifasRoutingModule } from './tarifas.routing-module';
+import { TarifaEspecialComponent } from './components/tarifa-especial/tarifa-especial.component';
+import { TarifaExpressComponent } from './components/tarifa-express/tarifa-express.component';
+import { EditExpressComponent } from './components/tarifa-express/edit-express/edit-express.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
 
 @NgModule({
   declarations: [
-   TarifarioComponent,
    TarifasComponent,
+   TarifaEspecialComponent,
+   TarifaExpressComponent,
+   EditExpressComponent
       ],
   imports: [
     MatSlideToggleModule,
-    CommonModule,
-    FormsModule,
     GeneralModule,
     HighlightModule,
-    CRUDTableModule,
     NgbNavModule,
     NgbTooltipModule,
     CommonModule,
@@ -72,11 +73,7 @@ registerLocaleData(localeEs);
     MatAutocompleteModule,
     MatSelectModule,
     MatListModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatToolbarModule,
-    MatFormFieldModule,
-    MatSelectModule,
     MatDialogModule,
     MatInputModule,
     MatRadioModule,
@@ -84,7 +81,8 @@ registerLocaleData(localeEs);
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatSortModule,
-    TarifasRoutingModule
+    TarifasRoutingModule,
+    NgbModule,
 
        // RouterModule.forChild([
     //   {
@@ -95,12 +93,12 @@ registerLocaleData(localeEs);
   ],
 
   entryComponents: [
-    
+
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' },
 ]
 })
-@Injectable({
-  providedIn: 'root',
-})
+// @Injectable({
+//   providedIn: 'root',
+// })
 export class TarifasModule {}

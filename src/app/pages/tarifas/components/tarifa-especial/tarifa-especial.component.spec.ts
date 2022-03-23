@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TarifarioComponent } from './tarifario.component';
+import { TarifaEspecialComponent } from './tarifa-especial.component';
 
-describe('TarifarioComponent', () => {
-  let component: TarifarioComponent;
-  let fixture: ComponentFixture<TarifarioComponent>;
+describe('TarifaEspecialComponent', () => {
+  let component: TarifaEspecialComponent;
+  let fixture: ComponentFixture<TarifaEspecialComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TarifarioComponent ]
+      declarations: [ TarifaEspecialComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TarifarioComponent);
+    fixture = TestBed.createComponent(TarifaEspecialComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

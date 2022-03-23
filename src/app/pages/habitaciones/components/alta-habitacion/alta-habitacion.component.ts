@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, Form, FormArray, FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 import { Adicional } from '../../_models/adicionales';
@@ -22,7 +22,8 @@ type listaCamas = {key:number;value:string;cantidad:number}
 @Component({
   selector: 'app-alta-habitacion',
   templateUrl: './alta-habitacion.component.html',
-  styleUrls: ['./alta-habitacion.component.scss']
+  styleUrls: ['./alta-habitacion.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AltaHabitacionComponent implements OnInit {
 
@@ -31,6 +32,7 @@ export class AltaHabitacionComponent implements OnInit {
 
   /**Modal */
   closeResult:string
+  habitacion:Habitacion;
 
   /**FormControl */
   formGroup:FormGroup
@@ -56,6 +58,9 @@ export class AltaHabitacionComponent implements OnInit {
   loadingAdicionales:boolean=true
   checkBox:boolean=false
   nombresIguales:boolean=false
+  edicion:boolean=false
+  inicio:boolean=true
+  editarHab:boolean=false
 
   //VALORES DEFAULT
   quantity:number=1;
@@ -71,7 +76,8 @@ export class AltaHabitacionComponent implements OnInit {
     public tiposHabitacionService:TiposService,
     public modalService : NgbModal,
     public habitacionService:HabitacionesService,
-    public router : Router
+    public router : Router,
+    public modal:NgbActiveModal
   ) { 
 
   }
@@ -82,6 +88,7 @@ export class AltaHabitacionComponent implements OnInit {
     this.getAmenidades();
     this.getCamas();
     
+    console.log(this.edicion)
 
     this.formGroup = this.fb.group({
       nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100),NoWhiteSpacesValidator.cannotContainSpace])],
@@ -91,12 +98,26 @@ export class AltaHabitacionComponent implements OnInit {
       extras: [0, Validators.required],
       vista: [''],
       inventario: [1, Validators.required],
+      orden:[1,Validators.required],
       nombreHabs: this.fb.array([])
     })
 
     this.inputForm = this.fb.group({
       nombreHabs: ['',],
     });
+
+    if(this.habitacion!=undefined){
+      this.editarHab=true
+      this.f.nombre.patchValue(this.habitacion.Codigo)
+      this.f.tipo.patchValue(this.habitacion.Tipo)
+      this.f.descripcion.patchValue(this.habitacion.Descripcion)
+      this.f.personas.patchValue(this.habitacion.Personas)
+      this.f.extras.patchValue(this.habitacion.Personas_Extra)
+      this.f.vista.patchValue(this.habitacion.Vista)
+      this.f.inventario.patchValue(this.habitacion.Inventario)
+
+      // this.formGroup.controls["nombreHabs"].patchValue(this.habitacion.Tipos_Camas)
+    }
 
     this.inputs.push(this.inputForm);
 
@@ -218,7 +239,8 @@ export class AltaHabitacionComponent implements OnInit {
     this.formGroup.controls['tipo'].patchValue('')
     this.formGroup.controls['nombre'].patchValue('')
     this.formGroup.controls['vista'].patchValue('')
-    
+    this.formGroup.controls['orden'].patchValue('')
+
     this.quantity=1
     this.quantityExtra=0
     this.formGroup.controls['personas'].patchValue(this.quantity)
@@ -226,14 +248,25 @@ export class AltaHabitacionComponent implements OnInit {
     // this.formGroup.controls['inventario'].patchValue(1)
     this.camasArr=[]
     // this.amenidadesArr=[]
-    this.inputs.reset();
-    this.amenidadesFC.reset();
-    this.camasFC.reset();
+    // this.inputs.reset();
+    // this.amenidadesFC.reset();
+    // this.camasFC.reset();
+    this.amenidadesArr=[]
+    this.resultLocation=[]
+    this.getAmenidades()
+    this.disponiblesIndexadosCamas=[]
+    this.resultLocationCamas=[]
+    this.getCamas()
+
+    this.f.tipo.patchValue(0)
+    this.camasFC.markAsUntouched();
+    this.amenidadesFC.markAsUntouched();
   
   }
 
   onSubmit(){
     let habitacionNueva:Habitacion
+    this.inicio=false
 
     if(this.formGroup.invalid){
       this.findInvalidControls()
@@ -254,7 +287,30 @@ export class AltaHabitacionComponent implements OnInit {
     //     }
     //   }
     // }
+    let conteoCamas=0;
 
+  for(let y=0;y<this.camasFC.value.length; y++){
+    let numero
+    numero=parseInt(this.camasFC.value[y].split(' ')[0])
+    conteoCamas=numero+conteoCamas
+  }
+
+  if(this.editarHab==true){
+    habitacionNueva = {
+      Codigo:this.formGroup.value.nombre,
+      Numero:this.habitacion.Numero,
+      Descripcion:this.formGroup.value.descripcion,
+      Tipo:this.formGroup.value.tipo,
+      Personas:this.formGroup.value.personas,
+      Personas_Extra:this.formGroup.value.extras,
+      Inventario:this.formGroup.value.inventario,
+      Vista:this.formGroup.value.vista,
+      Camas:conteoCamas,
+      Tipos_Camas:this.camasFC.value,
+      Amenidades:this.amenidadesFC.value,
+      Orden:this.formGroup.value.orden
+    }
+  }else {
     habitacionNueva = {
       Codigo:this.formGroup.value.nombre,
       Numero:this.formGroup.value.nombreHabs,
@@ -264,11 +320,14 @@ export class AltaHabitacionComponent implements OnInit {
       Personas_Extra:this.formGroup.value.extras,
       Inventario:this.formGroup.value.inventario,
       Vista:this.formGroup.value.vista,
-      Camas:this.camasFC.value,
+      Camas:conteoCamas,
+      Tipos_Camas:this.camasFC.value,
       Amenidades:this.amenidadesFC.value,
+      Orden:this.formGroup.value.orden
     }
+  }
 
-    const sb =  this.habitacionService.postHabitacion(habitacionNueva).subscribe(
+    const sb =  this.habitacionService.postHabitacion(habitacionNueva,this.editarHab).subscribe(
       (value)=>{
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Exito'
@@ -281,8 +340,11 @@ export class AltaHabitacionComponent implements OnInit {
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
-          
-          this.resetForm();
+          if(this.editarHab==true){
+            this.modal.close()
+          }else{
+            this.resetForm();
+          }
 
         },
       (error)=>{

@@ -2,19 +2,23 @@
 <div class="card card-custom gutter-b">
     <div class="card-header">
      <div class="card-title">
-      <h3 class="card-label">
+      <h3 *ngIf="editarHab===false" class="card-label">
         Nueva Habitación
+      </h3>
+      <h3 *ngIf="editarHab===true" class="card-label">
+        Editar Habitación
       </h3>
      </div>
     </div>
+    
     <div class="float-container">
         <form [formGroup]="formGroup" >
-
-        <div class="float-child"> <!--First Container-->
+        <div [style.width]="editarHab===true ? '100%' : '50%'" class="float-child"> <!--First Container-->
                     <div class="row col-lg-12">
                         <div class="form-group col-lg-12">
                             <label style="color:#00506a; font-weight: bold;">Nombre de la Habitación</label>
                             <input 
+                                [attr.disabled]="editarHab ? false : null"
                                 formControlName="nombre" 
                                 style="background-color: #e6e9ed;" 
                                 class="form-control"
@@ -44,20 +48,38 @@
                               </div>
                         </div>
                     </div>
+                    <div *ngIf="editarHab == true" class="row col-lg-12">
+                        <div class="form-group col-lg-12">
+                            <label style="color:#00506a; font-weight: bold;">Número de la Habitación</label>
+                            <input 
+                                [value]="habitacion.Numero"
+                                [attr.disabled]="editarHab ? false : null"
+                                style="background-color: #e6e9ed;" 
+                                class="form-control"
+                                disabled>
+                        </div>
+                    </div>
                     <div class="row col-lg-12">
                         <div class="form-group col-lg-12">
                             <label style="color:#00506a; font-weight: bold;">Tipo de la Habitación</label>
-                            <mat-select #tipodeCuartoDropDown
-                            class="form-control form-control-lg "
-                            formControlName="tipo"
-                            placeholder="-- Seleccione Tipo de Habitación -- " 
-                            required
-                            [class.is-invalid]="isControlInvalid('tipo')"
-                            [class.is-valid]="isControlValid('tipo')"
-                            >
-                            <mat-option value="0">-- Selecciona Tipo de Habitación --</mat-option>
-                                <mat-option *ngFor="let tipoCuarto of tiposArr" [value]="tipoCuarto.Descripcion">{{tipoCuarto.Descripcion}} </mat-option>
-                            </mat-select>                        
+                            <div class="input-group">
+                                <mat-select #tipodeCuartoDropDown
+                                class="form-control form-control-lg "
+                                formControlName="tipo"
+                                placeholder="-- Seleccione Tipo de Habitación -- " 
+                                required
+                                [class.is-invalid]="isControlInvalid('tipo')"
+                                [class.is-valid]="isControlValid('tipo')"
+                                >
+                                <mat-option value="0">-- Selecciona Tipo de Habitación --</mat-option>
+                                    <mat-option *ngFor="let tipoCuarto of tiposArr" [value]="tipoCuarto.Descripcion">{{tipoCuarto.Descripcion}} </mat-option>
+                                </mat-select> 
+                                <div class="input-group-append">
+                                    <button (click)="getTiposHAB()" class="btn btn-secondary">
+                                        <i class="ki ki-reload" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>                       
                         </div>
                         <div
                                 class="invalid-feedback"
@@ -109,7 +131,7 @@
                 </div>
                 <div class="row col-lg-12">
                     <div class="form-group col-lg-6">
-                        <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Capacidad de Personas</label> -->
+                        <label style="color:#00506a; font-weight: bold;" class="form-label">Capacidad de Personas</label>
                             <div class="input-group">
                                 <div class="input-group-append">
                                     <button style="background-color: transparent;border-right: 2px solid #e6e9ed; border-left: 2px solid #dadcdf; border-top : 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minus()" type="button" ng-click="countVal=countVal+1">
@@ -138,7 +160,7 @@
                     </div>
         
                     <div class="form-group col-lg-6">
-                        <!-- <label style="color:#00506a; font-weight: bold;" class="form-label">Maximo de Personas Extra</label> -->
+                        <label style="color:#00506a; font-weight: bold;" class="form-label">Maximo de Personas Extra</label>
                             <div class="input-group">
                                 <div class="input-group-append">
                                     <button style="background-color: transparent; border-left: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="minusExtra()" type="button">
@@ -198,9 +220,8 @@
                                     <mat-option #matOption [value]="amenidades.Descripcion" *ngFor="let amenidades of amenidadesArr; let i = index" >{{amenidades.Descripcion}}</mat-option>
                                   </div>
                                 </mat-select>
-                                <div class="input-group-append">
-
-                                <button class="btn btn-secondary">
+                            <div class="input-group-append">
+                                <button (click)="getAmenidades()" class="btn btn-secondary">
                                     <i class="ki ki-reload" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -216,6 +237,8 @@
                                 #camasSelect
                                 multiple
                                 class="form-control form-control-lg"
+                                [class.is-invalid]="resultLocationCamas.length==0 && inicio!=true"
+                                [class.is-valid]="resultLocationCamas.length!=0 && inicio!=true"
                                 [formControl]="camasFC"                               
                                 [(ngModel)]="resultLocationCamas">
                                 <footer class="col-sm-12">
@@ -238,12 +261,11 @@
                                 </mat-select-trigger>
                       
                                   <div>
-                                    <mat-option (click)="$event.stopPropagation();" #matOption [value]="inputOption.value +' '+ camas.value" *ngFor="let camas of disponiblesIndexadosCamas; let i = index" [attr.data-index]="i"><input #inputOption [value]="camas.cantidad" style="width:25%; box-sizing: border-box;" class="col-sm-2" placeholder="Cant." (click)="$event.stopPropagation();" type="number" min="1">{{camas.value}} </mat-option>
+                                    <mat-option (click)="$event.stopPropagation();" #matOption [value]="inputOption.value +' '+ camas.value" *ngFor="let camas of disponiblesIndexadosCamas; let i = index" [attr.data-index]="i"><input #inputOption [value]="camas.cantidad" style="width:30%; box-sizing: border-box;" class="col-sm-3" placeholder="Cant." (click)="$event.stopPropagation();" type="number" min="1">{{camas.value}} </mat-option>
                                   </div>
                                 </mat-select>
-                                <div class="input-group-append">
-
-                                <button class="btn btn-secondary">
+                            <div class="input-group-append">
+                                <button (click)="getCamas()" class="btn btn-secondary">
                                     <i class="ki ki-reload" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -257,79 +279,94 @@
                         <input formControlName="vista" style="background-color: #e6e9ed;" class="form-control">
                     </div>
                 </div>
-
         </div> <!--End First Container-->
         
-        <div class="float-child"> <!---Right Container-->
-            <div class="col-md-12">
-                <label style="color:#00506a; font-weight: bold;">Generar Habitaciones (Inventario)</label>
-                <p>¿Cuantas habitaciones fisicas tendrá este tipo de habitación?
-                Las habitaciones fisicas se crearan automaticamente en el Calendario
-                Una vez guardada la habitación, podra ir a tarifas para asignarlas</p>
-            </div>   
-            <br>     
-            <div class="input-group">
-                <div class="input-group-append">
-                    <button style="background-color: transparent;border-right: 2px solid #e6e9ed; border-left: 2px solid #dadcdf; border-top : 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="removeInput()" type="button">
-                        <i class="fa fa-minus">
-                        </i>
-                    </button>
+        <div [style.width]="editarHab==true ? '100%' : '50%'" class="float-child"> <!---Right Container-->
+            <ng-container *ngIf="editarHab==false">
+                <div class="col-md-12">
+                    <label style="color:#00506a; font-weight: bold;">Generar Habitaciones (Inventario)</label>
+                    <p>¿Cuantas habitaciones fisicas tendrá este tipo de habitación?
+                    Las habitaciones fisicas se crearan automaticamente en el Calendario
+                    Una vez guardada la habitación, podra ir a tarifas para asignarlas</p>
+                </div>   
+                <br>     
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <button style="background-color: transparent;border-right: 2px solid #e6e9ed; border-left: 2px solid #dadcdf; border-top : 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="removeInput()" type="button">
+                            <i class="fa fa-minus">
+                            </i>
+                        </button>
+                    </div>
+                        <input
+                        style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;  border-left: 2px solid #e6e9ed;"
+                        class="text-center input-group form-control form-control-lg form-control-solid"
+                        placeholder=""
+                        disabled
+                        formControlName="inventario"
+                        [value]="quantityInv"
+                        [class.is-invalid]="isControlInvalid('personas')"
+                        [class.is-valid]="isControlValid('personas')"
+                        >
+        
+                    <div class="input-group-append">
+                        <button style="border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; background-color: transparent;" class="btn btn-secondary" (click)="addInput()" type="button">
+                            <i class="fa fa-plus">
+                            </i>
+                        </button>
+                    </div>
+                </div> 
+                <br>
+                <div class="form-group col-md-12" style="font-weight: bold;">
+                    <mat-checkbox #checked >¿Deseas asignar Numeración o Nombre Especiales? </mat-checkbox>
+                </div> 
+                <div class="form-group col-md-12" style="font-weight: bold;">
+                    <small class="col-lg-12" style="color: red;" *ngIf="nombresIguales">Los Nombres de las habitaciones no pueden ser identicos</small>
                 </div>
-                    <input
-                    style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;  border-left: 2px solid #e6e9ed;"
-                    class="text-center input-group form-control form-control-lg form-control-solid"
-                    placeholder=""
-                    disabled
-                    formControlName="inventario"
-                    [value]="quantityInv"
-                    [class.is-invalid]="isControlInvalid('personas')"
-                    [class.is-valid]="isControlValid('personas')"
-                    >
+                <ng-container *ngIf="checked.checked">
+                    <ng-container formArrayName="lessons">
+                        <ng-container *ngFor="let inputForm of inputs.controls; let i = index">
+                            <div [formGroup]="inputForm" class="form-group" style="float:left; margin: 5px;">
+                                <input 
+                                formControlName="nombreHabs"
+                                placeholder="{{i+1}}.-" 
+                                style="background-color: #e6e9ed;" 
+                                class="form-control"
+                                type="text"
+                                [class.is-invalid]="nombresIguales">
+                            </div>
+                        </ng-container> 
+                    </ng-container>       
+                </ng-container> 
     
-                <div class="input-group-append">
-                    <button style="border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; background-color: transparent;" class="btn btn-secondary" (click)="addInput()" type="button">
-                        <i class="fa fa-plus">
-                        </i>
-                    </button>
+                <br> 
+            </ng-container>
+            
+            <div class="row col-lg-12">
+                <div class="form-group col-lg-12">
+                    <label style="color:#00506a; font-weight: bold;">Orden de Visualizacion en el Calendario</label>
+                    <input 
+                    formControlName="orden" 
+                    style="background-color: #e6e9ed;" 
+                    class="form-control"
+                    [class.is-invalid]="isControlInvalid('orden')"
+                    [class.is-valid]="isControlValid('orden')">
                 </div>
-            </div> 
-            <br>
-            <div class="form-group col-md-12" style="font-weight: bold;">
-                <mat-checkbox #checked >¿Deseas asignar Numeración o Nombre Especiales? </mat-checkbox>
-            </div> 
-            <div class="form-group col-md-12" style="font-weight: bold;">
-                <small class="col-lg-12" style="color: red;" *ngIf="nombresIguales">Los Nombres de las habitaciones no pueden ser identicos</small>
-            </div>
-            <ng-container *ngIf="checked.checked">
-                <ng-container formArrayName="lessons">
-                    <ng-container *ngFor="let inputForm of inputs.controls; let i = index">
-                        <div [formGroup]="inputForm" class="form-group" style="float:left; margin: 5px;">
-                            <input 
-                            formControlName="nombreHabs"
-                            placeholder="{{i+1}}.-" 
-                            style="background-color: #e6e9ed;" 
-                            class="form-control"
-                            type="text"
-                            [class.is-invalid]="nombresIguales">
-                        </div>
-                    </ng-container> 
-                </ng-container>       
-            </ng-container> 
-
-            <br> 
-            <div class="row form-group col-md-12">
-                <label style="color:#00506a; font-weight: bold;">Orden de Visualizacion en el Calendario</label>
-                <input  style="background-color: #e6e9ed;" class="form-control">
             </div>  
-            <br>
-            <div class="row form-group col-md-12">
-                <label style="color:#00506a; font-weight: bold;">Fotografias de la Habitación</label>
-            </div>  
-            <div class="row form-group col-lg-12" >
-                <button type="file" id="image" 
-                name="image" value="" style="background: url(../../../../../assets/media/misc/upload_img_button.jpg); background-size: 276px 86px; height: 86px; width: 276px;">
-                </button>
-            </div>
+                <br>
+                <ng-container>
+                <div class="row col-lg-12">
+                    <div class="form-group col-lg-12">
+                    <label style="color:#00506a; font-weight: bold;">Fotografias de la Habitación</label>
+                    </div>
+                </div>  
+                <div class="row col-lg-12">
+                    <div class="form-group col-lg-12">                    
+                    <button type="file" id="image" 
+                    name="image" value="" style="background: url(../../../../../assets/media/misc/upload_img_button.jpg); background-size: 276px 86px; height: 86px; width: 276px;">
+                    </button>
+                    </div>
+                </div>
+            </ng-container>
         </div><!--Fin de containr izquierdo-->
         </form>
     </div><!--Fin  FloatContainer-->
