@@ -13,37 +13,45 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./modules/errors/errors.module').then((m) => m.ErrorsModule),
   },
+  // {
+  //   path: 'tarifas',
+  //   canActivate:[AuthGuard], 
+  //   loadChildren: () => 
+  //     import('./pages/tarifas/tarifas.module').then(m => m.TarifasModule)
+  // },
   {
     path: '',
     canActivate: [AuthGuard],
     loadChildren: () =>
       import('./pages/layout.module').then((m) => m.LayoutModule),
   },
-  {
-    path:'tarifas',
-    canActivate: [AuthGuard],
-    redirectTo: 'tarifas/tarifario' 
-  },
-  {
-  path:'reportes',
-  canActivate: [AuthGuard],
-  redirectTo: 'reportes/customers' 
-  },
-  {
-    path:'parametros',
-    canActivate: [AuthGuard],
-    redirectTo: 'parametros' 
-  },
+
+  //  {
+  // path:'reportes',
+  // canActivate: [AuthGuard],
+  // redirectTo: 'reportes/customers' 
+  // },
+  // {
+  //   path:'tarifas',
+  //   canActivate: [AuthGuard],
+  //   redirectTo: 'tarifas/tarifario' 
+  // },
+  // {
+  //   path:'parametros',
+  //   canActivate: [AuthGuard],
+  //   redirectTo: 'parametros' 
+  // },
+  // {
+  //   path:'habitacion',
+  //   canActivate: [AuthGuard],
+  //   redirectTo: 'habitacion/main' 
+  // }, 
   // {
   //   path:'clientes',
   //   canActivate: [AuthGuard],
   //   redirectTo: 'reportes/clientes' 
   // },
-  {
-    path:'habitacion',
-    canActivate: [AuthGuard],
-    redirectTo: 'habitacion/main' 
-  },
+
   { path: '**',   
   redirectTo: 'auth/login' 
 },

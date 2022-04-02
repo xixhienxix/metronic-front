@@ -65,7 +65,6 @@ import { HttpClientModule } from '@angular/common/http';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatSortModule,
-    TarifasRoutingModule,
   ],
   exports:[LoadingSpinnerComponent]
 

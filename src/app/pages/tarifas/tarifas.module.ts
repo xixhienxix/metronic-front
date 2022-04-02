@@ -40,6 +40,7 @@ import { TarifasRoutingModule } from './tarifas.routing-module';
 import { TarifaEspecialComponent } from './components/tarifa-especial/tarifa-especial.component';
 import { TarifaExpressComponent } from './components/tarifa-express/tarifa-express.component';
 import { EditExpressComponent } from './components/tarifa-express/edit-express/edit-express.component';
+import { MainComponent } from './components/main/main.component';
 
 // the second parameter 'fr' is optional
 registerLocaleData(localeEs);
@@ -49,7 +50,8 @@ registerLocaleData(localeEs);
    TarifasComponent,
    TarifaEspecialComponent,
    TarifaExpressComponent,
-   EditExpressComponent
+   EditExpressComponent,
+   MainComponent
       ],
   imports: [
     MatSlideToggleModule,
@@ -84,12 +86,6 @@ registerLocaleData(localeEs);
     TarifasRoutingModule,
     NgbModule,
 
-       // RouterModule.forChild([
-    //   {
-    //     path: '',
-    //     component: ReportesComponent,
-    //   },
-    // ]),
   ],
 
   entryComponents: [
