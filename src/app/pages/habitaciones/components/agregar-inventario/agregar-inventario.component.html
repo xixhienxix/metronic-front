@@ -147,3 +147,8 @@
 <div class="card-footer col-lg-12">
     <button style="float:right; margin: 5px;" class="btn btn-primary" (click)="onSubmit()">ACEPTAR</button>
 </div>
+
+
+<ng-container *ngIf="isLoading">
+    <app-loader-spinner></app-loader-spinner>
+  </ng-container>

@@ -38,7 +38,7 @@ export class AgregarInventarioComponent implements OnInit {
   /**DOM */
   nombresIguales:boolean=false
   closeResult:string;
-
+  isLoading:boolean=false
   
   constructor(public modal : NgbActiveModal,
     public fb : FormBuilder,
@@ -97,9 +97,11 @@ export class AgregarInventarioComponent implements OnInit {
         Amenidades:this.habitacion.Amenidades,
         Orden:this.habitacion.Orden
       }
+      this.isLoading=true
 
       const sb =  this.habitacionService.agregarInventario(habitacionNueva,this.habitacion.Inventario).subscribe(
         (value)=>{
+          this.isLoading=false
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Habitación(es) Generadas con éxito'          
@@ -115,6 +117,7 @@ export class AgregarInventarioComponent implements OnInit {
 
           },
         (error)=>{
+          this.isLoading=false
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Error'
           modalRef.componentInstance.mensaje='No se pudo guardar la habitación intente de nuevo mas tarde'

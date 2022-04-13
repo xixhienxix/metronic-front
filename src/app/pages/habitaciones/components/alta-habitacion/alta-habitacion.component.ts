@@ -61,6 +61,7 @@ export class AltaHabitacionComponent implements OnInit {
   edicion:boolean=false
   inicio:boolean=true
   editarHab:boolean=false
+  isLoading:boolean=false
 
   //VALORES DEFAULT
   quantity:number=1;
@@ -316,9 +317,10 @@ export class AltaHabitacionComponent implements OnInit {
       Orden:this.formGroup.value.orden
     }
   }
-
+this.isLoading=true
     const sb =  this.habitacionService.postHabitacion(habitacionNueva,this.editarHab).subscribe(
       (value)=>{
+        this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Habitación(es) Generadas con éxito'          
@@ -350,6 +352,7 @@ export class AltaHabitacionComponent implements OnInit {
             modalRef.close('Close click');
           },4000)
           return
+          this.isLoading=false
       }
     )   
   }
