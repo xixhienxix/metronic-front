@@ -276,17 +276,7 @@ export class AltaHabitacionComponent implements OnInit {
       return
     }
     let codigo = this.formGroup.value.nombre.trim('')
-    // for(let i=0; i<this.formGroup.controls.nombreHabs.value.length;i++){
-    //   for(let x=1;x<this.formGroup.controls.nombreHabs.value.length;x++){
-    //     if(this.formGroup.controls.nombreHabs.value[i].nombreHabs==this.formGroup.controls.nombreHabs.value[x].nombreHabs)
-    //     {
-    //       if(this.formGroup.controls.nombreHabs.value[i].nombreHabs!=''){
-    //         this.nombresIguales=true
-    //         return
-    //       }
-    //     }
-    //   }
-    // }
+
     let conteoCamas=0;
 
   for(let y=0;y<this.camasFC.value.length; y++){

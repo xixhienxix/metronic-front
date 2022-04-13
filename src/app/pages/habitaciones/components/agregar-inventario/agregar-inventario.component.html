@@ -1,0 +1,149 @@
+
+<div class="card card-custom gutter-b">
+    <div class="card-header">
+     <div class="card-title">
+      <h3 class="card-label">
+        Agregar inventario 
+      </h3>
+      <button style="background-color:#fa6d7c; font-weight: bold; color: white; 
+        line-height: 12px;
+    width: 18px;
+    font-size: 8pt;
+    font-family: tahoma;
+    margin-top: 1px;
+    margin-right: 2px;
+    position:absolute;
+    top:0;
+    right:0;" class="btn" (click)="closeModal()"> X </button>
+
+     </div>
+    </div>
+    <div class="card-header">
+        <div class="card-title">
+         <h3 style="font-weight:bold" class="card-label">
+           {{habitacion.Codigo}}
+         </h3>   
+        </div>
+       </div>
+
+</div>
+<div class="float-container">
+    <form [formGroup]="formGroup" >
+        <!-- <div class="row col-lg-12">
+            <div class="form-group col-lg-12">
+                <label style="color:#00506a; font-weight: bold;">Etiqueta de la Habitación</label>
+                <input 
+                    formControlName="etiqueta" 
+                    style="background-color: #e6e9ed;" 
+                    class="form-control"
+                    [class.is-invalid]="isControlInvalid('etiqueta')"
+                    [class.is-valid]="isControlValid('etiqueta')">
+                    <div 
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('cannotContainSpace','etiqueta')"
+                    >La Etiqueta no puede contener espacio en blanco, utilize '_' en su lugar</div>
+                    <div
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('required', 'etiqueta')"
+                  >
+                    La Etiqueta del Cuarto es requerido
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('minlength', 'etiqueta')"
+                  >
+                    El minimo de caracteres para la Etiqueta son 3
+                  </div>
+                  <div
+                    class="invalid-feedback"
+                    *ngIf="controlHasError('maxlength', 'etiqueta')"
+                  >
+                    El Maximó de caracteres para la Etiqueta son 100
+                  </div>
+            </div>
+        </div> -->
+        <!-- <div class="row col-lg-12">
+            <div class="form-group col-lg-12">
+                <label style="color:#00506a; font-weight: bold;">Tipo de la Habitación</label>
+                <div class="input-group">
+                    <mat-select #tipodeCuartoDropDown
+                    class="form-control form-control-lg "
+                    formControlName="tipo"
+                    placeholder="-- Seleccione Tipo de Habitación -- " 
+                    required
+                    [class.is-invalid]="isControlInvalid('tipo')"
+                    [class.is-valid]="isControlValid('tipo')"
+                    >
+                    <mat-option value="0">-- Selecciona Tipo de Habitación --</mat-option>
+                        <mat-option *ngFor="let tipoCuarto of tiposArr" [value]="tipoCuarto.Descripcion">{{tipoCuarto.Descripcion}} </mat-option>
+                    </mat-select> 
+                    <div class="input-group-append">
+                        <button (click)="getTiposHAB()" class="btn btn-secondary">
+                            <i class="ki ki-reload" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>                       
+            </div>
+        </div> -->
+                <div class="col-md-12">
+                    <label style="color:#00506a; font-weight: bold;">Generar Habitaciones (Inventario)</label>
+                    <p>¿Cuantas habitaciones fisicas tendrá este tipo de habitación?
+                    Las habitaciones fisicas se crearan automaticamente en el Calendario
+                    Una vez guardada la habitación, podra ir a tarifas para asignarlas</p>
+                </div>   
+                <br>     
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <button style="background-color: transparent;border-right: 2px solid #e6e9ed; border-left: 2px solid #dadcdf; border-top : 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;" class="btn btn-secondary" (click)="removeInput()" type="button">
+                            <i class="fa fa-minus">
+                            </i>
+                        </button>
+                    </div>
+                        <input
+                        style="background-color: #e6e9ed; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf;  border-left: 2px solid #e6e9ed;"
+                        class="text-center input-group form-control form-control-lg form-control-solid"
+                        placeholder=""
+                        disabled
+                        formControlName="inventario"
+                        [value]="quantityInv"
+                        >
+        
+                    <div class="input-group-append">
+                        <button style="border-right: 2px solid #dadcdf; border-top: 2px solid #dadcdf; border-bottom: 2px solid #dadcdf; background-color: transparent;" class="btn btn-secondary" (click)="addInput()" type="button">
+                            <i class="fa fa-plus">
+                            </i>
+                        </button>
+                    </div>
+                </div> 
+                <br>
+                <div class="form-group col-md-12" style="font-weight: bold;">
+                    <mat-checkbox #checked >¿Deseas asignar Numeración o Nombre Especiales? </mat-checkbox>
+                </div> 
+                <div class="form-group col-md-12" style="font-weight: bold;">
+                    <small class="col-lg-12" style="color: red;" *ngIf="nombresIguales">Los Nombres de las habitaciones no pueden ser identicos</small>
+                </div>
+                <div class="input-group">
+                    <ng-container *ngIf="checked.checked">
+                        <ng-container *ngFor="let inputForm of inputs.controls; let i = index">
+                            <div [formGroup]="inputForm" class="form-group" style="float:left; margin: 5px;">
+                                <input 
+                                formControlName="nombreHabs"
+                                placeholder="{{i+1}}.-" 
+                                style="background-color: #e6e9ed;" 
+                                class="form-control"
+                                type="text"
+                                [class.is-invalid]="nombresIguales">
+                            </div>
+                        </ng-container> 
+                </ng-container> 
+                </div>
+               
+                <br> 
+    </form>
+</div><!--Fin  FloatContainer-->
+
+    
+
+<div class="card-footer col-lg-12">
+    <button style="float:right; margin: 5px;" class="btn btn-primary" (click)="onSubmit()">ACEPTAR</button>
+</div>

@@ -39,6 +39,8 @@ import { CRUDTableModule } from 'src/app/_metronic/shared/crud-table';
 import { AltaHabitacionComponent } from './components/alta-habitacion/alta-habitacion.component';
 import { HabitacionMainComponent } from './main/habitacion-main/habitacion-main.component';
 import { LoadingComponent } from './_helpers/loading/loading.component';
+import { AgregarInventarioComponent } from './components/agregar-inventario/agregar-inventario.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 
 @NgModule({
@@ -47,9 +49,11 @@ import { LoadingComponent } from './_helpers/loading/loading.component';
    AltaHabitacionComponent,
    HabitacionMainComponent,
    LoadingComponent,
+   AgregarInventarioComponent,
    
       ],
   imports: [
+    SharedModule,
     MatSlideToggleModule,
     CommonModule,
     FormsModule,

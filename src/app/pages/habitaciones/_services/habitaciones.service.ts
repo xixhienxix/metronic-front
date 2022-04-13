@@ -75,6 +75,8 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
    }
 
+   
+
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Habitacion>> {
     return this.http.get<Habitacion[]>(this.API_URL).pipe(
@@ -127,6 +129,10 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   postHabitacion(habitacion:Habitacion,editar:boolean){
     return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar})
+  }
+
+  agregarInventario(habitacion:Habitacion,inventario:number){
+    return this.http.post(environment.apiUrl+'/habitacion/agregar',{habitacion,inventario})
   }
 
   buscarHabitacion(habitacion:Habitacion){

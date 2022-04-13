@@ -50,14 +50,21 @@
                     </div>
                     <div *ngIf="editarHab == true" class="row col-lg-12">
                         <div class="form-group col-lg-12">
-                            <label style="color:#00506a; font-weight: bold;">Número de la Habitación</label>
+                            <label style="color:#00506a; font-weight: bold;">Nombre/Número de la Habitación</label>
                             <input 
                                 [value]="habitacion.Numero"
                                 [attr.disabled]="editarHab ? false : null"
                                 style="background-color: #e6e9ed;" 
                                 class="form-control"
-                                disabled>
+                                >
                         </div>
+                    </div>
+                    <div *ngIf="editarHab == false" class="form-group col-lg-12">
+                        <label style="color:#00506a; font-weight: bold;">Nombre/Número de la Habitación</label>
+                        <input 
+                            style="background-color: #e6e9ed;" 
+                            class="form-control"
+                            >
                     </div>
                     <div class="row col-lg-12">
                         <div class="form-group col-lg-12">
@@ -304,8 +311,6 @@
                         disabled
                         formControlName="inventario"
                         [value]="quantityInv"
-                        [class.is-invalid]="isControlInvalid('personas')"
-                        [class.is-valid]="isControlValid('personas')"
                         >
         
                     <div class="input-group-append">
@@ -323,7 +328,6 @@
                     <small class="col-lg-12" style="color: red;" *ngIf="nombresIguales">Los Nombres de las habitaciones no pueden ser identicos</small>
                 </div>
                 <ng-container *ngIf="checked.checked">
-                    <ng-container formArrayName="lessons">
                         <ng-container *ngFor="let inputForm of inputs.controls; let i = index">
                             <div [formGroup]="inputForm" class="form-group" style="float:left; margin: 5px;">
                                 <input 
@@ -335,7 +339,6 @@
                                 [class.is-invalid]="nombresIguales">
                             </div>
                         </ng-container> 
-                    </ng-container>       
                 </ng-container> 
     
                 <br> 

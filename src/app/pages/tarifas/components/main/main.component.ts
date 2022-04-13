@@ -10,6 +10,7 @@ import { TarifaEspecialComponent } from '../tarifa-especial/tarifa-especial.comp
 import { TarifaExpressComponent } from '../tarifa-express/tarifa-express.component';
 import { Tarifas } from '../../_models/tarifas'; 
 import { TarifasService } from '../../_services/tarifas.service';
+import { EditExpressComponent } from '../tarifa-express/edit-express/edit-express.component';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -238,12 +239,13 @@ export class MainComponent implements OnInit {
     
   }
 
-  editarTarifaExpress(){
-
+  editarTarifaExpress(row:any){
+    const modalref = this.modalService.open(EditExpressComponent,{size:'lg',backdrop:'static'})
+    modalref.componentInstance.tarifa=row
   }
 
-  editTarifaEspecial(){
-1
+  editTarifaEspecial(row:any){
+
   }
 
   nuevaTarifaExpress(){
