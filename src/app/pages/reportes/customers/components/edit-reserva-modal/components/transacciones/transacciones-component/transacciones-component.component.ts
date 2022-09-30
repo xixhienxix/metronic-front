@@ -22,43 +22,7 @@ import {DateTime} from 'luxon'
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { DivisasService } from 'src/app/pages/parametros/_services/divisas.service';
 
-const EMPTY_CUSTOMER: Huesped = {
-  id:undefined,
-  folio:undefined,
-  adultos:1,
-  ninos:1,
-  nombre: '',
-  estatus:'',
-  // llegada: date.getDay().toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
-  // salida: (date.getDay()+1).toString()+'/'+date.getMonth()+'/'+date.getFullYear(),
-  llegada:'',
-  salida:'',
-  noches: 1,
-  tarifa:500,
-  porPagar: 500,
-  pendiente:500,
-  origen: 'Online',
-  habitacion: "",
-  telefono:"",
-  email:"",
-  motivo:"",
-  //OTROS DATOs
-  fechaNacimiento:'',
-  trabajaEn:'',
-  tipoDeID:'',
-  numeroDeID:'',
-  direccion:'',
-  pais:'',
-  ciudad:'',
-  codigoPostal:'',
-  lenguaje:'Español',
-  numeroCuarto:0,
-  creada:'',
-  tipoHuesped:"Regular",
-  notas:'',
-  vip:'',
-  ID_Socio:0
-};
+
 
 @Component({
   selector: 'app-transacciones-component',

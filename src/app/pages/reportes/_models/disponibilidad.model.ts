@@ -3,7 +3,7 @@ import { BaseModel } from '../../../_metronic/shared/crud-table';
 export interface Disponibilidad extends BaseModel
 {
   Cuarto:string,
-  Habitacion:number,
+  Habitacion:string,
   Estatus:number,
   Dia:number,
   Mes:number,

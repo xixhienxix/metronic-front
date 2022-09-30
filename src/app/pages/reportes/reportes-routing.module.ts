@@ -3,8 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { ReportesComponent } from './reportes.component';
 import { CustomersComponent } from './customers/customers.component';
-import { ProductsComponent } from './products/products.component';
-import { ProductEditComponent } from './products/product-edit/product-edit.component';
+
+
 import { ClientesComponent } from './clientes/clientes.component';
 // import { TarifarioComponent } from '../tarifas/tarifario/tarifario.component';
 
@@ -21,22 +21,7 @@ const routes: Routes = [
         path: 'clientes',
         component: ClientesComponent,
       },
-      {
-        path: 'products',
-        component: ProductsComponent,
-      },
-      {
-        path: 'product/add',
-        component: ProductEditComponent
-      },
-      {
-        path: 'product/edit',
-        component: ProductEditComponent
-      },
-      {
-        path: 'product/edit/:id',
-        component: ProductEditComponent
-      },
+
 
       { path: '', redirectTo: 'customers', pathMatch: 'full' },
       { path: '**', redirectTo: 'customers', pathMatch: 'full' },

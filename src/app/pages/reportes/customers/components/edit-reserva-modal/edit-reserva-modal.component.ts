@@ -39,7 +39,7 @@ import { SaldoCuentaComponent } from './components/_helpers/saldo-cuenta/saldo-c
 const DISPONIBILIDAD_DEFAULT:Disponibilidad ={
 id:1,
 Cuarto:'',
-Habitacion:100,
+Habitacion:'100',
 Estatus:1,
 Dia:1,
 Mes:1,
@@ -58,7 +58,7 @@ const EMPTY_CUSTOMER: Huesped = {
   llegada:'',
   salida:'',
   noches: 1,
-  tarifa:500,
+  tarifa:'Tarifa Estandar',
   porPagar: 500,
   pendiente:500,
   origen: 'Online',
@@ -76,7 +76,7 @@ const EMPTY_CUSTOMER: Huesped = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'Español',
-  numeroCuarto:0,
+  numeroCuarto:'0',
   creada:'',
   tipoHuesped:"Regular",
   notas:'',
@@ -622,7 +622,7 @@ export class EditReservaModalComponent implements OnInit {
 
             if(nochesAlojadas==0){this.nochesReales=1}
 
-            this.totalAlojamientoNuevo = this.huesped.tarifa*this.nochesReales
+            this.totalAlojamientoNuevo = 0//this.huesped.tarifa*this.nochesReales
 
             const cargosSinAlojamiento:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(cargos => cargos.Cargo > 0 && cargos.Descripcion !='Alojamiento');
             const abonos:edoCuenta[] = this.estadoDeCuentaService.currentCuentaValue.filter(abonos=> abonos.Abono>0)

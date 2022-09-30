@@ -60,6 +60,7 @@ export class MainComponent implements OnInit {
     const sb =this.tarifasService.getNotification().subscribe(data=>{
       if(data)
       {
+        this.dataSourceEspecial.data=[]
         this.getTarifasRack();
         this.getTarifas();
       }
@@ -79,6 +80,7 @@ export class MainComponent implements OnInit {
 
   getTarifasRack(){
     this.tarifaRackArr=[]
+    this.dataSource.data=[]
     this.tarifaRackCompleto=[]
     this.tarifasService.getTarifaRack().subscribe(
       (value)=>{
@@ -97,10 +99,7 @@ export class MainComponent implements OnInit {
                   EstanciaMinima:value[e].EstanciaMinima,
                   EstanciaMaxima:value[e].EstanciaMaxima,
                   TarifaRack:value[e].TarifaRack,
-                  Tarifa1Persona:value[e].Tarifa1Persona,
-                  Tarifa2Persona:value[e].Tarifa2Persona,
-                  Tarifa3Persona:value[e].Tarifa3Persona,
-                  Tarifa4Persona:value[e].Tarifa4Persona,
+                  TarifaxPersona:value[e].TarifaxPersona,
                   Dias:value[e].Dias,
                   Estado:value[e].Estado==true ? 'Activa' : 'No Activa'
               }
@@ -119,7 +118,9 @@ export class MainComponent implements OnInit {
   }
 
   getTarifas(){
+    this.dataSourceEspecial.data=[]
     this.tarifaEspecialArray=[]
+    this.tarifaRackCompleto=[]
     this.tarifasService.getAll().subscribe(
       (value)=>{
         for(let i=0;i<value.length;i++){
@@ -127,7 +128,14 @@ export class MainComponent implements OnInit {
             this.tarifaEspecialArray.push(value[i])
           }
         }
-        this.dataSourceEspecial.data=this.tarifaEspecialArray
+        /*Borra Duplicados*/
+        var borraDuplicados = this.tarifaEspecialArray.filter((value, index, self) =>
+        index === self.findIndex((t) => (
+          t.Tarifa === value.Tarifa
+          ))
+      )
+      /** */
+        this.dataSourceEspecial.data=borraDuplicados
       },
       (error)=>{
 
@@ -142,12 +150,29 @@ export class MainComponent implements OnInit {
           if(result=='Aceptar')        
           {
             this.deleteTarifaRack(habitacion)
-
+            this.tarifaEspecialArray=[]
           } 
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
           });
+
+  }
+
+  promtDeleteEspecial(element:Tarifas){
+    const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+    modalRef.componentInstance.alertHeader = 'Advertencia'
+    modalRef.componentInstance.mensaje='Estas seguro que deseas eliminar la "'+element.Tarifa+'"'          
+    modalRef.result.then((result) => {
+      if(result=='Aceptar')        
+      {
+        this.deleteTarifaRackEspecial(element)
+        this.tarifaEspecialArray=[]
+      } 
+      this.closeResult = `Closed with: ${result}`;
+      }, (reason) => {
+          this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      });
   }
 
   deleteTarifaRack(habitacion:string){
@@ -192,10 +217,7 @@ export class MainComponent implements OnInit {
               EstanciaMinima:this.tarifaRackCompleto[i].EstanciaMinima,
               EstanciaMaxima:this.tarifaRackCompleto[i].EstanciaMaxima,
               TarifaRack:this.tarifaRackCompleto[i].TarifaRack,
-              Tarifa1Persona:this.tarifaRackCompleto[i].Tarifa1Persona,
-              Tarifa2Persona:this.tarifaRackCompleto[i].Tarifa2Persona,
-              Tarifa3Persona:this.tarifaRackCompleto[i].Tarifa3Persona,
-              Tarifa4Persona:this.tarifaRackCompleto[i].Tarifa4Persona,
+              TarifaxPersona:this.tarifaRackCompleto[i].TarifaxPersona,
               Dias:this.options,
               Estado:true
           }
@@ -239,6 +261,40 @@ export class MainComponent implements OnInit {
     
   }
 
+  deleteTarifaRackEspecial(element:Tarifas){
+    this.tarifasService.deleteTarifaEspecial(element).subscribe(
+      (value)=>{
+        this.getTarifas();
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje='Tarifa Eliminada con éxito'          
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+          this.tarifasService.sendNotification(true);
+        
+      },
+      (error)=>{
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader = 'Error'
+        modalRef.componentInstance.mensaje='No se pudo eliminar la tarifa intente de nuevo mas tarde'
+        modalRef.result.then((result) => {
+          this.closeResult = `Closed with: ${result}`;
+          }, (reason) => {
+              this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+          });
+          setTimeout(() => {
+            modalRef.close('Close click');
+          },4000)
+          return
+      })
+  }
+
   editarTarifaExpress(row:any){
     const modalref = this.modalService.open(EditExpressComponent,{size:'lg',backdrop:'static'})
     modalref.componentInstance.tarifa=row
@@ -275,23 +331,5 @@ export class MainComponent implements OnInit {
         return  `with: ${reason}`;
     }
   }
-  // sorting
-  // sort(column: string) {
-  //   const sorting = this.sorting;
-  //   const isActiveColumn = sorting.column === column;
-  //   if (!isActiveColumn) {
-  //     sorting.column = column;
-  //     sorting.direction = 'desc';
-  //   } else {
-  //     sorting.direction = sorting.direction === 'desc' ? 'asc' : 'desc';
-  //   }
-  //   this.tarifasService.patchState({ sorting });
-  // }
-
-  // pagination
-  // paginate(paginator: PaginatorState) {
-  //   this.tarifasService.patchState({ paginator });
-  // }
-
 
 }

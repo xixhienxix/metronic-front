@@ -13,7 +13,7 @@ export class DisponibilidadService {
   private mySet = new Set();
   private dispo:any[] = []
 
-  getDisponibilidadCompleta(llegada:string,salida:string,tipoCuarto:string,numeroCuarto:number,dias:number,folio:number){
+  getDisponibilidadCompleta(llegada:string,salida:string,tipoCuarto:string,numeroCuarto:string,dias:number,folio:number){
     const params = new HttpParams()
     .set('llegada', llegada)
     .set('salida', salida)
@@ -62,7 +62,7 @@ export class DisponibilidadService {
     return this.http.put(environment.apiUrl+"/update/disponibilidad",disponibilidad)
    }
   
-   getEstatusAmaDeLlaves(dia:number,mes:number,ano:number,numeroCuarto:number,habitacion:string){
+   getEstatusAmaDeLlaves(dia:number,mes:number,ano:number,numeroCuarto:string,habitacion:string){
     
     let parametros = {
       dia:dia,

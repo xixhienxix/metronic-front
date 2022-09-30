@@ -2,7 +2,7 @@
     <div class="card-header">
       <div class="card-title ">
         <h3 class="card-label">Tarifas</h3>
-        <button style="position: absolute; right: 0px; margin: 10px;" class="btn btn-danger" (click)="nuevaTarifaExpress()">Nueva Tarifa Express</button>
+        <button disabled style="position: absolute; right: 0px; margin: 10px;" class="btn btn-danger" (click)="nuevaTarifaExpress()">Nueva Tarifa Express</button>
       </div>
 
     </div> 
@@ -59,7 +59,7 @@
           <!-- Estancia Column -->
           <ng-container matColumnDef="Estancia">
             <th mat-header-cell *matHeaderCellDef> Min/Max </th>
-            <td mat-cell *matCellDef="let element"> {{element.EstanciaMinima}}/{{element.EstanciaMaxima}}  </td>
+            <td mat-cell *matCellDef="let element"> {{element.EstanciaMinima}}/{{element.EstanciaMaxima ? 0 : '-'}}  </td>
           </ng-container>
 
           <!-- Estancia Column -->
@@ -171,7 +171,7 @@
                 </a>
             
                 <a title="Borrar Tarifa" class="btn btn-icon btn-light btn-hover-danger btn-sm">
-                  <span (click)="promtDelete(element.Habitacion)" [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
+                  <span (click)="promtDeleteEspecial(element)" [inlineSVG]="'./assets/media/svg/icons/General/Trash.svg'" cacheSVG="true"
                     class="svg-icon svg-icon-md svg-icon-danger">
                   </span>
                 </a>   

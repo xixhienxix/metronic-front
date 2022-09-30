@@ -32,7 +32,7 @@ const EMPTY_CUSTOMER: Huesped = {
   llegada:'',
   salida:'',
   noches: 1,
-  tarifa:500,
+  tarifa:'Tarifa Estandar',
   porPagar: 500,
   pendiente:500,
   origen: 'Online',
@@ -50,7 +50,7 @@ const EMPTY_CUSTOMER: Huesped = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'Español',
-  numeroCuarto:0,
+  numeroCuarto:'0',
   creada:'',
   tipoHuesped:"Regular"
 };

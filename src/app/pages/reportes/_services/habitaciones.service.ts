@@ -37,7 +37,7 @@ export class HabitacionesService {
     .get<Habitaciones[]>(environment.apiUrl + '/reportes/habitaciones')
   }
 
-  getInfoHabitaciones(numero:number,tipo:string) :Observable<Habitaciones[]> {
+  getInfoHabitaciones(numero:string,tipo:string) :Observable<Habitaciones[]> {
     const params = new HttpParams()
     .set('numero', numero.toString())
     .set('tipo', tipo)

@@ -66,7 +66,7 @@ export class ModificaHuespedComponent implements OnInit {
   isLoading:boolean=false;
 
   cuarto:string;
-  numCuartoNumber:number;
+  numCuartoNumber:string;
   tarifa:number;
   codigoCuartoString:string;
   codigo:any[]=[]
@@ -330,7 +330,7 @@ export class ModificaHuespedComponent implements OnInit {
   }
 
 
-    habitacionSeleccionada(cuarto:number,codigo:string,tarifa:number){
+    habitacionSeleccionada(cuarto:string,codigo:string,tarifa:number){
       this.numCuartoNumber=cuarto;
       this.codigoCuartoString=codigo;
       this.tarifa=tarifa;
@@ -376,11 +376,11 @@ export class ModificaHuespedComponent implements OnInit {
       (value)=>{
         
     this.huesped.noches=this.diaDif
-    this.huesped.tarifa=this.tarifa
+    this.huesped.tarifa=''
     this.huesped.habitacion=this.codigoCuartoString
     this.huesped.numeroCuarto=this.numCuartoNumber,
-    this.huesped.pendiente=this.huesped.tarifa*this.diaDif
-    this.huesped.porPagar=this.huesped.tarifa*this.diaDif
+    this.huesped.pendiente=0
+    this.huesped.porPagar=0
 
     
     this.huesped.llegada=this.comparadorInicial.day+'/'+this.comparadorInicial.month+'/'+this.comparadorInicial.year

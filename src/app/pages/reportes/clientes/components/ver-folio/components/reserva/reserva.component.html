@@ -110,7 +110,7 @@
         class="form-control"
         type="text"
         value="$ {{
-          ((historicoService.getCurrentClienteValue.tarifa)).toLocaleString('es-MX')
+          ((historicoService.getCurrentClienteValue.tarifa)).toLocaleString()
         }}    MXN"
       />
     </div>
@@ -124,10 +124,10 @@
         style="width: 150px"
         class="form-control"
         type="text"
-        value="$ {{
-          (historicoService.getCurrentClienteValue.tarifa * historicoService.getCurrentClienteValue.noches).toLocaleString('es-MX')
-        }}    MXN"
-      />
+
+      /><!--        value="$ {{
+        (historicoService.getCurrentClienteValue.tarifa * historicoService.getCurrentClienteValue.noches).toLocaleString()
+      }}    MXN"-->
     </div>
   </div>
 

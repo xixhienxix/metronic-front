@@ -110,7 +110,7 @@
         class="form-control"
         type="text"
         value="$ {{
-          ((huesped.tarifa)).toLocaleString('es-MX')
+          ((huesped.tarifa)).toLocaleString()
         }}    MXN"
       />
     </div>
@@ -124,10 +124,11 @@
         style="width: 150px"
         class="form-control"
         type="text"
-        value="$ {{
-          (huesped.tarifa * huesped.noches).toLocaleString('es-MX')
-        }}    MXN"
+
       />
+      <!--         value="$ {{
+          (huesped.tarifa * huesped.noches).toLocaleString()
+        }}    MXN" -->
     </div>
   </div>
 

@@ -95,7 +95,8 @@ export class AgregarInventarioComponent implements OnInit {
         Camas:this.habitacion.Camas,
         Tipos_Camas:this.habitacion.Tipos_Camas,
         Amenidades:this.habitacion.Amenidades,
-        Orden:this.habitacion.Orden
+        Orden:this.habitacion.Orden,
+        Tarifa:this.habitacion.Tarifa
       }
       this.isLoading=true
 

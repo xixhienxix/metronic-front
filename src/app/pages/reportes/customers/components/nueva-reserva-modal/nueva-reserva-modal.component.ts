@@ -36,10 +36,36 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Historico } from '../../../_models/historico.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { TarifaService } from '../../../_services/tarifas.service';
+import { Tarifas } from '../../../_models/tarifas';
 
 // const todayDate = new Date();
 
 // const todayString = todayDate.getUTCDate()+"/"+todayDate.getUTCMonth()+"/"+todayDate.getUTCFullYear()+"-"+todayDate.getUTCHours()+":"+todayDate.getUTCMinutes()+":"+todayDate.getUTCSeconds()
+type days = {
+  name:string,
+  value:number,
+  checked:boolean
+}
+type tarifarioTabla={
+  Habitacion:string,
+  Tarifa:string,
+  Dias:{
+    name: string;
+    value: number;
+    checked: boolean;
+}[],
+  Estado:string,
+  EstanciaMaxima:number,
+  EstanciaMinima:number,
+  Llegada:string,
+  Plan:string,
+  Politicas:string,
+  Salida:string,
+  TarifaxPersona:number[]
+  Tarifa_Promedio:number,
+  TarifaRack:number
+}
 
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
@@ -51,7 +77,7 @@ const EMPTY_CUSTOMER: Huesped = {
   llegada:'',
   salida:'',
   noches: 1,
-  tarifa:500,
+  tarifa:'',
   porPagar: 500,
   pendiente:500,
   origen: '',
@@ -69,7 +95,7 @@ const EMPTY_CUSTOMER: Huesped = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'Español',
-  numeroCuarto: 0,
+  numeroCuarto: '0',
   creada:'',
   tipoHuesped:"Regular",
   notas:'',
@@ -132,7 +158,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   hoveredDate: NgbDate | null = null;
   
   ToDoListForm:any;
-  diaDif:number;
+  diaDif:number=1;
 
   closeResult: string;
   minDate:NgbDateStruct;
@@ -141,6 +167,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   public dialog: MatDialog
   searchGroup: FormGroup;
   mySet = new Set();
+  cuartosUnicos=[]
   maxAdultos:number=6;
   maxNinos:number=6;
   bandera:boolean=false;
@@ -159,6 +186,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   searchValue:string='';
   dropDownHabValueIndex:any
   origenReserva='Online'
+  cuartoSeleccionado:any
+
+  personas:number=1
+  ninos:number=0
 
   /*FECHAS*/
   today: DateTime | null;
@@ -183,10 +214,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
   noDisabledCheckIn:boolean;
   hiddenCliente:boolean=true;
   hiddenClienteTable:boolean=false;
-  
+  maximoDePersonas:boolean=false
+  styleDisponibilidad:string='background-color:#99d284;'
 
 /**Models */
-public listaHistorico:Historico[]=[];
+  public listaHistorico:Historico[]=[];
   public folios:Foliador[]=[];
   public cuartos:Habitaciones[]=[];
   public codigoCuarto:Habitaciones[]=[];
@@ -199,6 +231,20 @@ public listaHistorico:Historico[]=[];
   public listaFolios:Foliador[];
   estatusID:number;
   personasXCuarto:any[]=[];
+  tarifasArray:tarifarioTabla[]=[];
+  tarifasArrayCompleto:tarifarioTabla[]=[];
+  tarifaSeleccionada:any=[];
+  tarifaEstandarSeleccionada:tarifarioTabla
+  inforCuartoyNombre:any=[]
+  dias:days[]=[
+    // {name:'Lun',value:0},
+    // {name:'Mar',value:1},
+    // {name:'Mie',value:2},
+    // {name:'Jue',value:3},
+    // {name:'Vie',value:4},
+    // {name:'Sab',value:5},
+    // {name:'Dom',value:6}
+  ]
 
   
   /**Clienter Distinguido */
@@ -207,13 +253,17 @@ public listaHistorico:Historico[]=[];
   telefonoHistorico:string
   id_Socio:number=0
 
+  /**Datatable */
+  displayedColumnsTarifa: string[] = ['Tarifa', '$ Noche Prom.', 'Total'];
+  dataSourceTarifa = new MatTableDataSource<any[]>();
+
     /*Subscriptions*/
   private subscriptions: Subscription[] = [];
   
 /**MAT TABLE */
-displayedColumns:string[]=['id_Socio','nombre','email','telefono']
-dataSource = new MatTableDataSource<Historico>();
-resultsLength = 0;
+  displayedColumns:string[]=['id_Socio','nombre','email','telefono']
+  dataSource = new MatTableDataSource<Historico>();
+  resultsLength = 0;
   isLoadingResults = true;
   isRateLimitReached = false;
 
@@ -235,6 +285,7 @@ resultsLength = 0;
     public i18n: NgbDatepickerI18n,
     public parametrosService:ParametrosServiceService,
     public divisasService:DivisasService,
+    public tarifasService:TarifaService
     ) {
 
     
@@ -270,6 +321,7 @@ resultsLength = 0;
     this.getDispo();
     this.getFolios();
     this.getEstatus();
+    this.getTarifas();
 
     this.formGroup.controls['habitacion'].setValue(0);
 
@@ -280,7 +332,42 @@ resultsLength = 0;
   }
 
 
+  getTarifas(){
+    this.tarifasService.getTarifas().subscribe(
+      (value)=>{
+        this.tarifasArray=[]
+        if(value){
+          for(let e=0;e<value.length;e++){
+            for(let i=0;i<value[e].Habitacion.length;i++){
+              let tarifario = {
+                  Tarifa:value[e].Tarifa,
+                  Habitacion:value[e].Habitacion[i],
+                  Llegada:value[e].Llegada,
+                  Salida:value[e].Salida,
+                  Plan:value[e].Plan,
+                  Politicas:value[e].Politicas,
+                  EstanciaMinima:value[e].EstanciaMinima,
+                  EstanciaMaxima:value[e].EstanciaMaxima,
+                  TarifaRack:value[e].TarifaRack,
+                  TarifaxPersona:value[e].TarifaxPersona,
+                  Dias:value[e].Dias,
+                  Estado:value[e].Estado==true ? 'Activa' : 'No Activa',
+                  Tarifa_Promedio:0
+              }
+              if(value[e].Estado==true){
+                this.tarifasArray.push(tarifario)
+                this.tarifasArrayCompleto.push(tarifario)
+              }
 
+          }
+        }
+       
+        this.filtrarTarifario()        
+      }
+      },
+      (error)=>{}
+      )
+  }
 
   getHistorico(){
     const sb = this.historicoService.items$.subscribe(
@@ -321,6 +408,69 @@ resultsLength = 0;
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
+  }
+
+  tarifaRadioButton(tarifa:any){
+    this.tarifaSeleccionada=tarifa
+    for(let i=0;i<this.tarifasArrayCompleto.length;i++){
+      if(this.tarifasArrayCompleto[i].Tarifa=='Tarifa Estandar'){
+        for(let x=0;x<this.tarifasArrayCompleto[i].Habitacion.length;x++){
+          if(this.tarifasArrayCompleto[i].Habitacion[x]==this.cuarto){
+            this.tarifaEstandarSeleccionada=this.tarifasArrayCompleto[i]
+          }
+        }
+      }
+    }
+  }
+
+  filtrarTarifario(){
+
+            /**Comparador de Fechas Tarifas */
+            this.tarifasArray=this.tarifasArrayCompleto.filter(d => 
+              {
+                var timeLlegada = DateTime.fromObject({ year: d.Llegada.split("/")[2], month: d.Llegada.split("/")[1], day: d.Llegada.split("/")[0]})
+                var timeSalida = DateTime.fromObject({ year: d.Salida.split("/")[2], month: d.Salida.split("/")[1], day: d.Salida.split("/")[0]})
+                return (this.fromDate >= timeLlegada );
+                // return (this.fromDate >= timeLlegada && this.toDate <= timeSalida);
+              });
+    
+            /**Comparador de Estancias Tarifario */
+            this.tarifasArray=this.tarifasArray.filter(x=>{
+              var estanciaMinima = x.EstanciaMinima
+              var estanciaMaxima = x.EstanciaMaxima
+              if(x.EstanciaMaxima==0){
+                estanciaMaxima=999
+              }
+              return (this.diaDif >= estanciaMinima &&  this.diaDif <= estanciaMaxima  )
+            })
+
+            /**Elimina Tarifas que no apliquen para el dia de llegada */
+            for(let i=0;i<this.tarifasArray.length;i++){
+              if(this.tarifasArray[i].Tarifa!='Tarifa Estandar'){
+                
+                var timeLlegada = DateTime.fromObject({ year: this.tarifasArray[i].Llegada.split("/")[2], month: this.tarifasArray[i].Llegada.split("/")[1], day: this.tarifasArray[i].Llegada.split("/")[0]})
+                var timeSalida = DateTime.fromObject({ year: this.tarifasArray[i].Salida.split("/")[2], month: this.tarifasArray[i].Salida.split("/")[1], day: this.tarifasArray[i].Salida.split("/")[0]})
+                
+                for(let y=this.fromDate;this.fromDate>=timeLlegada;timeLlegada=timeLlegada.plus({ days: 1 })){
+                  if(this.fromDate.hasSame(timeLlegada, 'day') && this.fromDate.hasSame(timeLlegada, 'year') && this.fromDate.hasSame(timeLlegada, 'month')){
+
+                    var diaDeLlegada = this.fromDate.setLocale("es").weekdayShort
+                    var diaDeLlegadaMayus = diaDeLlegada.charAt(0).toUpperCase() + diaDeLlegada.slice(1);
+                    
+                    for(let x=0;x<this.tarifasArray[i].Dias.length;x++){
+                      if(this.tarifasArray[i].Dias[x].name==diaDeLlegadaMayus && this.tarifasArray[i].Dias[x].checked==false){
+                        this.tarifasArray = this.tarifasArray.filter( obj => obj.Tarifa !== this.tarifasArray[i].Tarifa);
+                        break
+                      }
+                    }
+                  }
+                }
+              }
+              /** */
+            }
+ 
+
+
   }
 
   loadCustomer() {
@@ -514,7 +664,7 @@ resultsLength = 0;
     this.huesped.llegada='',
     this.huesped.salida='',
     this.huesped.noches= 1,
-    this.huesped.tarifa=500,
+    this.huesped.tarifa='',
     this.huesped.porPagar= 500,
     this.huesped.pendiente=500,
     this.huesped.origen= '',
@@ -532,7 +682,7 @@ resultsLength = 0;
     this.huesped.ciudad='',
     this.huesped.codigoPostal='',
     this.huesped.lenguaje='Español',
-    this.huesped.numeroCuarto= 0,
+    this.huesped.numeroCuarto= '0',
     this.huesped.creada='',
     this.huesped.tipoHuesped="Regular",
     this.huesped.notas='',
@@ -599,6 +749,54 @@ resultsLength = 0;
 
     const formData = this.formGroup.value;
 
+    /**Tarifas Asignacion */
+    // let fechaInicial = this.fromDate
+    // let fechaFinal = this.toDate
+
+    let pendiente:number=0
+    let porPagar:number=0
+
+    for(let x=0;x<this.diaDif;x++){
+
+      const dia = this.fromDate.weekday
+
+        if(this.tarifaSeleccionada.Dias[dia].checked==true){
+          if(this.huesped.adultos<5){
+            if(this.tarifaSeleccionada.TarifaxPersona.length != 0 ){
+              switch(this.huesped.adultos){
+                case 1:
+                  pendiente+=this.tarifaSeleccionada.TarifaRack
+                  porPagar+=this.tarifaSeleccionada.TarifaRack
+                  break;
+                case 2:
+                  pendiente+=this.tarifaSeleccionada.TarifaxPersona[0]
+                  porPagar+=this.tarifaSeleccionada.TarifaRack[0]
+                  break;
+                case 3:
+                  pendiente+=this.tarifaSeleccionada.TarifaxPersona[3]
+                  porPagar+=this.tarifaSeleccionada.TarifaRack[3]
+                  break;
+                case 4:
+                  pendiente+=this.tarifaSeleccionada.TarifaxPersona[4]
+                  porPagar+=this.tarifaSeleccionada.TarifaRack[4]
+                  break;
+                default:               
+                pendiente+=0
+                porPagar+=0
+                break;
+              }
+              
+            }
+          }            
+        }else{
+          pendiente+=this.tarifaSeleccionada.TarifaRack
+          porPagar+=this.tarifaSeleccionada.TarifaRack
+        }
+
+      // fechaFinal=fechaFinal.plus({days:1})
+    }
+    /** */
+
     for(let habitaciones of this.preAsig)
     {
 
@@ -614,11 +812,11 @@ resultsLength = 0;
       this.huesped.llegada = diaFromDate +"/"+ mesFromDate +"/"+ anoFromDate
       this.huesped.salida = diaToDate +"/"+ mesToDate +"/"+ anoToDate
       this.huesped.nombre = formData.nombre;
-
+      this.huesped.tarifa=this.tarifaSeleccionada.Tarifa
 
         this.huesped.noches=Math.trunc((this.diaDif>=1) ? this.diaDif : (this.diaDif-1))
-        this.huesped.porPagar=this.huesped.tarifa*this.huesped.noches
-        this.huesped.pendiente=this.huesped.tarifa*this.huesped.noches
+        this.huesped.porPagar=porPagar
+        this.huesped.pendiente=pendiente
         this.huesped.habitacion=habitaciones.codigo
         this.huesped.telefono=formData.telefono
         this.huesped.email=formData.email
@@ -774,6 +972,41 @@ resultsLength = 0;
   buscaDispo(codigoCuarto:string)
   {
     this.resetDispo()
+    var maximoDePersonas
+
+    
+    /**Revision de Maximo de Personas */
+
+    if(codigoCuarto=='1'){
+
+      maximoDePersonas=Math.max.apply(Math, this.personasXCuarto.map(function(o) { return o.Personas; }))
+      if(this.quantity>maximoDePersonas){
+        this.maximoDePersonas=true
+        this.styleDisponibilidad='background-color:#fa6d7c;'
+      }else{
+        this.styleDisponibilidad='background-color:#99d284;'
+        this.maximoDePersonas=false
+
+      }
+
+    }else{
+
+      this.cuartoSeleccionado = this.personasXCuarto.filter(d=>{
+        return(d.Codigo==codigoCuarto)
+      })
+
+      if(this.quantity>this.cuartoSeleccionado[0].Personas){
+        this.maximoDePersonas=true
+        this.styleDisponibilidad='background-color:#fa6d7c;'
+      }else{
+        this.styleDisponibilidad='background-color:#99d284;'
+        this.maximoDePersonas=false
+      }
+
+    }
+    /**-------------------------------- */
+
+    this.tarifasArray
 
     this.cuarto=codigoCuarto
     // this.cuartos=this.codigos
@@ -805,10 +1038,29 @@ resultsLength = 0;
         this.accordionDisplay=''
         this.isLoading=false
         this.inicio=false;
+        this.inforCuartoyNombre=[]
+        this.cuartosUnicos=[]
         for(let i=0;i<disponibles.length;i++){
           this.mySet.add(disponibles[i])
         }
+          this.mySet.forEach(element => {
+              this.cuartosUnicos.push(element); // 👉️ one, two, three, four
+        });
+        
+       for(let d=0; d<this.cuartosUnicos.length;d++){
+        for(let g=0;g<this.infoCuarto.length;g++){
+          if(this.cuartosUnicos[d]==this.infoCuarto[g].Numero){
+            this.inforCuartoyNombre.push({
+              nombreHabitacion:this.cuartosUnicos[d],
+              tipodeCuarto:this.infoCuarto[g].Codigo
+            })
+        }
+      }
+       }
+
         this.setStep(1)  
+        
+
       },
       (error)=>{})
     
@@ -818,10 +1070,10 @@ resultsLength = 0;
 
 
 
-  preAsignar(numeroCuarto:number,codigo:string,event,tarifa:number)
+  preAsignar(numeroCuarto:string,codigo:string,event)
   {
 
-    this.huesped.tarifa=tarifa;
+    //  this.huesped.tarifa=;
 
     if(event)
     {
@@ -883,7 +1135,6 @@ resultsLength = 0;
 fechaSeleccionadaInicial(event:NgbDate){
  
   this.resetDispo()
-
   // this.formGroup.get("habitacion").patchValue(0);
   this.formGroup.patchValue({['habitacion']: 0});
 
@@ -894,8 +1145,75 @@ fechaSeleccionadaInicial(event:NgbDate){
 
   this.fechaInicial= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
 
-  let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
-  this.diaDif = diaDif.days
+  let diaDif = this.toDate.diff(this.fromDate, ["days"])
+
+  this.diaDif=Math.ceil(diaDif.days)
+
+  let fechainicial = this.fromDate
+
+  this.filtrarTarifario()
+
+  for(let i=0;i<this.diaDif;i++){
+
+    const dia = fechainicial.weekday
+
+    for(let x=0;x<this.tarifasArray.length;x++){
+      for(let y=0;y<this.tarifasArray[x].Dias.length;y++){
+        if(this.tarifasArray[x].Dias[y].value==dia && this.tarifasArray[x].Dias[y].checked==true){
+          if(this.huesped.adultos<5){
+            // switch (this.huesped.adultos) {
+            //   case 1:
+            //     if(this.tarifasArray[x].Tarifa1Persona!=0){
+            //       pendiente+=this.tarifasArray[x].Tarifa1Persona
+            //       porPagar+=this.tarifasArray[x].Tarifa1Persona
+            //     }else{
+            //       pendiente+=this.tarifasArray[x].TarifaRack
+            //       porPagar+=this.tarifasArray[x].TarifaRack
+            //     }
+            //     break;
+            //   case 2:
+            //     if(this.tarifasArray[x].Tarifa2Persona!=0){
+            //       pendiente+=this.tarifasArray[x].Tarifa2Persona
+            //       porPagar+=this.tarifasArray[x].Tarifa2Persona
+            //     }else{
+            //       pendiente+=this.tarifasArray[x].TarifaRack
+            //       porPagar+=this.tarifasArray[x].TarifaRack
+            //     }
+            //     break;
+            //   case 3:
+            //     if(this.tarifasArray[x].Tarifa3Persona!=0){
+            //       pendiente+=this.tarifasArray[x].Tarifa3Persona
+            //       porPagar+=this.tarifasArray[x].Tarifa3Persona
+            //     }else{
+            //       pendiente+=this.tarifasArray[x].TarifaRack
+            //       porPagar+=this.tarifasArray[x].TarifaRack
+            //     }                
+            //     break;
+            //   case 4:
+            //     if(this.tarifasArray[x].Tarifa4Persona!=0){
+            //       pendiente+=this.tarifasArray[x].Tarifa4Persona
+            //       porPagar+=this.tarifasArray[x].Tarifa4Persona
+            //     }else{
+            //       pendiente+=this.tarifasArray[x].TarifaRack
+            //       porPagar+=this.tarifasArray[x].TarifaRack
+            //     }                
+            //     break;
+
+            //     default:
+            //     break;
+            // }            
+          }
+        }else{
+          // pendiente+=this.tarifasArray[x].TarifaRack
+          // porPagar+=this.tarifasArray[x].TarifaRack
+        }
+        }
+      }
+    
+
+    fechainicial = fechainicial.plus({ days: 1 });
+
+  }
 
   if(this.fromDate.day==this.todayDate.day && this.fromDate.month==this.todayDate.month && this.fromDate.year==this.todayDate.year)
     {this.noDisabledCheckIn=true}
@@ -928,8 +1246,25 @@ fechaSeleccionadaFinal(event:NgbDate){
 
   this.fechaFinal= event.day+" de "+this.i18n.getMonthFullName(event.month)+" del "+event.year
 
-  let diaDif = this.toDate.diff(this.fromDate, ["years", "months", "days", "hours"])
-  this.diaDif = diaDif.days
+  let diaDif = this.toDate.diff(this.fromDate, ["days"])
+
+  this.diaDif=Math.ceil(diaDif.days)
+
+  this.filtrarTarifario()
+        /**Comparador de Fechas Tarifas */
+        // this.tarifasArray=this.tarifasArrayCompleto.filter(d => 
+        //     {
+        //       var timeLlegada = DateTime.fromObject({ year: d.Llegada.split("/")[2], month: d.Llegada.split("/")[1], day: d.Llegada.split("/")[0]})
+        //       var timeSalida = DateTime.fromObject({ year: d.Salida.split("/")[2], month: d.Salida.split("/")[1], day: d.Salida.split("/")[0]})
+        //     return (this.fromDate >= timeLlegada && this.toDate <= timeSalida);
+        // });
+
+        /**Comparador de Estancias Tarifario */
+        // this.tarifasArray=this.tarifasArray.filter(x=>{
+        //   var estanciaMinima = x.EstanciaMinima
+        //   var estanciaMaxima = x.EstanciaMaxima
+        //   return (diaDif.days >= estanciaMinima &&  diaDif.days <= estanciaMaxima  )
+        // })
 
   if(this.fromDate.day==this.todayDate.day && this.fromDate.month==this.todayDate.month && this.fromDate.year==this.todayDate.year)
     {this.noDisabledCheckIn=true}
@@ -957,6 +1292,12 @@ fechaSeleccionadaFinal(event:NgbDate){
 
   plus()
   {
+    this.resetDispo()
+
+    this.formGroup.get("habitacion").patchValue(0);
+
+    this.filtrarTarifario();
+
     if(this.quantity<8){
       this.quantity++;
       this.huesped.adultos=this.quantity
@@ -966,6 +1307,12 @@ fechaSeleccionadaFinal(event:NgbDate){
   }
   minus()
   {
+    this.resetDispo()
+
+    this.formGroup.get("habitacion").patchValue(0);
+
+    this.filtrarTarifario();
+
     if(this.quantity>1)
     {
     this.quantity--;

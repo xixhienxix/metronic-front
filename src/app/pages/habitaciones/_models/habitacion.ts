@@ -14,5 +14,6 @@ export interface Habitacion extends BaseModel
   Camas:number,
   Tipos_Camas:string[],
   Amenidades:string[],
-  Orden:Number
+  Orden:Number,
+  Tarifa:number
 }

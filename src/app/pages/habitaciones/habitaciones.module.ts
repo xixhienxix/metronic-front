@@ -41,7 +41,10 @@ import { HabitacionMainComponent } from './main/habitacion-main/habitacion-main.
 import { LoadingComponent } from './_helpers/loading/loading.component';
 import { AgregarInventarioComponent } from './components/agregar-inventario/agregar-inventario.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-
+import {BlockUIModule} from 'primeng/blockui';
+import {PanelModule} from 'primeng/panel';
+import { ReportesModule } from '../reportes/reportes.module';
+import { InlineSpinnerComponent } from './components/helpers/inline-spinner/inline-spinner.component';
 
 @NgModule({
   declarations: [
@@ -50,9 +53,12 @@ import { SharedModule } from 'src/app/shared/shared.module';
    HabitacionMainComponent,
    LoadingComponent,
    AgregarInventarioComponent,
+   InlineSpinnerComponent,
    
       ],
   imports: [
+    PanelModule,
+    BlockUIModule,
     SharedModule,
     MatSlideToggleModule,
     CommonModule,

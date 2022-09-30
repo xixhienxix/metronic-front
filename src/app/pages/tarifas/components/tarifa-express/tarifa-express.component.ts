@@ -25,13 +25,13 @@ export class TarifaExpressComponent implements OnInit {
 
   /**CheckBoxes */
   options = [
-    {name:'Lun', value:'0', checked:false},
-    {name:'Mar', value:'1', checked:false},
-    {name:'Mie', value:'2', checked:false},
-    {name:'Jue', value:'3', checked:false},
-    {name:'Vie', value:'4', checked:false},
-    {name:'Sab', value:'5', checked:false},
-    {name:'Dom', value:'6', checked:false}
+    {name:'Lun', value:0, checked:false},
+    {name:'Mar', value:1, checked:false},
+    {name:'Mie', value:2, checked:false},
+    {name:'Jue', value:3, checked:false},
+    {name:'Vie', value:4, checked:false},
+    {name:'Sab', value:5, checked:false},
+    {name:'Dom', value:6, checked:false}
   ]
   gratis:boolean=false
   sinRembolso:boolean=false
@@ -48,18 +48,25 @@ export class TarifaExpressComponent implements OnInit {
   
   /**FormGroup */
   tarifaFormGroup:FormGroup
+  preciosFormGroup:FormGroup
   camasFC = new FormControl();
+  precios = new FormArray([]);
+
 
   /**Models & Arrays */
   codigoCuarto:Habitacion[]=[]
   tipodeCaurto:string;
   resultLocationCamas = []
   disponiblesIndexadosCamas:listaCamas[]=[]
+  cuartosArray:Habitacion[]=[]
+  numbers
+  tarifas = []
 
   /**Variables */
   closeResult:string
   plan:string="No Aplica"
   camaFCVacio:boolean=false
+  maximoDePersonas:number
 
   /**DOM */
   tarifaEspecialYVariantes:boolean=false
@@ -99,20 +106,34 @@ export class TarifaExpressComponent implements OnInit {
               .map(opt => opt.value)
   }
 
+  get f(){
+    return this.tarifaFormGroup.controls;
+  }
+
+
 
   ngOnInit(): void {
     this.tarifaFormGroup = this.fb.group({
       tarifaRack:[0,Validators.required],
       minima:[1,Validators.required],
-      maxima:[1,Validators.required],
-      precio1:[0],
-      precio2:[0],
-      precio3:[0],
-      precio4:[0],
+      maxima:[0,Validators.required],
+    })
+    this.preciosFormGroup = this.fb.group({
+      precios: this.fb.array([])
     })
 
-
+    this.getHabitaciones();
     this.getCodigosCuarto();
+  }
+
+  getHabitaciones(){
+    const sb = this.habitacionService.getAll().subscribe(
+      (res)=>{
+        this.cuartosArray=res
+      },
+      (error)=>{
+
+      })
   }
 
   //Date Helpers
@@ -166,25 +187,54 @@ export class TarifaExpressComponent implements OnInit {
   }
 
   tarifaEspecial(event:MatCheckboxChange){
-    if(event.checked){
-      this.tarifaEspecialYVariantes=true
-    }else
-    {
-      this.tarifaEspecialYVariantes=false
+    if(!event.checked){
+      this.precios.clear();
+    }else{
+
+      var cuartosFiltrados:Habitacion[]=[];
+      let filtro
+  
+      for(let j=0;j<this.resultLocationCamas.length;j++){
+  
+         filtro = this.cuartosArray.find(object => {
+          return object.Codigo == this.resultLocationCamas[j];
+        });
+        
+        cuartosFiltrados.push(filtro)
+  
+  
+      }
+  
+      if(cuartosFiltrados.length==0){
+        this.maximoDePersonas=cuartosFiltrados[0].Personas
+      }else{
+        this.maximoDePersonas= Math.max(...cuartosFiltrados.map(o => o.Personas))
+        
+      }
+      this.numbers = Array(this.maximoDePersonas);
+      this.numbers = this.numbers.fill().map((x,i)=>i)
+  
+      for(let e=0; e<this.numbers.length;e++){
+        this.precios.push(new FormControl(''));
+      }
+  
+      if(event.checked){
+        this.tarifaEspecialYVariantes=true
+      }else
+      {
+        this.tarifaEspecialYVariantes=false
+      }
+  
     }
+
   }
 
   onSubmit(){
 
-    // if(this.tarifaFormGroup.invalid){
-    //   Object.keys(this.tarifaFormGroup.controls).forEach(key => {
-    //     this.tarifaFormGroup.get(key).markAsDirty();
-    //   });
-    //   return
-    // }
 
     let fromDate = this.fromDate.day+"/"+this.fromDate.month+"/"+this.fromDate.year
     let toDate = this.toDate.day+"/"+this.toDate.month+"/"+this.toDate.year
+
 
     if(this.resultLocationCamas.length==0){
       this.camaFCVacio=true
@@ -202,11 +252,9 @@ export class TarifaExpressComponent implements OnInit {
       EstanciaMaxima:this.formControls['maxima'].value,
       Estado:true,
       TarifaRack:this.formControls['tarifaRack'].value,
-      Tarifa1Persona:this.formControls['precio1'].value,
-      Tarifa2Persona:this.formControls['precio2'].value,
-      Tarifa3Persona:this.formControls['precio3'].value,
-      Tarifa4Persona:this.formControls['precio4'].value,
-      Dias:this.options
+      TarifaxPersona:this.precios.value,
+      Dias:this.options,
+      Descuento:0
     }
 
     this.tarifasService.postTarifa(tarifa).subscribe(
@@ -223,7 +271,8 @@ export class TarifaExpressComponent implements OnInit {
             modalRef.close('Close click');
           },4000)
           this.tarifasService.sendNotification(true)
-          this.modal.close()
+          this.modal.close();
+          
       },
       (error)=>{
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })

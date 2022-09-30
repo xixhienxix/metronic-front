@@ -22,7 +22,7 @@ const routes: Routes = [
         import('./habitaciones/habitaciones.module').then((m) => m.HabitacionesModule),
       },
       {
-        path:'tarifas',
+        path:'tarifas/tarifario',
         loadChildren:()=>
         import('./tarifas/tarifas.module').then((m) => m.TarifasModule),
       },
@@ -109,4 +109,3 @@ const routes: Routes = [
   exports: [RouterModule],
 })
 export class PagesRoutingModule { }
-

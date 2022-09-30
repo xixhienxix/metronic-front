@@ -14,6 +14,11 @@ import { Tipos_Habitacion } from '../../_models/tipos';
 import { HabitacionesService } from '../../_services/habitaciones.service';
 import { TiposService } from '../../_services/tipos.service';
 import { NoWhiteSpacesValidator } from '../../_validators/nonwhitespaces.validator/nonwhitespaces.validator.component';
+import { DateTime } from 'luxon'
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
+import { Tarifas } from 'src/app/pages/reportes/_models/tarifas';
+import { TarifasService } from 'src/app/pages/tarifas/_services/tarifas.service';
+import { Disponibilidad } from 'src/app/pages/reportes/_models/disponibilidad.model';
 
 type listaAmenidades = {key:number;value:string}
 type listaCamas = {key:number;value:string;cantidad:number}
@@ -46,6 +51,7 @@ export class AltaHabitacionComponent implements OnInit {
   amenidadesArr:Amenidades[]=[]
   disponiblesIndexados:listaAmenidades[]=[]
   disponiblesIndexadosCamas:listaCamas[]=[]
+  disponibilidadNuevaGeneral:Disponibilidad[]=[]
   resultLocation = []
   resultLocationCamas = []
   resultAdicionales = []
@@ -53,6 +59,10 @@ export class AltaHabitacionComponent implements OnInit {
   camasArr:Adicional[]=[]
   // inventarioArr:number[]=[1]
   nombreHabs:[]=[]
+
+  /**DateTime */
+  toDate: DateTime;
+  fromDate:DateTime
 
   /*DOM*/
   loadingAdicionales:boolean=true
@@ -62,6 +72,16 @@ export class AltaHabitacionComponent implements OnInit {
   inicio:boolean=true
   editarHab:boolean=false
   isLoading:boolean=false
+  reload:boolean=false
+
+  /**FLAGS DE Generacion */
+  habitacionGenerada:boolean = false
+  tarifaGenerada:boolean = false
+  disponibilidadGenerada:boolean = false
+  mensajeDeHabitacionGenerada:string=''
+  mensajeDeTarifaGenerada:string=''
+  mensajeDeDisponibilidadGenerada:string=''
+
 
   //VALORES DEFAULT
   quantity:number=1;
@@ -78,9 +98,15 @@ export class AltaHabitacionComponent implements OnInit {
     public modalService : NgbModal,
     public habitacionService:HabitacionesService,
     public router : Router,
-    public modal:NgbActiveModal
+    public modal:NgbActiveModal,
+    public tarifasService:TarifasService,
+    public parametrosService:ParametrosServiceService
+    
   ) { 
-
+    this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+    this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+    this.toDate = this.toDate.plus({ days: 1 });
+    
   }
 
   ngOnInit(): void {
@@ -89,7 +115,6 @@ export class AltaHabitacionComponent implements OnInit {
     this.getAmenidades();
     this.getCamas();
     
-    console.log(this.edicion)
 
     this.formGroup = this.fb.group({
       nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100),NoWhiteSpacesValidator.cannotContainSpace])],
@@ -100,7 +125,9 @@ export class AltaHabitacionComponent implements OnInit {
       vista: [''],
       inventario: [1, Validators.required],
       orden:[1,Validators.required],
-      nombreHabs: this.fb.array([])
+      nombreHabs: this.fb.array([]),
+      tarifaBase:[0,Validators.required],
+      etiqueta:[0,Validators.required]
     })
 
     this.inputForm = this.fb.group({
@@ -115,25 +142,16 @@ export class AltaHabitacionComponent implements OnInit {
       this.f.personas.patchValue(this.habitacion.Personas)
       this.f.extras.patchValue(this.habitacion.Personas_Extra)
       this.f.vista.patchValue(this.habitacion.Vista)
+      this.f.tarifaBase.patchValue(this.habitacion.Tarifa)
       this.f.inventario.patchValue(this.habitacion.Inventario)
+      this.f.etiqueta.patchValue(this.habitacion.Numero)
 
       // this.formGroup.controls["nombreHabs"].patchValue(this.habitacion.Tipos_Camas)
     }
 
     this.inputs.push(this.inputForm);
 
-    // this.formGroup.controls['inventario'].valueChanges.subscribe(
-    //   (value)=>{
-    //     this.inventarioArr=[]
-    //     for(let i=value;i>0; i--)
-    //     this.inventarioArr.push(i)
-    //     this.inventarioArr.sort(function(a, b) {
-    //       return a - b;
-    //     });
-    //   },
-    //   (error)=>{
 
-    //   })
     
   }
 
@@ -159,15 +177,18 @@ export class AltaHabitacionComponent implements OnInit {
   }
 
   getAmenidades(){
+    this.reload=true;
     const sb = this.tiposHabitacionService.getAmenidades().subscribe(
       (value)=>{ 
-        if(value){this.amenidadesArr=value} 
+        this.reload=false
 
+        if(value){this.amenidadesArr=value} 
         for(let i=0;i<value.length;i++){
           this.disponiblesIndexados.push({key:i,value:value[i].Descripcion})
         }
     },
     (error)=>{
+      this.reload=false
 
     }
     )
@@ -276,6 +297,8 @@ export class AltaHabitacionComponent implements OnInit {
       });
       return
     }
+    this.closeModal();
+
     let codigo = this.formGroup.value.nombre.trim('')
 
     let conteoCamas=0;
@@ -288,8 +311,9 @@ export class AltaHabitacionComponent implements OnInit {
 
   if(this.editarHab==true){
     habitacionNueva = {
+      _id:this.habitacion._id,
       Codigo:this.formGroup.value.nombre,
-      Numero:this.habitacion.Numero,
+      Numero:this.formGroup.value.etiqueta,
       Descripcion:this.formGroup.value.descripcion,
       Tipo:this.formGroup.value.tipo,
       Personas:this.formGroup.value.personas,
@@ -299,7 +323,8 @@ export class AltaHabitacionComponent implements OnInit {
       Camas:conteoCamas,
       Tipos_Camas:this.camasFC.value,
       Amenidades:this.amenidadesFC.value,
-      Orden:this.formGroup.value.orden
+      Orden:this.formGroup.value.orden,
+      Tarifa:this.formGroup.value.tarifaBase
     }
   }else {
     habitacionNueva = {
@@ -314,16 +339,95 @@ export class AltaHabitacionComponent implements OnInit {
       Camas:conteoCamas,
       Tipos_Camas:this.camasFC.value,
       Amenidades:this.amenidadesFC.value,
-      Orden:this.formGroup.value.orden
+      Orden:this.formGroup.value.orden,
+      Tarifa:this.formGroup.value.tarifaBase
     }
   }
 this.isLoading=true
     const sb =  this.habitacionService.postHabitacion(habitacionNueva,this.editarHab).subscribe(
       (value)=>{
-        this.isLoading=false
-        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-        modalRef.componentInstance.alertHeader = 'Exito'
-        modalRef.componentInstance.mensaje='Habitación(es) Generadas con éxito'          
+        let dispo:Disponibilidad
+        this.habitacionGenerada = true
+        this.mensajeDeHabitacionGenerada='Habitación(es) Generadas con éxito'
+
+
+        this.habitacionService.creaDisponibilidad(this.formGroup.value.nombreHabs,this.formGroup.value.nombre).subscribe(
+          (value)=>{
+            this.isLoading=false
+            console.log(value)
+        },
+        (error)=>{
+
+        })
+    
+        let fromDate = this.fromDate.day+"/"+this.fromDate.month+"/"+this.fromDate.year
+        let toDate = this.toDate.day+"/"+this.toDate.month+"/"+this.toDate.year+1
+    
+        let tarifa :Tarifas= {
+          Tarifa:'Tarifa Estandar',
+          Habitacion:this.formGroup.value.nombre,
+          Llegada:fromDate,
+          Salida:toDate,
+          Plan:'Ninguno',
+          Politicas:'Ninguno',
+          EstanciaMinima:1,
+          EstanciaMaxima:0,
+          Estado:true,
+          TarifaRack:this.formGroup.value.tarifaBase,
+          TarifaxPersona:[this.formGroup.value.tarifaBase],
+
+          Dias:[
+            {name:'Lun', value:0, checked:true},
+            {name:'Mar', value:1, checked:true},
+            {name:'Mie', value:2, checked:true},
+            {name:'Jue', value:3, checked:true},
+            {name:'Vie', value:4, checked:true},
+            {name:'Sab', value:5, checked:true},
+            {name:'Dom', value:6, checked:true}
+          ]
+        }
+    
+        this.tarifasService.postTarifa(tarifa).subscribe(
+          (value)=>{
+            this.isLoading=false
+            this.tarifaGenerada=true
+            this.mensajeDeTarifaGenerada='Tarifa(s) Generada(s) con éxito'  
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+            modalRef.componentInstance.alertHeader = 'Exito'
+            modalRef.componentInstance.mensaje='Tarifa(s) Generada(s) con éxito'          
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              });
+              setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
+              this.tarifasService.sendNotification(true)
+              this.modal.close()
+          },
+          (error)=>{
+            this.tarifaGenerada=false
+            this.mensajeDeTarifaGenerada='No se pudo guardar la tarifa intente de nuevo mas tarde'
+
+            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+            modalRef.componentInstance.alertHeader = 'Error'
+            modalRef.componentInstance.mensaje='No se pudo guardar la tarifa intente de nuevo mas tarde'
+            modalRef.result.then((result) => {
+              this.closeResult = `Closed with: ${result}`;
+              }, (reason) => {
+                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+              });
+              setTimeout(() => {
+                modalRef.close('Close click');
+              },4000)
+              return
+          })
+
+          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+          modalRef.componentInstance.alertHeader = 'Exito'
+          modalRef.componentInstance.mensaje=this.mensajeDeHabitacionGenerada
+
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
@@ -332,17 +436,16 @@ this.isLoading=true
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
-          if(this.editarHab==true){
+          this.habitacionService.fetch();
             this.modal.close()
-          }else{
-            this.resetForm();
-          }
 
         },
       (error)=>{
+        this.habitacionGenerada = false
+        this.mensajeDeHabitacionGenerada='No se pudo guardar la habitación intente de nuevo mas tarde'
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Error'
-        modalRef.componentInstance.mensaje='No se pudo guardar la habitación intente de nuevo mas tarde'
+        modalRef.componentInstance.mensaje=this.mensajeDeHabitacionGenerada
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
@@ -367,10 +470,6 @@ this.isLoading=true
     }
     return invalid;
 }
-
-  back(){
-    this.router.navigate(['/habitacion'])
-  }
 
   checkbox(value:any){
     if(value){
@@ -457,6 +556,10 @@ this.isLoading=true
       } else {
           return  `with: ${reason}`;
       }
+    }
+    closeModal()
+    {
+      this.modal.close();
     }
 
     ngOnDestroy(): void {

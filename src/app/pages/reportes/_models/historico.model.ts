@@ -13,7 +13,7 @@ export interface Historico extends BaseModel {
   llegada: string;
   salida: string;
   noches: number;
-  tarifa:number;
+  tarifa:string;
   porPagar: number;
   pendiente: number;
   origen: string;
@@ -32,7 +32,7 @@ export interface Historico extends BaseModel {
   ciudad:string;
   codigoPostal:string;
   lenguaje:string;
-  numeroCuarto:number;
+  numeroCuarto:string;
   estatus_historico:string;
   tipoHuesped:string;
   

@@ -13,3 +13,6 @@
   .cdk-overlay-container, .cdk-overlay-pane {
     z-index: 9999 !important;
   }
+  .disable-backdrop-click .cdk-overlay-backdrop.cdk-overlay-transparent-backdrop.cdk-overlay-backdrop-showing {
+    pointer-events: none;
+  }

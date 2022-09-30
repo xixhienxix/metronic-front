@@ -27,18 +27,16 @@ const DEFAULT_TARIFA = {
   EstanciaMaxima:1,
   Estado:true,
   TarifaRack:0,
-  Tarifa1Persona:0,
-  Tarifa2Persona:0,
-  Tarifa3Persona:0,
-  Tarifa4Persona:0,
+  TarifaxPersona:[0],
+  Descuento:0,
   Dias:[
-    {name:'Lun', value:'0', checked:false},
-    {name:'Mar', value:'1', checked:false},
-    {name:'Mie', value:'2', checked:false},
-    {name:'Jue', value:'3', checked:false},
-    {name:'Vie', value:'4', checked:false},
-    {name:'Sab', value:'5', checked:false},
-    {name:'Dom', value:'6', checked:false}
+    {name:'Lun', value:0, checked:false},
+    {name:'Mar', value:1, checked:false},
+    {name:'Mie', value:2, checked:false},
+    {name:'Jue', value:3, checked:false},
+    {name:'Vie', value:4, checked:false},
+    {name:'Sab', value:5, checked:false},
+    {name:'Dom', value:6, checked:false}
   ]
 }
 
@@ -158,6 +156,14 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
 
   deleteTarifas(tarifa:Tarifas){
     return this.http.post(environment.apiUrl+'/tarifas/rack/delete',{tarifa}).pipe(
+      map((data=>{
+        this.sendNotification(true);
+        }
+    )));
+  }
+
+  deleteTarifaEspecial(tarifa:Tarifas){
+    return this.http.post(environment.apiUrl+'/tarifas/especial/delete',{tarifa}).pipe(
       map((data=>{
         this.sendNotification(true);
         }

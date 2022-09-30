@@ -512,7 +512,7 @@ initializeBloqueo(){
       this.diaDif=1;
     }
    
-    const sb = this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,0,this.diaDif, 0)
+    const sb = this.disponibilidadService.getDisponibilidadCompleta(comparadorInicialString,comparadorFinalString,this.cuarto,'0',this.diaDif, 0)
     .subscribe(
       (disponibles)=>{
         if(disponibles.length==0){

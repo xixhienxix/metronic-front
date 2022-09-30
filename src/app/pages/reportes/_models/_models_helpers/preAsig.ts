@@ -1,5 +1,5 @@
 export interface preAsigModel
 {
-  habitacion:number,
+  habitacion:string,
   codigo:string
 }

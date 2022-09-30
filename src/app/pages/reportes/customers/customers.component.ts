@@ -59,7 +59,7 @@ import { Ama_De_Llaves } from '../_models/ama-llaves';
 const DISPONIBILIDAD_DEFAULT:Disponibilidad ={
   id:1,
   Cuarto:'',
-  Habitacion:100,
+  Habitacion:'100',
   Estatus:1,
   Dia:1,
   Mes:1,
@@ -79,7 +79,7 @@ const EMPTY_CUSTOMER: Huesped = {
   llegada:'',
   salida:'',
   noches: 1,
-  tarifa:500,
+  tarifa:'Tarifa Rack',
   porPagar: 500,
   pendiente:500,
   origen: 'Online',
@@ -97,7 +97,7 @@ const EMPTY_CUSTOMER: Huesped = {
   ciudad:'',
   codigoPostal:'',
   lenguaje:'Español',
-  numeroCuarto:0,
+  numeroCuarto:'0',
   creada: new Date().toString(),
   tipoHuesped:"Regular",
   notas:'',
@@ -349,7 +349,7 @@ this.origenService.getOrigenes()
                         })
   }
 
-  onChangeAma(estatus:string,habitacion:number,cuarto:string,folio:number)
+  onChangeAma(estatus:string,habitacion:string,cuarto:string,folio:number)
     {
       this.todayDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
 
@@ -664,7 +664,7 @@ this.origenService.getOrigenes()
     return color;
   }
 
- getAmaDeLlavesByID(estatus:string,habitacion:string,numeroCuarto:number){
+ getAmaDeLlavesByID(estatus:string,habitacion:string,numeroCuarto:string){
 
     let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
      

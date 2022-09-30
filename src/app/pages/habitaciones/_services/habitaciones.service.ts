@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { baseFilter } from 'src/app/_fake/fake-helpers/http-extenstions';
 import { GroupingState, ITableState, PaginatorState, SortState, TableResponseModel, TableService } from 'src/app/_metronic/shared/crud-table';
 import { environment } from 'src/environments/environment';
+import { Disponibilidad } from '../../reportes/_models/disponibilidad.model';
 import { Habitacion } from '../_models/habitacion';
 
 const DEFAULT_STATE: ITableState = {
@@ -28,7 +29,8 @@ const DEFAULT_HABITACION = {
   Vista:'',
   Amenidades:[],
   Tipos_Camas:[],
-  Orden:1
+  Orden:1,
+  Tarifa:0
 }
 // Codigo:string,
 // Numero:string[],
@@ -149,6 +151,14 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
      })
      )
 
+   }
+
+   creaDisponibilidad(numeroHabs:any,nombreCuarto:string){
+    return this.http.post(environment.apiUrl+'/disponibilidad/crear',{numeroHabs,nombreCuarto}).pipe(
+      map(response=>{
+        return response
+      })
+    )
    }
 
   ngOnDestroy() {

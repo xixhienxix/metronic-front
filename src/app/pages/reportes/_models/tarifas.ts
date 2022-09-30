@@ -1,7 +1,7 @@
 import { BaseModel } from "src/app/_metronic/shared/crud-table";
 
 export interface Tarifas extends BaseModel {
-_id?:string;
+
     Tarifa:string;
     Habitacion:string[];
     Llegada:string;
@@ -11,9 +11,7 @@ _id?:string;
     EstanciaMinima:number;
     EstanciaMaxima:number;
     TarifaRack:number;
-    TarifaxPersona:number[];
-    Activa?:boolean;
-    Descuento?:number;
+    TarifaxPersona:number[]
     Estado:boolean
     Dias:{
         name: string;

@@ -19,6 +19,7 @@ import { HabitacionesService } from '../../_services/habitaciones.service';
 export class HabitacionMainComponent implements OnInit {
   //DOM
   isLoading: boolean;
+  blockedTabled:boolean=false;
 
   //Forms
   filterGroup: FormGroup;
@@ -77,6 +78,8 @@ export class HabitacionMainComponent implements OnInit {
   }
 
   getHabitaciones(){
+    this.blockedTabled=true
+
     const sb = this.habitacionService.getCodigohabitaciones().subscribe(
       (value)=>{
         const sb = this.habitacionService.getAll().subscribe((habitaciones)=>{
@@ -86,6 +89,7 @@ export class HabitacionMainComponent implements OnInit {
                       return r;
                   }, Object.create(null));
           
+          this.habitacionesArr=[] // limpia array de habitaciones
 
 
           for(let i=0;i<value.length;i++){
@@ -125,10 +129,9 @@ export class HabitacionMainComponent implements OnInit {
               array.Orden=  this.habitacionesporCodigo[value[i].toString()][0].Orden
 
               this.habitacionesArr.push(array)
-            
+              this.blockedTabled=false
           }
           this.dataSource.data=this.habitacionesArr
-          
         },
         (error)=>{
     
@@ -149,6 +152,7 @@ export class HabitacionMainComponent implements OnInit {
     modalRef.result.then((result) => {
       this.habitacionesArr=[]
       this.getHabitaciones();
+      this.habitacionService.fetch();
       this.closeResult = `Closed with: ${result}`;
       }, (reason) => {
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -165,6 +169,13 @@ export class HabitacionMainComponent implements OnInit {
     const modalRef=this.modalService.open(AltaHabitacionComponent,{ size: 'lg', backdrop:'static' })
     modalRef.componentInstance.habitacion=habitacion
     modalRef.componentInstance.edicion=true
+    modalRef.result.then((result)=>{
+      this.habitacionesArr=[]
+      this.getHabitaciones(); 
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });  
 
   }
 
@@ -209,6 +220,8 @@ export class HabitacionMainComponent implements OnInit {
         modalRef.componentInstance.alertHeader = 'Exito'
         modalRef.componentInstance.mensaje='Habitación Eliminada con éxito'          
         modalRef.result.then((result) => {
+          this.habitacionesArr=[]
+      this.getHabitaciones();
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;

@@ -1,15 +1,21 @@
 
 <div class="card card-custom gutter-b">
-    <div class="card-header">
-     <div class="card-title">
-      <h3 *ngIf="editarHab===false" class="card-label">
-        Nueva Habitación
-      </h3>
-      <h3 *ngIf="editarHab===true" class="card-label">
-        Editar Habitación
-      </h3>
-     </div>
-    </div>
+    <div class="modal-content">
+        <div style="background-color: #00506a;" class="modal-header">
+          <div  *ngIf="editarHab===false" style="text-align: center; color: white;" class="text-center modal-title h4 col-10"
+            id="example-modal-sizes-title-lg">
+            Nueva Habitación            
+          </div>
+          <div *ngIf="editarHab===true" style="text-align: center; color: white;" class="text-center modal-title h4 col-10"
+          id="example-modal-sizes-title-lg">
+          Editar Habitación            
+        </div>
+          <button style="background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="closeModal()"> X </button>
+      
+        </div>
+      
+      
+      </div>
     
     <div class="float-container">
         <form [formGroup]="formGroup" >
@@ -52,20 +58,14 @@
                         <div class="form-group col-lg-12">
                             <label style="color:#00506a; font-weight: bold;">Nombre/Número de la Habitación</label>
                             <input 
+                                formControlName="etiqueta"
                                 [value]="habitacion.Numero"
-                                [attr.disabled]="editarHab ? false : null"
                                 style="background-color: #e6e9ed;" 
                                 class="form-control"
                                 >
                         </div>
                     </div>
-                    <div *ngIf="editarHab == false" class="form-group col-lg-12">
-                        <label style="color:#00506a; font-weight: bold;">Nombre/Número de la Habitación</label>
-                        <input 
-                            style="background-color: #e6e9ed;" 
-                            class="form-control"
-                            >
-                    </div>
+                  
                     <div class="row col-lg-12">
                         <div class="form-group col-lg-12">
                             <label style="color:#00506a; font-weight: bold;">Tipo de la Habitación</label>
@@ -228,7 +228,7 @@
                                   </div>
                                 </mat-select>
                             <div class="input-group-append">
-                                <button (click)="getAmenidades()" class="btn btn-secondary">
+                                <button [disabled]="reload" (click)="getAmenidades()" class="btn btn-secondary">
                                     <i class="ki ki-reload" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -346,7 +346,9 @@
             
             <div class="row col-lg-12">
                 <div class="form-group col-lg-12">
-                    <label style="color:#00506a; font-weight: bold;">Orden de Visualizacion en el Calendario</label>
+                    <label
+                        style="color:#00506a; font-weight: bold;">Orden de Visualizacion en el Calendario
+                    </label>
                     <input 
                     formControlName="orden" 
                     style="background-color: #e6e9ed;" 
@@ -355,6 +357,42 @@
                     [class.is-valid]="isControlValid('orden')">
                 </div>
             </div>  
+            <div class="row col-lg-12">
+                <div *ngIf="editarHab != true"
+                     class="form-group col-lg-12">
+                    <label           
+                        style="color:#00506a; font-weight: bold;">Tarifa Base Aplicable
+                    </label>
+                    <span
+                     class="fa fa-question-circle"
+                     ngbTooltip="Tarifa base aplicable a todas las habitaciones asignadas a este tipo de habitaciòn" 
+                     >
+                    </span>
+                    <input
+                        formControlName="tarifaBase" 
+                        style="background-color: #e6e9ed;" 
+                        class="form-control"
+                        >
+                </div>
+            </div>
+            <div class="row col-lg-12">
+                <div *ngIf="editarHab == true"
+                     class="form-group col-lg-12">
+                    <label           
+                        style="color:#00506a; font-weight: bold;">Tarifa Base Aplicable
+                    </label>
+                    <span
+                    class="fa fa-question-circle"
+                    ngbTooltip="Tarifa base aplicable a la habitaciòn" 
+                    >
+                   </span>
+                    <input
+                        formControlName="tarifaBase" 
+                        style="background-color: #e6e9ed;" 
+                        class="form-control"
+                        >
+                </div>
+            </div>
                 <br>
                 <ng-container>
                 <div class="row col-lg-12">
@@ -374,8 +412,8 @@
         </form>
     </div><!--Fin  FloatContainer-->
     <div class="card-footer col-lg-12">
-        <button style="float:right; margin: 5px;" class="btn btn-success" (click)="back()">REGRESAR</button>
-        <button style="float:right; margin: 5px;" class="btn btn-danger" (click)="resetForm()">CANCELAR</button>
+        <!-- <button style="float:right; margin: 5px;" class="btn btn-success" (click)="back()">REGRESAR</button>
+        <button style="float:right; margin: 5px;" class="btn btn-danger" (click)="resetForm()">CANCELAR</button> -->
         <button style="float:right; margin: 5px;" class="btn btn-primary" (click)="onSubmit()">ACEPTAR</button>
     </div>
 
