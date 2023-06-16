@@ -2,9 +2,14 @@
 <div class="card card-custom gutter-b">
   <div class="card-header">
     <div class="card-title ">
-      <h3 class="card-label">Tipos de Habitaciòn</h3>
-          <button (click)="getHabitaciones()" class="btn btn-secondary"><i aria-hidden="true" class="ki ki-reload"></i></button>
-          <button style="position: absolute; right: 0px; margin: 10px;" class="btn btn-primary" (click)="altaDehabitacion()">Agregar Nueva Habitacin</button>
+      <h3 class="card-label">Tipos de Habitación</h3>
+      <ng-container *ngIf="reloading===true" >
+        <button  style="height: 2.5em; width: 2.5em;" class="btn btn-secondary"><div class="lds-ring"><div></div><div></div><div></div><div></div></div></button>
+      </ng-container>
+      <ng-container *ngIf="reloading===false">
+        <button (click)="getHabitaciones(true)" class="btn btn-secondary"><i aria-hidden="true" class="ki ki-reload"></i></button>
+      </ng-container>
+      <button style="position: absolute; right: 0px; margin: 10px;" class="btn btn-primary" (click)="altaDehabitacion()">Agregar Nueva Habitacin</button>
     </div>
   </div> 
 
@@ -30,9 +35,9 @@
     <!-- begin:Table -->
     <div class="table-responsive angular-bootstrap-table">
 
-      <app-inline-spinner *ngIF="blockedTable"></app-inline-spinner>
+      <!-- <app-inline-spinner *ngIf="blockedTabled"></app-inline-spinner> -->
 
-        <mat-table *ngIF="blockedTable==false" [dataSource]="dataSource" class="mat-elevation-z8">
+        <mat-table *ngIf="blockedTabled" [dataSource]="dataSource" class="mat-elevation-z8">
           <!-- Codigo Column -->
           <ng-container matColumnDef="Codigo">
             <mat-header-cell *matHeaderCellDef> Codigo </mat-header-cell>

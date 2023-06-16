@@ -63,8 +63,6 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
       this.subject.next({text:value});
   }
 
-  //this will be subscribed by the listing component which needs to display the //added/deleted ie updated list.
-
   getNotification(){
       return this.subject.asObservable();
   }

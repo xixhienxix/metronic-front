@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription, Observable, BehaviorSubject } from 'rxjs';
-import { delay, first } from 'rxjs/operators';
+import { Subscription, Observable, BehaviorSubject, Subject } from 'rxjs';
+import { delay, first, takeUntil } from 'rxjs/operators';
 import { UserModel } from '../_models/user.model';
 import { AuthService } from '../_services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 @Component({
   selector: 'app-login',
@@ -17,17 +18,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   returnUrl: string;
   isLoading$: Observable<boolean>;
   isLoading:boolean
-  
+
   loading:boolean;
   message: any;
   // private fields
   private unsubscribe: Subscription[] = [];
+  private ngUnsubscribe = new Subject<void>();
+
 
   constructor(
     private fb: FormBuilder,
     public authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
+    private parametrosService : ParametrosServiceService
   ) {
 
   }
@@ -48,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         Validators.compose([
           Validators.required,
           Validators.minLength(3),
-          Validators.maxLength(10), 
+          Validators.maxLength(10),
         ]),
       ],
       password: [
@@ -69,7 +73,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       {
         if(value)
         {
-          this.router.navigate(['reportes/customers'])
+        this.parametrosService.getParametros().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+          (value1)=>{
+
+              this.router.navigate(['/calendario'])
+
+          },
+          (error)=>{
+          })
         }
         this.isLoading=false
       },
@@ -80,7 +91,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           {          this.message='Fallo en la solicitud intente de nuevo mas tarde'        }
           else {           this.message='Usuario o Contraseña Incorrectos'        }
         }
-        this.isLoading = false;  
+        this.isLoading = false;
       },
       ()=>{
         console.log('finalize')
@@ -88,8 +99,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.unsubscribe.push(sb)
   }
 
-  
+
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
   }
 }

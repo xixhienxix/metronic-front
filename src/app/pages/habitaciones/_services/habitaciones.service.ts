@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, forkJoin, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { baseFilter } from 'src/app/_fake/fake-helpers/http-extenstions';
 import { GroupingState, ITableState, PaginatorState, SortState, TableResponseModel, TableService } from 'src/app/_metronic/shared/crud-table';
 import { environment } from 'src/environments/environment';
@@ -52,7 +52,9 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   /*Oservables*/
   HabitacionUpdate$: Observable<Habitacion>;
   private currentHabitacion$=new BehaviorSubject<Habitacion>(DEFAULT_HABITACION);
-  
+  private errorMessage = new BehaviorSubject<string>('');
+
+
   constructor(@Inject(HttpClient) http) {
     super(http);
     this.HabitacionUpdate$=this.currentHabitacion$.asObservable();
@@ -66,6 +68,24 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
     this.currentHabitacion$.next(Habitacion);
   }
 
+  saveUrlToMongo(downloadURL:string,fileUploadName:string){
+    const params = new HttpParams()
+    .set('downloadURL', downloadURL)
+    .set('fileUploadName', fileUploadName)
+
+
+    return this.http.post(environment.apiUrl+"/update/habitaciones/url",{params:params}).pipe(
+      catchError(err => {
+        this.errorMessage.next(err);
+        console.error('UPDATE ITEM', err);
+        return of(err);
+      }),
+      // finalize(() => 
+      // this._isLoading$.next(false)
+      // )
+    );
+  }
+
   getAll() :Observable<Habitacion[]> {
     return this.http
      .get<Habitacion[]>(environment.apiUrl + '/codigos/habitaciones')
@@ -74,10 +94,7 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
        return responseData
      })
      )
-
    }
-
-   
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Habitacion>> {
@@ -129,8 +146,9 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
     .post(environment.apiUrl+'/codigos/adicional',{descripcion,precio})
   }
 
-  postHabitacion(habitacion:Habitacion,editar:boolean){
+  postHabitacion(habitacion:Habitacion,editar:boolean,filename:File){
     return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar})
+
   }
 
   agregarInventario(habitacion:Habitacion,inventario:number){

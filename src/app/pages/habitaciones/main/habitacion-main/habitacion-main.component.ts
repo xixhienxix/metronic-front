@@ -10,6 +10,8 @@ import { AgregarInventarioComponent } from '../../components/agregar-inventario/
 import { AltaHabitacionComponent } from '../../components/alta-habitacion/alta-habitacion.component';
 import { Habitacion } from '../../_models/habitacion';
 import { HabitacionesService } from '../../_services/habitaciones.service';
+import { FileUploadService } from '../../_services/file.upload.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-habitacion-main',
@@ -20,6 +22,7 @@ export class HabitacionMainComponent implements OnInit {
   //DOM
   isLoading: boolean;
   blockedTabled:boolean=false;
+  reloading:boolean=false
 
   //Forms
   filterGroup: FormGroup;
@@ -37,36 +40,31 @@ export class HabitacionMainComponent implements OnInit {
   //Models
   habitacionesArr:any[]=[]
 
+  //Files
+  fileList:any
+
   /**Table */
   dataSource = new MatTableDataSource<any[]>();
   displayedColumns = ['Codigo', 'Capacidad', 'Tipo','Inventario', 'Acciones'];
-  
+
   private subscriptions: Subscription[] = [];
-  
+
   constructor(
+    public uploadService : FileUploadService,
     public fb : FormBuilder,
     public habitacionService:HabitacionesService,
     public modalService :NgbModal,
     private router:Router
-  ) {  
+  ) {
     }
 
   ngOnInit(): void {
 
-    this.habitacionService.fetch()
-    this.getHabitaciones()
-    // this.habitacionService.items$.subscribe(
-    //   (value)=>{
-    //       this.habitacionesporCodigo = value.reduce(function (r, a) {
-    //           r[a.Codigo] = r[a.Codigo] || [];
-    //           r[a.Codigo].push(a);
-    //           return r;
-    //       }, Object.create(null));
-    //       console.log(this.habitacionesporCodigo)
-    //     },
-    // (error)=>{
+    this.getImagenesHabitaciones();
 
-    // })
+    this.habitacionService.fetch()
+    this.getHabitaciones(false)
+
     const sb = this.habitacionService.isLoading$.subscribe((res) => this.isLoading = res);
     this.subscriptions.push(sb);
 
@@ -77,8 +75,25 @@ export class HabitacionMainComponent implements OnInit {
     this.sorting.direction = 'asc'
   }
 
-  getHabitaciones(){
-    this.blockedTabled=true
+  getImagenesHabitaciones(){
+    this.uploadService.getAllFiles().snapshotChanges().pipe(
+      map(changes =>
+        changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
+      )
+    ).subscribe(fileUploads => {
+      this.fileList = fileUploads;
+    });
+  }
+
+  getHabitaciones(reloading:boolean){
+    
+    if(!reloading)
+    {
+      this.blockedTabled=true
+    }
+    if(reloading){
+      this.reloading=true
+    }
 
     const sb = this.habitacionService.getCodigohabitaciones().subscribe(
       (value)=>{
@@ -88,7 +103,7 @@ export class HabitacionMainComponent implements OnInit {
                       r[a.Codigo].push(a);
                       return r;
                   }, Object.create(null));
-          
+
           this.habitacionesArr=[] // limpia array de habitaciones
 
 
@@ -114,7 +129,7 @@ export class HabitacionMainComponent implements OnInit {
               Vista:'',
               Tipos_Camas:[],
               Orden:1
-            } 
+            }
               array.Codigo=this.habitacionesporCodigo[value[i].toString()][0].Codigo
               array.Capacidad = this.habitacionesporCodigo[value[i].toString()][0].Personas
               array.Amenidades = this.habitacionesporCodigo[value[i].toString()][0].Amenidades
@@ -130,13 +145,14 @@ export class HabitacionMainComponent implements OnInit {
 
               this.habitacionesArr.push(array)
               this.blockedTabled=false
+              this.reloading=false
           }
           this.dataSource.data=this.habitacionesArr
         },
         (error)=>{
-    
+
         })
-    
+
         this.subscriptions.push(sb)
     },
     (error)=>{
@@ -151,7 +167,7 @@ export class HabitacionMainComponent implements OnInit {
     modalRef.componentInstance.habitacion=habitacion
     modalRef.result.then((result) => {
       this.habitacionesArr=[]
-      this.getHabitaciones();
+      this.getHabitaciones(false);
       this.habitacionService.fetch();
       this.closeResult = `Closed with: ${result}`;
       }, (reason) => {
@@ -166,16 +182,20 @@ export class HabitacionMainComponent implements OnInit {
   }
 
   edit(habitacion:Habitacion){
+    const imagen = this.fileList.filter(c=>c.name.split('.')[0] == habitacion.Codigo)
     const modalRef=this.modalService.open(AltaHabitacionComponent,{ size: 'lg', backdrop:'static' })
     modalRef.componentInstance.habitacion=habitacion
     modalRef.componentInstance.edicion=true
+    modalRef.componentInstance.imagen=imagen[0].url
     modalRef.result.then((result)=>{
       this.habitacionesArr=[]
-      this.getHabitaciones(); 
+      this.getHabitaciones(false);
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
+        this.fileList=[]
+        this.getImagenesHabitaciones()
         this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });  
+    });
 
   }
 
@@ -185,7 +205,7 @@ export class HabitacionMainComponent implements OnInit {
         modalRef.componentInstance.mensaje='Esta seguro que quiere eliminar esta habitación'
 
         modalRef.result.then((result) => {
-          if(result=='Aceptar')        
+          if(result=='Aceptar')
           {
             this.isLoading=true
             const sb = this.habitacionService.buscarHabitacion(habitacion).subscribe(
@@ -193,8 +213,11 @@ export class HabitacionMainComponent implements OnInit {
                 if(value.length!=0){
                   const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
                         modalRef.componentInstance.alertsHeader='Error'
-                        modalRef.componentInstance.mensaje='Hay reservaciones asignadas a esta habitación, cambie estos folio de habitación antes de borrar la misma'
+                        modalRef.componentInstance.mensaje='Existen reservaciones que fueron asignadas a esta habitacion aun asi desea eliminarla?'
                         modalRef.result.then((result) => {
+                          if(result=='Aceptar') {
+                            this.deletehab(habitacion._id)
+                          }else
                           this.closeResult = `Closed with: ${result}`;
                           }, (reason) => {
                               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -203,8 +226,8 @@ export class HabitacionMainComponent implements OnInit {
                 }else{
                   this.deletehab(habitacion._id)
                 }
-              }) 
-          } 
+              })
+          }
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -218,10 +241,10 @@ export class HabitacionMainComponent implements OnInit {
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Exito'
-        modalRef.componentInstance.mensaje='Habitación Eliminada con éxito'          
+        modalRef.componentInstance.mensaje='Habitación Eliminada con éxito'
         modalRef.result.then((result) => {
           this.habitacionesArr=[]
-      this.getHabitaciones();
+          this.getHabitaciones(false);
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {
               this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -235,7 +258,7 @@ export class HabitacionMainComponent implements OnInit {
         this.isLoading=false
         const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
         modalRef.componentInstance.alertHeader = 'Exito'
-        modalRef.componentInstance.mensaje='No se pudo Eliminar la habitación intente de nuevo mas tarde'          
+        modalRef.componentInstance.mensaje='No se pudo Eliminar la habitación intente de nuevo mas tarde'
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
           }, (reason) => {

@@ -1,0 +1,47 @@
+
+<section class="example-container mat-elevation-z8" tabindex="0">
+  <mat-table [dataSource]="dataSource" *ngFor="let table of tables">
+    
+    <ng-container matColumnDef="Habitacion" [sticky]="true">
+      <mat-header-cell *matHeaderCellDef> Hab </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.Habitacion}} </mat-cell>
+      <mat-footer-cell *matFooterCellDef> Disponibilidad </mat-footer-cell>
+      <mat-footer-cell *matFooterCellDef> % De Ocupaciòn </mat-footer-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="filler">
+      <mat-header-cell *matHeaderCellDef> {{columnsToDisplay[1]}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> Filler data cell </mat-cell>
+      <mat-footer-cell *matFooterCellDef> Filler footer cell </mat-footer-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    <mat-footer-row *matFooterRowDef="displayedColumns; "></mat-footer-row>
+    
+  </mat-table>
+</section>
+<!-- 
+<section class="example-container mat-elevation-z8" tabindex="0">
+  <mat-table [dataSource]="dataSource" *ngFor="let table of tables">
+
+    <ng-container matColumnDef="column" *ngFor="let column of displayedColumns" [sticky]="true">
+      <mat-header-cell *matHeaderCellDef> {{column}} </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.Habitacion}} </mat-cell>
+      <mat-footer-cell *matFooterCellDef> Disponibilidad </mat-footer-cell>
+    </ng-container>
+
+
+    <ng-container matColumnDef="filler">
+      <mat-header-cell *matHeaderCellDef> Filler header cell </mat-header-cell>
+      <mat-cell *matCellDef="let element"> Filler data cell </mat-cell>
+      <mat-footer-cell *matFooterCellDef> Filler footer cell </mat-footer-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="columnsToDisplay; sticky: true"></mat-header-row>
+
+    <mat-row *matRowDef="let row; columns: columnsToDisplay;"></mat-row>
+
+    <mat-footer-row *matFooterRowDef="displayedColumns; "></mat-footer-row>
+  </mat-table>
+</section> -->

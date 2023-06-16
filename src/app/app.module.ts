@@ -10,7 +10,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthService } from './modules/auth/_services/auth.service';
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.prod';
 import { NgIdleKeepaliveModule } from '@ng-idle/keepalive'; // this includes the core NgIdleModule but includes keepalive providers for easy wireup
 import { MomentModule } from 'angular2-moment'; // optional, provides moment-style pipes for date formatting
 
@@ -35,7 +35,9 @@ import localeEs from '@angular/common/locales/es-MX';
 import { registerLocaleData } from '@angular/common';
 import { SharedModule } from './shared/shared.module';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
-
+import { AngularFireModule} from '@angular/fire'
+import { AngularFireStorageModule} from '@angular/fire/storage'
+import { AngularFireDatabaseModule } from '@angular/fire/database'
 
 function appInitializer(authService: AuthService) {
   return () => {
@@ -50,6 +52,17 @@ registerLocaleData(localeEs, 'es');
 @NgModule({
   declarations: [AppComponent,ClickOutsideDirective, DialogComponent],
   imports: [
+    AngularFireDatabaseModule,
+    AngularFireModule.initializeApp({
+      apiKey: environment.fireBaseStorageSecrets.apiKey,
+      authDomain: environment.fireBaseStorageSecrets.authDomain,
+      projectId: environment.fireBaseStorageSecrets.projectId,
+      storageBucket: environment.fireBaseStorageSecrets.storageBucket,
+      messagingSenderId: environment.fireBaseStorageSecrets.messagingSenderId,
+      appId: environment.fireBaseStorageSecrets.appId,
+      databaseURL: environment.fireBaseStorageSecrets.databaseURL,
+    }),
+    AngularFireStorageModule,
     BrowserModule,
     BrowserAnimationsModule,
     SplashScreenModule,
@@ -61,7 +74,7 @@ registerLocaleData(localeEs, 'es');
     MomentModule,
     SharedModule,
     MatProgressBarModule,
-    
+
     // MatTabsModule,
     // MatCheckboxModule,
     // MatExpansionModule,

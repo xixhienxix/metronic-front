@@ -6,6 +6,7 @@ import {environment} from "../../../../environments/environment"
 import { catchError, map, tap } from 'rxjs/operators';
 import { HabitacionesService }  from './habitaciones.service'
 import { DateTime } from 'luxon'
+import { NumberLiteralType } from 'typescript';
 @Injectable({
   providedIn: 'root'
 })
@@ -43,27 +44,21 @@ export class DisponibilidadService {
      )
    }
 
-  //  getdisponibilidadTodos(dia:number,mes:number,ano:number) :Observable<Disponibilidad[]> {
-  //   const params = new HttpParams()
-  //   .set('dia', dia.toString())
-  //   .set('mes', mes.toString())
-  //   .set('ano',ano.toString())
+  getDisponibilidadAnual(dia:number,mes:number,ano:number){
+    const params = new HttpParams()
+    .set('dia', dia.toString())
+    .set('mes', mes.toString())
+    .set('ano',ano.toString())
 
-  //   return this.http
-  //    .get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad/todos',{params:params})
-  //    .pipe(
-  //      map(responseData=>{
-  //      return responseData
-  //    })
-  //    )
-  //  }
+    return this.http.get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad/todos',{params:params})
+  }
 
    actualizaDisponibilidad(disponibilidad:Disponibilidad){
     return this.http.put(environment.apiUrl+"/update/disponibilidad",disponibilidad)
    }
-  
+
    getEstatusAmaDeLlaves(dia:number,mes:number,ano:number,numeroCuarto:string,habitacion:string){
-    
+
     let parametros = {
       dia:dia,
       mes:mes,

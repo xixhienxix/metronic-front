@@ -758,7 +758,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
     for(let x=0;x<this.diaDif;x++){
 
-      const dia = this.fromDate.weekday
+      const dia = (this.fromDate.weekday)-1
 
         if(this.tarifaSeleccionada.Dias[dia].checked==true){
           if(this.huesped.adultos<5){

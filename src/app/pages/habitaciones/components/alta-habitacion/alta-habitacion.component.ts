@@ -5,7 +5,7 @@ import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { ModalDismissReasons, NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 import { Adicional } from '../../_models/adicionales';
 import { Amenidades } from '../../_models/amenidades';
@@ -19,10 +19,25 @@ import { ParametrosServiceService } from 'src/app/pages/parametros/_services/par
 import { Tarifas } from 'src/app/pages/reportes/_models/tarifas';
 import { TarifasService } from 'src/app/pages/tarifas/_services/tarifas.service';
 import { Disponibilidad } from 'src/app/pages/reportes/_models/disponibilidad.model';
+import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/storage'
+import { AngularFireDatabase, AngularFireList } from '@angular/fire/database'
+import { finalize, map } from 'rxjs/operators';
+import { FileUploadService } from '../../_services/file.upload.service'
+import { UploadFormComponent } from '../helpers/uploads/upload-form.component';
 
 type listaAmenidades = {key:number;value:string}
 type listaCamas = {key:number;value:string;cantidad:number}
 
+export class FileUpload {
+  key: string;
+  name: string;
+  url: string;
+  file: File;
+
+  constructor(file: File) {
+    this.file = file;
+  }
+}
 
 @Component({
   selector: 'app-alta-habitacion',
@@ -34,7 +49,6 @@ export class AltaHabitacionComponent implements OnInit {
 
   @ViewChild('itemSelect') public itemSelect: MatSelect;
   @ViewChild('matOption') public matOption: MatOption;
-
   /**Modal */
   closeResult:string
   habitacion:Habitacion;
@@ -89,10 +103,17 @@ export class AltaHabitacionComponent implements OnInit {
   quantityInv:number=1;
   quantityExtraInv:number=0;
 
+  //File Upload
+  sendUpload: boolean;
+  imagen:any;
+  imageSelected:boolean=false
+
+
   /**Subscription */
   subscriptions:Subscription[]=[]
 
   constructor(
+    private uploadService: FileUploadService,
     public fb : FormBuilder,
     public tiposHabitacionService:TiposService,
     public modalService : NgbModal,
@@ -100,21 +121,22 @@ export class AltaHabitacionComponent implements OnInit {
     public router : Router,
     public modal:NgbActiveModal,
     public tarifasService:TarifasService,
-    public parametrosService:ParametrosServiceService
-    
-  ) { 
+    public parametrosService:ParametrosServiceService,
+    private af :AngularFireStorage
+  ) {
     this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
     this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
     this.toDate = this.toDate.plus({ days: 1 });
-    
+
   }
 
   ngOnInit(): void {
 
+
     this.getTiposHAB();
     this.getAmenidades();
     this.getCamas();
-    
+
 
     this.formGroup = this.fb.group({
       nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100),NoWhiteSpacesValidator.cannotContainSpace])],
@@ -127,7 +149,8 @@ export class AltaHabitacionComponent implements OnInit {
       orden:[1,Validators.required],
       nombreHabs: this.fb.array([]),
       tarifaBase:[0,Validators.required],
-      etiqueta:[0,Validators.required]
+      etiqueta:[0,Validators.required],
+
     })
 
     this.inputForm = this.fb.group({
@@ -152,7 +175,7 @@ export class AltaHabitacionComponent implements OnInit {
     this.inputs.push(this.inputForm);
 
 
-    
+
   }
 
   get inputs() {
@@ -164,8 +187,8 @@ export class AltaHabitacionComponent implements OnInit {
 
   getTiposHAB(){
    const sb = this.tiposHabitacionService.getTiposDeCuarto().subscribe(
-      (value)=>{ 
-        if(value){this.tiposArr=value} 
+      (value)=>{
+        if(value){this.tiposArr=value}
     },
     (error)=>{
 
@@ -179,10 +202,10 @@ export class AltaHabitacionComponent implements OnInit {
   getAmenidades(){
     this.reload=true;
     const sb = this.tiposHabitacionService.getAmenidades().subscribe(
-      (value)=>{ 
+      (value)=>{
         this.reload=false
 
-        if(value){this.amenidadesArr=value} 
+        if(value){this.amenidadesArr=value}
         for(let i=0;i<value.length;i++){
           this.disponiblesIndexados.push({key:i,value:value[i].Descripcion})
         }
@@ -198,8 +221,8 @@ export class AltaHabitacionComponent implements OnInit {
 
   getCamas(){
     const sb = this.tiposHabitacionService.getCamas().subscribe(
-      (value)=>{ 
-        if(value){this.camasArr=value} 
+      (value)=>{
+        if(value){this.camasArr=value}
 
         for(let i=0;i<value.length;i++){
           this.disponiblesIndexadosCamas.push({key:i,value:value[i].Descripcion,cantidad:1})
@@ -217,7 +240,7 @@ export class AltaHabitacionComponent implements OnInit {
     this.resultLocationCamas = this.resultLocationCamas.filter((option) => {
       return option !== selected;
     });
-  
+
   }
 
   amenidadesValue(selected:string){
@@ -225,7 +248,7 @@ export class AltaHabitacionComponent implements OnInit {
     this.resultLocation = this.resultLocation.filter((option) => {
       return option !== selected;
     });
-  
+
   }
 
   addInput(){
@@ -241,7 +264,7 @@ export class AltaHabitacionComponent implements OnInit {
   }
 
   removeInput(){
-    
+
     if(this.quantityInv>1)
       {
       this.quantityInv--;
@@ -283,10 +306,10 @@ export class AltaHabitacionComponent implements OnInit {
     this.f.tipo.patchValue(0)
     this.camasFC.markAsUntouched();
     this.amenidadesFC.markAsUntouched();
-  
+
   }
 
-  onSubmit(){
+  async onSubmit(){
     let habitacionNueva:Habitacion
     this.inicio=false
 
@@ -299,14 +322,20 @@ export class AltaHabitacionComponent implements OnInit {
     }
     this.closeModal();
 
-    let codigo = this.formGroup.value.nombre.trim('')
-
     let conteoCamas=0;
 
-  for(let y=0;y<this.camasFC.value.length; y++){
-    let numero
-    numero=parseInt(this.camasFC.value[y].split(' ')[0])
-    conteoCamas=numero+conteoCamas
+    for(let y=0;y<this.camasFC.value.length; y++){
+      let numero
+      numero=parseInt(this.camasFC.value[y].split(' ')[0])
+      conteoCamas=numero+conteoCamas
+    }
+
+  let nombreHabs=[]
+
+  for(let y=0; y<this.formGroup.value.nombreHabs.length;y++){
+    if(this.formGroup.value.nombreHabs[y].nombreHabs==''){
+      nombreHabs.push({nombreHabs:this.formGroup.value.nombre.toString()+((y+1).toString())})
+    }
   }
 
   if(this.editarHab==true){
@@ -327,106 +356,57 @@ export class AltaHabitacionComponent implements OnInit {
       Tarifa:this.formGroup.value.tarifaBase
     }
   }else {
-    habitacionNueva = {
-      Codigo:this.formGroup.value.nombre,
-      Numero:this.formGroup.value.nombreHabs,
-      Descripcion:this.formGroup.value.descripcion,
-      Tipo:this.formGroup.value.tipo,
-      Personas:this.formGroup.value.personas,
-      Personas_Extra:this.formGroup.value.extras,
-      Inventario:this.formGroup.value.inventario,
-      Vista:this.formGroup.value.vista,
-      Camas:conteoCamas,
-      Tipos_Camas:this.camasFC.value,
-      Amenidades:this.amenidadesFC.value,
-      Orden:this.formGroup.value.orden,
-      Tarifa:this.formGroup.value.tarifaBase
+    if(nombreHabs.length!=0){
+      habitacionNueva = {
+        Codigo:this.formGroup.value.nombre,
+        Numero:nombreHabs,
+        Descripcion:this.formGroup.value.descripcion,
+        Tipo:this.formGroup.value.tipo,
+        Personas:this.formGroup.value.personas,
+        Personas_Extra:this.formGroup.value.extras,
+        Inventario:this.formGroup.value.inventario,
+        Vista:this.formGroup.value.vista,
+        Camas:conteoCamas,
+        Tipos_Camas:this.camasFC.value,
+        Amenidades:this.amenidadesFC.value,
+        Orden:this.formGroup.value.orden,
+        Tarifa:this.formGroup.value.tarifaBase
+      }
+    }else{
+      habitacionNueva = {
+        Codigo:this.formGroup.value.nombre,
+        Numero:this.formGroup.value.nombreHabs,
+        Descripcion:this.formGroup.value.descripcion,
+        Tipo:this.formGroup.value.tipo,
+        Personas:this.formGroup.value.personas,
+        Personas_Extra:this.formGroup.value.extras,
+        Inventario:this.formGroup.value.inventario,
+        Vista:this.formGroup.value.vista,
+        Camas:conteoCamas,
+        Tipos_Camas:this.camasFC.value,
+        Amenidades:this.amenidadesFC.value,
+        Orden:this.formGroup.value.orden,
+        Tarifa:this.formGroup.value.tarifaBase
+      }
     }
+
   }
 this.isLoading=true
-    const sb =  this.habitacionService.postHabitacion(habitacionNueva,this.editarHab).subscribe(
+
+    const sb =  this.habitacionService.postHabitacion(habitacionNueva,this.editarHab,this.formGroup.value.image).subscribe(
       (value)=>{
-        let dispo:Disponibilidad
+
+        this.sendUpload=true
         this.habitacionGenerada = true
         this.mensajeDeHabitacionGenerada='Habitación(es) Generadas con éxito'
 
+        const dispoCreada = this.habitacionService.creaDisponibilidad(nombreHabs,this.formGroup.value.nombre)
 
-        this.habitacionService.creaDisponibilidad(this.formGroup.value.nombreHabs,this.formGroup.value.nombre).subscribe(
-          (value)=>{
-            this.isLoading=false
-            console.log(value)
-        },
-        (error)=>{
+        const tarifasCreadas = this.postTarifa()
 
-        })
-    
-        let fromDate = this.fromDate.day+"/"+this.fromDate.month+"/"+this.fromDate.year
-        let toDate = this.toDate.day+"/"+this.toDate.month+"/"+this.toDate.year+1
-    
-        let tarifa :Tarifas= {
-          Tarifa:'Tarifa Estandar',
-          Habitacion:this.formGroup.value.nombre,
-          Llegada:fromDate,
-          Salida:toDate,
-          Plan:'Ninguno',
-          Politicas:'Ninguno',
-          EstanciaMinima:1,
-          EstanciaMaxima:0,
-          Estado:true,
-          TarifaRack:this.formGroup.value.tarifaBase,
-          TarifaxPersona:[this.formGroup.value.tarifaBase],
-
-          Dias:[
-            {name:'Lun', value:0, checked:true},
-            {name:'Mar', value:1, checked:true},
-            {name:'Mie', value:2, checked:true},
-            {name:'Jue', value:3, checked:true},
-            {name:'Vie', value:4, checked:true},
-            {name:'Sab', value:5, checked:true},
-            {name:'Dom', value:6, checked:true}
-          ]
-        }
-    
-        this.tarifasService.postTarifa(tarifa).subscribe(
-          (value)=>{
-            this.isLoading=false
-            this.tarifaGenerada=true
-            this.mensajeDeTarifaGenerada='Tarifa(s) Generada(s) con éxito'  
-            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-            modalRef.componentInstance.alertHeader = 'Exito'
-            modalRef.componentInstance.mensaje='Tarifa(s) Generada(s) con éxito'          
-            modalRef.result.then((result) => {
-              this.closeResult = `Closed with: ${result}`;
-              }, (reason) => {
-                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-              });
-              setTimeout(() => {
-                modalRef.close('Close click');
-              },4000)
-              this.tarifasService.sendNotification(true)
-              this.modal.close()
-          },
-          (error)=>{
-            this.tarifaGenerada=false
-            this.mensajeDeTarifaGenerada='No se pudo guardar la tarifa intente de nuevo mas tarde'
-
-            const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-            modalRef.componentInstance.alertHeader = 'Error'
-            modalRef.componentInstance.mensaje='No se pudo guardar la tarifa intente de nuevo mas tarde'
-            modalRef.result.then((result) => {
-              this.closeResult = `Closed with: ${result}`;
-              }, (reason) => {
-                  this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-              });
-              setTimeout(() => {
-                modalRef.close('Close click');
-              },4000)
-              return
-          })
-
-          const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-          modalRef.componentInstance.alertHeader = 'Exito'
-          modalRef.componentInstance.mensaje=this.mensajeDeHabitacionGenerada
+        const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
+        modalRef.componentInstance.alertHeader = 'Exito'
+        modalRef.componentInstance.mensaje=this.mensajeDeHabitacionGenerada
 
         modalRef.result.then((result) => {
           this.closeResult = `Closed with: ${result}`;
@@ -457,7 +437,48 @@ this.isLoading=true
           return
           this.isLoading=false
       }
-    )   
+    )
+  }
+
+
+  async postTarifa(){
+
+    let fromDate = this.fromDate.day+"/"+this.fromDate.month+"/"+this.fromDate.year
+    let toDate = this.toDate.day+"/"+this.toDate.month+"/"+this.toDate.year+1
+
+    let tarifa : Tarifas= {
+      Tarifa:'Tarifa Estandar',
+      Habitacion:this.formGroup.value.nombre,
+      Llegada:fromDate,
+      Salida:toDate,
+      Plan:'Ninguno',
+      Politicas:'Ninguno',
+      EstanciaMinima:1,
+      EstanciaMaxima:0,
+      Estado:true,
+      TarifaRack:this.formGroup.value.tarifaBase,
+      TarifaxPersona:[this.formGroup.value.tarifaBase],
+
+      Dias:[
+        {name:'Lun', value:0, checked:true},
+        {name:'Mar', value:1, checked:true},
+        {name:'Mie', value:2, checked:true},
+        {name:'Jue', value:3, checked:true},
+        {name:'Vie', value:4, checked:true},
+        {name:'Sab', value:5, checked:true},
+        {name:'Dom', value:6, checked:true}
+      ]
+    }
+
+    return this.tarifasService.postTarifa(tarifa).subscribe(
+      (value)=>{
+
+        this.tarifasService.sendNotification(true)
+        return "Tarifa(s) Generada(s) con éxito"
+      },
+      (error)=>{
+        return "No se pudo guardar la tarifa intente de nuevo mas tarde"
+      })
   }
 
   public findInvalidControls() {
@@ -484,17 +505,17 @@ this.isLoading=true
       const control = this.formGroup.controls[controlName];
       return control.valid && (control.dirty || control.touched);
     }
-  
+
     isControlInvalid(controlName: string): boolean {
       const control = this.formGroup.controls[controlName];
       return control.invalid && (control.dirty || control.touched);
     }
-  
+
     controlHasError(validation, controlName): boolean {
       const control = this.formGroup.controls[controlName];
       return control.hasError(validation) && (control.dirty || control.touched);
     }
-  
+
     isControlTouched(controlName): boolean {
       const control = this.formGroup.controls[controlName];
       return control.dirty || control.touched;
@@ -503,7 +524,7 @@ this.isLoading=true
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
         const invalidCtrl = !!(control?.invalid && control?.parent?.dirty);
         const invalidParent = !!(control?.parent?.invalid && control?.parent?.dirty);
-    
+
         return invalidCtrl || invalidParent;
     }
 
@@ -545,9 +566,9 @@ this.isLoading=true
       this.quantityExtra
       this.formGroup.controls['extras'].patchValue(this.quantityExtra)
 
-    
+
     }
-    
+
     private getDismissReason(reason: any): string {
       if (reason === ModalDismissReasons.ESC) {
           return 'by pressing ESC';
@@ -557,6 +578,12 @@ this.isLoading=true
           return  `with: ${reason}`;
       }
     }
+
+    imageSelectedFunc(){
+      this.imageSelected=true;
+    }
+
+
     closeModal()
     {
       this.modal.close();

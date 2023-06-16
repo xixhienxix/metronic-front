@@ -41,6 +41,11 @@ const routes: Routes = [
       loadChildren: () =>
         import('./parametros/parametros.module').then((m) => m.ParametrosModule),
     },
+    { 
+      path: 'calendario',
+      loadChildren: () =>
+        import('./calendario/calendario.module').then((m) => m.CalendarioModule),
+    },
       
 //    {
 //        path: 'ecommerce',

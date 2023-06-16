@@ -28,10 +28,10 @@ border: 2px solid #564caf; /* Green */
 }
 .lesser-size{
   font-size: .5rem;
-  position:absolute; 
-  top:-3px; 
+  position:absolute;
+  top:-3px;
   // left:-3px
-  
+
 }
 .withoutArrow {
   .mat-select-arrow {
@@ -51,7 +51,11 @@ border: 2px solid #564caf; /* Green */
 
 .float-child {
   float: left;
-}  
+}
 .cdk-overlay-container, .cdk-overlay-pane {
   z-index: 19999 !important;
+}
+.square {
+  height: 200px;
+  width: 300px;
 }

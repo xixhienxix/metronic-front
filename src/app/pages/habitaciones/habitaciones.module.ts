@@ -45,7 +45,9 @@ import {BlockUIModule} from 'primeng/blockui';
 import {PanelModule} from 'primeng/panel';
 import { ReportesModule } from '../reportes/reportes.module';
 import { InlineSpinnerComponent } from './components/helpers/inline-spinner/inline-spinner.component';
-
+import { UploadDetailsComponent } from './components/helpers/uploads/upload-details.component';
+import { UploadListComponent } from './components/helpers/uploads/upload-list.component';
+import { UploadFormComponent } from './components/helpers/uploads/upload-form.component';
 @NgModule({
   declarations: [
    HabitacionesComponent,
@@ -54,9 +56,12 @@ import { InlineSpinnerComponent } from './components/helpers/inline-spinner/inli
    LoadingComponent,
    AgregarInventarioComponent,
    InlineSpinnerComponent,
-   
+   UploadDetailsComponent,
+   UploadListComponent,
+   UploadFormComponent
       ],
   imports: [
+
     PanelModule,
     BlockUIModule,
     SharedModule,
@@ -103,7 +108,7 @@ import { InlineSpinnerComponent } from './components/helpers/inline-spinner/inli
   ],
 
   entryComponents: [
-    
+
   ],
   providers: [{ provide: LOCALE_ID, useValue: 'fr-FR' },
 ]

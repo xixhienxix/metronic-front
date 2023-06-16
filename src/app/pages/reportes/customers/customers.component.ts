@@ -184,36 +184,46 @@ export class CustomersComponent
     public amaDeLlavesService:AmaLlavesService
 
   ) {
+
   }
 
 
   // angular lifecircle hooks
   ngOnInit(): void {
 
-    this.divisasService.getcurrentDivisa.Simbolo
+    this.customerService.items$.subscribe(
+      (result)=>{
+        this.divisasService.getcurrentDivisa.Simbolo
 
-    this.iddleService.initiateIddle();
-    this.postService.getPost();
-    this.getFolios();
-    this.getCuartos();
-    this.getEstatus();
-    this.getOrigen();
-    this.getTipoCuarto();
-    this.filterForm();
-    this.searchForm();
-    this.getAmaDeLlaves();
-    // this.getEstatusAmaDeLlaves();
-    this.customerService.fetch();
-    this.grouping = this.customerService.grouping;
-    this.paginator = this.customerService.paginator;
-    this.sorting = this.customerService.sorting;
-    const sb = this.customerService.isLoading$.subscribe((res) => this.isLoading = res);
-    this.subscriptions.push(sb);
-    this.sorting.direction = 'desc';
+        this.iddleService.initiateIddle();
+        this.postService.getPost();
+        this.getFolios();
+        this.getCuartos();
+        this.getEstatus();
+        this.getOrigen();
+        this.getTipoCuarto();
+        this.filterForm();
+        this.searchForm();
+        this.getAmaDeLlaves();
+        // this.getEstatusAmaDeLlaves();
+        this.customerService.fetch();
+        this.grouping = this.customerService.grouping;
+        this.paginator = this.customerService.paginator;
+        this.sorting = this.customerService.sorting;
+        const sb = this.customerService.isLoading$.subscribe((res) => this.isLoading = res);
+        this.subscriptions.push(sb);
+        this.sorting.direction = 'desc';
+      },
+      (error)=>{
+        console.log(error)
+      },
+      ()=>{})
 
 
 
-    
+
+
+
     // this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
   }
 
@@ -370,7 +380,7 @@ this.origenService.getOrigenes()
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Estatus de habitacion Actualizado'
-        
+
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
@@ -386,12 +396,12 @@ this.origenService.getOrigenes()
               this.closeResult = `Closed with: ${result}`;
               }, (reason) => {
                   this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-  
+
               });
-            
+
         })
         this.subscriptions.push(sb)
-    } 
+    }
 
   // filtration
   filterForm() {
@@ -510,7 +520,7 @@ this.origenService.getOrigenes()
       this.customerService.fetch(),
       () => { }
       );
-      
+
       modalRef.result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
       }, (reason) => {
@@ -529,7 +539,7 @@ this.origenService.getOrigenes()
         ).subscribe((huesped1: Huesped) => {
           this.huesped = huesped1;
           this.customerService.setCurrentHuespedValue=huesped1
-          
+
           const modalRef = this.modalService.open(EditReservaModalComponent, { size: 'md',backdrop: 'static' });
           modalRef.componentInstance.folio = id;
           modalRef.componentInstance.id = id;
@@ -540,11 +550,11 @@ this.origenService.getOrigenes()
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
           });
 
-        
+
         });
-        
+
         this.customerService.fetch(),
- 
+
         this.subscriptions.push(sb);
     }
   }
@@ -666,8 +676,8 @@ this.origenService.getOrigenes()
 
  getAmaDeLlavesByID(estatus:string,habitacion:string,numeroCuarto:string){
 
-    let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
-     
+    let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+
     const sb =  this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day, diaDeHoy.month, diaDeHoy.year, numeroCuarto, habitacion).subscribe(
       (value) => {
         console.log(numeroCuarto)
@@ -683,7 +693,7 @@ this.origenService.getOrigenes()
       this.subscriptions.push(sb)
   }
 
- 
+
 
   getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
