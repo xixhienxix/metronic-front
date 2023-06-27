@@ -124,7 +124,7 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
       map((data=>{
         this.sendNotification(true);
         }
-    )));
+    )))
   }
 
   postTarifaEspecial(tarifa:Tarifas){

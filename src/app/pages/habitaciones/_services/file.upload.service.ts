@@ -22,11 +22,14 @@ private basePath = '/uploads';
 
     uploadTask.snapshotChanges().pipe(
       finalize(() => {
-        storageRef.getDownloadURL().subscribe(downloadURL => {
+        storageRef.getDownloadURL().subscribe(async(downloadURL) => {
           fileUpload.url = downloadURL;
           fileUpload.name = fileUpload.file.name;
           this.saveFileData(fileUpload);
-          this._HabitacionService.saveUrlToMongo(downloadURL,fileUpload.file.name)
+          const urlReponse = await this._HabitacionService.saveUrlToMongo(downloadURL,fileUpload.file.name)
+          console.log(urlReponse)
+
+          return urlReponse
         });
       })
     ).subscribe();

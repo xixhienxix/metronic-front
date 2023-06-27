@@ -76,7 +76,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.parametrosService.getParametros().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
           (value1)=>{
 
-              this.router.navigate(['/calendario'])
+              this.router.navigate(['/reportes'])// /calendario
 
           },
           (error)=>{

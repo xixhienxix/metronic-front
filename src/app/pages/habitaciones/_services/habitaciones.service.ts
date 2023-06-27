@@ -1,12 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, forkJoin, Observable, of } from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { baseFilter } from 'src/app/_fake/fake-helpers/http-extenstions';
 import { GroupingState, ITableState, PaginatorState, SortState, TableResponseModel, TableService } from 'src/app/_metronic/shared/crud-table';
 import { environment } from 'src/environments/environment';
 import { Disponibilidad } from '../../reportes/_models/disponibilidad.model';
 import { Habitacion } from '../_models/habitacion';
+
 
 const DEFAULT_STATE: ITableState = {
   filter: {},
@@ -49,6 +50,7 @@ const DEFAULT_HABITACION = {
 export class HabitacionesService extends TableService<Habitacion> implements OnDestroy  {
 
   API_URL = `${environment.apiUrl}/codigos/habitaciones`;
+  API_URL_MAIN = `${environment.apiUrl}`
   /*Oservables*/
   HabitacionUpdate$: Observable<Habitacion>;
   private currentHabitacion$=new BehaviorSubject<Habitacion>(DEFAULT_HABITACION);
@@ -69,21 +71,14 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   }
 
   saveUrlToMongo(downloadURL:string,fileUploadName:string){
-    const params = new HttpParams()
-    .set('downloadURL', downloadURL)
-    .set('fileUploadName', fileUploadName)
-
-
-    return this.http.post(environment.apiUrl+"/update/habitaciones/url",{params:params}).pipe(
-      catchError(err => {
-        this.errorMessage.next(err);
-        console.error('UPDATE ITEM', err);
-        return of(err);
-      }),
-      // finalize(() => 
-      // this._isLoading$.next(false)
-      // )
-    );
+    return this.http.post(this.API_URL_MAIN+"/update/habitacion/imageurl",{downloadURL:downloadURL,fileUploadName:fileUploadName}).pipe(
+      map(result => {
+          return (result);  
+       }),
+      catchError((err, caught) => {
+        return err;
+      })
+    ).toPromise();;
   }
 
   getAll() :Observable<Habitacion[]> {
@@ -147,8 +142,11 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   }
 
   postHabitacion(habitacion:Habitacion,editar:boolean,filename:File){
-    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar})
-
+    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar}).pipe(
+      map(response=>{
+        return response
+      })
+    )
   }
 
   agregarInventario(habitacion:Habitacion,inventario:number){
@@ -171,13 +169,27 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
    }
 
-   creaDisponibilidad(numeroHabs:any,nombreCuarto:string){
-    return this.http.post(environment.apiUrl+'/disponibilidad/crear',{numeroHabs,nombreCuarto}).pipe(
+   creaDisponibilidad(numeroHabs:any,nombreCuarto:string){ 
+    return this.http.post(this.API_URL_MAIN+'/disponibilidad/crear',{numeroHabs,nombreCuarto})
+    .pipe(      
+      // catchError((error)=> {return error}),
       map(response=>{
         return response
       })
     )
    }
+
+   handleError(error) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      // client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    return throwError(errorMessage);
+  }
 
   ngOnDestroy() {
     this.subscriptions.forEach(sb => sb.unsubscribe());
