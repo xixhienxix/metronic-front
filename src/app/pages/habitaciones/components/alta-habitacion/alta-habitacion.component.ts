@@ -390,7 +390,7 @@ export class AltaHabitacionComponent implements OnInit {
   }
   
   let fromDate = this.fromDate.day+"/"+this.fromDate.month+"/"+this.fromDate.year
-  let toDate = this.toDate.day+"/"+this.toDate.month+"/"+this.toDate.year+1
+  let toDate = this.toDate.day+"/"+this.toDate.month+"/"+this.toDate.plus({ years: 1 });
 
   let tarifa : Tarifas= {
     Tarifa:'Tarifa Estandar',
