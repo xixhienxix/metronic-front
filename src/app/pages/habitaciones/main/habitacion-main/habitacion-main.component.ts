@@ -89,7 +89,7 @@ export class HabitacionMainComponent implements OnInit {
     
     if(!reloading)
     {
-      this.blockedTabled=true
+      // this.blockedTabled=true //
     }
     if(reloading){
       this.reloading=true
