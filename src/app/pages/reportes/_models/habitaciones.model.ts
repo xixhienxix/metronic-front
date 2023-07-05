@@ -7,7 +7,7 @@ export interface Habitaciones extends BaseModel
   Descripcion:string,
   Estatus:number;
   Camas:number;
-  Personas:number;
-  Personas_Extra:number;
+  Adultos:number;
+  Ninos:number;
   Tarifa:number;
 }

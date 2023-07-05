@@ -1098,11 +1098,11 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
     this.subscriptions.push(sb)
 
-    if(this.quantity>this.infoCuarto[0].Personas)
+    if(this.quantity>this.infoCuarto[0].Adultos)
     {
       this.formGroup.controls['adultos'].updateValueAndValidity();
-      this.maxNinos=this.infoCuarto[0].Personas
-      this.maxNinos=this.infoCuarto[0].Personas_Extra
+      this.maxNinos=this.infoCuarto[0].Adultos
+      this.maxNinos=this.infoCuarto[0].Ninos
     }
 
 

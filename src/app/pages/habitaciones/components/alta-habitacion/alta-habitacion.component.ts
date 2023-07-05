@@ -138,8 +138,8 @@ export class AltaHabitacionComponent implements OnInit {
       nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100),NoWhiteSpacesValidator.cannotContainSpace])],
       tipo: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       descripcion: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(1000)])],
-      personas: [1, Validators.compose([Validators.required,Validators.min(1)])],
-      extras: [0, Validators.required],
+      adultos: [1, Validators.compose([Validators.required,Validators.min(1)])],
+      ninos: [0, Validators.required],
       vista: [''],
       inventario: [1, Validators.required],
       orden:[1,Validators.required],
@@ -158,8 +158,8 @@ export class AltaHabitacionComponent implements OnInit {
       this.f.nombre.patchValue(this.habitacion.Codigo)
       this.f.tipo.patchValue(this.habitacion.Tipo)
       this.f.descripcion.patchValue(this.habitacion.Descripcion)
-      this.f.personas.patchValue(this.habitacion.Personas)
-      this.f.extras.patchValue(this.habitacion.Personas_Extra)
+      this.f.adultos.patchValue(this.habitacion.Adultos)
+      this.f.ninos.patchValue(this.habitacion.Ninos)
       this.f.vista.patchValue(this.habitacion.Vista)
       this.f.tarifaBase.patchValue(this.habitacion.Tarifa)
       this.f.inventario.patchValue(this.habitacion.Inventario)
@@ -194,6 +194,7 @@ export class AltaHabitacionComponent implements OnInit {
     this.subscriptions.push(sb)
 
   }
+
 
   getAmenidades(){
     this.reload=true;
@@ -284,8 +285,8 @@ export class AltaHabitacionComponent implements OnInit {
 
     this.quantity=1
     this.quantityExtra=0
-    this.formGroup.controls['personas'].patchValue(this.quantity)
-    this.formGroup.controls['extras'].patchValue(this.quantity)
+    this.formGroup.controls['adultos'].patchValue(this.quantity)
+    this.formGroup.controls['ninos'].patchValue(this.quantity)
     // this.formGroup.controls['inventario'].patchValue(1)
     this.camasArr=[]
     // this.amenidadesArr=[]
@@ -343,8 +344,8 @@ export class AltaHabitacionComponent implements OnInit {
       Numero:this.formGroup.value.etiqueta,
       Descripcion:this.formGroup.value.descripcion,
       Tipo:this.formGroup.value.tipo,
-      Personas:this.formGroup.value.personas,
-      Personas_Extra:this.formGroup.value.extras,
+      Adultos:this.formGroup.value.adultos,
+      Ninos:this.formGroup.value.ninos,
       Inventario:this.formGroup.value.inventario,
       Vista:this.formGroup.value.vista,
       Camas:conteoCamas,
@@ -360,8 +361,8 @@ export class AltaHabitacionComponent implements OnInit {
         Numero:nombreHabs,
         Descripcion:this.formGroup.value.descripcion,
         Tipo:this.formGroup.value.tipo,
-        Personas:this.formGroup.value.personas,
-        Personas_Extra:this.formGroup.value.extras,
+        Adultos:this.formGroup.value.adultos,
+        Ninos:this.formGroup.value.ninos,
         Inventario:this.formGroup.value.inventario,
         Vista:this.formGroup.value.vista,
         Camas:conteoCamas,
@@ -376,8 +377,8 @@ export class AltaHabitacionComponent implements OnInit {
         Numero:this.formGroup.value.nombreHabs,
         Descripcion:this.formGroup.value.descripcion,
         Tipo:this.formGroup.value.tipo,
-        Personas:this.formGroup.value.personas,
-        Personas_Extra:this.formGroup.value.extras,
+        Adultos:this.formGroup.value.adultos,
+        Ninos:this.formGroup.value.ninos,
         Inventario:this.formGroup.value.inventario,
         Vista:this.formGroup.value.vista,
         Camas:conteoCamas,
@@ -516,7 +517,7 @@ export class AltaHabitacionComponent implements OnInit {
     plus()
     {
         this.quantity++;
-        this.formGroup.controls['personas'].patchValue(this.quantity)
+        this.formGroup.controls['adultos'].patchValue(this.quantity)
         //this.formGroup.controls['ninos'].updateValueAndValidity();
     }
     minus()
@@ -524,19 +525,19 @@ export class AltaHabitacionComponent implements OnInit {
       if(this.quantity>1)
       {
       this.quantity--;
-      this.formGroup.controls['personas'].patchValue(this.quantity)
+      this.formGroup.controls['adultos'].patchValue(this.quantity)
 
       }
       else
       this.quantity
-      this.formGroup.controls['personas'].patchValue(this.quantity)
+      this.formGroup.controls['adultos'].patchValue(this.quantity)
 
     }
 
     plusExtra()
     {
         this.quantityExtra++;
-        this.formGroup.controls['extras'].patchValue(this.quantityExtra)
+        this.formGroup.controls['ninos'].patchValue(this.quantityExtra)
 
     }
     minusExtra()
@@ -544,12 +545,12 @@ export class AltaHabitacionComponent implements OnInit {
       if(this.quantityExtra>0)
       {
       this.quantityExtra--;
-      this.formGroup.controls['extras'].patchValue(this.quantityExtra)
+      this.formGroup.controls['ninos'].patchValue(this.quantityExtra)
 
       }
       else
       this.quantityExtra
-      this.formGroup.controls['extras'].patchValue(this.quantityExtra)
+      this.formGroup.controls['ninos'].patchValue(this.quantityExtra)
 
 
     }

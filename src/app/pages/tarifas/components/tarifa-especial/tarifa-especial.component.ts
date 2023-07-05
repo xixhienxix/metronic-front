@@ -300,9 +300,9 @@ export class TarifaEspecialComponent implements OnInit {
       }
   
       if(cuartosFiltrados.length==0){
-        this.maximoDePersonas=cuartosFiltrados[0].Personas
+        this.maximoDePersonas=cuartosFiltrados[0].Adultos
       }else{
-        this.maximoDePersonas= Math.max(...cuartosFiltrados.map(o => o.Personas))
+        this.maximoDePersonas= Math.max(...cuartosFiltrados.map(o => o.Adultos))
         
       }
       this.numbers = Array(this.maximoDePersonas);
