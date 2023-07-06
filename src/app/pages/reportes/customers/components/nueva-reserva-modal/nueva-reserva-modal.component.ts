@@ -62,7 +62,8 @@ type tarifarioTabla={
   Plan:string,
   Politicas:string,
   Salida:string,
-  TarifaxPersona:number[]
+  TarifaXAdulto:number[],
+  TarifaXNino:number[],
   Tarifa_Promedio:number,
   TarifaRack:number
 }
@@ -349,7 +350,8 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
                   EstanciaMinima:value[e].EstanciaMinima,
                   EstanciaMaxima:value[e].EstanciaMaxima,
                   TarifaRack:value[e].TarifaRack,
-                  TarifaxPersona:value[e].TarifaxPersona,
+                  TarifaXAdulto:value[e].TarifaXAdulto,
+                  TarifaXNino:value[e].TarifaXNino,
                   Dias:value[e].Dias,
                   Estado:value[e].Estado==true ? 'Activa' : 'No Activa',
                   Tarifa_Promedio:0

@@ -400,11 +400,14 @@ export class AltaHabitacionComponent implements OnInit {
     Salida:toDate,
     Plan:'Ninguno',
     Politicas:'Ninguno',
+    Adultos:1,
+    Ninos:0,
     EstanciaMinima:1,
     EstanciaMaxima:0,
     Estado:true,
     TarifaRack:this.formGroup.value.tarifaBase,
-    TarifaxPersona:[this.formGroup.value.tarifaBase],
+    TarifaXAdulto:[this.formGroup.value.tarifaBase],
+    TarifaXNino:[this.formGroup.value.tarifaBase],
 
     Dias:[
       {name:'Lun', value:0, checked:true},

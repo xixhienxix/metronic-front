@@ -252,8 +252,11 @@ export class TarifaExpressComponent implements OnInit {
       EstanciaMaxima:this.formControls['maxima'].value,
       Estado:true,
       TarifaRack:this.formControls['tarifaRack'].value,
-      TarifaxPersona:this.precios.value,
+      TarifaXAdulto:this.precios.value,
+      TarifaXNino:this.precios.value,
       Dias:this.options,
+      Adultos:1,
+      Ninos:0,
       Descuento:0
     }
 

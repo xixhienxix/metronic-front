@@ -50,6 +50,7 @@ export class TarifaEspecialComponent implements OnInit {
   tarifaFormGroup:FormGroup
   camasFC = new FormControl();
   precios = new FormArray([]);
+  preciosNinos = new FormArray([]);
   preciosFormGroup:FormGroup;
 
   /**Models & Arrays */
@@ -60,7 +61,8 @@ export class TarifaEspecialComponent implements OnInit {
   tarifaRackArr:any[]=[]
   tarifaRackArrOnly:Tarifas
   cuartosArray:Habitacion[]=[]
-  numbers
+  numbers:any
+  numbersNinos:any
   tarifas = []
 
   /**Variables */
@@ -71,7 +73,12 @@ export class TarifaEspecialComponent implements OnInit {
   descuentoTotalProCheckbox:boolean=false
   activa:boolean=true
   maximoDePersonas:number
+  maximoDeNinos:number;
   descuentoNoAplicado=false
+  adultos:number=1;
+  ninos:number=0
+  dehabilitaButtons:boolean=false
+
 
   /**Subscription */
   subscription:Subscription[]=[]
@@ -126,8 +133,15 @@ export class TarifaEspecialComponent implements OnInit {
     this.preciosFormGroup = this.fb.group({
       tarifaRack:[0,Validators.required],
       descuento:[0],
-      precios: this.fb.array([])
+      precios: this.fb.array([]),
+      preciosNinos: this.fb.array([]),
+      adultos:[1,Validators.required],
+      ninos:[0,Validators.required],
     })
+
+    const adultos = this.tarifaFormGroup.value.adultos
+    const ninos = this.tarifaFormGroup.value.ninos
+
 
 
     this.preciosFormGroup.controls['descuento'].valueChanges.subscribe(value => {
@@ -157,8 +171,11 @@ export class TarifaEspecialComponent implements OnInit {
                   Politicas:value[e].Politicas,
                   EstanciaMinima:value[e].EstanciaMinima,
                   EstanciaMaxima:value[e].EstanciaMaxima,
+                  Adultos:value[e].Adultos,
+                  Ninos:value[e].Ninos,
                   TarifaRack:value[e].TarifaRack,
-                  TarifaxPersona:value[e].TarifaxPersona,
+                  TarifaXAdulto:value[e].TarifaXAdulto,
+                  TarifaXNino:value[e].TarifaXNino,
                   Dias:value[e].Dias,
                   Estado:value[e].Estado==true ? 'Activa' : 'No Activa'
               }
@@ -193,15 +210,22 @@ export class TarifaEspecialComponent implements OnInit {
   }
 
   aplicaDescuento(){
-
+    this.dehabilitaButtons=true
     this.preciosControls.tarifaRack.patchValue(this.preciosControls.tarifaRack.value-(this.preciosControls.tarifaRack.value*this.preciosControls.descuento.value/100))
     
     let preciosConDesc = []
+    let preciosConDescNinos = []
 
     for(let i=0;i<this.precios.value.length;i++){
       preciosConDesc.push(this.precios.value[i]-(this.precios.value[i]*this.preciosControls.descuento.value/100))
     }
     this.precios.patchValue(preciosConDesc)
+
+    for(let i=0;i<this.preciosNinos.value.length;i++){
+      preciosConDescNinos.push(this.preciosNinos.value[i]-(this.preciosNinos.value[i]*this.preciosControls.descuento.value/100))
+    }
+    this.preciosNinos.patchValue(preciosConDescNinos)
+
     this.descuentoNoAplicado=false
 
 
@@ -284,6 +308,7 @@ export class TarifaEspecialComponent implements OnInit {
   tarifaEspecial(event:MatCheckboxChange){
     if(!event.checked){
       this.precios.clear();
+      this.preciosNinos.clear();
     }else{
 
       var cuartosFiltrados:Habitacion[]=[];
@@ -301,15 +326,24 @@ export class TarifaEspecialComponent implements OnInit {
   
       if(cuartosFiltrados.length==0){
         this.maximoDePersonas=cuartosFiltrados[0].Adultos
+        this.maximoDeNinos=cuartosFiltrados[0].Ninos
       }else{
         this.maximoDePersonas= Math.max(...cuartosFiltrados.map(o => o.Adultos))
-        
+        this.maximoDeNinos= Math.max(...cuartosFiltrados.map(o => o.Ninos))
+
       }
       this.numbers = Array(this.maximoDePersonas);
       this.numbers = this.numbers.fill().map((x,i)=>i)
+
+      this.numbersNinos = Array(this.maximoDeNinos);
+      this.numbersNinos = this.numbersNinos.fill().map((x,i)=>i)
   
       for(let e=1; e<this.numbers.length;e++){
         this.precios.push(new FormControl(0));
+      }
+
+      for(let e=1; e<this.numbersNinos.length;e++){
+        this.preciosNinos.push(new FormControl(0));
       }
   
       if(event.checked){
@@ -381,12 +415,15 @@ export class TarifaEspecialComponent implements OnInit {
       Llegada:fromDate,
       Salida:toDate,
       Plan:this.plan,
+      Adultos:this.preciosFormGroup.value.adultos,
+      Ninos:this.preciosFormGroup.value.ninos,
       Politicas: this.gratis!=true ? 'Gratis' : 'Ninguno' || this.sinRembolso!=true ? 'No Reembolsable' : 'Ninguno',
       EstanciaMinima:this.formControls['minima'].value,
       EstanciaMaxima:this.formControls['maxima'].value,
       Estado:true,
       TarifaRack:this.preciosControls['tarifaRack'].value,
-      TarifaxPersona:this.precios.value,
+      TarifaXAdulto:this.precios.value,
+      TarifaXNino:this.preciosNinos.value,
       Dias:this.options,
       Descuento:this.preciosControls['descuento'].value
     }

@@ -27,8 +27,11 @@ const DEFAULT_TARIFA = {
   EstanciaMaxima:1,
   Estado:true,
   TarifaRack:0,
-  TarifaxPersona:[0],
+  TarifaXAdulto:[0],
+  TarifaXNino:[0],
   Descuento:0,
+  Adultos:1,
+  Ninos:0,
   Dias:[
     {name:'Lun', value:0, checked:false},
     {name:'Mar', value:1, checked:false},

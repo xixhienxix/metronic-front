@@ -11,10 +11,13 @@ _id?:string;
     EstanciaMinima:number;
     EstanciaMaxima:number;
     TarifaRack:number;
-    TarifaxPersona:number[];
+    TarifaXAdulto:number[];
+    TarifaXNino:number[];
     Activa?:boolean;
     Descuento?:number;
-    Estado:boolean
+    Estado:boolean,
+    Adultos:number,
+    Ninos:number,
     Dias:{
         name: string;
         value: number;

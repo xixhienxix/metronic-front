@@ -171,20 +171,60 @@
         >
        </span></label>
      <!--[attr.disabled]="descuentoTotalProCheckbox ? false : null"-->
-      <input type="number" class="form-control" formControlName="tarifaRack" name="rack">
+      <input [disabled]="dehabilitaButtons" type="number" class="form-control" formControlName="tarifaRack" name="rack">
     </div>
   </div>
   <br> 
   <div class="row">
     <ng-container *ngIf="checkboxEspecial.checked">
-      <ng-container *ngFor="let item of precios.controls; let i = index">
-        <div class="col-lg-6">
-          <label style="color:#00506a; font-weight: bold;" class="form-label">Precio para {{i+2}} Adulto(s)</label>
-          <input type="number" class="form-control"  [formControl]="precios.controls[i]">
-        </div>
-      </ng-container>
+    <div class="col-lg-6" style="padding-bottom: 10px;">
+      <label style="color:#00506a; font-weight: bold;" class="form-label">Número de Adutos:</label>
+      <mat-select [(ngModel)]="adultos" class="form-control form-control-lg" formControlName="adultos">
+        <ng-container *ngFor="let adulto of resultLocationCamas">
+
+        </ng-container>
+        <mat-option [value]="1">1</mat-option>
+        <mat-option [value]="2">2</mat-option>
+        <mat-option [value]="3">3</mat-option>
+        <mat-option [value]="4">4</mat-option>
+        <mat-option [value]="5">5</mat-option>
+        <mat-option [value]="6">6</mat-option>
+        <mat-option [value]="7">7</mat-option>
+        <mat-option [value]="8">8</mat-option>
+      </mat-select>
+    </div>
+    <div class="col-lg-6" style="padding-bottom: 10px;">
+      <label style="color:#00506a; font-weight: bold;" class="form-label">Número de niños:</label>
+      <mat-select [(ngModel)]="ninos" class="form-control form-control-lg" formControlName="ninos">
+        <mat-option [value]="0">0</mat-option>
+        <mat-option [value]="1">1</mat-option>
+        <mat-option [value]="2">2</mat-option>
+        <mat-option [value]="3">3</mat-option>
+        <mat-option [value]="4">4</mat-option>
+        <mat-option [value]="5">5</mat-option>
+        <mat-option [value]="6">6</mat-option>
+        <mat-option [value]="7">7</mat-option>
+        <mat-option [value]="8">8</mat-option>
+      </mat-select>        
+    </div>
     </ng-container>
   </div>
+  <div class="row">
+      <ng-container *ngFor="let item of precios.controls; let i = index">
+        <div class="col-lg-6" style="padding-bottom: 10px;">
+          <label style="color:#00506a; font-weight: bold;" class="form-label">Precio para {{i+2}} Adulto(s)</label>
+          <input [disabled]="dehabilitaButtons" type="number" class="form-control"  [formControl]="precios.controls[i]">
+        </div>
+      </ng-container>
+  </div>
+  <div class="row">
+    <ng-container *ngFor="let item of preciosNinos.controls; let i = index">
+      <div class="col-lg-6" style="padding-bottom: 10px;">
+        <label style="color:#00506a; font-weight: bold;" class="form-label">Precio para {{i+1}} Niños(s)</label>
+        <input [disabled]="dehabilitaButtons" type="number" class="form-control"  [formControl]="preciosNinos.controls[i]">
+      </div>
+    </ng-container>
+</div>
   <div class="row">
     <div class="col-lg-6">
     <section class="checkbox-section">

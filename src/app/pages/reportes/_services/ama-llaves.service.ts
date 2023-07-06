@@ -33,7 +33,6 @@ export class AmaLlavesService {
   getAmaDeLlaves(){
       return this.http.get<Ama_De_Llaves[]>(environment.apiUrl+'/reportes/ama_llaves')
       .pipe( map(responseData=>{
-        console.log("MAP",responseData)
         return responseData
       })
       )}
@@ -41,7 +40,6 @@ export class AmaLlavesService {
   getAmaDeLlavesByID(cuarto:string,numero:number){
         return this.http.get<Ama_De_Llaves>(environment.apiUrl+'/reportes/ama_llaves/'+{cuarto,numero})
         .pipe( map(responseData=>{
-          console.log("MAP",responseData)
           return responseData
         })
     )}

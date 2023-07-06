@@ -11,8 +11,11 @@ export interface Tarifas extends BaseModel {
     EstanciaMinima:number;
     EstanciaMaxima:number;
     TarifaRack:number;
-    TarifaxPersona:number[]
-    Estado:boolean
+    TarifaXAdulto:number[]
+    TarifaXNino:number[]
+    Estado:boolean,
+    Adultos:number,
+    Ninos:number,
     Dias:{
         name: string;
         value: number;

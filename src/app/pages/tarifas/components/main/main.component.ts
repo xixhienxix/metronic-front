@@ -99,7 +99,8 @@ export class MainComponent implements OnInit {
                   EstanciaMinima:value[e].EstanciaMinima,
                   EstanciaMaxima:value[e].EstanciaMaxima,
                   TarifaRack:value[e].TarifaRack,
-                  TarifaxPersona:value[e].TarifaxPersona,
+                  TarifaXAdulto:value[e].TarifaXAdulto,
+                  TarifaXNino:value[e].TarifaXNino,
                   Dias:value[e].Dias,
                   Estado:value[e].Estado==true ? 'Activa' : 'No Activa'
               }
@@ -217,7 +218,8 @@ export class MainComponent implements OnInit {
               EstanciaMinima:this.tarifaRackCompleto[i].EstanciaMinima,
               EstanciaMaxima:this.tarifaRackCompleto[i].EstanciaMaxima,
               TarifaRack:this.tarifaRackCompleto[i].TarifaRack,
-              TarifaxPersona:this.tarifaRackCompleto[i].TarifaxPersona,
+              TarifaXAdulto:this.tarifaRackCompleto[i].TarifaXAdulto,
+              TarifaXNino:this.tarifaRackCompleto[i].TarifaXNino,
               Dias:this.options,
               Estado:true
           }
