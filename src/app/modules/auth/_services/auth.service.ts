@@ -12,6 +12,9 @@ export interface AuthModel {
   nombre:string,
   terminos:string,
   accessToken:string,
+  email:string,
+  hotel:string,
+  rol:number,
 }
 
 @Injectable({
@@ -47,7 +50,6 @@ export class AuthService implements OnDestroy {
     return this.http.post(environment.apiUrl+"/auth/login",{username,password})
     .pipe(catchError(err => 
       {
-      // let errMessaje = 'Ocurrio un Error'
       if(err){
 
         this._hasError$.next(true)
@@ -59,8 +61,8 @@ export class AuthService implements OnDestroy {
           if(datosUsuario.hasOwnProperty(i))
           {
              usuario = datosUsuario[i]
+             this.currentUserSubject.next(usuario);
              this.currentUserSubject = new BehaviorSubject<AuthModel>(usuario);
-
           }
         }
       if(usuario){
@@ -91,6 +93,24 @@ export class AuthService implements OnDestroy {
       }
     }))
       
+  }
+
+  create(hotel:string,fullname:string,email:string,username:string,password:string,terminos:boolean)
+  {
+    return this.http.post<any>(environment.apiUrl+"/createdb",{hotel,fullname,email,username,password,terminos})
+    .pipe(map(res=>{
+      let mensaje=null
+      if(res.mensaje==="Tablas creadas correctamente"){
+
+        return res
+      }
+      if(res.response==='El usuario ya existe especifique otro nombre de usuario'){
+        return res.response
+      }
+      else {
+        return mensaje ='No se pudo registrar al usuario'
+      }
+    }))
   }
 
   logout(){
@@ -135,6 +155,8 @@ export class AuthService implements OnDestroy {
   saveUserData(data:any){
     localStorage.setItem('ACCESS_TOKEN',data.accessToken)
     localStorage.setItem('USER',JSON.stringify(data))
+    localStorage.setItem('HOTEL',data.hotel)
+
   }
 
   isAuthenticated():boolean

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {Foliador } from '../_models/foliador.model'
-import { Observable, throwError , of } from 'rxjs';
+import { Observable, throwError , of, BehaviorSubject } from 'rxjs';
 import { HttpClient } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { catchError, map, tap  } from 'rxjs/operators';
@@ -9,14 +9,15 @@ import { catchError, map, tap  } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class FoliosService {
-  private listaFolios: Foliador[] = [];
-  // private foliosUpdated = new Subject<Foliador[]>();
+  private currentFolios$=new BehaviorSubject<Foliador>(undefined);
 
-  // getFolios(): Observable<Foliador>[] {
-  //   const folios = of (FOLIOS);
-  //   return folios;
-  // }
+  get getCurrentFoliosValue(): Foliador {
+    return this.currentFolios$.value;
+  }
 
+  set setCurrentFoliosValue(foliador: Foliador) {
+    this.currentFolios$.next(foliador);
+  }
 
   getFoliosbyLetra(id:string) : Observable<Foliador[]> {
     console.log("BY LETRA = environment.apiUrl + '/reportes/folios'",environment.apiUrl + '/reportes/folios')
@@ -34,12 +35,18 @@ export class FoliosService {
   getFolios() :Observable<Foliador[]> {
    return this.http
     .get<Foliador[]>(environment.apiUrl + '/reportes/folios')
-    .pipe(
-      map(responseData=>{
-      return responseData
-    })
-    )
-
+    .pipe(map(
+      (value)=>{
+        const postArray = []
+         for(const key in value)
+         {
+           if(value.hasOwnProperty(key))
+           postArray.push(value[key]);
+           this.setCurrentFoliosValue = postArray[0] 
+          }
+          return value
+      }
+      ))
   }
 
   updateFolio(id:number) {

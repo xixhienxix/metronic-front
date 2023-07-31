@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -23,7 +23,7 @@ const DEFAULT_PARAMS ={
 })
 export class ParametrosServiceService {
 
-  private currentParametros$=new BehaviorSubject<Parametros>(DEFAULT_PARAMS);
+  currentParametros$=new BehaviorSubject<Parametros>(DEFAULT_PARAMS);
 
   constructor(public http:HttpClient,
     private divisaService:DivisasService) { }
@@ -37,16 +37,20 @@ export class ParametrosServiceService {
   }
 
 
-  getParametros(){
-    return this.http.get<Parametros>(environment.apiUrl+'/parametros').pipe(map(
+  getParametros(hotel:string){
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+    
+    return this.http.get<Parametros>(environment.apiUrl+'/parametros',{params:queryParams}).pipe(map(
       (value)=>{
         const postArray = []
          for(const key in value)
          {
            if(value.hasOwnProperty(key))
            postArray.push(value[key]);
-           this.setCurrentParametrosValue =postArray[0] 
-           this.divisaService.getDivisasByParametro(postArray[0].divisa)       
+           this.divisaService.getDivisasByParametro(postArray[0].divisa)   
+           this.setCurrentParametrosValue = postArray[0] 
+    
           }
       }))
   }

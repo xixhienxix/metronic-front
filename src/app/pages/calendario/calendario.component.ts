@@ -9,6 +9,7 @@ import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { takeUntil } from 'rxjs/operators';
 import { DisponibilidadService } from '../reportes/_services/disponibilidad.service';
+import { AuthService } from 'src/app/modules/auth';
 
 export interface ListaHabitaciones {
   Habitacion: string;
@@ -43,12 +44,10 @@ export class CalendarioComponent implements OnInit {
     public habitacionService : HabitacionesService,
     public parametrosService : ParametrosServiceService,
     public modalService: NgbModal,
-    public disponibilidadService : DisponibilidadService
+    public disponibilidadService : DisponibilidadService,
+    public authService : AuthService
     ) {
-      
-      this.today = DateTime.now().setZone('America/Mexico_City')
-    // this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
-
+    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
     this.displayedColumns.length = this.getDatest();
 
     this.displayedColumns.fill('filler');
@@ -58,29 +57,12 @@ export class CalendarioComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.getDisponibilidad();
-    this.getParametros();
     this.getHabitaciones();
-  }
-
-  async getParametros(): Promise<any>{
-
-    return new Promise((resolve, reject) => {
-
-      this.parametrosService.getParametros().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-        (value)=>{
-          this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
-          this.displayedColumns.length = this.getDatest();
-          resolve(this.getDatest())
-        },
-        (error)=>{
-          reject('No se pudieron cargar los Parametros refresque la pagina')
-        })
- 
- 
-   })
 
   }
+
 
   getDisponibilidad(){
     this.disponibilidadService.getDisponibilidadAnual(this.today.day,this.today.month,this.today.year).subscribe(

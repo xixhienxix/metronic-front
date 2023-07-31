@@ -38,7 +38,6 @@ set setcurrentDivisa(divisa:Divisas){
     .subscribe(
       (value)=>{
         this.setcurrentDivisa=value[0]
-        console.log(this.getcurrentDivisa.Simbolo)
       },
       ()=>{}
       )

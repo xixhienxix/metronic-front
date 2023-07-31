@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         Validators.compose([
           Validators.required,
           Validators.minLength(3),
-          Validators.maxLength(10),
+          Validators.maxLength(20),
         ]),
       ],
       password: [
@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         Validators.compose([
           Validators.required,
           Validators.minLength(3),
-          Validators.maxLength(10),
+          Validators.maxLength(15),
         ]),
       ],
     });
@@ -73,9 +73,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       {
         if(value)
         {
-        this.parametrosService.getParametros().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+        this.parametrosService.getParametros(this.authService.currentUserValue.hotel).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
           (value1)=>{
-
+              this.parametrosService.getCurrentParametrosValue
               this.router.navigate(['/reportes'])// /calendario
 
           },

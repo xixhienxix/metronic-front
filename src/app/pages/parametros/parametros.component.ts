@@ -9,6 +9,7 @@ import { TimeZones } from './_models/timezone';
 import { DivisasService } from './_services/divisas.service';
 import { ParametrosServiceService } from './_services/parametros.service.service';
 import { TimezonesService } from './_services/timezones.service.service';
+import { AuthService } from 'src/app/modules/auth';
 
 const DEFAULT_TIMEZONE = {
   _id:'',
@@ -49,14 +50,15 @@ export class ParametrosComponent implements OnInit {
     public modal : NgbModal,
     public timezonesService : TimezonesService,
     public divisasService:DivisasService,
-    public parametrosService:ParametrosServiceService
+    public parametrosService:ParametrosServiceService,
+    public authService : AuthService
   ) { 
     this.fechas= new Date();
     this.parametrosService.getCurrentParametrosValue
   }
 
   ngOnInit(): void {
-    this.getParametros();
+    this.setFormGroup();
     this.getTimeZones();
     this.getDivisas();
     this.initForm();
@@ -67,9 +69,8 @@ export class ParametrosComponent implements OnInit {
     this.susbcription.forEach(sb=>sb.unsubscribe())
   }
   
-  getParametros(){
-    this.parametrosService.getParametros().subscribe(
-      (value)=>{
+  setFormGroup(){
+
         this.formGroup.controls['timeZone'].setValue(this.parametrosService.getCurrentParametrosValue.codigoZona);
         this.formGroup.controls['divisa'].setValue(this.parametrosService.getCurrentParametrosValue.divisa);
         this.formGroup.controls['iva'].setValue(this.parametrosService.getCurrentParametrosValue.iva);
@@ -77,12 +78,6 @@ export class ParametrosComponent implements OnInit {
         this.formGroup.controls['checkOut'].setValue(this.parametrosService.getCurrentParametrosValue.checkOut);
         this.formGroup.controls['noShow'].setValue(this.parametrosService.getCurrentParametrosValue.noShow);
         this.formGroup.controls['auditoria'].setValue(this.parametrosService.getCurrentParametrosValue.auditoria);
-      },
-      (error)=>{
-        const modalRef=this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-        modalRef.componentInstance.alertsHeader='Error'
-        modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
-      })
   }
 
   getTimeZones()
@@ -184,7 +179,7 @@ export class ParametrosComponent implements OnInit {
        const modalRef = this.modal.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
        modalRef.componentInstance.alertHeader='Exito'
        modalRef.componentInstance.mensaje='Parametros Actualizados con exito'
-        this.getParametros()
+        this.setFormGroup()
       },
       (error)=>{
         this.isLoading=false

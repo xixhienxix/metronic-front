@@ -184,29 +184,28 @@ export class CustomersComponent
     public amaDeLlavesService:AmaLlavesService
 
   ) {
+    this.divisasService.getcurrentDivisa.Simbolo
+ // this.iddleService.initiateIddle();
 
   }
 
 
   // angular lifecircle hooks
   ngOnInit(): void {
+    // this.postService.getPost();
+    this.getCuartos();
+    this.getEstatus();
+    this.getOrigen();
+    this.getTipoCuarto();
+    this.getAmaDeLlaves();
+    this.customerService.fetch();
 
     this.customerService.items$.subscribe(
       (result)=>{
-        this.divisasService.getcurrentDivisa.Simbolo
-
-        this.iddleService.initiateIddle();
-        this.postService.getPost();
-        this.getFolios();
-        this.getCuartos();
-        this.getEstatus();
-        this.getOrigen();
-        this.getTipoCuarto();
+      
         this.filterForm();
         this.searchForm();
-        this.getAmaDeLlaves();
         // this.getEstatusAmaDeLlaves();
-        this.customerService.fetch();
         this.grouping = this.customerService.grouping;
         this.paginator = this.customerService.paginator;
         this.sorting = this.customerService.sorting;
@@ -321,25 +320,6 @@ this.origenService.getOrigenes()
                         })
   }
 
-
-
-  getFolios(): void {
-
-    this.foliosService.getFolios()
-                      .pipe(map(
-                        (responseData)=>{
-                          const postArray = []
-                          for(const key in responseData)
-                          {
-                            if(responseData.hasOwnProperty(key))
-                            postArray.push(responseData[key]);
-                          }
-                          return postArray
-                        }))
-                        .subscribe((folios)=>{
-                          this.folios=(folios)
-                        })
-  }
 
   getTipoCuarto(): void {
 
@@ -506,7 +486,23 @@ this.origenService.getOrigenes()
     );
     }
 
+    getFolios(): void {
 
+      this.foliosService.getFolios()
+                        .pipe(map(
+                          (responseData)=>{
+                            const postArray = []
+                            for(const key in responseData)
+                            {
+                              if(responseData.hasOwnProperty(key))
+                              postArray.push(responseData[key]);
+                            }
+                            return postArray
+                          }))
+                          .subscribe((folios)=>{
+                            this.folios=(folios)
+                          })
+    }
 
    edit(id: number) {
 

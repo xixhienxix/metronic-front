@@ -10,15 +10,18 @@ import { LogoutComponent } from './logout/logout.component';
 import { AuthComponent } from './auth.component';
 import {TranslationModule} from '../i18n/translation.module';
 import { LoaderSpinnerComponent } from './login/loader-spinner/loading-spinner.component';
+import {MatFormFieldModule} from '@angular/material/form-field';
+
 @NgModule({
   declarations: [LoaderSpinnerComponent,
     LoginComponent,
     RegistrationComponent,
     ForgotPasswordComponent,
     LogoutComponent,
-    AuthComponent
+    AuthComponent,
   ],
   imports: [
+    MatFormFieldModule,
     CommonModule,
     TranslationModule,
     AuthRoutingModule,

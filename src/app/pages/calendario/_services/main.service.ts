@@ -18,6 +18,8 @@ export class MainService {
 
   constructor(public parametrosService : ParametrosServiceService) { 
 
+    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.getDatest(this.today);
   }
 
   get currentCuentaValue(): any[] {
@@ -35,20 +37,6 @@ export class MainService {
   getNotification(){
     return this.subject.asObservable();
 }
-
-  getParametros(){
-    const sb = this.parametrosService.getParametros().pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-      (value)=>{
-        this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
-        this.getDatest(this.today);
-      },
-      (error)=>{
-        // const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-        // modalRef.componentInstance.alertsHeader='Error'
-        // modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
-      })
-
-  }
 
   getDatest(today:DateTime){
    let configTabla : {

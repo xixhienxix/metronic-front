@@ -53,21 +53,21 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     public parametrosService:ParametrosServiceService,
     public auditoriaService:AuditoriaService,
     public modal : NgbModal,
-    public i18n : NgbDatepickerI18n
+    public i18n : NgbDatepickerI18n,
+    public authService:AuthService
       ) {
-    this.user$ = this.auth.currentUserSubject.asObservable();
-    const sb = this.parametrosService.getParametros().subscribe(
-      (value)=>{
-       this.fecha = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
-       this.fecha0=this.fecha.toString().split('T')[0]        
-       this.fecha1=this.fecha.toString().split('T')[1]  
-       this.todayString =this.fecha.day+" de "+this.i18n.getMonthFullName(this.fecha.month)+" del "+this.fecha.year
-       this.horaString=this.fecha.toFormat('HH:mm')
-      //  this.fecha = DateTime.fromString('12.05am', 'hh.mma', {zone: 'utc'}).toFormat('HH:mm')
+        this.parametrosService.currentParametros$.subscribe((val)=>{
+          console.log(val)
+          this.fecha = DateTime.now().setZone(val.zona)
+          this.fecha0=this.fecha.toString().split('T')[0]        
+          this.fecha1=this.fecha.toString().split('T')[1]  
+          this.todayString =this.fecha.day+" de "+this.i18n.getMonthFullName(this.fecha.month)+" del "+this.fecha.year
+          this.horaString=this.fecha.toFormat('HH:mm')
+          //  this.fecha = DateTime.fromString('12.05am', 'hh.mma', {zone: 'utc'}).toFormat('HH:mm')
 
-      });
-    this.subscription.push(sb)
-  }
+        })
+    this.user$ = this.auth.currentUserSubject.asObservable();
+    }
 
   ngOnInit(): void {
     // topbar extras
@@ -98,7 +98,6 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     this.user$ = this.auth.currentUserSubject.asObservable();
 
   }
-
 
   ngAfterViewInit(): void {
     KTUtil.ready(() => {

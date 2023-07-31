@@ -37,17 +37,17 @@ export class ReportesComponent implements OnInit {
     this.subscriptions.forEach((sb)=>sb.unsubscribe());
   }
 
-  getPost(){
-    const sb = this.http
-    .get<{huesped:Huesped[]}>
-    (environment.apiUrl + '/reportes/huesped')
-    .subscribe( (postHuesped) => {
-      this.huesped = postHuesped.huesped
-    });
+  // getPost(){
+  //   const sb = this.http
+  //   .get<{huesped:Huesped[]}>
+  //   (environment.apiUrl + '/reportes/huesped')
+  //   .subscribe( (postHuesped) => {
+  //     this.huesped = postHuesped.huesped
+  //   });
     
-    this.subscriptions.push(sb);
+  //   this.subscriptions.push(sb);
 
-  }
+  // }
 
   getPostUpdateListener() {
     return this.postsUpdated.asObservable();

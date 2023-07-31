@@ -22,6 +22,7 @@ import { AlertsComponent } from '../../../../../main/alerts/alerts.component';
 import {DateTime} from 'luxon'
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
+import { AuthService } from 'src/app/modules/auth';
 
 type listaHabitaciones = {key:number;value:string}
 
@@ -182,7 +183,8 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
     public postService : ReportesComponent,
     private http: HttpClient,
     public i18n: NgbDatepickerI18n,
-    public parametrosService : ParametrosServiceService
+    public parametrosService : ParametrosServiceService,
+    public authService : AuthService
     )
     {
       this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
@@ -199,7 +201,6 @@ export class BloqueoReservaModalComponent implements  OnInit, OnDestroy
 
 
   ngOnInit(): void {
-    this.getParametros();
     this.loadForm();
     this.getCodigosCuarto();
     this.getHabitaciones();
@@ -227,20 +228,6 @@ onFormSubmit(value: string) {
   else {
     console.log('invalid');
   }
-}
-
-
-getParametros(){
- const sb = this.parametrosService.getParametros().subscribe(
-    (value)=>{
-      
-    },
-    (error)=>{
-      const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-      modalRef.componentInstance.alertsHeader='Error'
-      modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
-    })
-    this.subscription.push(sb)
 }
 
   getHabitaciones()

@@ -38,6 +38,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TarifaService } from '../../../_services/tarifas.service';
 import { Tarifas } from '../../../_models/tarifas';
+import { AuthService } from 'src/app/modules/auth';
 
 // const todayDate = new Date();
 
@@ -286,11 +287,9 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     public i18n: NgbDatepickerI18n,
     public parametrosService:ParametrosServiceService,
     public divisasService:DivisasService,
-    public tarifasService:TarifaService
+    public tarifasService:TarifaService,
+    public authService:AuthService
     ) {
-
-    
-
 
       this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
@@ -314,7 +313,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 
   ngOnInit(): void {
-    this.getParametros();
     this.historicoService.fetch();
     this.loadCustomer();
     this.getHistorico();
@@ -382,21 +380,6 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
       },
       
       ()=>{})
-
-      this.subscriptions.push(sb)
-  }
-
-
-  getParametros(){
-    const sb = this.parametrosService.getParametros().subscribe(
-      (value)=>{
-        
-      },
-      (error)=>{
-        const modalRef=this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
-        modalRef.componentInstance.alertsHeader='Error'
-        modalRef.componentInstance.mensaje='No se pudieron cargar los Parametros intente de nuevo'
-      })
 
       this.subscriptions.push(sb)
   }

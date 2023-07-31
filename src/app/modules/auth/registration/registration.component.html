@@ -11,7 +11,7 @@
     <!--begin::Title-->
     <div class="pb-13 pt-lg-0 pt-5">
       <h3 class="font-weight-bolder text-dark font-size-h4 font-size-h1-lg">
-        Registro
+        Registro de Hotel
       </h3>
       <p class="text-muted font-weight-bold font-size-h4">
         Llena el formulario con tus datos
@@ -31,13 +31,55 @@
 
     <!--begin::Form group-->
     <div class="form-group">
+      <label class="font-size-h6 font-weight-bolder text-dark">Nombre del Hotel</label>
+      <input
+        class="form-control form-control-solid h-auto py-7 px-6 rounded-lg font-size-h6"
+        type="text"
+        name="hotel"
+        formControlName="hotel"
+        placeholder="Nombre del Hotel"
+        autocomplete="off"
+        [ngClass]="{
+          'is-invalid': registrationForm.controls['hotel'].invalid
+        }"
+      />
+      <mat-error *ngIf="registrationForm.controls['hotel'].hasError('invalidName')">
+        Special characters not allowed!
+      </mat-error>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'required',
+          message: 'El Nombre del Hotel es obligatorio',
+          control: registrationForm.controls['hotel']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'minlength',
+          message: 'Nombre del Hotel debe de tener almenos 3 caracteres',
+          control: registrationForm.controls['hotel']
+        }"
+      ></ng-container>
+      <ng-container
+        [ngTemplateOutlet]="formError"
+        [ngTemplateOutletContext]="{
+          validation: 'maxLength',
+          message: 'Nombre del Hotel debe de tener maximo 100 caracteres',
+          control: registrationForm.controls['hotel']
+        }"
+      ></ng-container>
+    </div>
+
+    <div class="form-group">
       <label class="font-size-h6 font-weight-bolder text-dark">Nombre Completo</label>
       <input
         class="form-control form-control-solid h-auto py-7 px-6 rounded-lg font-size-h6"
         type="text"
         name="fullname"
         formControlName="fullname"
-        placeholder="Fullname"
+        placeholder="Nombre Completo"
         autocomplete="off"
         [ngClass]="{
           'is-invalid': registrationForm.controls['fullname'].invalid
@@ -76,7 +118,7 @@
       <input
         class="form-control form-control-solid h-auto py-7 px-6 rounded-lg font-size-h6"
         type="email"
-        placeholder="Email"
+        placeholder="Correo Electronico"
         name="email"
         formControlName="email"
         autocomplete="off"
