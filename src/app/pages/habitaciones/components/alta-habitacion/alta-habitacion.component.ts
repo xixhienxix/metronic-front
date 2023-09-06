@@ -135,7 +135,7 @@ export class AltaHabitacionComponent implements OnInit {
 
 
     this.formGroup = this.fb.group({
-      nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100),NoWhiteSpacesValidator.cannotContainSpace])],
+      nombre: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       tipo: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(100)])],
       descripcion: ['', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(1000)])],
       adultos: [1, Validators.compose([Validators.required,Validators.min(1)])],
@@ -309,7 +309,7 @@ export class AltaHabitacionComponent implements OnInit {
   async onSubmit(){
     let habitacionNueva:Habitacion
     this.inicio=false
-
+    const codigoHab = this.formGroup.value.nombre.replace(' ', '_')
 
     if(this.formGroup.invalid){
       this.findInvalidControls()
@@ -340,7 +340,7 @@ export class AltaHabitacionComponent implements OnInit {
   if(this.editarHab==true){
     habitacionNueva = {
       _id:this.habitacion._id,
-      Codigo:this.formGroup.value.nombre,
+      Codigo:codigoHab,
       Numero:this.formGroup.value.etiqueta,
       Descripcion:this.formGroup.value.descripcion,
       Tipo:this.formGroup.value.tipo,
@@ -357,7 +357,7 @@ export class AltaHabitacionComponent implements OnInit {
   }else {
     if(nombreHabs.length!=0){
       habitacionNueva = {
-        Codigo:this.formGroup.value.nombre,
+        Codigo:codigoHab,
         Numero:nombreHabs,
         Descripcion:this.formGroup.value.descripcion,
         Tipo:this.formGroup.value.tipo,
@@ -373,7 +373,7 @@ export class AltaHabitacionComponent implements OnInit {
       }
     }else{
       habitacionNueva = {
-        Codigo:this.formGroup.value.nombre,
+        Codigo:codigoHab,
         Numero:this.formGroup.value.nombreHabs,
         Descripcion:this.formGroup.value.descripcion,
         Tipo:this.formGroup.value.tipo,
@@ -395,7 +395,7 @@ export class AltaHabitacionComponent implements OnInit {
 
   let tarifa : Tarifas= {
     Tarifa:'Tarifa Estandar',
-    Habitacion:this.formGroup.value.nombre,
+    Habitacion:codigoHab,
     Llegada:fromDate,
     Salida:toDate,
     Plan:'Ninguno',

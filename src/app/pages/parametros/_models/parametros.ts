@@ -6,6 +6,7 @@ export interface Parametros {
     zona:string,
     noShow:string,
     checkOut:string,
+    checkIn:string,
     auditoria:string,
     codigoZona:string,
     id?:string,

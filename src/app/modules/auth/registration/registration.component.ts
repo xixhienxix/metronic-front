@@ -122,27 +122,32 @@ export class RegistrationComponent implements OnInit, OnDestroy {
         if(value.mensaje==="Tablas creadas correctamente")
         {
           this.router.navigate(['auth/login'])
-        }
-        if(value.response){
+        } else
+        if(value==='El nombre de usuario no se puede usar, especifique otro'){
           const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
           modalRef.componentInstance.alertHeader = 'Error'
-          modalRef.componentInstance.mensaje=value.response
+          modalRef.componentInstance.mensaje=value
 
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
                 this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
             });
-            setTimeout(() => {
-              modalRef.close('Close click');
-            },4000)
               
         }
       },
       (err)=>{
         if(err){
-          console.log(err)
-        }
+          const modalRef = this.modalService.open(AlertsComponent, { size: 'sm', backdrop:'static' });
+          modalRef.componentInstance.alertHeader = 'Error'
+          modalRef.componentInstance.mensaje='No se puede crear un usuario nuevo en este momento, intente de nuevo mas tarde o contactenos via email si el problema persiste'
+
+          modalRef.result.then((result) => {
+            this.closeResult = `Closed with: ${result}`;
+            }, (reason) => {
+                this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+            });
+            }
       },
       ()=>{
         

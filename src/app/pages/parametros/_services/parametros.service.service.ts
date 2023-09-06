@@ -13,6 +13,7 @@ const DEFAULT_PARAMS ={
   auditoria:'',
   noShow:'',
   checkOut:'',
+  checkIn:'',
   zona:'',
   divisa:'',
   codigoZona:''

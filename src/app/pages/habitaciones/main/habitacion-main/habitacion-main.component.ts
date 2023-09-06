@@ -65,7 +65,9 @@ export class HabitacionMainComponent implements OnInit {
     this.habitacionService.fetch()
     this.getHabitaciones(false)
 
-    const sb = this.habitacionService.isLoading$.subscribe((res) => this.isLoading = res);
+    const sb = this.habitacionService.isLoading$.subscribe((res) => {
+      this.isLoading = res
+    });
     this.subscriptions.push(sb);
 
     this.grouping = this.habitacionService.grouping;
@@ -73,6 +75,8 @@ export class HabitacionMainComponent implements OnInit {
     this.sorting = this.habitacionService.sorting;
     this.sorting.column = 'Codigo'
     this.sorting.direction = 'asc'
+    
+    this.isLoading=false
   }
 
   getImagenesHabitaciones(){

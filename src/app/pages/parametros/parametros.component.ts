@@ -58,10 +58,11 @@ export class ParametrosComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.initForm();
+
     this.setFormGroup();
     this.getTimeZones();
     this.getDivisas();
-    this.initForm();
   }
 
   ngOnDestroy():void
@@ -76,6 +77,7 @@ export class ParametrosComponent implements OnInit {
         this.formGroup.controls['iva'].setValue(this.parametrosService.getCurrentParametrosValue.iva);
         this.formGroup.controls['ish'].setValue(this.parametrosService.getCurrentParametrosValue.ish);
         this.formGroup.controls['checkOut'].setValue(this.parametrosService.getCurrentParametrosValue.checkOut);
+        this.formGroup.controls['checkIn'].setValue(this.parametrosService.getCurrentParametrosValue.checkIn);
         this.formGroup.controls['noShow'].setValue(this.parametrosService.getCurrentParametrosValue.noShow);
         this.formGroup.controls['auditoria'].setValue(this.parametrosService.getCurrentParametrosValue.auditoria);
   }
@@ -131,6 +133,7 @@ export class ParametrosComponent implements OnInit {
       iva:['',Validators.required],
       ish:['',Validators.required],
       checkOut:['',Validators.required],
+      checkIn:['',Validators.required],
       noShow:['',Validators.required],
       auditoria:['',Validators.required]
     })
@@ -167,6 +170,7 @@ export class ParametrosComponent implements OnInit {
       codigoZona:codigoZona,
       noShow:this.getFormGroupValues.noShow.value,
       checkOut:this.getFormGroupValues.checkOut.value,
+      checkIn:this.getFormGroupValues.checkIn.value,
       auditoria:this.getFormGroupValues.auditoria.value,
       
 

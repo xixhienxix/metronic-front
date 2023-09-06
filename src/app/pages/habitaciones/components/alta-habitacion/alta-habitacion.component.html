@@ -30,10 +30,10 @@
                                 class="form-control"
                                 [class.is-invalid]="isControlInvalid('nombre')"
                                 [class.is-valid]="isControlValid('nombre')">
-                                <div
+                                <!-- <div
                                 class="invalid-feedback"
                                 *ngIf="controlHasError('cannotContainSpace','nombre')"
-                                >El Nombre no puede contener espacio en blanco, utilize '_' en su lugar</div>
+                                >El Nombre no puede contener espacio en blanco, utilize '_' en su lugar</div> -->
                                 <div
                                 class="invalid-feedback"
                                 *ngIf="controlHasError('required', 'nombre')"
