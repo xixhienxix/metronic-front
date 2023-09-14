@@ -8,7 +8,7 @@ export const environment = {
   USERDATA_KEY: 'authf649fc9a5f55',
   isMockEnabled: false,
   apiUrl:'http://localhost:4000/api',
-  //apiUrl:'https://movnext-api.herokuapp.com/api'
+  //apiUrl:'https://us-central1-movnext-api.cloudfunctions.net/app/api',
   fireBaseStorageSecrets:{
     apiKey: "AIzaSyB3tYq0nD6m4hljK3lfkGmQtqHwm3ssCiU",
     authDomain: "movnext-api.firebaseapp.com",

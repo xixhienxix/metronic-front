@@ -156,7 +156,6 @@ export class AuthService implements OnDestroy {
     localStorage.setItem('ACCESS_TOKEN',data.accessToken)
     localStorage.setItem('USER',JSON.stringify(data))
     localStorage.setItem('HOTEL',data.hotel)
-
   }
 
   isAuthenticated():boolean

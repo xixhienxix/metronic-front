@@ -51,7 +51,7 @@ export class ParametrosServiceService {
            postArray.push(value[key]);
            this.divisaService.getDivisasByParametro(postArray[0].divisa)   
            this.setCurrentParametrosValue = postArray[0] 
-    
+  
           }
       }))
   }

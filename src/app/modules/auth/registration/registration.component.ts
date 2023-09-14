@@ -18,6 +18,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   registrationForm: FormGroup;
   hasError: boolean;
   isLoading$: Observable<boolean>;
+  isLoading: boolean;
 
   // private fields
   private unsubscribe: Subscription[] = []; 
@@ -116,7 +117,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
 
   submit() {
     this.hasError = false;
-    
+    this.isLoading=true
    const sb = this.authService.create(this.f.hotel.value,this.f.fullname.value,this.f.email.value,this.f.username.value,this.f.password.value,this.f.agree.value).subscribe(
       (value)=>{
         if(value.mensaje==="Tablas creadas correctamente")
@@ -135,6 +136,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             });
               
         }
+        this.isLoading=false
+
       },
       (err)=>{
         if(err){
@@ -150,7 +153,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
             }
       },
       ()=>{
-        
+        this.isLoading=false
       })
       this.unsubscribe.push(sb)
   }

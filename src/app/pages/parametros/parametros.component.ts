@@ -172,8 +172,6 @@ export class ParametrosComponent implements OnInit {
       checkOut:this.getFormGroupValues.checkOut.value,
       checkIn:this.getFormGroupValues.checkIn.value,
       auditoria:this.getFormGroupValues.auditoria.value,
-      
-
     }
 
     const sb = this.parametrosService.postParametros(parametros).subscribe(

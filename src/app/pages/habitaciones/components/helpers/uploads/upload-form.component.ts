@@ -26,10 +26,12 @@ export class UploadFormComponent implements OnInit {
   }
 
   ngOnChanges(changes: any) {
-    if(typeof changes.triggerUpload.currentValue !== 'undefined' ){
-      if(changes.triggerUpload.currentValue===true){
-        this.upload()
-      }
+    if(changes.triggerUpload.currentValue){
+      if(typeof changes.triggerUpload.currentValue !== 'undefined' ){
+        if(changes.triggerUpload.currentValue===true){
+          this.upload()
+        }
+      }      
     }
   }
 

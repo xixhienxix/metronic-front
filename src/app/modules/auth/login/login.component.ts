@@ -68,18 +68,25 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   submit() {
     this.isLoading=true
-    const sb = this.authService.login(this.f.username.value,this.f.password.value).subscribe(
-      (value)=>
+    const usuario = this.f.username.value.toLowerCase();
+    var hotel
+    const sb = this.authService.login(usuario,this.f.password.value).subscribe(
+      (value)=> 
       {
         if(value)
         {
-        this.parametrosService.getParametros(this.authService.currentUserValue.hotel).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
-          (value1)=>{
+          hotel = this.authService.currentUserValue.hotel.replace(/\s/g, '_');
+
+        this.parametrosService.getParametros(hotel).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+          (value)=>{
+            this.parametrosService.getCurrentParametrosValue.hotel= hotel
+
               this.parametrosService.getCurrentParametrosValue
               this.router.navigate(['/reportes'])// /calendario
 
           },
           (error)=>{
+            console.log(error)
           })
         }
         this.isLoading=false

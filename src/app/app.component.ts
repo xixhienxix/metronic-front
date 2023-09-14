@@ -62,11 +62,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    if(localStorage.getItem("HOTEL")!=undefined){
-      let nombreHotel = localStorage.getItem("HOTEL").replace(/\s/g, '')
-      this.parametrosService.getParametros(nombreHotel).subscribe((value)=>{
-      })
-    }
+    // if(localStorage.getItem("HOTEL")!=undefined){
+    //   let nombreHotel = localStorage.getItem("HOTEL").replace(/\s/g, '_')
+    //   this.parametrosService.getParametros(nombreHotel).subscribe((value)=>{
+    //   })
+    // }
     if(localStorage.getItem("USER")!=undefined){
       let userData = localStorage.getItem("USER")
       let userDataModel = JSON.parse(userData)

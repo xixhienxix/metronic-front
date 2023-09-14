@@ -10,5 +10,5 @@ export interface Parametros {
     auditoria:string,
     codigoZona:string,
     id?:string,
-
+    hotel?:string;
 }
