@@ -156,6 +156,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
         this.isLoading=false
       })
       this.unsubscribe.push(sb)
+      this.isLoading=false
   }
 
   getDismissReason(reason: any): string 
