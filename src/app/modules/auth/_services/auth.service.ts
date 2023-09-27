@@ -105,6 +105,7 @@ export class AuthService implements OnDestroy {
         return res
       }
       if(res.response==='El nombre de usuario no se puede usar, especifique otro'){
+        
         return res.response
       }
       else {
