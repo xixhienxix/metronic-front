@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import {Origen } from '../_models/origen.model'
 import { Observable, throwError , of } from 'rxjs';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { catchError, map, tap  } from 'rxjs/operators';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,10 @@ export class OrigenService {
 
   getOrigenbyID(id:number) : Observable<Origen>
   {
-  return  (this.http.get<Origen>(environment.apiUrl+"/reportes/origen/"+id))
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    
+  return  (this.http.get<Origen>(environment.apiUrl+"/reportes/origen/"+id,{params:queryParams}))
   }
 
   getOrigenes() :Observable<Origen> {
@@ -38,5 +42,5 @@ export class OrigenService {
     return throwError(errorMessage);
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 }

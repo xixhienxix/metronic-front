@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -62,7 +62,10 @@ export class ClientesService extends TableService<Huesped> implements OnDestroy 
   }
 
   getClientes(){
-    return this.http.get(environment.apiUrl+'/reportes/clientes')
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    
+    return this.http.get(environment.apiUrl+'/reportes/clientes',{params:queryParams})
   }
 
   ngOnDestroy() {

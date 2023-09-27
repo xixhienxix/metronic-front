@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy, Inject, Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
 import { exhaustMap, map } from 'rxjs/operators';
 import { TableService, TableResponseModel, ITableState, BaseModel, PaginatorState, SortState, GroupingState } from '../../../_metronic/shared/crud-table';
@@ -101,7 +101,10 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
    }
 
    getVisitasById(id:number){
-    return this.http.get<Historico[]>(environment.apiUrl + '/reportes/historico/visitas/'+id)
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+    return this.http.get<Historico[]>(environment.apiUrl + '/reportes/historico/visitas/'+id,{params:queryParams})
     .pipe(
       map(responseData=>{
       return responseData
@@ -111,7 +114,10 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Historico>> {
-    return this.http.get<Historico[]>(this.API_URL).pipe(
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+    return this.http.get<Historico[]>(this.API_URL, {params:queryParams}).pipe(
       map((response: Historico[]) => {
         const filteredResult = baseFilter(response, tableState);
         const result: TableResponseModel<Historico> = {
@@ -132,7 +138,10 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
   }
 
   updateStatusForItems(ids: number[], status: number): Observable<any> {
-    return this.http.get<Historico[]>(this.API_URL).pipe(
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+    return this.http.get<Historico[]>(this.API_URL,{params:queryParams}).pipe(
       map((huespedes: Historico[]) => {
         return huespedes.filter(c => ids.indexOf(c.id ) > -1).map(c => {
           c.noches = status;

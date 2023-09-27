@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {DateTime} from 'luxon'
@@ -37,8 +37,8 @@ export class AuditoriaService {
     private edoCuentaService:Edo_Cuenta_Service,
     private historicoService : HistoricoService,
     private customerService: HuespedService,
-    private modal:NgbModal
-
+    private modal:NgbModal,
+    private _parametrosService : ParametrosServiceService
     ) 
   {   }
   
@@ -96,7 +96,10 @@ export class AuditoriaService {
 
    getHuespedes()
     {
-       return this.http.get<Huesped[]>(environment.apiUrl+'/reportes/huesped')  
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+       return this.http.get<Huesped[]>(environment.apiUrl+'/reportes/huesped',{params:queryParams})  
     }
 
     // getEdoCuentas(){

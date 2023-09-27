@@ -7,6 +7,7 @@ import { GroupingState, ITableState, PaginatorState, SortState, TableResponseMod
 import { environment } from 'src/environments/environment';
 import { Disponibilidad } from '../../reportes/_models/disponibilidad.model';
 import { Habitacion } from '../_models/habitacion';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 
 const DEFAULT_STATE: ITableState = {
@@ -57,7 +58,10 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   private errorMessage = new BehaviorSubject<string>('');
 
 
-  constructor(@Inject(HttpClient) http) {
+  constructor(
+    @Inject(HttpClient) http,
+    @Inject(ParametrosServiceService) _parametrosService
+  ) {
     super(http);
     this.HabitacionUpdate$=this.currentHabitacion$.asObservable();
    }
@@ -93,7 +97,10 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Habitacion>> {
-    return this.http.get<Habitacion[]>(this.API_URL).pipe(
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+    return this.http.get<Habitacion[]>(this.API_URL,{params:queryParams}).pipe(
       map((response: Habitacion[]) => {
         const filteredResult = baseFilter(response, tableState);
         const result: TableResponseModel<Habitacion> = {

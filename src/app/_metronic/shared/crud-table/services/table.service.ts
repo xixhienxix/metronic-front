@@ -1,5 +1,5 @@
 // tslint:disable:variable-name
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { PaginatorState } from '../models/paginator.model';
@@ -8,6 +8,7 @@ import { BaseModel } from '../models/base.model';
 import { SortState } from '../models/sort.model';
 import { GroupingState } from '../models/grouping.model';
 import { environment } from '../../../../../environments/environment';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 const DEFAULT_STATE: ITableState = {
   filter: {},
@@ -26,7 +27,7 @@ export abstract class TableService<T> {
   private _tableState$ = new BehaviorSubject<ITableState>(DEFAULT_STATE);
   private _errorMessage = new BehaviorSubject<string>('');
   private _subscriptions: Subscription[] = [];
-
+  public _parametrosService: ParametrosServiceService
   // Getters
   get items$() {
     return this._items$.asObservable();
@@ -101,7 +102,10 @@ export abstract class TableService<T> {
     this._errorMessage.next('');
     const url = `${this.API_URL}/${id}`;
 
-    return this.http.get<BaseModel>(url)
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    
+    return this.http.get<BaseModel>(url,{params:queryParams})
     .pipe(
       catchError(err => {
         this._errorMessage.next(err);

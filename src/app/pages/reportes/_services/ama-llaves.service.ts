@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {environment} from "../../../../environments/environment"
 import { Ama_De_Llaves } from '../_models/ama-llaves';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 const EMPTY_ESTAUTS = {
   _id:'',
@@ -27,18 +28,25 @@ export class AmaLlavesService {
     this.currentEstatusAmaDeLlaves$.next(ama);
   }
   constructor(
-    public http : HttpClient
+    public http : HttpClient,
+    private _parametrosService : ParametrosServiceService
   ) { }
 
   getAmaDeLlaves(){
-      return this.http.get<Ama_De_Llaves[]>(environment.apiUrl+'/reportes/ama_llaves')
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+      return this.http.get<Ama_De_Llaves[]>(environment.apiUrl+'/reportes/ama_llaves',{params:queryParams})
       .pipe( map(responseData=>{
         return responseData
       })
       )}
 
   getAmaDeLlavesByID(cuarto:string,numero:number){
-        return this.http.get<Ama_De_Llaves>(environment.apiUrl+'/reportes/ama_llaves/'+{cuarto,numero})
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+        return this.http.get<Ama_De_Llaves>(environment.apiUrl+'/reportes/ama_llaves/'+{cuarto,numero}, {params:queryParams})
         .pipe( map(responseData=>{
           return responseData
         })

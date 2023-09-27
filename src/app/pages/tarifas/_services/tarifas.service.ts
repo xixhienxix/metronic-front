@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, forkJoin, Observable, Subject } from 'rxjs';
 import { exhaustMap, map } from 'rxjs/operators';
@@ -102,7 +102,10 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Tarifas>> {
-    return this.http.get<Tarifas[]>(this.API_URL).pipe(
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    
+    return this.http.get<Tarifas[]>(this.API_URL,{params:queryParams}).pipe(
       map((response: Tarifas[]) => {
         const filteredResult = baseFilter(response, tableState);
         const result: TableResponseModel<Tarifas> = {

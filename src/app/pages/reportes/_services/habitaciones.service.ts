@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { HttpClient,HttpParams } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { catchError, map, tap } from 'rxjs/operators';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,10 @@ export class HabitacionesService {
 
 
   getHabitacionesbyTipo(id:string) : Observable<Habitaciones[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
-  return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id)
+  return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id,{params:queryParams})
       .pipe(
         map(responseData=>{
           return responseData
@@ -23,8 +26,10 @@ export class HabitacionesService {
   }
 
   getHabitacionbyNumero(numero:string) : Observable<Habitaciones[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
-    return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitacion/"+numero)
+    return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitacion/"+numero,{params:queryParams})
         .pipe(
           map(responseData=>{
             return responseData
@@ -64,5 +69,5 @@ export class HabitacionesService {
 
    }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 }

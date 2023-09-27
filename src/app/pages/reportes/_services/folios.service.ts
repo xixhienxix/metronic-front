@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import {Foliador } from '../_models/foliador.model'
 import { Observable, throwError , of, BehaviorSubject } from 'rxjs';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { catchError, map, tap  } from 'rxjs/operators';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,9 +21,10 @@ export class FoliosService {
   }
 
   getFoliosbyLetra(id:string) : Observable<Foliador[]> {
-    console.log("BY LETRA = environment.apiUrl + '/reportes/folios'",environment.apiUrl + '/reportes/folios')
-
-  return  (this.http.get<Foliador[]>(environment.apiUrl+"/reportes/folios/"+id)
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    
+  return  (this.http.get<Foliador[]>(environment.apiUrl+"/reportes/folios/"+id,{params:queryParams})
       .pipe(
         map(responseData=>{
 
@@ -71,5 +73,5 @@ export class FoliosService {
     return throwError(errorMessage);
   }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 }

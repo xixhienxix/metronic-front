@@ -1,14 +1,18 @@
 import { Injectable, OnDestroy, Inject, Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {Adicional}from '../_models/adicional.model';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 @Injectable({
   providedIn: 'root'
 })
 export class AdicionalService  {
 
     getAdicionales(){
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
         return this.http.get<Adicional[]>(environment.apiUrl+"/adicionales")
         .pipe(
           map(responseData=>{
@@ -19,5 +23,5 @@ export class AdicionalService  {
         )
     }
     
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 }

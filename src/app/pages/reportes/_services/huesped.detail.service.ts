@@ -1,17 +1,21 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { Huesped_Detail } from "../_models/huesped.details.model";
+import { ParametrosServiceService } from "../../parametros/_services/parametros.service.service";
 
 @Injectable({
     providedIn: 'root'
   })
 export class Huesped_Detail_Service{
 
-    constructor (private http : HttpClient){}
+    constructor (private http : HttpClient, private _parametrosService:ParametrosServiceService){}
 
     getDetails(){
-        return this.http.get<Huesped_Detail>(environment.apiUrl+"/details")
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+        return this.http.get<Huesped_Detail>(environment.apiUrl+"/details",{params:queryParams})
     }
 
     updateDetails(huesped:Huesped_Detail){
@@ -19,8 +23,10 @@ export class Huesped_Detail_Service{
     }
 
     getDetailsById(folio:number){
-        console.log(environment.apiUrl+"/details/"+folio)
-        return this.http.get<Huesped_Detail>(environment.apiUrl+"/details/"+folio)
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+        return this.http.get<Huesped_Detail>(environment.apiUrl+"/details/"+folio,{params:queryParams})
     }
 
 }

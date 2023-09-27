@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Divisas } from '../_models/divisas';
+import { ParametrosServiceService } from './parametros.service.service';
 const DEFAULT_DIVISA ={
   _id:'',
     Localidad:'Mexico',
@@ -26,15 +27,22 @@ set setcurrentDivisa(divisa:Divisas){
 }
 
   constructor(
-    public http:HttpClient
+    public http:HttpClient,
+    private _parametrosService:ParametrosServiceService
   ) { }
 
   getDivisas(){
-    return this.http.get(environment.apiUrl+'/parametros/divisas')
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+    return this.http.get(environment.apiUrl+'/parametros/divisas',{params:queryParams})
   }
 
   getDivisasByParametro(divisa:string){
-     this.http.get<Divisas>(environment.apiUrl+'/parametros/divisas/'+divisa)
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+     this.http.get<Divisas>(environment.apiUrl+'/parametros/divisas/'+divisa,{params:queryParams})
     .subscribe(
       (value)=>{
         this.setcurrentDivisa=value[0]

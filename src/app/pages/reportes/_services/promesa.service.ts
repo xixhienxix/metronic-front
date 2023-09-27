@@ -1,8 +1,9 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { Promesa } from "../_models/promesa.model";
+import { ParametrosServiceService } from "../../parametros/_services/parametros.service.service";
 
 @Injectable({
     providedIn: 'root'
@@ -10,7 +11,8 @@ import { Promesa } from "../_models/promesa.model";
 export class PromesaService {
 
     constructor(
-        private http : HttpClient
+        private http : HttpClient,
+        private _parametrosService:ParametrosServiceService
     ){}
 
     borrarPromesa(_id:string){
@@ -22,7 +24,10 @@ export class PromesaService {
       }
 
     getPromesas(folio:number ){
-        return this.http.get<Promesa[]>(environment.apiUrl+'/reportes/promesas/'+folio)
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+        
+        return this.http.get<Promesa[]>(environment.apiUrl+'/reportes/promesas/'+folio,{params:queryParams})
         .pipe(
             map((datosCuenta)=>{
             let promesa:Promesa[]=[];

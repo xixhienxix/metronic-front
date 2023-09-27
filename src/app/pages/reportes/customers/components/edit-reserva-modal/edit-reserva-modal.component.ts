@@ -242,10 +242,7 @@ export class EditReservaModalComponent implements OnInit {
      return this.formGroup.controls
     }
 
-    // async getPrice(currency: string): Promise<number> {
-    //   const response = await this.http.get(this.currentPriceUrl).toPromise();
-    //   return response.json().bpi[currency].rate;
-    // }
+
     getAmaDeLlaves(){
 
       const sb = this.amaDeLlavesService.getAmaDeLlaves().subscribe(

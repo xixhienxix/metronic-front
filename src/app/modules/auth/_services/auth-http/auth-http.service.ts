@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { UserModel } from '../../_models/user.model';
 import { environment } from '../../../../../environments/environment';
 import { AuthModel } from '../../_models/auth.model';
@@ -11,7 +11,8 @@ const API_USERS_URL = `${environment.apiUrl}/auth`;
   providedIn: 'root',
 })
 export class AuthHTTPService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private _parametrosService) { }
 
   // public methods
   login(email: string, password: string): Observable<any> {
@@ -34,7 +35,11 @@ export class AuthHTTPService {
     const httpHeaders = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    
     return this.http.get<UserModel>(`${API_USERS_URL}/me`, {
+      params:queryParams,
       headers: httpHeaders,
     });
   }

@@ -7,6 +7,7 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { HabitacionesService }  from './habitaciones.service'
 import { DateTime } from 'luxon'
 import { NumberLiteralType } from 'typescript';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -22,7 +23,7 @@ export class DisponibilidadService {
     .set('numeroCuarto',numeroCuarto.toString())
     .set('dias',dias.toString())
     .set('folio',folio.toString())
-
+    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
     return this.http.get<any>(environment.apiUrl+'/disponibilidad/completa',{params:params})
 
@@ -34,6 +35,7 @@ export class DisponibilidadService {
     .set('mes', mes.toString())
     .set('ano',ano.toString())
     .set('cuarto',cuarto.toString())
+    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
     return this.http
      .get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad',{params:params})
@@ -49,6 +51,7 @@ export class DisponibilidadService {
     .set('dia', dia.toString())
     .set('mes', mes.toString())
     .set('ano',ano.toString())
+    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
     return this.http.get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad/todos',{params:params})
   }
@@ -72,6 +75,7 @@ export class DisponibilidadService {
   }
 
   constructor(private http: HttpClient,
+    private _parametrosService:ParametrosServiceService,
     public habitacionesService : HabitacionesService,
     ) { }
 }

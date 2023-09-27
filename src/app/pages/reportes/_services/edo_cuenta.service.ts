@@ -1,10 +1,11 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { map } from "rxjs/operators";
 import { ITableState } from "src/app/_metronic/shared/crud-table";
 import { environment } from "src/environments/environment";
 import { edoCuenta } from "../_models/edoCuenta.model";
+import { ParametrosServiceService } from "../../parametros/_services/parametros.service.service";
 
 const EMPTY_EDO = {
   Folio:0,
@@ -42,7 +43,7 @@ getNotification(){
       this.edoCuentaSubject.next(user);
     }
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 
     agregarPago(pago:edoCuenta ){
        return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',pago).pipe(
@@ -62,7 +63,10 @@ getNotification(){
 
 
     getCuentas(folio:number ){
-        return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuenta/'+folio)
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+        return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuenta/'+folio,{params:queryParams})
         .pipe(
             map((datosCuenta)=>{
             let estadoDeCuenta:edoCuenta[]=[];
@@ -83,7 +87,10 @@ getNotification(){
     }
 
     getTodasLasCuentas(){
-      return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuentas')
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
+      return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuentas',{params:queryParams})
       .pipe(
           map((datosCuenta)=>{
           let estadoDeCuenta:edoCuenta[]=[];
