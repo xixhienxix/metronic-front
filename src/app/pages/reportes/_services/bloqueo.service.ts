@@ -53,6 +53,7 @@ export class BloqueoService  {
     fueraDeServicio:boolean,
     comentarios:string
     ) {
+      const hotel = this._parametrosService.getCurrentParametrosValue.hotel
       let bloqueos: Bloqueo = {
                                 _id:_id,
                                 Habitacion:cuarto,
@@ -65,7 +66,7 @@ export class BloqueoService  {
                                 Comentarios:comentarios.trim()
                                 };
 
-   return this.http.post<Bloqueo>(environment.apiUrl+"/actualiza/bloqueos", bloqueos,{observe:'response'})
+   return this.http.post<Bloqueo>(environment.apiUrl+"/actualiza/bloqueos", {bloqueos,hotel},{observe:'response'})
 
       }
 
@@ -77,8 +78,12 @@ export class BloqueoService  {
 
 
   getBloqueos() :Observable<Bloqueo[]> {
+    
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
    return this.http
-    .get<Bloqueo[]>(environment.apiUrl + '/reportes/bloqueos')
+    .get<Bloqueo[]>(environment.apiUrl + '/reportes/bloqueos',{params:queryParams})
     .pipe(
       map(responseData=>{
       return responseData
@@ -110,7 +115,9 @@ fueraDeServicio:fueraDeServicio,
 Comentarios:text
 
 };
- return this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", bloqueos, {observe:'response'})
+const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+ return this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", {bloqueos,hotel}, {observe:'response'})
 
   }
 
@@ -132,7 +139,9 @@ Comentarios:text
                                 fueraDeServicio:false,
                                 Comentarios:''
                                 };
-  return this.http.post<Bloqueo>(environment.apiUrl+"/libera/bloqueos", bloqueos)
+                                const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+  return this.http.post<Bloqueo>(environment.apiUrl+"/libera/bloqueos", {bloqueos,hotel})
 
       }
 

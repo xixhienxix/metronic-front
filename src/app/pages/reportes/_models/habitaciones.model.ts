@@ -10,4 +10,6 @@ export interface Habitaciones extends BaseModel
   Adultos:number;
   Ninos:number;
   Tarifa:number;
+  hotel?:string;
+
 }

@@ -82,7 +82,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.parametrosService.getCurrentParametrosValue.hotel= hotel
 
               this.parametrosService.getCurrentParametrosValue
-              this.router.navigate(['/reportes'])// /calendario
+              this.router.navigate(['/calendario'])// /calendario
 
           },
           (error)=>{

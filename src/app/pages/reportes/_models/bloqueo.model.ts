@@ -12,4 +12,6 @@ export interface Bloqueo
   sinSalidas:boolean;
   fueraDeServicio:boolean;
   Comentarios:string;
+  hotel?:string;
+
 }

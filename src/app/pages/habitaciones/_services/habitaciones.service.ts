@@ -75,7 +75,9 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   }
 
   saveUrlToMongo(downloadURL:string,fileUploadName:string){
-    return this.http.post(this.API_URL_MAIN+"/update/habitacion/imageurl",{downloadURL:downloadURL,fileUploadName:fileUploadName}).pipe(
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(this.API_URL_MAIN+"/update/habitacion/imageurl",{downloadURL:downloadURL,fileUploadName:fileUploadName,hotel:hotel}).pipe(
       map(result => {
           return (result);  
        }),
@@ -122,34 +124,45 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   updateHabitacion(Habitacion:Habitacion)
   {
-    return this.http.post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{Habitacion})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    return this.http.post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{Habitacion,hotel})
   }
 
   updateHabitacionModifica(HabitacionAnterior:any)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/habitacion/actualiza/Habitacion/modifica',HabitacionAnterior)
+    .post(environment.apiUrl+'/habitacion/actualiza/Habitacion/modifica',{HabitacionAnterior,hotel})
   }
 
   modificaHabitacion(codigo,numero,llegada,salida)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{codigo:codigo,numero:numero,llegada:llegada,salida:salida})
+    .post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{codigo:codigo,numero:numero,llegada:llegada,salida:salida, hotel})
   }
 
   deleteHabitacion(_id:string){
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
     .delete(environment.apiUrl+'/habitacion/delete/'+_id)
   }
 
   postAdicional(descripcion:string,precio:number)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/codigos/adicional',{descripcion,precio})
+    .post(environment.apiUrl+'/codigos/adicional',{descripcion,precio,hotel})
   }
 
   postHabitacion(habitacion:Habitacion,editar:boolean,filename:File){
-    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar}).pipe(
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar,hotel}).pipe(
       map(response=>{
         return response
       })
@@ -157,11 +170,15 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   }
 
   agregarInventario(habitacion:Habitacion,inventario:number){
-    return this.http.post(environment.apiUrl+'/habitacion/agregar',{habitacion,inventario})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/habitacion/agregar',{habitacion,inventario,hotel})
   }
 
   buscarHabitacion(habitacion:Habitacion){
-    return this.http.post<Habitacion[]>(environment.apiUrl+'/habitacion/buscar',{habitacion})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post<Habitacion[]>(environment.apiUrl+'/habitacion/buscar',{habitacion,hotel})
   }
 
   getCodigohabitaciones() :Observable<Habitacion[]> {

@@ -39,6 +39,8 @@ export interface Historico extends BaseModel {
   razonsocial:string;
   rfc:string;
   cfdi:string;
+  hotel?:string;
+
   
 }
 

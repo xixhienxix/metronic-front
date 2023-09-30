@@ -90,8 +90,11 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
 
   //
   getAll() :Observable<Historico[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
     return this.http
-     .get<Historico[]>(environment.apiUrl + '/reportes/historico')
+     .get<Historico[]>(environment.apiUrl + '/reportes/historico',{params:queryParams})
      .pipe(
        map(responseData=>{
        return responseData
@@ -159,14 +162,18 @@ export class HistoricoService extends TableService<Historico> implements OnDestr
   }
 
   addPost(huesped:Huesped) {
-    return this.http.post<Huesped>(environment.apiUrl+"/guarda/historico", huesped)
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post<Huesped>(environment.apiUrl+"/guarda/historico", {huesped,hotel})
     }
 
 
   updateHistorico(cliente:Historico){
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     const clients=cliente
     console.log(environment.apiUrl)
-    return this.http.post<Historico>(environment.apiUrl+"/historico/actualizaDatos",cliente).pipe(
+    return this.http.post<Historico>(environment.apiUrl+"/historico/actualizaDatos",{cliente,hotel}).pipe(
       map((data=>{
         this.sendNotification(cliente);
         }

@@ -38,14 +38,18 @@ export class HabitacionesService {
     }
 
   gethabitaciones() :Observable<Habitaciones[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
    return this.http
-    .get<Habitaciones[]>(environment.apiUrl + '/reportes/habitaciones')
+    .get<Habitaciones[]>(environment.apiUrl + '/reportes/habitaciones',{params:queryParams})
   }
 
   getInfoHabitaciones(numero:string,tipo:string) :Observable<Habitaciones[]> {
     const params = new HttpParams()
     .set('numero', numero.toString())
     .set('tipo', tipo)
+    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
     return this.http
      .get<Habitaciones[]>(environment.apiUrl + '/info/habitaciones', {params:params})
@@ -58,9 +62,11 @@ export class HabitacionesService {
    }
 
   getCodigohabitaciones() :Observable<Habitaciones[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
 
     return this.http
-     .get<Habitaciones[]>(environment.apiUrl + '/reportes/tipo')
+     .get<Habitaciones[]>(environment.apiUrl + '/reportes/tipo',{params:queryParams})
      .pipe(
        map(responseData=>{
        return responseData

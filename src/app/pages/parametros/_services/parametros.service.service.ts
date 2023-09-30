@@ -49,15 +49,17 @@ export class ParametrosServiceService {
          {
            if(value.hasOwnProperty(key))
            postArray.push(value[key]);
-           this.divisaService.getDivisasByParametro(postArray[0].divisa)   
            this.setCurrentParametrosValue = postArray[0] 
+           this.divisaService.getDivisasByParametro(postArray[0].divisa,postArray[0].hotel)   
   
           }
       }))
   }
 
   postParametros(parametros:Parametros){
-    return this.http.post(environment.apiUrl+'/parametros',parametros)
+    const hotel = this.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/parametros',{parametros,hotel})
   }
 
 }

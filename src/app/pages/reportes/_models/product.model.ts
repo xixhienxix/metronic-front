@@ -12,4 +12,6 @@ export interface Product extends BaseModel {
   condition: number;
   status: number;
   VINCode: string;
+  hotel?:string;
+
 }

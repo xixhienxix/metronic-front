@@ -3,6 +3,8 @@ export class FileUpload {
   name: string;
   url: string;
   file: File;
+  hotel?:string;
+
 
   constructor(file: File) {
     this.file = file;

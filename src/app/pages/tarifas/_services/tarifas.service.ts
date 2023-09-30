@@ -126,7 +126,9 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   postTarifa(tarifa:Tarifas){
-    return this.http.post(environment.apiUrl+'/tarifas/agregar',{tarifa}).pipe(
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/tarifas/agregar',{tarifa,hotel}).pipe(
       map((data=>{
         this.sendNotification(true);
         }
@@ -134,7 +136,9 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   postTarifaEspecial(tarifa:Tarifas){
-    return this.http.post(environment.apiUrl+'/tarifas/especial/agregar',{tarifa}).pipe(
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/tarifas/especial/agregar',{tarifa,hotel}).pipe(
       map((data=>{
         this.sendNotification(true);
         }
@@ -143,13 +147,17 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
 
   updateTarifas(Tarifas:Tarifas)
   {
-    return this.http.post(environment.apiUrl+'/tarifario/actualiza/tarifas',{Tarifas})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/tarifario/actualiza/tarifas',{Tarifas,hotel})
   }
 
   updateTarifasModifica(TarifasAnterior:any)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/tarifario/actualiza/tarifas/modifica',TarifasAnterior)
+    .post(environment.apiUrl+'/tarifario/actualiza/tarifas/modifica',{TarifasAnterior,hotel})
   }
 
   modificaTarifas(codigo,numero,llegada,salida)
@@ -159,7 +167,9 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   deleteTarifas(tarifa:Tarifas){
-    return this.http.post(environment.apiUrl+'/tarifas/rack/delete',{tarifa}).pipe(
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/tarifas/rack/delete',{tarifa,hotel}).pipe(
       map((data=>{
         this.sendNotification(true);
         }
@@ -167,7 +177,9 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   deleteTarifaEspecial(tarifa:Tarifas){
-    return this.http.post(environment.apiUrl+'/tarifas/especial/delete',{tarifa}).pipe(
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/tarifas/especial/delete',{tarifa,hotel}).pipe(
       map((data=>{
         this.sendNotification(true);
         }

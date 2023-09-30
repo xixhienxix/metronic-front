@@ -8,6 +8,7 @@ import { baseFilter } from '../../../_fake/fake-helpers/http-extenstions';
 import { environment } from '../../../../environments/environment';
 import { Router } from '@angular/router';
 import { Habitaciones } from '../_models/habitaciones.model';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 const EMPTY_CUSTOMER: Huesped = {
   id:undefined,
   folio:undefined,
@@ -62,7 +63,8 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
    private currentHuesped$=new BehaviorSubject<Huesped>(EMPTY_CUSTOMER);
 
 
-  constructor(@Inject(HttpClient) http) {
+  constructor(@Inject(HttpClient) http, 
+              @Inject(ParametrosServiceService) _parametrosService) {
     super(http);
     this.huespedUpdate$=this.currentHuesped$.asObservable();
 
@@ -135,31 +137,41 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   }
 
   addPost(huesped:Huesped) {
-    return this.http.post<any>(environment.apiUrl+"/reportes/huesped", huesped)
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post<any>(environment.apiUrl+"/reportes/huesped", {huesped,hotel})
     }
 
   updateEstatusHuesped(huesped:Huesped)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/reportes/actualiza/estatus/huesped',huesped)
+    .post(environment.apiUrl+'/reportes/actualiza/estatus/huesped',{huesped,hotel})
   }
 
   updateHuesped(huesped:Huesped)
   {
-    return this.http.post(environment.apiUrl+'/reportes/actualiza/huesped',{huesped})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+'/reportes/actualiza/huesped',{huesped,hotel})
   }
 
   
   updateHuespedModifica(huespedAnterior:any)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/reportes/actualiza/huesped/modifica',huespedAnterior)
+    .post(environment.apiUrl+'/reportes/actualiza/huesped/modifica',{huespedAnterior,hotel})
   }
 
   modificaHuesped(codigo,numero,llegada,salida)
   {
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
     return this.http
-    .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida})
+    .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida,hotel:hotel})
   }
 
   deleteHuesped(_id:string){

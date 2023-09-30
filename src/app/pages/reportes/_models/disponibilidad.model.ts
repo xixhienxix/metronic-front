@@ -10,5 +10,7 @@ export interface Disponibilidad extends BaseModel
   Ano:number
   Estatus_Ama_De_Llaves:string,
   Folio_Huesped:number,
-  Fecha?:string
+  Fecha?:string;
+  hotel?:string;
+
 }

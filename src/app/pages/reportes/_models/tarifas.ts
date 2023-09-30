@@ -20,5 +20,7 @@ export interface Tarifas extends BaseModel {
         name: string;
         value: number;
         checked: boolean;
-    }[]
+    }[],
+    hotel?:string;
+
 }

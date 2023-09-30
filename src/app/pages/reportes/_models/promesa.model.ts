@@ -7,4 +7,6 @@ Fecha:Date;
 Cantidad:number;
 Aplicado:boolean;
 Estatus:string;
+hotel?:string;
+
 }

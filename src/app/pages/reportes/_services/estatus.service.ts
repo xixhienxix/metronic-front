@@ -33,8 +33,11 @@ export class EstatusService  {
 
 
   getEstatus() :Observable<Estatus[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
    return this.http
-    .get<Estatus[]>(environment.apiUrl + '/reportes/estatus')
+    .get<Estatus[]>(environment.apiUrl + '/reportes/estatus',{params:queryParams})
     .pipe(
       map(responseData=>{
       return responseData
@@ -44,8 +47,9 @@ export class EstatusService  {
   }
 
   actualizaEstatus(estatus,folio,huesped:Huesped){
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio,huesped:huesped})
+    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio,huesped:huesped,hotel})
 
   }
 

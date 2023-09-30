@@ -16,6 +16,7 @@ export class DisponibilidadService {
   private dispo:any[] = []
 
   getDisponibilidadCompleta(llegada:string,salida:string,tipoCuarto:string,numeroCuarto:string,dias:number,folio:number){
+
     const params = new HttpParams()
     .set('llegada', llegada)
     .set('salida', salida)
@@ -57,17 +58,22 @@ export class DisponibilidadService {
   }
 
    actualizaDisponibilidad(disponibilidad:Disponibilidad){
-    return this.http.put(environment.apiUrl+"/update/disponibilidad",disponibilidad)
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.put(environment.apiUrl+"/update/disponibilidad",{disponibilidad,hotel})
    }
 
    getEstatusAmaDeLlaves(dia:number,mes:number,ano:number,numeroCuarto:string,habitacion:string){
+
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
     let parametros = {
       dia:dia,
       mes:mes,
       ano:ano,
       numeroCuarto:numeroCuarto,
-      habitacion:habitacion
+      habitacion:habitacion,
+      hotel:hotel
       };
 
      return this.http.post<Disponibilidad>(environment.apiUrl+'/disponibilidad/ama',parametros)

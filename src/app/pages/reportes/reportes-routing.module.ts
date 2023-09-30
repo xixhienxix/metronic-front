@@ -6,6 +6,7 @@ import { CustomersComponent } from './customers/customers.component';
 
 
 import { ClientesComponent } from './clientes/clientes.component';
+import { CalendarioComponent } from '../calendario/calendario.component';
 // import { TarifarioComponent } from '../tarifas/tarifario/tarifario.component';
 
 const routes: Routes = [
@@ -21,7 +22,6 @@ const routes: Routes = [
         path: 'clientes',
         component: ClientesComponent,
       },
-
 
       { path: '', redirectTo: 'customers', pathMatch: 'full' },
       { path: '**', redirectTo: 'customers', pathMatch: 'full' },

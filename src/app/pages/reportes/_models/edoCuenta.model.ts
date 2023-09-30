@@ -11,5 +11,7 @@ export interface edoCuenta {
     Abono?:number,
     Total?:number,
     Estatus:string,
-    Autorizo?:string
+    Autorizo?:string,
+    hotel?:string;
+
 }

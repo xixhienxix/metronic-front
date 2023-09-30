@@ -14,5 +14,7 @@ export interface Huesped_Detail
     ciudad:string,
     codigoPostal:string,
     lenguaje:string,
-    notas:string
+    notas:string,
+    hotel?:string;
+
 }

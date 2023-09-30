@@ -1,5 +1,7 @@
 export interface Origen
 {
   ID:number;
-  descripcion:string
+  descripcion:string;
+  hotel?:string;
+
 }

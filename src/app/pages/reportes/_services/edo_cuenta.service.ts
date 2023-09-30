@@ -46,7 +46,9 @@ getNotification(){
     constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 
     agregarPago(pago:edoCuenta ){
-       return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',pago).pipe(
+      const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+       return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',{pago,hotel}).pipe(
         map((data=>{
           this.sendNotification(true);
           }
@@ -54,7 +56,9 @@ getNotification(){
     }
 
     updateRow(_id:string,estatus:string,fechaCancelado:Date,autorizo:string){
-      return this.http.put(environment.apiUrl+"/edo_cuenta/pagos",{_id,estatus,fechaCancelado,autorizo}).pipe(
+      const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+      return this.http.put(environment.apiUrl+"/edo_cuenta/pagos",{_id,estatus,fechaCancelado,autorizo,hotel}).pipe(
         map((data=>{
           this.sendNotification(true);
           }
@@ -108,7 +112,9 @@ getNotification(){
   }
 
   actualizaSaldo(_id:string,monto:number){
-    return this.http.put<edoCuenta>(environment.apiUrl+'/edo_cuenta/alojamiento',{_id,monto})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.put<edoCuenta>(environment.apiUrl+'/edo_cuenta/alojamiento',{_id,monto,hotel})
   }
 
 }

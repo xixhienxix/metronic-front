@@ -5,6 +5,7 @@ import { UserModel } from '../_models/user.model';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 export interface AuthModel {
   _id:string,
   username:string,
@@ -26,7 +27,7 @@ export class AuthService implements OnDestroy {
   currentUserSubject:BehaviorSubject<AuthModel>
   currentUser$:Observable<AuthModel>
   jwtHelper = new JwtHelperService();
-
+  hotel:string="MovNext"
 
   _hasError$:BehaviorSubject<boolean>= new BehaviorSubject<boolean>(false)
   // public hasErrorOnLogin: Observable<boolean> = this._hasError$.asObservable();
@@ -39,9 +40,10 @@ export class AuthService implements OnDestroy {
     this.currentUserSubject.next(user);
   }
 
-  constructor(private http : HttpClient){
+  constructor(private http : HttpClient, private _parametrosService : ParametrosServiceService){
     this.currentUserSubject = new BehaviorSubject<AuthModel>(undefined);
     this.currentUser$ = this.currentUserSubject.asObservable();
+    this.hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
   }
 
@@ -75,12 +77,15 @@ export class AuthService implements OnDestroy {
   } 
 
   olvidoPassword(email:string){
-    return this.http.post(environment.apiUrl+"/auth/forgot",{email})
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+    return this.http.post(environment.apiUrl+"/auth/forgot",{email,hotel})
   }
 
   registro(fullname:string,email:string,username:string,password:string,terminos:boolean)
   {
-    return this.http.post(environment.apiUrl+"/auth/registro",{fullname,email,username,password,terminos})
+    const hotel = this.hotel
+    return this.http.post(environment.apiUrl+"/auth/registro",{fullname,email,username,password,terminos,hotel})
     .pipe(map(res=>{
       let mensaje=null
       if(res){
@@ -100,11 +105,11 @@ export class AuthService implements OnDestroy {
     return this.http.post<any>(environment.apiUrl+"/createdb",{hotel,fullname,email,username,password,terminos})
     .pipe(map(res=>{
       let mensaje=null
-      if(res.mensaje==="Tablas creadas correctamente"){
+      if(res.mensaje == "Usuario agregado con exito"){
 
         return res
       }
-      if(res.response==='El nombre de usuario no se puede usar, especifique otro'){
+      if(res.response == 'El nombre de usuario no se puede usar, especifique otro'){
         
         return res.response
       }
@@ -168,7 +173,8 @@ export class AuthService implements OnDestroy {
    }
 
    autoriza(usuario:string,password:string){
-    return this.http.post(environment.apiUrl+'/auth/autoriza',{usuario,password}).pipe(timeout(5000))
+    const hotel = this.hotel
+    return this.http.post(environment.apiUrl+'/auth/autoriza',{usuario,password,hotel}).pipe(timeout(5000))
    }
 
   ngOnDestroy(){

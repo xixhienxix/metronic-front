@@ -19,7 +19,9 @@ export class Huesped_Detail_Service{
     }
 
     updateDetails(huesped:Huesped_Detail){
-        return this.http.post(environment.apiUrl+"/reportes/details",huesped)
+        const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+        return this.http.post(environment.apiUrl+"/reportes/details",{huesped,hotel})
     }
 
     getDetailsById(folio:number){

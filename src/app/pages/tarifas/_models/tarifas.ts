@@ -22,5 +22,7 @@ _id?:string;
         name: string;
         value: number;
         checked: boolean;
-    }[]
+    }[];
+    hotel?:string;
+
 }

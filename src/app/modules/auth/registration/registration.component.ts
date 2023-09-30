@@ -120,7 +120,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
     this.isLoading=true
    const sb = this.authService.create(this.f.hotel.value,this.f.fullname.value,this.f.email.value,this.f.username.value,this.f.password.value,this.f.agree.value).subscribe(
       (value)=>{
-        if(value.mensaje==="Tablas creadas correctamente")
+        if(value.mensaje==="Usuario agregado con exito")
         {
           this.router.navigate(['auth/login'])
         } else

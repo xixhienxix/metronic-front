@@ -16,11 +16,13 @@ export class AuthHTTPService {
 
   // public methods
   login(email: string, password: string): Observable<any> {
-    return this.http.post<AuthModel>(`${API_USERS_URL}/login`, { email, password });
+    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    return this.http.post<AuthModel>(`${API_USERS_URL}/login`, { email, password, hotel });
   }
 
   // CREATE =>  POST: add a new user to the server
   createUser(user: UserModel): Observable<UserModel> {
+    
     return this.http.post<UserModel>(API_USERS_URL, user);
   }
 

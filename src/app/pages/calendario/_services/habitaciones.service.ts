@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ import { environment } from 'src/environments/environment';
 export class HabitacionesService {
 
   constructor(private http : HttpClient,
-    private _parametrosService) { }
+    private _parametrosService: ParametrosServiceService) { }
 
   getCodigosDeCuarto():Observable<string[]>{
     let queryParams = new HttpParams();

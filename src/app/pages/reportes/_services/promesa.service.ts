@@ -20,7 +20,9 @@ export class PromesaService {
     }
 
     guardarPromesa (folio:number,fecha:Date,cantidad:number,estatus:string){
-        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad,estatus:estatus})
+        const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+
+        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad,estatus:estatus,hotel:hotel})
       }
 
     getPromesas(folio:number ){

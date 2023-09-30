@@ -9,7 +9,7 @@ import {FoliosService} from '../_services/folios.service'
 import { ReportesComponent } from '../reportes.component';
 // import { Status } from "./estatus.enum";
 import { Foliador } from '../_models/foliador.model';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import {environment} from "../../../../environments/environment"
 import { map, filter, switchMap } from 'rxjs/operators';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
@@ -171,18 +171,14 @@ export class CustomersComponent
     public postService : ReportesComponent,
     public foliosService : FoliosService,
     public habitacionesService : HabitacionesService,
-    private http: HttpClient,
     public habitacionService : HabitacionesService,
     public origenService : OrigenService,
     public disponibilidadSercice : DisponibilidadService,
     public estatusService : EstatusService,
-    private iddleService:IddleService,
-    private auditoriaService:AuditoriaService,
     public divisasService : DivisasService,
     public parametrosService:ParametrosServiceService,
     public disponibilidadService:DisponibilidadService,
-    public amaDeLlavesService:AmaLlavesService
-
+    public amaDeLlavesService:AmaLlavesService,
   ) {
     this.divisasService.getcurrentDivisa.Simbolo
  // this.iddleService.initiateIddle();
@@ -217,13 +213,6 @@ export class CustomersComponent
         console.log(error)
       },
       ()=>{})
-
-
-
-
-
-
-    // this.formGroup.get('ama').patchValue(this.disponibilidadEstatus.Estatus_Ama_De_Llaves)
   }
 
 
@@ -235,7 +224,7 @@ export class CustomersComponent
   getAmaDeLlaves(){
 
     const sb = this.amaDeLlavesService.getAmaDeLlaves().subscribe(
-      (value)=>{
+      (value)=>{ 
         for(let i=0;i<value.length;i++)
         {
           this.amaDeLlavesList.push(value[i])
@@ -304,6 +293,7 @@ this.origenService.getOrigenes()
   }
 
   getCuartos(): void {
+
     this.habitacionesService.gethabitaciones()
                       .pipe(map(
                         (responseData)=>{

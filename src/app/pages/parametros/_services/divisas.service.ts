@@ -38,9 +38,9 @@ set setcurrentDivisa(divisa:Divisas){
     return this.http.get(environment.apiUrl+'/parametros/divisas',{params:queryParams})
   }
 
-  getDivisasByParametro(divisa:string){
+  getDivisasByParametro(divisa:string, hotel:string){
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
      this.http.get<Divisas>(environment.apiUrl+'/parametros/divisas/'+divisa,{params:queryParams})
     .subscribe(

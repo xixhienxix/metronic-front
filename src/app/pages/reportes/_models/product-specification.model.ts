@@ -6,4 +6,6 @@ export interface ProductSpecification extends BaseModel {
   specId: number;
   specName: string;
   value: string;
+  hotel?:string;
+
 }

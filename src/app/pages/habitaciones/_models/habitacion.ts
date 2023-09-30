@@ -17,5 +17,6 @@ export interface Habitacion extends BaseModel
   Orden:Number,
   Tarifa:number,
   URL?: string;
+  hotel?:string;
 
 }

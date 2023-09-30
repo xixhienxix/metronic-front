@@ -6,4 +6,6 @@ export interface ProductRemark extends BaseModel {
   text: string;
   type: number; // Info 1, Note 2, Reminder 3
   dueDate: string;
+  hotel?:string;
+
 }
