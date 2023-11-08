@@ -34,6 +34,7 @@ import { DivisasService } from '../../parametros/_services/divisas.service';
 import { HuespedService } from '../_services';
 import { HistoricoService } from '../_services/historico.service';
 import { VerFolioComponent } from './components/ver-folio/ver-folio.component';
+import { ParametrosServiceService } from '../../parametros/_services/parametros.service.service';
 
 
 @Component({
@@ -81,7 +82,8 @@ export class ClientesComponent implements OnInit {
     public fb : FormBuilder,
     public divisasService : DivisasService,
     public customerService: HuespedService,
-    public historicoService : HistoricoService
+    public historicoService : HistoricoService,
+    private _parametrosService: ParametrosServiceService
     ) 
     {  
       const sb = this.historicoService.getNotification().subscribe(data=>{
@@ -96,7 +98,7 @@ export class ClientesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getAll();
-    this.historicoService.fetch();
+    this.historicoService.fetch(sessionStorage.getItem("HOTEL"));
 
     // this.filterForm();
     this.getClientes();

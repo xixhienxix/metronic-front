@@ -162,6 +162,7 @@ export class CustomersComponent
   /**DOM */
   cargando:boolean=true
   oldDropValue:string
+  hotel:string="";
 
   constructor(
     private fb: FormBuilder,
@@ -176,13 +177,12 @@ export class CustomersComponent
     public disponibilidadSercice : DisponibilidadService,
     public estatusService : EstatusService,
     public divisasService : DivisasService,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public disponibilidadService:DisponibilidadService,
     public amaDeLlavesService:AmaLlavesService,
   ) {
     this.divisasService.getcurrentDivisa.Simbolo
- // this.iddleService.initiateIddle();
-
+    this.hotel=sessionStorage.getItem("HOTEL")
   }
 
 
@@ -194,7 +194,8 @@ export class CustomersComponent
     this.getOrigen();
     this.getTipoCuarto();
     this.getAmaDeLlaves();
-    this.customerService.fetch();
+
+    this.customerService.fetch(this.hotel);
 
     this.customerService.items$.subscribe(
       (result)=>{
@@ -331,7 +332,7 @@ this.origenService.getOrigenes()
 
   onChangeAma(estatus:string,habitacion:string,cuarto:string,folio:number)
     {
-      this.todayDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+      this.todayDate = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
 
 
       this.disponibilidadEstatus.Estatus_Ama_De_Llaves=estatus
@@ -345,7 +346,7 @@ this.origenService.getOrigenes()
 
      const sb = this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
         (value)=>{
-          this.customerService.fetch();
+          this.customerService.fetch(this.hotel);
 
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
@@ -470,7 +471,7 @@ this.origenService.getOrigenes()
   bloqueo() {
       const modalRef = this.modalService.open(BloqueoReservaModalComponent, { size: 'md',backdrop: 'static' });
       modalRef.result.then( () =>
-      this.customerService.fetch(),
+      this.customerService.fetch(this.hotel),
       () => { }
 
     );
@@ -503,7 +504,7 @@ this.origenService.getOrigenes()
       modalRef.componentInstance.id = id;
 
       modalRef.result.then( () =>
-      this.customerService.fetch(),
+      this.customerService.fetch(this.hotel),
       () => { }
       );
 
@@ -539,7 +540,7 @@ this.origenService.getOrigenes()
 
         });
 
-        this.customerService.fetch(),
+        this.customerService.fetch(this.hotel),
 
         this.subscriptions.push(sb);
     }
@@ -548,25 +549,25 @@ this.origenService.getOrigenes()
   delete(id: number) {
     const modalRef = this.modalService.open(DeleteHuespedModalComponent);
     modalRef.componentInstance.id = id;
-    modalRef.result.then(() => this.customerService.fetch(), () => { });
+    modalRef.result.then(() => this.customerService.fetch(this.hotel), () => { });
   }
 
   deleteSelected() {
     const modalRef = this.modalService.open(DeleteHuespedModalComponent);
     modalRef.componentInstance.ids = this.grouping.getSelectedRows();
-    modalRef.result.then(() => this.customerService.fetch(), () => { });
+    modalRef.result.then(() => this.customerService.fetch(this.hotel), () => { });
   }
 
   updateStatusForSelected() {
     const modalRef = this.modalService.open(UpdateCustomersStatusModalComponent);
     modalRef.componentInstance.ids = this.grouping.getSelectedRows();
-    modalRef.result.then(() => this.customerService.fetch(), () => { });
+    modalRef.result.then(() => this.customerService.fetch(this.hotel), () => { });
   }
 
   fetchSelected() {
     const modalRef = this.modalService.open(FetchCustomersModalComponent);
     modalRef.componentInstance.ids = this.grouping.getSelectedRows();
-    modalRef.result.then(() => this.customerService.fetch(), () => { });
+    modalRef.result.then(() => this.customerService.fetch(this.hotel), () => { });
   }
 
   // estatus(elem: HTMLElement,value:number) {
@@ -662,7 +663,7 @@ this.origenService.getOrigenes()
 
  getAmaDeLlavesByID(estatus:string,habitacion:string,numeroCuarto:string){
 
-    let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    let diaDeHoy=DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
 
     const sb =  this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day, diaDeHoy.month, diaDeHoy.year, numeroCuarto, habitacion).subscribe(
       (value) => {
@@ -731,7 +732,7 @@ openDialog(huesped:Huesped) {
 
   modalRef.componentInstance.huesped = huesped;
   modalRef.result.then((result) => {
-    this.customerService.fetch()
+    this.customerService.fetch(this.hotel)
     console.log(result);
   }, (reason) => {
   });

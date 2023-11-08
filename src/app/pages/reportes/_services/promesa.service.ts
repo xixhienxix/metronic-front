@@ -16,18 +16,25 @@ export class PromesaService {
     ){}
 
     borrarPromesa(_id:string){
-        return this.http.delete(environment.apiUrl+'/reportes/promesa/delete/'+_id)
+        const hotel = sessionStorage.getItem("HOTEL");
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",hotel);
+        
+        return this.http.delete(environment.apiUrl+'/reportes/promesa/delete/'+_id,{params:queryParams})
     }
 
     guardarPromesa (folio:number,fecha:Date,cantidad:number,estatus:string){
-        const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+        const hotel = sessionStorage.getItem("HOTEL");
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",hotel);
 
-        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad,estatus:estatus,hotel:hotel})
+        return this.http.post(environment.apiUrl+'/reportes/promesa',{folio:folio,fecha:fecha,cantidad:cantidad,estatus:estatus,params:queryParams})
       }
 
     getPromesas(folio:number ){
+        const hotel = sessionStorage.getItem("HOTEL");
         let queryParams = new HttpParams();
-        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+        queryParams = queryParams.append("hotel",hotel);
         
         return this.http.get<Promesa[]>(environment.apiUrl+'/reportes/promesas/'+folio,{params:queryParams})
         .pipe(
@@ -45,10 +52,18 @@ export class PromesaService {
 
     }
     updatePromesa(id:string,estatus:string){
-        return this.http.put(environment.apiUrl+"/reportes/promesas/update",{id,estatus})
+        const hotel = sessionStorage.getItem("HOTEL");
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",hotel);
+
+        return this.http.put(environment.apiUrl+"/reportes/promesas/update",{id,estatus,params:queryParams})
     }
     updatePromesaEstatus(id:string,estatus:string){
-            return this.http.put(environment.apiUrl+"/reportes/promesas/update/estatus",{id,estatus})
+        const hotel = sessionStorage.getItem("HOTEL");
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",hotel);
+
+            return this.http.put(environment.apiUrl+"/reportes/promesas/update/estatus",{id,estatus,params:queryParams})
         
     }
 }

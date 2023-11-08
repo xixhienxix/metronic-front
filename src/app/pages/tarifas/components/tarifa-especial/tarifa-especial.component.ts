@@ -88,13 +88,13 @@ export class TarifaEspecialComponent implements OnInit {
     public habitacionService:HabitacionesService,
     public fb:FormBuilder,
     public i18n: NgbDatepickerI18n,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public tarifasService:TarifasService,
     public modalService:NgbModal,
     private overlayContainer: OverlayContainer
   ) {
-    this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
-    this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+    this.fromDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
+    this.toDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
     this.toDate = this.toDate.plus({ days: 1 });
     this.fechaInicial=this.fromDate.day+" de "+this.i18n.getMonthFullName(this.fromDate.month)+" del "+this.fromDate.year
     this.fechaFinal=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year

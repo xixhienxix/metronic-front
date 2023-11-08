@@ -4,6 +4,7 @@ import { HuespedService } from 'src/app/pages/reportes/_services';
 import { Huesped } from 'src/app/pages/reportes/_models/customer.model';
 import { ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 @Component({
   selector: 'app-confirmation-modal',
@@ -22,7 +23,7 @@ export class ConfirmationModalComponent implements OnInit {
     public customerService: HuespedService,
     public activeModal: NgbActiveModal,
     private modalService: NgbModal,
-
+    public _parametrosService: ParametrosServiceService
   ) { }
 
   ngOnInit(): void {
@@ -46,7 +47,7 @@ export class ConfirmationModalComponent implements OnInit {
         }, (reason) => {
             this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
         });
-        this.customerService.fetch();
+        this.customerService.fetch(sessionStorage.getItem("HOTEL"));
 
         setTimeout(() => {
           modalRef.close('Close click');

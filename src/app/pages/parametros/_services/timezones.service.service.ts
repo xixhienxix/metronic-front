@@ -12,8 +12,7 @@ export class TimezonesService {
   constructor(private http : HttpClient,private _parametrosService:ParametrosServiceService) { }
 
   getTimeZones(){
-    let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+
    return this.http.get(environment.apiUrl+'/parametros/timezones')
   }
 }

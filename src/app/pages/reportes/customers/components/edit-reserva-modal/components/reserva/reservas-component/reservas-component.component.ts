@@ -128,16 +128,16 @@ export class ReservasComponentComponent implements OnInit {
     public modalService: NgbModal,
     public promesaService : PromesaService,
     public edoCuentaService:Edo_Cuenta_Service,
-    public parametrosService:ParametrosServiceService
+    public _parametrosService:ParametrosServiceService
   ) {  
-    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
 
     this.todayString = this.today.month+"/"+this.today.day+"/"+this.today.year
 
-    this.fromDate = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.fromDate = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
     // this.toDate = calendar.getNext(calendar.getToday(), 'd', 1); 
     this.toDate=this.today.plus({days:1})
-    this.minDate=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.minDate=DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
 
      this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
 
@@ -205,7 +205,7 @@ export class ReservasComponentComponent implements OnInit {
     {
    const sb = this.promesaService.getPromesas(this.huesped.folio).subscribe(
                           (result)=>{
-                            let today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+                            let today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
 
                             for(let i =0;i<result.length;i++){
                               
@@ -554,7 +554,7 @@ this.subscription.push(sb)
               this.customerService.updateEstatusHuesped(this.huesped).subscribe(
                 (value)=>{
                   this.customerService.setCurrentHuespedValue=this.huesped
-                  this.customerService.fetch();
+                  this.customerService.fetch(sessionStorage.getItem("HOTEL"));
                 },
                 (error)=>{
 

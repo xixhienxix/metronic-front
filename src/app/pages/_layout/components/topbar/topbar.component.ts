@@ -50,13 +50,13 @@ export class TopbarComponent implements OnInit, AfterViewInit {
   constructor(
     private layout: LayoutService,
     private auth: AuthService,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public auditoriaService:AuditoriaService,
     public modal : NgbModal,
     public i18n : NgbDatepickerI18n,
     public authService:AuthService
       ) {
-        this.parametrosService.currentParametros$.subscribe((val)=>{
+        this._parametrosService.currentParametros$.subscribe((val)=>{
           console.log(val)
           this.fecha = DateTime.now().setZone(val.zona)
           this.fecha0=this.fecha.toString().split('T')[0]        
@@ -97,6 +97,10 @@ export class TopbarComponent implements OnInit, AfterViewInit {
     );
     this.user$ = this.auth.currentUserSubject.asObservable();
 
+  }
+
+  logout(){
+    this.authService.logout();
   }
 
   ngAfterViewInit(): void {

@@ -3,7 +3,7 @@ import { Observable, BehaviorSubject, of, Subscription, Subject, throwError } fr
 import { map, catchError, switchMap, finalize,timeout } from 'rxjs/operators';
 import { UserModel } from '../_models/user.model';
 import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { JwtHelperService } from "@auth0/angular-jwt";
 import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 export interface AuthModel {
@@ -49,7 +49,12 @@ export class AuthService implements OnDestroy {
 
   login(username:string,password:string){
     this.logout()
-    return this.http.post(environment.apiUrl+"/auth/login",{username,password})
+    
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post(environment.apiUrl+"/auth/login",{params:queryParams,username,password})
     .pipe(catchError(err => 
       {
       if(err){
@@ -57,8 +62,13 @@ export class AuthService implements OnDestroy {
         this._hasError$.next(true)
         return throwError(err.statusText)
       }
-    }),map((datosUsuario)=>{
-      let usuario:AuthModel;
+    }),map((datosUsuario:any)=>{
+      if(datosUsuario.mensaje=="usuario inexistente")
+      {
+        return datosUsuario.mensaje
+      }
+      else if(datosUsuario){
+        let usuario:AuthModel;
         for(var i in datosUsuario){
           if(datosUsuario.hasOwnProperty(i))
           {
@@ -72,14 +82,17 @@ export class AuthService implements OnDestroy {
         
         return usuario
       }
-
+      }
     }))
   } 
 
   olvidoPassword(email:string){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-    return this.http.post(environment.apiUrl+"/auth/forgot",{email,hotel})
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post(environment.apiUrl+"/auth/forgot",{params:queryParams,email,hotel})
   }
 
   registro(fullname:string,email:string,username:string,password:string,terminos:boolean)
@@ -100,9 +113,14 @@ export class AuthService implements OnDestroy {
       
   }
 
-  create(hotel:string,fullname:string,email:string,username:string,password:string,terminos:boolean)
+  create(hotels:string,fullname:string,email:string,username:string,password:string,terminos:boolean)
   {
-    return this.http.post<any>(environment.apiUrl+"/createdb",{hotel,fullname,email,username,password,terminos})
+
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post<any>(environment.apiUrl+"/createdb",{params:queryParams,hotels,fullname,email,username,password,terminos})
     .pipe(map(res=>{
       let mensaje=null
       if(res.mensaje == "Usuario agregado con exito"){
@@ -122,6 +140,7 @@ export class AuthService implements OnDestroy {
   logout(){
     localStorage.removeItem('ACCESS_TOKEN')
     localStorage.removeItem('USER')
+    sessionStorage.removeItem('HOTEL')
   }
   
   isTokenExpired():boolean{
@@ -173,8 +192,11 @@ export class AuthService implements OnDestroy {
    }
 
    autoriza(usuario:string,password:string){
-    const hotel = this.hotel
-    return this.http.post(environment.apiUrl+'/auth/autoriza',{usuario,password,hotel}).pipe(timeout(5000))
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+    
+    return this.http.post(environment.apiUrl+'/auth/autoriza',{params:queryParams,usuario,password,hotel}).pipe(timeout(5000))
    }
 
   ngOnDestroy(){

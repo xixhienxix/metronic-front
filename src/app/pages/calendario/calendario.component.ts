@@ -42,12 +42,12 @@ export class CalendarioComponent implements OnInit {
 
   constructor(
     public habitacionService : HabitacionesService,
-    public parametrosService : ParametrosServiceService,
+    public _parametrosService : ParametrosServiceService,
     public modalService: NgbModal,
     public disponibilidadService : DisponibilidadService,
     public authService : AuthService
     ) {
-    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
     this.displayedColumns.length = this.getDatest();
 
     this.displayedColumns.fill('filler');

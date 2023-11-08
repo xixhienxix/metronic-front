@@ -24,6 +24,7 @@ import { DivisasService } from './pages/parametros/_services/divisas.service';
 import { ParametrosServiceService } from './pages/parametros/_services/parametros.service.service';
 import { AuthService } from './modules/auth';
 import { AuthModel } from './modules/auth/_models/auth.model';
+import { filter } from 'rxjs/operators';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -61,10 +62,20 @@ export class AppComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    this.router.events
+    .pipe(filter((rs): rs is NavigationEnd => rs instanceof NavigationEnd))
+    .subscribe(event => {
+      if (
+        event.id === 1 &&
+        event.url === event.urlAfterRedirects
+      ) {
+          this.authService.logout();
+      }
+    })
 
     // if(localStorage.getItem("HOTEL")!=undefined){
     //   let nombreHotel = localStorage.getItem("HOTEL").replace(/\s/g, '_')
-    //   this.parametrosService.getParametros(nombreHotel).subscribe((value)=>{
+    //   this._parametrosService.getParametros(nombreHotel).subscribe((value)=>{
     //   })
     // }
     if(localStorage.getItem("USER")!=undefined){

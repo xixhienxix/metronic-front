@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Huesped} from './_models/customer.model'
 import { Subject, Subscription } from 'rxjs';
 import { NgPaginationNumber } from 'src/app/_metronic/shared/crud-table/components/paginator/ng-pagination/ng-pagination.component';
@@ -46,8 +46,13 @@ export class ReportesComponent implements OnInit {
 
   actualizaEstatusHabitacion(id:number)
   {
+    const hotel = sessionStorage.getItem("HOTEL");
+
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
   const sb =  this.http
-    .post<{ message: string }>(environment.apiUrl+"/reportes/habitacion/estatus/:id", id)
+    .post<{ message: string }>(environment.apiUrl+"/reportes/habitacion/estatus/:id",{params:queryParams})
     .subscribe(responseData => {
       console.log(responseData.message);
     });

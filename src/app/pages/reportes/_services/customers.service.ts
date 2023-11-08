@@ -63,8 +63,8 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
    private currentHuesped$=new BehaviorSubject<Huesped>(EMPTY_CUSTOMER);
 
 
-  constructor(@Inject(HttpClient) http, 
-              @Inject(ParametrosServiceService) _parametrosService) {
+  constructor(@Inject(HttpClient) http
+              ) {
     super(http);
     this.huespedUpdate$=this.currentHuesped$.asObservable();
 
@@ -80,6 +80,12 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   }
 
   getAll() :Observable<Huesped[]> {
+
+    const hotel = sessionStorage.getItem("HOTEL");
+
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
     return this.http
      .get<Huesped[]>(environment.apiUrl + '/reportes/huesped')
      .pipe(
@@ -92,8 +98,9 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Huesped>> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
     return this.http.get<Huesped[]>(this.API_URL,{params:queryParams}).pipe(
       map((response: Huesped[]) => {
@@ -116,8 +123,9 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   }
 
   updateStatusForItems(ids: number[], status: number): Observable<any> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
     return this.http.get<Huesped[]>(this.API_URL,{params:queryParams}).pipe(
       map((huespedes: Huesped[]) => {
@@ -137,14 +145,18 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
   }
 
   addPost(huesped:Huesped) {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-    return this.http.post<any>(environment.apiUrl+"/reportes/huesped", {huesped,hotel})
+    const hotel = sessionStorage.getItem("HOTEL");
+
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post<any>(environment.apiUrl+"/reportes/huesped", {huesped,params:queryParams})
     }
 
   updateEstatusHuesped(huesped:Huesped)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = this.hotel
 
     return this.http
     .post(environment.apiUrl+'/reportes/actualiza/estatus/huesped',{huesped,hotel})
@@ -152,15 +164,17 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
 
   updateHuesped(huesped:Huesped)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/reportes/actualiza/huesped',{huesped,hotel})
+    return this.http.post(environment.apiUrl+'/reportes/actualiza/huesped',{huesped,params:queryParams})
   }
 
   
   updateHuespedModifica(huespedAnterior:any)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = this.hotel
 
     return this.http
     .post(environment.apiUrl+'/reportes/actualiza/huesped/modifica',{huespedAnterior,hotel})
@@ -168,7 +182,7 @@ export class HuespedService extends TableService<Huesped> implements OnDestroy {
 
   modificaHuesped(codigo,numero,llegada,salida)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = this.hotel
 
     return this.http
     .post(environment.apiUrl+'/reportes/actualiza/huesped',{codigo:codigo,numero:numero,llegada:llegada,salida:salida,hotel:hotel})

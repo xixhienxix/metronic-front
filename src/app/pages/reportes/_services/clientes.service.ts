@@ -62,8 +62,9 @@ export class ClientesService extends TableService<Huesped> implements OnDestroy 
   }
 
   getClientes(){
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
     return this.http.get(environment.apiUrl+'/reportes/clientes',{params:queryParams})
   }

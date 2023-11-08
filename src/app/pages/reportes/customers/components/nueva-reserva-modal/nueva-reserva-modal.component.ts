@@ -285,19 +285,19 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
     public postService : ReportesComponent,
     private http: HttpClient,
     public i18n: NgbDatepickerI18n,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public divisasService:DivisasService,
     public tarifasService:TarifaService,
     public authService:AuthService
     ) {
 
-      this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+      this.todayDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
       this.todayString = this.todayDate.day.toString()+"/"+(this.todayDate.month).toString()+"/"+this.todayDate.year.toString()+"-"+this.todayDate.hour.toString()+":"+this.todayDate.minute.toString()+":"+this.todayDate.second.toString()
-      this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+      this.today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
       this.tomorrow = this.today.plus({days:1})
 
-      this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
-      this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+      this.fromDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
+      this.toDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
       this.toDate = this.toDate.plus({ days: 1 });
 
       this.minDate=calendar.getToday();
@@ -313,7 +313,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
 
   ngOnInit(): void {
-    this.historicoService.fetch();
+    this.historicoService.fetch(sessionStorage.getItem("HOTEL"));
     this.loadCustomer();
     this.getHistorico();
     this.getHabitaciones();
@@ -569,7 +569,7 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   customerServiceFetch()
   {
-    this.customerService.fetch()
+    this.customerService.fetch(sessionStorage.getItem("HOTEL"))
   }
 
   getFolios(): void
@@ -814,10 +814,10 @@ export class NuevaReservaModalComponent implements  OnInit, OnDestroy
 
   let post = this.customerService.addPost(this.huesped)
   .subscribe(
-      ()=>{
+      (msg)=>{
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
-          modalRef.componentInstance.mensaje='Húesped Generado con éxito'          
+          modalRef.componentInstance.mensaje=msg        
           modalRef.result.then((result) => {
             this.closeResult = `Closed with: ${result}`;
             }, (reason) => {
@@ -1394,13 +1394,13 @@ fechaSeleccionadaFinal(event:NgbDate){
 
   //   if (!this.fromDate && !this.toDate) {
   //     // this.fromDate = date;
-  //     this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+  //     this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this._parametrosService.getCurrentParametrosValue.zona})
   //   } else if (this.fromDate && !this.toDate && date && date.after(fromDateNGB)) {
-  //     this.toDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+  //     this.toDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this._parametrosService.getCurrentParametrosValue.zona})
   //   } else {
   //     this.toDate = null;
   //     // this.fromDate = date;
-  //     this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this.parametrosService.getCurrentParametrosValue.zona})
+  //     this.fromDate = DateTime.fromObject({day: date.day, month: date.month, year:date.year }, { zone: this._parametrosService.getCurrentParametrosValue.zona})
 
   //   }
   

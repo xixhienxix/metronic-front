@@ -212,11 +212,11 @@ export class EditReservaModalComponent implements OnInit {
       private emailService:EmailService,
       private estadoDeCuentaService:Edo_Cuenta_Service,
       private historicoService : HistoricoService,
-      public parametrosService:ParametrosServiceService,
+      public _parametrosService:ParametrosServiceService,
       public disponibilidadService:DisponibilidadService,
       public divisasService : DivisasService
       ) {
-        this.todayDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+        this.todayDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
         this.todayDateString = this.todayDate.day+'/'+this.todayDate.month+'/'+this.todayDate.year
       }
 
@@ -265,7 +265,7 @@ export class EditReservaModalComponent implements OnInit {
 
       let habitacion=this.customerService.getCurrentHuespedValue.habitacion
       let numeroCuarto=this.customerService.getCurrentHuespedValue.numeroCuarto
-      let diaDeHoy=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona) 
+      let diaDeHoy=DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona) 
        
 
       const sb = this.disponibilidadService.getEstatusAmaDeLlaves(diaDeHoy.day,diaDeHoy.month,diaDeHoy.year,numeroCuarto,habitacion).subscribe(
@@ -462,7 +462,7 @@ export class EditReservaModalComponent implements OnInit {
 
      const sb = this.disponibilidadService.actualizaDisponibilidad(this.disponibilidadEstatus).subscribe(
         (value)=>{
-          this.customerService.fetch();
+          this.customerService.fetch(sessionStorage.getItem("HOTEL"));
           const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
           modalRef.componentInstance.alertHeader = 'Exito'
           modalRef.componentInstance.mensaje='Estatus de habitacion Actualizado'
@@ -566,7 +566,7 @@ export class EditReservaModalComponent implements OnInit {
                   modalRef.close('Close click');
                 },4000)
 
-                this.customerService.fetch();
+                this.customerService.fetch(sessionStorage.getItem("HOTEL"));
                 this.closeModal()
 
             },
@@ -699,7 +699,7 @@ export class EditReservaModalComponent implements OnInit {
 
                     this.postHistorico();
 
-                this.customerService.fetch();
+                this.customerService.fetch(sessionStorage.getItem("HOTEL"));
                 this.modal.dismiss();
 
                 },
@@ -778,7 +778,7 @@ export class EditReservaModalComponent implements OnInit {
       const sb = this.estatusService.actualizaEstatus(4,this.huesped.folio,this.huesped).subscribe(
         ()=>
         {
-          this.customerService.fetch();
+          this.customerService.fetch(sessionStorage.getItem("HOTEL"));
           for(let i=1;i<=this.nochesTotales;i++){
 
             const fecha = this.todayDate.plus({days:i})
@@ -811,7 +811,7 @@ export class EditReservaModalComponent implements OnInit {
 
            const sb = this.disponibilidadService.actualizaDisponibilidad(dispo).subscribe(
               (value)=>{
-                this.customerService.fetch();
+                this.customerService.fetch(sessionStorage.getItem("HOTEL"));
               },
               (error)=>{}
               )
@@ -827,7 +827,7 @@ export class EditReservaModalComponent implements OnInit {
               (value)=>
               { 
                 console.log(value)
-                this.customerService.fetch();
+                this.customerService.fetch(sessionStorage.getItem("HOTEL"));
 
               },
               (error)=>{  
@@ -879,7 +879,7 @@ export class EditReservaModalComponent implements OnInit {
             (value)=>{
               console.log(value)
               this.isLoading=false
-              this.customerService.fetch();
+              this.customerService.fetch(sessionStorage.getItem("HOTEL"));
 
               const sb = this.customerService.deleteHuesped(this.huesped._id).subscribe(
                 (value)=>{
@@ -931,7 +931,7 @@ export class EditReservaModalComponent implements OnInit {
         else 
         {this.llegaHoy=true}
 
-        this.customerService.fetch()
+        this.customerService.fetch(sessionStorage.getItem("HOTEL"))
         })
         
         //Recibir Data del Modal usando modal.close(data)

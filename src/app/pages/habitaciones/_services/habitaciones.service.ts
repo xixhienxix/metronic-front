@@ -75,9 +75,12 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   }
 
   saveUrlToMongo(downloadURL:string,fileUploadName:string){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-    return this.http.post(this.API_URL_MAIN+"/update/habitacion/imageurl",{downloadURL:downloadURL,fileUploadName:fileUploadName,hotel:hotel}).pipe(
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post(this.API_URL_MAIN+"/update/habitacion/imageurl",{downloadURL:downloadURL,fileUploadName:fileUploadName,params:queryParams}).pipe(
       map(result => {
           return (result);  
        }),
@@ -99,8 +102,9 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Habitacion>> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
     return this.http.get<Habitacion[]>(this.API_URL,{params:queryParams}).pipe(
       map((response: Habitacion[]) => {
@@ -124,13 +128,16 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   updateHabitacion(Habitacion:Habitacion)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
-    return this.http.post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{Habitacion,hotel})
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+    
+    return this.http.post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{Habitacion,params:queryParams})
   }
 
   updateHabitacionModifica(HabitacionAnterior:any)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL")
 
     return this.http
     .post(environment.apiUrl+'/habitacion/actualiza/Habitacion/modifica',{HabitacionAnterior,hotel})
@@ -138,14 +145,14 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   modificaHabitacion(codigo,numero,llegada,salida)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL")
 
     return this.http
     .post(environment.apiUrl+'/habitacion/actualiza/Habitacion',{codigo:codigo,numero:numero,llegada:llegada,salida:salida, hotel})
   }
 
   deleteHabitacion(_id:string){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL")
 
     return this.http
     .delete(environment.apiUrl+'/habitacion/delete/'+_id)
@@ -153,16 +160,19 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
 
   postAdicional(descripcion:string,precio:number)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL")
 
     return this.http
     .post(environment.apiUrl+'/codigos/adicional',{descripcion,precio,hotel})
   }
 
   postHabitacion(habitacion:Habitacion,editar:boolean,filename:File){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar,hotel}).pipe(
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post(environment.apiUrl+'/habitacion/guardar',{habitacion,editar,params:queryParams}).pipe(
       map(response=>{
         return response
       })
@@ -170,15 +180,19 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
   }
 
   agregarInventario(habitacion:Habitacion,inventario:number){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/habitacion/agregar',{habitacion,inventario,hotel})
+    return this.http.post(environment.apiUrl+'/habitacion/agregar',{habitacion,inventario,params:queryParams})
   }
 
   buscarHabitacion(habitacion:Habitacion){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post<Habitacion[]>(environment.apiUrl+'/habitacion/buscar',{habitacion,hotel})
+    return this.http.post<Habitacion[]>(environment.apiUrl+'/habitacion/buscar',{habitacion,params:queryParams})
   }
 
   getCodigohabitaciones() :Observable<Habitacion[]> {
@@ -194,7 +208,11 @@ export class HabitacionesService extends TableService<Habitacion> implements OnD
    }
 
    creaDisponibilidad(numeroHabs:any,nombreCuarto:string){ 
-    return this.http.post(this.API_URL_MAIN+'/disponibilidad/crear',{numeroHabs,nombreCuarto})
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post(this.API_URL_MAIN+'/disponibilidad/crear',{numeroHabs,nombreCuarto, params:queryParams})
     .pipe(      
       // catchError((error)=> {return error}),
       map(response=>{

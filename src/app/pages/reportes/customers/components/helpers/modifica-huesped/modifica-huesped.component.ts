@@ -103,13 +103,13 @@ export class ModificaHuespedComponent implements OnInit {
     public fb: FormBuilder,
     private calendar: NgbCalendar,
     public divisasService:DivisasService,
-    public parametrosService : ParametrosServiceService,
+    public _parametrosService : ParametrosServiceService,
     public edoCuentaService : Edo_Cuenta_Service
   ) { 
 
-    const current = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    const current = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
     this.minDate = {year:current.year,month:current.month,day:current.day}
-    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
     
    
   }
@@ -374,13 +374,14 @@ export class ModificaHuespedComponent implements OnInit {
 
    const sb = this.customerService.updateHuespedModifica(this.customerService.getCurrentHuespedValue).subscribe(
       (value)=>{
-        
+        const hotel = sessionStorage.getItem("HOTEL");
     this.huesped.noches=this.diaDif
     this.huesped.tarifa=''
     this.huesped.habitacion=this.codigoCuartoString
     this.huesped.numeroCuarto=this.numCuartoNumber,
     this.huesped.pendiente=0
     this.huesped.porPagar=0
+    this.huesped.hotel=hotel
 
     
     this.huesped.llegada=this.comparadorInicial.day+'/'+this.comparadorInicial.month+'/'+this.comparadorInicial.year

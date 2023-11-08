@@ -24,7 +24,7 @@ export class DisponibilidadService {
     .set('numeroCuarto',numeroCuarto.toString())
     .set('dias',dias.toString())
     .set('folio',folio.toString())
-    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    .append("hotel",sessionStorage.getItem("HOTEL"));
 
     return this.http.get<any>(environment.apiUrl+'/disponibilidad/completa',{params:params})
 
@@ -36,7 +36,7 @@ export class DisponibilidadService {
     .set('mes', mes.toString())
     .set('ano',ano.toString())
     .set('cuarto',cuarto.toString())
-    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    .append("hotel",sessionStorage.getItem("HOTEL"));
 
     return this.http
      .get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad',{params:params})
@@ -52,20 +52,24 @@ export class DisponibilidadService {
     .set('dia', dia.toString())
     .set('mes', mes.toString())
     .set('ano',ano.toString())
-    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    .append("hotel",sessionStorage.getItem("HOTEL"));
 
     return this.http.get<Disponibilidad[]>(environment.apiUrl + '/huespedes/disponibilidad/todos',{params:params})
   }
 
    actualizaDisponibilidad(disponibilidad:Disponibilidad){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.put(environment.apiUrl+"/update/disponibilidad",{disponibilidad,hotel})
+    return this.http.put(environment.apiUrl+"/update/disponibilidad",{disponibilidad,params:queryParams})
    }
 
    getEstatusAmaDeLlaves(dia:number,mes:number,ano:number,numeroCuarto:string,habitacion:string){
 
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
     let parametros = {
       dia:dia,
@@ -76,7 +80,7 @@ export class DisponibilidadService {
       hotel:hotel
       };
 
-     return this.http.post<Disponibilidad>(environment.apiUrl+'/disponibilidad/ama',parametros)
+     return this.http.post<Disponibilidad>(environment.apiUrl+'/disponibilidad/ama',{params:queryParams,parametros})
 
   }
 

@@ -13,7 +13,7 @@
   <p> al Estatus : {{estatus}}  </p>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="customerService.fetch();closeModal('Cancel')">Cerrar</button>
+  <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="customerService.fetch(_parametrosService.getCurrentParametrosValue.hotel);closeModal('Cancel')">Cerrar</button>
   <button type="button" class="btn btn-primary" (click)="cambiaEstatus(huesped);closeModal('Cancel')">Continuar</button>
 </div>
 
@@ -43,7 +43,7 @@
       <path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6.146-2.854a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
     </svg>
     <h4 class="modal-title">Hubo un problema al actualizar el Estatus intente de nuevo mas tarde</h4>
-    <button type="button" class="close" aria-label="Close" (click)="customerService.fetch();modal.dismiss('Cross click')">
+    <button type="button" class="close" aria-label="Close" (click)="customerService.fetch(_parametrosService.getCurrentParametrosValue.hotel);modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>

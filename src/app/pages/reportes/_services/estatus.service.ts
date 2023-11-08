@@ -17,8 +17,9 @@ export class EstatusService  {
 
   getEstatusbyLetra(id:string) : Observable<Estatus[]> {
 
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
   return  (this.http.get<Estatus[]>(environment.apiUrl+"/reportes/estatus/"+id,{params:queryParams})
       .pipe(
@@ -34,7 +35,7 @@ export class EstatusService  {
 
   getEstatus() :Observable<Estatus[]> {
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
 
    return this.http
     .get<Estatus[]>(environment.apiUrl + '/reportes/estatus',{params:queryParams})
@@ -47,9 +48,12 @@ export class EstatusService  {
   }
 
   actualizaEstatus(estatus,folio,huesped:Huesped){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio,huesped:huesped,hotel})
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post(environment.apiUrl+"/actualiza/estatus",{estatus:estatus,folio:folio,huesped:huesped,params:queryParams})
 
   }
 

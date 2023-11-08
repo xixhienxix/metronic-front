@@ -16,14 +16,18 @@ export class OrigenService {
   getOrigenbyID(id:number) : Observable<Origen>
   {
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
     
   return  (this.http.get<Origen>(environment.apiUrl+"/reportes/origen/"+id,{params:queryParams}))
   }
 
   getOrigenes() :Observable<Origen> {
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
    return this.http
-    .get<Origen>(environment.apiUrl + '/reportes/origen').pipe(
+    .get<Origen>(environment.apiUrl + '/reportes/origen',{params:queryParams}).pipe(
       catchError(this.handleError)
      )
   }

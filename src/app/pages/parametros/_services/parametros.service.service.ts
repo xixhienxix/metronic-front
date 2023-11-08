@@ -57,9 +57,11 @@ export class ParametrosServiceService {
   }
 
   postParametros(parametros:Parametros){
-    const hotel = this.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/parametros',{parametros,hotel})
+    return this.http.post(environment.apiUrl+'/parametros',{parametros,params:queryParams})
   }
 
 }

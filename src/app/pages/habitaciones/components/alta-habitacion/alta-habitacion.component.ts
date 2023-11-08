@@ -117,11 +117,11 @@ export class AltaHabitacionComponent implements OnInit {
     public router : Router,
     public modal:NgbActiveModal,
     public tarifasService:TarifasService,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     private af :AngularFireStorage
   ) {
-    this.fromDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
-    this.toDate = DateTime.now().setZone(parametrosService.getCurrentParametrosValue.zona)
+    this.fromDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
+    this.toDate = DateTime.now().setZone(_parametrosService.getCurrentParametrosValue.zona)
     this.toDate = this.toDate.plus({ days: 1 });
 
   }
@@ -440,7 +440,7 @@ export class AltaHabitacionComponent implements OnInit {
         setTimeout(() => {
           modalRef.close('Close click');
         },4000)
-        this.habitacionService.fetch();
+        this.habitacionService.fetch(sessionStorage.getItem("HOTEL"));
           this.modal.close()
 
           this.sendUpload=true

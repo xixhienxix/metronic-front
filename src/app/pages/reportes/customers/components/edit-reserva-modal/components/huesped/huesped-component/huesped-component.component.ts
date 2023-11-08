@@ -81,13 +81,13 @@ export class HuespedComponentComponent implements OnInit {
     public fb : FormBuilder,
     public modalService : NgbModal,
     private detallesService : Huesped_Detail_Service,
-    public parametrosService : ParametrosServiceService
+    public _parametrosService : ParametrosServiceService
   ) 
   {  
-    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
 
-    this.fromDate = DateTime.now().setZone({ zone: this.parametrosService.getCurrentParametrosValue.zona}) 
-    this.toDate = DateTime.now().setZone({ zone: this.parametrosService.getCurrentParametrosValue.zona}) .plus({ days: 1 }) 
+    this.fromDate = DateTime.now().setZone({ zone: this._parametrosService.getCurrentParametrosValue.zona}) 
+    this.toDate = DateTime.now().setZone({ zone: this._parametrosService.getCurrentParametrosValue.zona}) .plus({ days: 1 }) 
     console.log(this.fromDate)
     console.log(this.toDate)
     this.fechaFinalBloqueo=this.toDate.day+" de "+this.i18n.getMonthFullName(this.toDate.month)+" del "+this.toDate.year 
@@ -198,6 +198,8 @@ export class HuespedComponentComponent implements OnInit {
 
   private prepareHuesped() {
 
+    const hotel= sessionStorage.getItem("HOTEL");
+
     if(this.checkedRegular){this.huesped.tipoHuesped="Regular"}
     if(this.checkedVIP){this.huesped.tipoHuesped="VIP"}
     if(this.checkedListaNegra){this.huesped.tipoHuesped="Lista Negra"}
@@ -208,6 +210,7 @@ export class HuespedComponentComponent implements OnInit {
     this.huesped.id=this.huesped.folio
     this.huesped.notas=formData.notas
     this.huesped.ID_Socio=this.id_Socio
+    this.huesped.hotel=hotel;
 
     this.detailsList = {
       ID_Socio:this.id_Socio,
@@ -224,8 +227,8 @@ export class HuespedComponentComponent implements OnInit {
       ciudad:formData.ciudad,
       codigoPostal:formData.codigoPostal,
       lenguaje:formData.lenguaje,
-      notas:formData.notas
-
+      notas:formData.notas,
+      hotel:hotel
     }
     this.isLoading=true;
     const sb = this.customerService.updateHuesped(this.huesped).subscribe(

@@ -30,7 +30,7 @@ export class SaldoCuentaComponent implements OnInit {
   constructor(public modal: NgbActiveModal,
     public fb :FormBuilder,
     public customerService:HuespedService,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public edoCuentaService:Edo_Cuenta_Service,
     public modalService:NgbModal,
     public estatusService:EstatusService
@@ -66,7 +66,7 @@ export class SaldoCuentaComponent implements OnInit {
       pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
+        Fecha:DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:this.abonosf.notaAbono.value,
         Descripcion:this.abonosf.conceptoManual.value,

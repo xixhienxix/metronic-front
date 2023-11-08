@@ -27,7 +27,7 @@
               >
               <div class="col-lg-9 col-xl-4">
                 <mat-form-field appearance="fill">
-                  <mat-label>{{parametrosService.getCurrentParametrosValue.codigoZona}} - {{parametrosService.getCurrentParametrosValue.zona}}</mat-label>
+                  <mat-label>{{_parametrosService.getCurrentParametrosValue.codigoZona}} - {{_parametrosService.getCurrentParametrosValue.zona}}</mat-label>
                   <mat-select (selectionChange)='onSelectTimeZone($event.value)'  formControlName="timeZone" required>
                     <mat-option *ngFor="let timezone of zonaHoraria" [value]="timezone.UTC+' '+timezone.Nombre">
                       (UTC {{timezone.UTC}}) {{timezone.Nombre}} 
@@ -44,7 +44,7 @@
               >
               <div class="col-lg-9 col-xl-4">
                 <mat-form-field appearance="fill">
-                  <mat-label>{{parametrosService.getCurrentParametrosValue.divisa}}</mat-label>
+                  <mat-label>{{_parametrosService.getCurrentParametrosValue.divisa}}</mat-label>
                   <mat-select formControlName="divisa" required>
                     <mat-option *ngFor="let divisa of divisas" [value]="divisa.Nombre">
                       {{divisa.Nombre}} - {{divisa.Localidad}} - {{divisa.Simbolo}} 

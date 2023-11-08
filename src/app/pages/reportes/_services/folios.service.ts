@@ -21,8 +21,9 @@ export class FoliosService {
   }
 
   getFoliosbyLetra(id:string) : Observable<Foliador[]> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
   return  (this.http.get<Foliador[]>(environment.apiUrl+"/reportes/folios/"+id,{params:queryParams})
       .pipe(

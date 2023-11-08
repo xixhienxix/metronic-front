@@ -114,7 +114,7 @@ export class TransaccionesComponentComponent implements OnInit {
     private codigosService:CodigosDeCargoService,
     private modalService: NgbModal,
     private customerService:HuespedService,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public divisasService:DivisasService
 
     ) {
@@ -147,8 +147,8 @@ export class TransaccionesComponentComponent implements OnInit {
     const sb = this.customerService.updateHuesped(huesped).subscribe(
       (Value)=>{
         console.log("Huesped Actualizado con Exito")
-
-        this.customerService.fetch();
+        const hotel = sessionStorage.getItem("HOTEL")
+        this.customerService.fetch(hotel);
       },
       (error)=>{
         console.log("Error al Actualizar Huesped")
@@ -269,7 +269,9 @@ export class TransaccionesComponentComponent implements OnInit {
           this.huesped.pendiente = this.totalCalculado
           this.huesped.porPagar = totalCargos
 
+          const hotel = sessionStorage.getItem("HOTEL");
           this.customerService.setCurrentHuespedValue=this.huesped
+          this.huesped.hotel=hotel;
           this.actualizaHuesped(this.huesped);
       },
       (err)=>
@@ -460,7 +462,7 @@ this.nuevosConceptos=false
 
           if(receivedEntry.id==3)
           {
-            this.fechaCancelado=DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+            this.fechaCancelado=DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
             
                   if(edo_cuenta.Forma_De_Pago=='No Aplica')
                   {
@@ -758,7 +760,7 @@ this.subscription.push(sb)
         pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
+        Fecha:DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:'',
         Descripcion:this.nuevas.nuevoConcepto.value,
@@ -781,7 +783,7 @@ this.subscription.push(sb)
         pago = {
 
           Folio:this.customerService.getCurrentHuespedValue.folio,
-          Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
+          Fecha:DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona),
           Fecha_Cancelado:'',
           Referencia:'',
           Descripcion:this.codigoDeCargo.Descripcion,
@@ -859,7 +861,7 @@ this.isLoading=true
       pago = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
+        Fecha:DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:this.abonosf.notaAbono.value,
         Descripcion:this.abonosf.conceptoManual.value,
@@ -937,7 +939,7 @@ this.isLoading=true
       descuento = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
+        Fecha:DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona),
         Fecha_Cancelado:'',
         Referencia:'',
         Descripcion:this.second.motivoDesc.value,
@@ -958,7 +960,7 @@ this.isLoading=true
       descuento = {
 
         Folio:this.customerService.getCurrentHuespedValue.folio,
-        Fecha:DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona),
+        Fecha:DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona),
         Referencia:'',
         Descripcion:this.second.motivoDesc.value + ' ('+this.second.qtyPrecio.value+'%'+')',
         Forma_de_Pago:'Descuento',

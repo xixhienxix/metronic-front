@@ -33,8 +33,9 @@ export class AmaLlavesService {
   ) { }
 
   getAmaDeLlaves(){
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
       return this.http.get<Ama_De_Llaves[]>(environment.apiUrl+'/reportes/ama_llaves',{params:queryParams})
       .pipe( map(responseData=>{
@@ -43,8 +44,9 @@ export class AmaLlavesService {
       )}
 
   getAmaDeLlavesByID(cuarto:string,numero:number){
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
         return this.http.get<Ama_De_Llaves>(environment.apiUrl+'/reportes/ama_llaves/'+{cuarto,numero}, {params:queryParams})
         .pipe( map(responseData=>{

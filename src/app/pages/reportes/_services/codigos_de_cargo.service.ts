@@ -10,8 +10,9 @@ export class CodigosDeCargoService {
         private _parametrosService:ParametrosServiceService){}
 
     getCodigosDeCargo(){
+        const hotel = sessionStorage.getItem("HOTEL");
         let queryParams = new HttpParams();
-        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+        queryParams = queryParams.append("hotel",hotel);
         
         return this.http.get(environment.apiUrl+'/codigos',{params:queryParams})
     }

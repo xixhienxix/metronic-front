@@ -10,8 +10,9 @@ import { ParametrosServiceService } from '../../parametros/_services/parametros.
 export class AdicionalService  {
 
     getAdicionales(){
+      const hotel = sessionStorage.getItem("HOTEL");
       let queryParams = new HttpParams();
-      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+      queryParams = queryParams.append("hotel",hotel);
 
         return this.http.get<Adicional[]>(environment.apiUrl+"/adicionales")
         .pipe(

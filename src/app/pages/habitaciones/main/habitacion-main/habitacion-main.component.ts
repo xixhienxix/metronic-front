@@ -12,6 +12,7 @@ import { Habitacion } from '../../_models/habitacion';
 import { HabitacionesService } from '../../_services/habitaciones.service';
 import { FileUploadService } from '../../_services/file.upload.service';
 import { map } from 'rxjs/operators';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 
 @Component({
   selector: 'app-habitacion-main',
@@ -54,7 +55,8 @@ export class HabitacionMainComponent implements OnInit {
     public fb : FormBuilder,
     public habitacionService:HabitacionesService,
     public modalService :NgbModal,
-    private router:Router
+    private router:Router,
+    private _parametrosService: ParametrosServiceService
   ) {
     }
 
@@ -62,7 +64,7 @@ export class HabitacionMainComponent implements OnInit {
 
     this.getImagenesHabitaciones();
 
-    this.habitacionService.fetch()
+    this.habitacionService.fetch(sessionStorage.getItem("HOTEL"))
     this.getHabitaciones(false)
 
     const sb = this.habitacionService.isLoading$.subscribe((res) => {
@@ -102,11 +104,13 @@ export class HabitacionMainComponent implements OnInit {
     const sb = this.habitacionService.getCodigohabitaciones().subscribe(
       (value)=>{
         const sb = this.habitacionService.getAll().subscribe((habitaciones)=>{
-          this.habitacionesporCodigo = habitaciones.reduce(function (r, a) {
-                      r[a.Codigo] = r[a.Codigo] || [];
-                      r[a.Codigo].push(a);
-                      return r;
-                  }, Object.create(null));
+          if(Object.keys(habitaciones).length !== 0){
+            this.habitacionesporCodigo = habitaciones.reduce(function (r, a) {
+              r[a.Codigo] = r[a.Codigo] || [];
+              r[a.Codigo].push(a);
+              return r;
+          }, Object.create(null));
+          
 
           this.habitacionesArr=[] // limpia array de habitaciones
 
@@ -152,6 +156,7 @@ export class HabitacionMainComponent implements OnInit {
               this.reloading=false
           }
           this.dataSource.data=this.habitacionesArr
+        }
         },
         (error)=>{
 
@@ -172,7 +177,7 @@ export class HabitacionMainComponent implements OnInit {
     modalRef.result.then((result) => {
       this.habitacionesArr=[]
       this.getHabitaciones(false);
-      this.habitacionService.fetch();
+      this.habitacionService.fetch(sessionStorage.getItem("HOTEL"));
       this.closeResult = `Closed with: ${result}`;
       }, (reason) => {
           this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -256,7 +261,7 @@ export class HabitacionMainComponent implements OnInit {
           setTimeout(() => {
             modalRef.close('Close click');
           },4000)
-          this.habitacionService.fetch();
+          this.habitacionService.fetch(sessionStorage.getItem("HOTEL"));
       },
       (error)=>{
         this.isLoading=false

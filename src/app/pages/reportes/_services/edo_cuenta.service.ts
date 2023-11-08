@@ -46,9 +46,11 @@ getNotification(){
     constructor(private http: HttpClient, private _parametrosService:ParametrosServiceService) { }
 
     agregarPago(pago:edoCuenta ){
-      const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+      const hotel = sessionStorage.getItem("HOTEL");
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",hotel);
 
-       return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',{pago,hotel}).pipe(
+       return this.http.post<edoCuenta>(environment.apiUrl+'/edo_cuenta/pagos',{pago,params:queryParams}).pipe(
         map((data=>{
           this.sendNotification(true);
           }
@@ -56,9 +58,10 @@ getNotification(){
     }
 
     updateRow(_id:string,estatus:string,fechaCancelado:Date,autorizo:string){
-      const hotel = this._parametrosService.getCurrentParametrosValue.hotel
-
-      return this.http.put(environment.apiUrl+"/edo_cuenta/pagos",{_id,estatus,fechaCancelado,autorizo,hotel}).pipe(
+      const hotel = sessionStorage.getItem("HOTEL");
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",hotel);
+      return this.http.put(environment.apiUrl+"/edo_cuenta/pagos",{_id,estatus,fechaCancelado,autorizo,params:queryParams}).pipe(
         map((data=>{
           this.sendNotification(true);
           }
@@ -67,8 +70,9 @@ getNotification(){
 
 
     getCuentas(folio:number ){
+      const hotel = sessionStorage.getItem("HOTEL");
       let queryParams = new HttpParams();
-      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+      queryParams = queryParams.append("hotel",hotel);
 
         return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuenta/'+folio,{params:queryParams})
         .pipe(
@@ -91,8 +95,9 @@ getNotification(){
     }
 
     getTodasLasCuentas(){
+      const hotel = sessionStorage.getItem("HOTEL");
       let queryParams = new HttpParams();
-      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+      queryParams = queryParams.append("hotel",hotel);
 
       return this.http.get<edoCuenta[]>(environment.apiUrl+'/edo_cuenta/cuentas',{params:queryParams})
       .pipe(
@@ -112,9 +117,11 @@ getNotification(){
   }
 
   actualizaSaldo(_id:string,monto:number){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.put<edoCuenta>(environment.apiUrl+'/edo_cuenta/alojamiento',{_id,monto,hotel})
+    return this.http.put<edoCuenta>(environment.apiUrl+'/edo_cuenta/alojamiento',{_id,monto,params:queryParams})
   }
 
 }

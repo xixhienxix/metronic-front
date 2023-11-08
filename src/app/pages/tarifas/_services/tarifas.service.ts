@@ -102,8 +102,9 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
 
   // READ
   find(tableState: ITableState): Observable<TableResponseModel<Tarifas>> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
     return this.http.get<Tarifas[]>(this.API_URL,{params:queryParams}).pipe(
       map((response: Tarifas[]) => {
@@ -126,9 +127,11 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   postTarifa(tarifa:Tarifas){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/tarifas/agregar',{tarifa,hotel}).pipe(
+    return this.http.post(environment.apiUrl+'/tarifas/agregar',{tarifa,params:queryParams}).pipe(
       map((data=>{
         this.sendNotification(true);
         }
@@ -136,9 +139,11 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   postTarifaEspecial(tarifa:Tarifas){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/tarifas/especial/agregar',{tarifa,hotel}).pipe(
+    return this.http.post(environment.apiUrl+'/tarifas/especial/agregar',{tarifa,params:queryParams}).pipe(
       map((data=>{
         this.sendNotification(true);
         }
@@ -147,14 +152,16 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
 
   updateTarifas(Tarifas:Tarifas)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/tarifario/actualiza/tarifas',{Tarifas,hotel})
+    return this.http.post(environment.apiUrl+'/tarifario/actualiza/tarifas',{Tarifas,params:queryParams})
   }
 
   updateTarifasModifica(TarifasAnterior:any)
   {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL")
 
     return this.http
     .post(environment.apiUrl+'/tarifario/actualiza/tarifas/modifica',{TarifasAnterior,hotel})
@@ -167,9 +174,11 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   deleteTarifas(tarifa:Tarifas){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/tarifas/rack/delete',{tarifa,hotel}).pipe(
+    return this.http.post(environment.apiUrl+'/tarifas/rack/delete',{tarifa,params:queryParams}).pipe(
       map((data=>{
         this.sendNotification(true);
         }
@@ -177,9 +186,11 @@ export class TarifasService extends TableService<Tarifas> implements OnDestroy {
   }
 
   deleteTarifaEspecial(tarifa:Tarifas){
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
 
-    return this.http.post(environment.apiUrl+'/tarifas/especial/delete',{tarifa,hotel}).pipe(
+    return this.http.post(environment.apiUrl+'/tarifas/especial/delete',{tarifa,queryParams}).pipe(
       map((data=>{
         this.sendNotification(true);
         }

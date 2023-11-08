@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
-    private parametrosService : ParametrosServiceService
+    private _parametrosService : ParametrosServiceService
   ) {
 
   }
@@ -73,15 +73,26 @@ export class LoginComponent implements OnInit, OnDestroy {
     const sb = this.authService.login(usuario,this.f.password.value).subscribe(
       (value)=> 
       {
+        if(value=='usuario inexistente'){
+          alert('Usuario o Contraseña Incorrectos')
+          
+        }else 
         if(value)
         {
-          hotel = this.authService.currentUserValue.hotel.replace(/\s/g, '_');
-
-        this.parametrosService.getParametros(hotel).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+          if(this.authService.currentUserValue.hotel){
+            hotel = this.authService.currentUserValue.hotel.replace(/\s/g, '_');
+          }
+          else {
+            alert('Usuario o Contraseña Incorrectos')
+            this.loading=false
+            return
+          }
+        this._parametrosService.getParametros(hotel).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
           (value)=>{
-            this.parametrosService.getCurrentParametrosValue.hotel= hotel
 
-              this.parametrosService.getCurrentParametrosValue
+              this._parametrosService.getCurrentParametrosValue
+              sessionStorage.setItem("HOTEL",this._parametrosService.getCurrentParametrosValue.hotel)
+
               this.router.navigate(['/calendario'])// /calendario
 
           },

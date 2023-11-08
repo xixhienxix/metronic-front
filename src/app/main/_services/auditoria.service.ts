@@ -96,8 +96,9 @@ export class AuditoriaService {
 
    getHuespedes()
     {
+      const hotel = sessionStorage.getItem("HOTEL");
       let queryParams = new HttpParams();
-      queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+      queryParams = queryParams.append("hotel",hotel);
 
        return this.http.get<Huesped[]>(environment.apiUrl+'/reportes/huesped',{params:queryParams})  
     }
@@ -110,27 +111,29 @@ export class AuditoriaService {
    revisaNoShow(huesped:Huesped){
     if(huesped.estatus=='Reserva Sin Pago' || huesped.estatus=='Esperando Deposito')
     {
-      huesped.estatus='No Show'
+      const hotel = sessionStorage.getItem("HOTEL");
 
+      huesped.estatus='No Show'
+      huesped.hotel = hotel
       let diaLlegada = huesped.llegada.split('/')[0]
       let mesLlegada = huesped.llegada.split('/')[1]
       let anoLlegada = huesped.llegada.split('/')[2]
 
-      let horaNoshow = this.parametrosService.getCurrentParametrosValue.noShow.split(':')[0]
-      let minutosNoShow = this.parametrosService.getCurrentParametrosValue.noShow.split(':')[1]
+      let horaNoshow = this._parametrosService.getCurrentParametrosValue.noShow.split(':')[0]
+      let minutosNoShow = this._parametrosService.getCurrentParametrosValue.noShow.split(':')[1]
 
       let fechaLlegada = DateTime.local().set({day:diaLlegada,month:mesLlegada,year:anoLlegada})
-      let fechaDelDia = DateTime.local().setZone(this.parametrosService.getCurrentParametrosValue.zona)
-      let horaNoShow = DateTime.local().setZone(this.parametrosService.getCurrentParametrosValue.zona).set({hour:horaNoshow,minutes:minutosNoShow})
+      let fechaDelDia = DateTime.local().setZone(this._parametrosService.getCurrentParametrosValue.zona)
+      let horaNoShow = DateTime.local().setZone(this._parametrosService.getCurrentParametrosValue.zona).set({hour:horaNoshow,minutes:minutosNoShow})
       
        if(fechaLlegada.ts<=horaNoShow.ts){
 
        const sb = this.estatusService.actualizaEstatus(11,huesped.folio,huesped).subscribe(
           (value)=>{
-            console.log(value)
+
 
             this.postHistorico(huesped)
-            this.customerservice.fetch()
+            this.customerservice.fetch(hotel)
           },
           (error)=>{
             console.log(error)
@@ -153,11 +156,11 @@ export class AuditoriaService {
         let mesSalida = huesped.salida.split('/')[1]
         let anoSalida = huesped.salida.split('/')[2]
   
-        let horaCheckOut = this.parametrosService.getCurrentParametrosValue.checkOut.split(':')[0]
-        let minutosCheckOut = this.parametrosService.getCurrentParametrosValue.checkOut.split(':')[1]
+        let horaCheckOut = this._parametrosService.getCurrentParametrosValue.checkOut.split(':')[0]
+        let minutosCheckOut = this._parametrosService.getCurrentParametrosValue.checkOut.split(':')[1]
   
         let fechaSalida = DateTime.local().set({day:diaSalida,month:mesSalida,year:anoSalida})
-        let fechahoraCheckOut = DateTime.local().setZone(this.parametrosService.getCurrentParametrosValue.zona).set({hour:horaCheckOut,minutes:minutosCheckOut})
+        let fechahoraCheckOut = DateTime.local().setZone(this._parametrosService.getCurrentParametrosValue.zona).set({hour:horaCheckOut,minutes:minutosCheckOut})
         
          if(fechaSalida.ts<=fechahoraCheckOut.ts){
   
@@ -166,7 +169,7 @@ export class AuditoriaService {
               this.postHistorico(huesped)
 
               console.log(value)
-              this.customerservice.fetch()
+              this.customerService.fetch(sessionStorage.getItem("HOTEL"))
             },
             (error)=>{
               console.log(error)
@@ -190,7 +193,7 @@ export class AuditoriaService {
 
             const sb = this.customerService.deleteHuesped(huesped._id).subscribe(
               (value)=>{
-                this.customerservice.fetch()
+                this.customerService.fetch(sessionStorage.getItem("HOTEL"))
 
               },
               (error)=>{})
@@ -211,7 +214,7 @@ export class AuditoriaService {
 
         const sb = this.customerService.deleteHuesped(huesped._id).subscribe(
           (value)=>{
-            this.customerService.fetch();
+            this.customerService.fetch(sessionStorage.getItem("HOTEL"));
 
           },
           (error)=>{})

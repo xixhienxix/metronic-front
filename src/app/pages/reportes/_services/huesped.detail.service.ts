@@ -12,21 +12,25 @@ export class Huesped_Detail_Service{
     constructor (private http : HttpClient, private _parametrosService:ParametrosServiceService){}
 
     getDetails(){
+        const hotel = sessionStorage.getItem("HOTEL");
         let queryParams = new HttpParams();
-        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+        queryParams = queryParams.append("hotel",hotel);
 
         return this.http.get<Huesped_Detail>(environment.apiUrl+"/details",{params:queryParams})
     }
 
     updateDetails(huesped:Huesped_Detail){
-        const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+        const hotel = sessionStorage.getItem("HOTEL");
+        let queryParams = new HttpParams();
+        queryParams = queryParams.append("hotel",hotel);
 
-        return this.http.post(environment.apiUrl+"/reportes/details",{huesped,hotel})
+        return this.http.post(environment.apiUrl+"/reportes/details",{huesped,params:queryParams})
     }
 
     getDetailsById(folio:number){
+        const hotel = sessionStorage.getItem("HOTEL");
         let queryParams = new HttpParams();
-        queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+        queryParams = queryParams.append("hotel",hotel);
 
         return this.http.get<Huesped_Detail>(environment.apiUrl+"/details/"+folio,{params:queryParams})
     }

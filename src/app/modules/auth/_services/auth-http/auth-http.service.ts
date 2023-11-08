@@ -16,19 +16,28 @@ export class AuthHTTPService {
 
   // public methods
   login(email: string, password: string): Observable<any> {
-    const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+    const hotel = sessionStorage.getItem("HOTEL")
     return this.http.post<AuthModel>(`${API_USERS_URL}/login`, { email, password, hotel });
   }
 
   // CREATE =>  POST: add a new user to the server
   createUser(user: UserModel): Observable<UserModel> {
-    
-    return this.http.post<UserModel>(API_USERS_URL, user);
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+    return this.http.post<UserModel>(API_USERS_URL,{params:queryParams,user});
   }
 
   // Your server should check email => If email exists send link to the user and return true | If email doesn't exist return false
   forgotPassword(email: string): Observable<boolean> {
+
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
     return this.http.post<boolean>(`${API_USERS_URL}/forgot-password`, {
+      params:queryParams,
       email,
     });
   }
@@ -37,8 +46,9 @@ export class AuthHTTPService {
     const httpHeaders = new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
     return this.http.get<UserModel>(`${API_USERS_URL}/me`, {
       params:queryParams,

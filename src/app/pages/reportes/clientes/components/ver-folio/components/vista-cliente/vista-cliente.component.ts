@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NgbAccordion, NgbActiveModal, NgbDatepickerI18n, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AlertsComponent } from 'src/app/main/alerts/alerts.component';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 import { Historico } from 'src/app/pages/reportes/_models/historico.model';
 import { HistoricoService } from 'src/app/pages/reportes/_services/historico.service';
 
@@ -45,7 +46,8 @@ export class VistaClienteComponent implements OnInit {
     public i18n: NgbDatepickerI18n,
     public fb : FormBuilder,
     public modalService : NgbModal,
-    public activeModal : NgbActiveModal
+    public activeModal : NgbActiveModal,
+    public _parametrosService: ParametrosServiceService
   ) { 
     this.cliente = this.historicoService.getCurrentClienteValue
   }
@@ -172,7 +174,7 @@ export class VistaClienteComponent implements OnInit {
     this.isLoading=true;
     const sb = this.historicoService.updateHistorico(detailsList).subscribe(
       (value)=>{
-        this.historicoService.fetch();
+        this.historicoService.fetch(sessionStorage.getItem("HOTEL"));
         this.isLoading=false
             const modalRef = this.modalService.open(AlertsComponent,{ size: 'sm', backdrop:'static' })
               modalRef.componentInstance.alertHeader='Exito'

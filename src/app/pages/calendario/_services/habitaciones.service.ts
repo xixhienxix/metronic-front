@@ -14,8 +14,9 @@ export class HabitacionesService {
     private _parametrosService: ParametrosServiceService) { }
 
   getCodigosDeCuarto():Observable<string[]>{
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
    return this.http.get<string[]>(environment.apiUrl + '/calendario/habitaciones',{params:queryParams})
    .pipe(

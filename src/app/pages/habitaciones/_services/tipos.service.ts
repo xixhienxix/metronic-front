@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -36,8 +36,11 @@ export class TiposService {
   }
 
   getTiposDeCuarto() :Observable<Tipos_Habitacion[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
+    
     return this.http
-     .get<Tipos_Habitacion[]>(environment.apiUrl + '/codigos/tipos_habitacion')
+     .get<Tipos_Habitacion[]>(environment.apiUrl + '/codigos/tipos_habitacion',{params:queryParams})
      .pipe(
        map(responseData=>{
        return responseData
@@ -47,8 +50,11 @@ export class TiposService {
    }
 
    getAmenidades() :Observable<Tipos_Habitacion[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
+
     return this.http
-     .get<Amenidades[]>(environment.apiUrl + '/codigos/amenidades')
+     .get<Amenidades[]>(environment.apiUrl + '/codigos/amenidades',{params:queryParams})
      .pipe(
        map(responseData=>{
        return responseData
@@ -58,8 +64,11 @@ export class TiposService {
    }
 
    getCamas() :Observable<Tipos_Habitacion[]> {
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
+
     return this.http
-     .get<Camas[]>(environment.apiUrl + '/codigos/camas')
+     .get<Camas[]>(environment.apiUrl + '/codigos/camas',{params:queryParams})
      .pipe(
        map(responseData=>{
        return responseData

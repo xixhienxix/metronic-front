@@ -50,11 +50,11 @@ export class ParametrosComponent implements OnInit {
     public modal : NgbModal,
     public timezonesService : TimezonesService,
     public divisasService:DivisasService,
-    public parametrosService:ParametrosServiceService,
+    public _parametrosService:ParametrosServiceService,
     public authService : AuthService
   ) { 
     this.fechas= new Date();
-    this.parametrosService.getCurrentParametrosValue
+    this._parametrosService.getCurrentParametrosValue
   }
 
   ngOnInit(): void {
@@ -72,14 +72,14 @@ export class ParametrosComponent implements OnInit {
   
   setFormGroup(){
 
-        this.formGroup.controls['timeZone'].setValue(this.parametrosService.getCurrentParametrosValue.codigoZona);
-        this.formGroup.controls['divisa'].setValue(this.parametrosService.getCurrentParametrosValue.divisa);
-        this.formGroup.controls['iva'].setValue(this.parametrosService.getCurrentParametrosValue.iva);
-        this.formGroup.controls['ish'].setValue(this.parametrosService.getCurrentParametrosValue.ish);
-        this.formGroup.controls['checkOut'].setValue(this.parametrosService.getCurrentParametrosValue.checkOut);
-        this.formGroup.controls['checkIn'].setValue(this.parametrosService.getCurrentParametrosValue.checkIn);
-        this.formGroup.controls['noShow'].setValue(this.parametrosService.getCurrentParametrosValue.noShow);
-        this.formGroup.controls['auditoria'].setValue(this.parametrosService.getCurrentParametrosValue.auditoria);
+        this.formGroup.controls['timeZone'].setValue(this._parametrosService.getCurrentParametrosValue.codigoZona);
+        this.formGroup.controls['divisa'].setValue(this._parametrosService.getCurrentParametrosValue.divisa);
+        this.formGroup.controls['iva'].setValue(this._parametrosService.getCurrentParametrosValue.iva);
+        this.formGroup.controls['ish'].setValue(this._parametrosService.getCurrentParametrosValue.ish);
+        this.formGroup.controls['checkOut'].setValue(this._parametrosService.getCurrentParametrosValue.checkOut);
+        this.formGroup.controls['checkIn'].setValue(this._parametrosService.getCurrentParametrosValue.checkIn);
+        this.formGroup.controls['noShow'].setValue(this._parametrosService.getCurrentParametrosValue.noShow);
+        this.formGroup.controls['auditoria'].setValue(this._parametrosService.getCurrentParametrosValue.auditoria);
   }
 
   getTimeZones()
@@ -162,7 +162,7 @@ export class ParametrosComponent implements OnInit {
     let zona = this.timezone.split(' ')[1]
 
     let parametros:Parametros = {
-      id:this.parametrosService.getCurrentParametrosValue.id,
+      id:this._parametrosService.getCurrentParametrosValue.id,
       divisa:this.getFormGroupValues.divisa.value,
       ish:this.getFormGroupValues.ish.value,
       iva:this.getFormGroupValues.iva.value,
@@ -174,7 +174,7 @@ export class ParametrosComponent implements OnInit {
       auditoria:this.getFormGroupValues.auditoria.value,
     }
 
-    const sb = this.parametrosService.postParametros(parametros).subscribe(
+    const sb = this._parametrosService.postParametros(parametros).subscribe(
       (value)=>{
         this.isLoading=false
 

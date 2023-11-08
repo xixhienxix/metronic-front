@@ -60,7 +60,7 @@ export abstract class TableService<T> {
   get grouping() {
     return this._tableState$.value.grouping;
   }
-
+  hotel:string='';
   protected http: HttpClient;
   // API URL has to be overrided
   API_URL = `${environment.apiUrl}/endpoint`;
@@ -102,8 +102,9 @@ export abstract class TableService<T> {
     this._errorMessage.next('');
     const url = `${this.API_URL}/${id}`;
 
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
     return this.http.get<BaseModel>(url,{params:queryParams})
     .pipe(
@@ -179,7 +180,8 @@ export abstract class TableService<T> {
     );
   }
 
-  public fetch() {
+  public fetch(hotel:string) {
+    this.hotel=hotel;
     this._isLoading$.next(true);
     this._errorMessage.next('');
     const request = this.find(this._tableState$.value)
@@ -231,7 +233,7 @@ export abstract class TableService<T> {
   // Base Methods
   public patchState(patch: Partial<ITableState>) {
     this.patchStateWithoutFetch(patch);
-    this.fetch();
+    this.fetch(this.hotel);
   }
 
   public patchStateWithoutFetch(patch: Partial<ITableState>) {

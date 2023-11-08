@@ -15,8 +15,9 @@ export class BloqueoService  {
 
 
   getBloqueosbyTipo(id:string) : Observable<Bloqueo[]> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
   return  (this.http.get<Bloqueo[]>(environment.apiUrl+"/reportes/bloqueos/"+id,{params:queryParams})
       .pipe(
@@ -29,8 +30,9 @@ export class BloqueoService  {
   }
 
   getBloqueosbyId(id:string) : Observable<Bloqueo[]> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
     
     return  (this.http.get<Bloqueo[]>(environment.apiUrl+"/get/bloqueos/"+id,{params:queryParams})
         .pipe(
@@ -53,7 +55,10 @@ export class BloqueoService  {
     fueraDeServicio:boolean,
     comentarios:string
     ) {
-      const hotel = this._parametrosService.getCurrentParametrosValue.hotel
+      const hotel = sessionStorage.getItem("HOTEL");
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",hotel);
+
       let bloqueos: Bloqueo = {
                                 _id:_id,
                                 Habitacion:cuarto,
@@ -63,16 +68,21 @@ export class BloqueoService  {
                                 sinLlegadas:sinLlegadasChecked,
                                 sinSalidas:sinSalidasChecked,
                                 fueraDeServicio:fueraDeServicio,
-                                Comentarios:comentarios.trim()
+                                Comentarios:comentarios.trim(),
+                                hotel:hotel
                                 };
 
-   return this.http.post<Bloqueo>(environment.apiUrl+"/actualiza/bloqueos", {bloqueos,hotel},{observe:'response'})
+   return this.http.post<Bloqueo>(environment.apiUrl+"/actualiza/bloqueos", {bloqueos,params:queryParams},{observe:'response'})
 
       }
 
 
   deleteBloqueo(id) {
-   return this.http.delete(environment.apiUrl + "/reportes/borrar-bloqueo/"+id,{observe:'response'})
+    const hotel = sessionStorage.getItem("HOTEL");
+    let queryParams = new HttpParams();
+    queryParams = queryParams.append("hotel",hotel);
+
+   return this.http.delete(environment.apiUrl + "/reportes/borrar-bloqueo/"+id,{observe:'response',params:queryParams})
 
   }
 
@@ -91,7 +101,6 @@ export class BloqueoService  {
     )
 
   }
-
   postBloqueo(
     _id:string,
     desde:string,
@@ -103,6 +112,10 @@ export class BloqueoService  {
     fueraDeServicio:boolean,
     text:string
     ) {
+      const hotel = sessionStorage.getItem("HOTEL");
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",hotel);
+
 const bloqueos: Bloqueo = {
 _id:_id,
 Habitacion:cuarto,
@@ -112,12 +125,11 @@ Hasta:hasta,
 sinLlegadas:sinLlegadasChecked,
 sinSalidas:sinSalidasChecked,
 fueraDeServicio:fueraDeServicio,
-Comentarios:text
-
+Comentarios:text,
+hotel:hotel
 };
-const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
- return this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", {bloqueos,hotel}, {observe:'response'})
+ return this.http.post<any>(environment.apiUrl+"/reportes/bloqueos/post", {bloqueos,params:queryParams}, {observe:'response'})
 
   }
 
@@ -128,6 +140,10 @@ const hotel = this._parametrosService.getCurrentParametrosValue.hotel
     habitacion:Array<string>,
     numCuarto:Array<number>,
     ) {
+      const hotel = sessionStorage.getItem("HOTEL");
+      let queryParams = new HttpParams();
+      queryParams = queryParams.append("hotel",hotel);
+
       let bloqueos: Bloqueo = {
                                 _id:_id,
                                 Habitacion:habitacion,
@@ -137,11 +153,11 @@ const hotel = this._parametrosService.getCurrentParametrosValue.hotel
                                 sinLlegadas:false,
                                 sinSalidas:false,
                                 fueraDeServicio:false,
-                                Comentarios:''
+                                Comentarios:'',
+                                hotel:sessionStorage.getItem("HOTEL")
                                 };
-                                const hotel = this._parametrosService.getCurrentParametrosValue.hotel
 
-  return this.http.post<Bloqueo>(environment.apiUrl+"/libera/bloqueos", {bloqueos,hotel})
+  return this.http.post<Bloqueo>(environment.apiUrl+"/libera/bloqueos", {bloqueos,params:queryParams})
 
       }
 

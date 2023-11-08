@@ -11,6 +11,7 @@ import { TarifaExpressComponent } from '../tarifa-express/tarifa-express.compone
 import { Tarifas } from '../../_models/tarifas'; 
 import { TarifasService } from '../../_services/tarifas.service';
 import { EditExpressComponent } from '../tarifa-express/edit-express/edit-express.component';
+import { ParametrosServiceService } from 'src/app/pages/parametros/_services/parametros.service.service';
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -54,9 +55,10 @@ export class MainComponent implements OnInit {
   constructor(
     public fb : FormBuilder,
     public tarifasService:TarifasService,
-    public modalService:NgbModal
+    public modalService:NgbModal,
+    private _parametrosService: ParametrosServiceService
   ) { 
-    this.tarifasService.fetch();
+    this.tarifasService.fetch(sessionStorage.getItem("HOTEL"));
     const sb =this.tarifasService.getNotification().subscribe(data=>{
       if(data)
       {
@@ -310,7 +312,7 @@ export class MainComponent implements OnInit {
     const modalRef = this.modalService.open(TarifaExpressComponent, { size: 'md',backdrop: 'static' });
 
       modalRef.result.then( () =>
-      this.tarifasService.fetch(),
+      this.tarifasService.fetch(sessionStorage.getItem("HOTEL")),
       () => { }
       );
   }
@@ -319,7 +321,7 @@ export class MainComponent implements OnInit {
     const modalRef = this.modalService.open(TarifaEspecialComponent, { size: 'md',backdrop: 'static' });
 
       modalRef.result.then( () =>
-      this.tarifasService.fetch(),
+      this.tarifasService.fetch(sessionStorage.getItem("HOTEL")),
       () => { }
       );
   }

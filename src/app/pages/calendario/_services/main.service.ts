@@ -16,9 +16,9 @@ export class MainService {
   private ngUnsubscribe = new Subject<void>();
   private subject =new Subject<any>();
 
-  constructor(public parametrosService : ParametrosServiceService) { 
+  constructor(public _parametrosService : ParametrosServiceService) { 
 
-    this.today = DateTime.now().setZone(this.parametrosService.getCurrentParametrosValue.zona)
+    this.today = DateTime.now().setZone(this._parametrosService.getCurrentParametrosValue.zona)
     this.getDatest(this.today);
   }
 

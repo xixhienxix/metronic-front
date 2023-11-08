@@ -14,8 +14,9 @@ export class HabitacionesService {
 
 
   getHabitacionesbyTipo(id:string) : Observable<Habitaciones[]> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
   return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id,{params:queryParams})
       .pipe(
@@ -26,8 +27,9 @@ export class HabitacionesService {
   }
 
   getHabitacionbyNumero(numero:string) : Observable<Habitaciones[]> {
+    const hotel = sessionStorage.getItem("HOTEL");
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",hotel);
 
     return  (this.http.get<Habitaciones[]>(environment.apiUrl+"/reportes/habitacion/"+numero,{params:queryParams})
         .pipe(
@@ -39,7 +41,7 @@ export class HabitacionesService {
 
   gethabitaciones() :Observable<Habitaciones[]> {
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
 
    return this.http
     .get<Habitaciones[]>(environment.apiUrl + '/reportes/habitaciones',{params:queryParams})
@@ -49,7 +51,7 @@ export class HabitacionesService {
     const params = new HttpParams()
     .set('numero', numero.toString())
     .set('tipo', tipo)
-    .append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    .append("hotel",sessionStorage.getItem("HOTEL"));
 
     return this.http
      .get<Habitaciones[]>(environment.apiUrl + '/info/habitaciones', {params:params})
@@ -63,7 +65,7 @@ export class HabitacionesService {
 
   getCodigohabitaciones() :Observable<Habitaciones[]> {
     let queryParams = new HttpParams();
-    queryParams = queryParams.append("hotel",this._parametrosService.getCurrentParametrosValue.hotel);
+    queryParams = queryParams.append("hotel",sessionStorage.getItem("HOTEL"));
 
     return this.http
      .get<Habitaciones[]>(environment.apiUrl + '/reportes/tipo',{params:queryParams})
